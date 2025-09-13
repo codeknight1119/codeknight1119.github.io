@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Firebase Login/Register</title>
+</head>
+
+<body>
+    <h2>Sign in</h2>
+    <form id="authForm">
+        <h4>Email</h4>
+        <input type="text" placeholder="example@something.com" id="email">
+        <h4>Password</h4>
+        <input type="password" placeholder="******" id="password">
+    </form>
+    <button id="logInBttn">Log In</button>
+    <button id="registerBttn">Sign Up</button>
+
+    <script type="module">
+console.log("login v.3");
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const db = getFirestore(app);
+
+        const messagesRef = collection(db, "messages");
+
+
+        // 🔹 Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+            authDomain: "chatroom4friends-522bd.firebaseapp.com",
+            projectId: "chatroom4friends-522bd",
+            storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+            messagingSenderId: "26805339142",
+            appId: "1:26805339142:web:86ff21490be804a16eaf87",
+            measurementId: "G-EXFX8QFGGF"
+        };
+
+        // 🔹 Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 🔹 Register
+        document.getElementById('registerBttn').addEventListener("click", (e) => {
+            e.preventDefault(); // stop page refresh
+            const username = prompt("Username\nThis can be changed later");
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    console.log("Registered:", userCredential.user);
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        });
+
+        //  Log in
+        document.getElementById('logInBttn').addEventListener("click", (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    console.log("Logged in:", userCredential.user);
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        });
+
+        //  Auth state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User is logged in:", user.email);
+                window.location.href = "chat.html"; // redirect if logged in
+            } else {
+                console.log("No user logged in");
+            }
+        });
+
+        async function setUpUserData(email, user) {
+            await setDoc(doc(db, "users", email), {
+                username : user
+            })
+        }
+    </script>
+</body>
+
+</html>

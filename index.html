@@ -17,7 +17,7 @@
     <button id="registerBttn">Sign Up</button>
 
     <script type="module">
-console.log("login v.3");
+        console.log("login v.6");
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import {
@@ -30,7 +30,7 @@ console.log("login v.3");
 
         import { doc, setDoc, getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        
+
 
 
         // Your Firebase config
@@ -51,22 +51,21 @@ console.log("login v.3");
         const messagesRef = collection(db, "users");
 
         // Register
-        document.getElementById('registerBttn').addEventListener("click", (e) => {
+        document.getElementById('registerBttn').addEventListener("click", async (e) => {
             e.preventDefault(); // stop page refresh
             const username = prompt("Username\nThis can be changed later");
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log("Registered:", user);
 
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("Registered:", userCredential.user);
-                    setUpUserData(email,password);
-
-                })
-                .catch((error) => {
-                    console.error(error.message);
-                });
+                await setUpUserData(user.uid, username);
+            } catch (error) {
+                console.error("Registration error:", error.message);
+            }
         });
 
         //  Log in
@@ -96,7 +95,7 @@ console.log("login v.3");
 
         async function setUpUserData(email, user) {
             await setDoc(doc(db, "users", email), {
-                username : user
+                username: user
             })
         }
     </script>

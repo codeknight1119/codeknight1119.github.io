@@ -30,9 +30,7 @@ console.log("login v.3");
 
         import { doc, setDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        const db = getFirestore(app);
-
-        const messagesRef = collection(db, "messages");
+        
 
 
         // 🔹 Your Firebase config
@@ -49,6 +47,8 @@ console.log("login v.3");
         // 🔹 Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+        const messagesRef = collection(db, "users");
 
         // 🔹 Register
         document.getElementById('registerBttn').addEventListener("click", (e) => {

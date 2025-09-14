@@ -31,7 +31,7 @@
         import { doc, addDoc, getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 
-
+let regestring = false;
 
         // Your Firebase config
         const firebaseConfig = {
@@ -53,6 +53,7 @@
         // Register
         document.getElementById('registerBttn').addEventListener("click", async (e) => {
             e.preventDefault(); // stop page refresh
+            regestring = true;
             const username = prompt("Username\nThis can be changed later");
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -85,7 +86,7 @@
 
         //  Auth state observer
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if (user && !regestring) {
                 console.log("User is logged in:", user.email);
                 window.location.href = "chat.html"; // redirect if logged in
             } else {
@@ -101,6 +102,7 @@
                     //createdAt: new Date()     // optionally
                 });
                 console.log("User document created");
+             window.location.href = "chat.html"; // redirect if logged in
             } catch (error) {
                 console.error("Error setting up user data:", error);
             }

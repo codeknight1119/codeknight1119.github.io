@@ -28,12 +28,12 @@ console.log("login v.3");
             signOut
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-        import { doc, setDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { doc, setDoc, getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         
 
 
-        // 🔹 Your Firebase config
+        // Your Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
             authDomain: "chatroom4friends-522bd.firebaseapp.com",
@@ -44,13 +44,13 @@ console.log("login v.3");
             measurementId: "G-EXFX8QFGGF"
         };
 
-        // 🔹 Initialize Firebase
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const messagesRef = collection(db, "users");
 
-        // 🔹 Register
+        // Register
         document.getElementById('registerBttn').addEventListener("click", (e) => {
             e.preventDefault(); // stop page refresh
             const username = prompt("Username\nThis can be changed later");
@@ -61,6 +61,8 @@ console.log("login v.3");
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     console.log("Registered:", userCredential.user);
+                    setUpUserData(email,password);
+
                 })
                 .catch((error) => {
                     console.error(error.message);

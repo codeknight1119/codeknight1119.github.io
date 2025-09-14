@@ -17,7 +17,7 @@
     <button id="registerBttn">Sign Up</button>
 
     <script type="module">
-        console.log("login v.7");
+        console.log("login v.8");
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import {
@@ -28,7 +28,7 @@
             signOut
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-        import { doc, setDoc, getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { doc, addDoc, getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 
 
@@ -95,7 +95,7 @@
 
         async function setUpUserData(uid, username) {
             try {
-                await setDoc(doc(db, "users", uid), {
+                await addDoc(doc(db, "users", uid), {
                     username: username,
                     // email: email,             // optionally
                     //createdAt: new Date()     // optionally

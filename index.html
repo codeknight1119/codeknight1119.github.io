@@ -93,10 +93,17 @@
             }
         });
 
-        async function setUpUserData(email, user) {
-            await setDoc(doc(db, "users", email), {
-                username: user
-            })
+        async function setUpUserData(uid, username) {
+            try {
+                await setDoc(doc(db, "users", uid), {
+                    username: username,
+                    // email: email,             // optionally
+                    //createdAt: new Date()     // optionally
+                });
+                console.log("User document created");
+            } catch (error) {
+                console.error("Error setting up user data:", error);
+            }
         }
     </script>
 </body>

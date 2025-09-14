@@ -60,7 +60,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { getDoc, getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
@@ -84,13 +84,14 @@
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
 
         // Show UI
         document.getElementById("messageSend").style.display = "block";
         document.getElementById("messages").style.display = "block";
-        myName = user.displayName || "Anonymous";
+        myName = await getUsername(user.uid) || "Anonymous";
+        document.getElementById("name").value = myName;
 
         // Start listening to messages
         const qAll = query(messagesRef, orderBy("timestamp"));
@@ -145,6 +146,16 @@
     console.log("User signed out");
   });
 });
+
+async function getUsername(uid) {
+  const docSnap = await getDoc(doc(db,"users", uid))
+
+  if (docSnap.exists()) {
+  return docSnap.data().username;
+} else {
+  console.log("No such document!");
+}
+}
   </script>
 
 </body>

@@ -90,7 +90,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { getDoc, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
@@ -188,9 +188,9 @@
       }
     }
 
-    document.getElementById("sendBtn").onclick  = async() => {
-      const talkto = promt("New chat with who?")
-      const firstMessage = promt("Send a message to be the first message in the chat.")
+    document.getElementById("newConv").onclick  = async() => {
+      const talkto = prompt("New chat with who?")
+      const firstMessage = prompt("Send a message to be the first message in the chat.")
       const q = query(collection(db, "users"), where("username", "==", talkto));
       const querySnapshot = await getDocs(q);
       let talktoUID;

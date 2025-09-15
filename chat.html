@@ -42,12 +42,26 @@
       margin-bottom: 8px;
       max-width: 60%;
     }
+
+    .chatsSelect {
+      background: lightblue;
+      width: 200px;
+      min-width: 100px;
+      max-width: 400px;
+      resize: horizontal;
+      overflow: auto;
+    }
+    #messageSend {
+      background: lightgreen;
+      flex: 1; /* takes up the rest of the space */
+      min-width: 300px; /* keeps it from collapsing */
+    }
   </style>
 </head>
 
 <body>
   <h2>Chatroom</h2>
-
+<div class="chatsSelect"></div>
   <div id="messages"></div>
 
   <div id="messageSend" style="margin-top: 370px;">
@@ -79,6 +93,7 @@
 
     let myName = "";
     let unsubscribe = null; // keep track of listener
+
 
     // Hide chat by default
     document.getElementById("messageSend").style.display = "none";
@@ -142,20 +157,20 @@
       }
     };
     document.getElementById("logoutBtn").addEventListener("click", () => {
-  signOut(auth).then(() => {
-    console.log("User signed out");
-  });
-});
+      signOut(auth).then(() => {
+        console.log("User signed out");
+      });
+    });
 
-async function getUsername(uid) {
-  const docSnap = await getDoc(doc(db,"users", uid))
+    async function getUsername(uid) {
+      const docSnap = await getDoc(doc(db, "users", uid))
 
-  if (docSnap.exists()) {
-  return docSnap.data().username;
-} else {
-  console.log("No such document!");
-}
-}
+      if (docSnap.exists()) {
+        return docSnap.data().username;
+      } else {
+        console.log("No such document!");
+      }
+    }
   </script>
 
 </body>

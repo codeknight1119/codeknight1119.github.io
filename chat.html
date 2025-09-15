@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.2.1</h3>
+  <h3>V.2.2</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -210,7 +210,7 @@
 
       try {
         // Create the first message in the new conversation
-        await setDoc(collection(db, "conversations", newChatName, "messages","participants"), {
+        await setDoc(collection(db, "conversations", "participants"), {
         particiants: [auth.currentUser.id, talktoUID]
         });
 

@@ -45,26 +45,34 @@
     }
 
     .chatsSelect {
-      background: lightblue;
-      width: 200px;
-      min-width: 100px;
-      max-width: 400px;
-      resize: horizontal;
-      overflow: auto;
+       /* initial width, but can expand/contract */
+      width: 200px; /* for example */
+      min-width: 100px; 
+      max-width: 400px; 
+      background-color: #ddd;
+      transition: width 0.3s ease;
+      /* overflow hidden if you hide content when shrinking */
     }
-    #messageSend {
-      background: lightgreen;
-      flex: 1; /* takes up the rest of the space */
-      min-width: 300px; /* keeps it from collapsing */
+    #messages {
+      flex: 1; /* take remaining space */
+      background-color: #fafafa;
+      padding: 20px;
+    }
+    .container {
+      display: flex;
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.3</h3>
+  <h3>V.4</h3>
+
+  <div class = "container">
 <div class="chatsSelect"></div>
   <div id="messages"></div>
+</div>
 
   <div id="messageSend" style="margin-top: 370px;">
     <input type="text" id="name" placeholder="Your name"><br><br>

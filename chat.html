@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.1.7</h3>
+  <h3>V.1.8</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -211,7 +211,7 @@ document.getElementById("newConv").onclick = async () => {
   const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
 
   try {
-    await addDoc(collection(db, "conversations", newChatName), {
+    await addDoc(collection(db, "conversations", newChatName, "messages"), {
       name: myName,
       text: firstMessage,
       timestamp: Date.now()

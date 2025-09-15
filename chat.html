@@ -45,19 +45,23 @@
     }
 
     .chatsSelect {
-       /* initial width, but can expand/contract */
-      width: 200px; /* for example */
-      min-width: 100px; 
-      max-width: 400px; 
+      /* initial width, but can expand/contract */
+      width: 200px;
+      /* for example */
+      min-width: 100px;
+      max-width: 400px;
       background-color: #ddd;
       transition: width 0.3s ease;
       /* overflow hidden if you hide content when shrinking */
     }
+
     #messages {
-      flex: 1; /* take remaining space */
+      flex: 1;
+      /* take remaining space */
       background-color: #fafafa;
       padding: 20px;
     }
+
     .container {
       display: flex;
       height: 100%;
@@ -67,24 +71,25 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.4</h3>
+  <h3>V.6</h3>
 
-  <div class = "container">
-<div class="chatsSelect"></div>
-  <div id="messages"></div>
-</div>
+  <div class="container">
+    <div class="chatsSelect"></div>
+    <div id="messages"></div>
+  </div>
 
   <div id="messageSend" style="margin-top: 370px;">
     <input type="text" id="name" placeholder="Your name"><br><br>
     <input type="text" id="messageInput" placeholder="Type a message">
     <button id="sendBtn">Send</button>
+    <button id="logoutBtn">Logout</button>
   </div>
 
-  <button id="logoutBtn">Logout</button>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { getDoc, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
@@ -179,6 +184,32 @@
         return docSnap.data().username;
       } else {
         console.log("No such document!");
+      }
+    }
+
+    async function createNewConversation(talkto) {
+      const firstMessage = promt("Send a message to be the first message in the chat.")
+      const q = query(collection(db, "users"), where("username", "==", talkto));
+      const querySnapshot = await getDocs(q);
+      let talktoUID;
+
+      if (querySnapshot.length === 0) {
+        alert("username does not exist");
+      } else if (querySnapshot.length > 1) {
+        alert("More than 1 user")
+      } else if (querySnapshot.length === 1) {
+        talktoUID = doc.id;
+        const newChatName = `${auth.uid}_${talktoUID}`;
+        await setDoc()
+      }
+
+      try {
+        await setDoc(doc(db, "conversations", newChatName, "metaData"), {
+    person1: auth.uid,
+    person2: talktoUID
+        });
+      } catch (err) {
+        console.error(err)
       }
     }
   </script>

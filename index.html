@@ -98,6 +98,7 @@ let regestring = false;
             try {
                 await setDoc(doc(db, "users", uid), {
                     username: username,
+                    conversations : []
                     // email: email,             // optionally
                     //createdAt: new Date()     // optionally
                 });

@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.8</h3>
+  <h3>V.9</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -189,31 +189,36 @@
     }
 
     document.getElementById("newConv").onclick  = async() => {
-      const talkto = prompt("New chat with who?")
-      const firstMessage = prompt("Send a message to be the first message in the chat.")
-      const q = query(collection(db, "users"), where("username", "==", talkto));
-      const querySnapshot = await getDocs(q);
-      let talktoUID;
+        const talkto = prompt("New chat with who?");
+  const firstMessage = prompt("Send a message to be the first message in the chat.");
+  
+  if (!talkto || !firstMessage) return;
 
-      if (querySnapshot.length === 0) {
-        alert("username does not exist");
-      } else if (querySnapshot.length > 1) {
-        alert("More than 1 user")
-      } else if (querySnapshot.length === 1) {
-        talktoUID = doc.id;
-        const newChatName = `${auth.uid}_${talktoUID}`;
-        await setDoc()
-      }
+  const q = query(collection(db, "users"), where("username", "==", talkto));
+  const querySnapshot = await getDocs(q);
 
-      try {
-        await setDoc(doc(db, "conversations", newChatName, "metaData"), {
-    person1: auth.uid,
-    person2: talktoUID
-        });
-      } catch (err) {
-        console.error(err)
-      }
+  if (querySnapshot.empty) {
+    alert("Username does not exist");
+  } else if (querySnapshot.size > 1) {
+    alert("More than 1 user found");
+  } else {
+    const userDoc = querySnapshot.docs[0];
+    const talktoUID = userDoc.id;
+    const newChatName = `${auth.uid}_${talktoUID}`;
+
+    try {
+      await setDoc(doc(db, "conversations", newChatName), {
+        person1: auth.uid,
+        person2: talktoUID,
+        firstMessage: firstMessage,
+        createdAt: Date.now()
+      });
+      console.log("New conversation created");
+    } catch (err) {
+      console.error("Error creating conversation:", err);
     }
+  }
+};
   </script>
 
 </body>

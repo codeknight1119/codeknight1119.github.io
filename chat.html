@@ -195,7 +195,7 @@
   if (!talkto || !firstMessage) return;
 
   const q = query(collection(db, "users"), where("username", "==", talkto));
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await getDoc(q);
 
   if (querySnapshot.empty) {
     alert("Username does not exist");
@@ -204,7 +204,7 @@
   } else {
     const userDoc = querySnapshot.docs[0];
     const talktoUID = userDoc.id;
-    const newChatName = `${auth.uid}_${talktoUID}`;
+    const newChatName = [auth.uid, talktoUID].sort().join("_");;
 
     try {
       await setDoc(doc(db, "conversations", newChatName), {

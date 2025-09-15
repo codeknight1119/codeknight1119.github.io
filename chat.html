@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.1.0</h3>
+  <h3>V.1.1</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -90,7 +90,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
@@ -188,37 +188,49 @@
       }
     }
 
-    document.getElementById("newConv").onclick  = async() => {
-        const talkto = prompt("New chat with who?");
-  const firstMessage = prompt("Send a message to be the first message in the chat.");
-  
-  if (!talkto || !firstMessage) return;
+  document.getElementById("newConv").onclick = async () => {
+    const talkto = prompt("New chat with who?");
+    const firstMessage = prompt("Send a message to be the first message in the chat.");
+    if (!talkto || !firstMessage) return;
 
-  const q = query(collection(db, "users"), where("username", "==", talkto));
-  const querySnapshot = await getDoc(q);
+    const q = query(collection(db, "users"), where("username", "==", talkto));
+    const querySnapshot = await getDocs(q); // <-- fix here
 
-  if (querySnapshot.empty) {
-    alert("Username does not exist");
-  } else if (querySnapshot.size > 1) {
-    alert("More than 1 user found");
-  } else {
+    if (querySnapshot.empty) {
+        alert("Username does not exist");
+        return;
+    } else if (querySnapshot.size > 1) {
+        alert("More than 1 user found");
+        return;
+    }
+
     const userDoc = querySnapshot.docs[0];
     const talktoUID = userDoc.id;
-    const newChatName = [auth.uid, talktoUID].sort().join("_");;
+    const newChatName = [auth.uid, talktoUID].sort().join("_");
 
     try {
-      await setDoc(doc(db, "conversations", newChatName), {
-        person1: auth.uid,
-        person2: talktoUID,
-        firstMessage: firstMessage,
-        createdAt: Date.now()
-      });
-      console.log("New conversation created");
+        // Create conversation
+        await setDoc(doc(db, "conversations", newChatName), {
+            person1: auth.uid,
+            person2: talktoUID,
+            firstMessage: firstMessage,
+            createdAt: Date.now()
+        });
+
+        // Add first message to messages collection
+        await addDoc(collection(db, "messages"), {
+            name: myName,
+            text: firstMessage,
+            conversationId: newChatName,
+            timestamp: Date.now()
+        });
+
+        console.log("New conversation created with first message");
     } catch (err) {
-      console.error("Error creating conversation:", err);
+        console.error("Error creating conversation:", err);
     }
-  }
 };
+
   </script>
 
 </body>

@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.1.9</h3>
+  <h3>V.2.0</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -90,7 +90,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
@@ -105,97 +105,89 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const messagesRef = collection(db, "messages");
 
     let myName = "";
-    let currentChat = null;
-    let chatUnsubscribe = null;
+    let unsubscribe = null; // keep track of listener
 
-    const chatsSelectDiv = document.querySelector(".chatsSelect");
-    const messagesDiv = document.getElementById("messages");
 
+    // Hide chat by default
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
 
-    // --- Helper to get username from UID ---
-    async function getUsername(uid) {
-      const docSnap = await getDoc(doc(db, "users", uid));
-      if (docSnap.exists()) return docSnap.data().username;
-      return "Unknown";
-    }
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
 
-    // --- Load all conversations for current user ---
-    async function loadConversations() {
-      chatsSelectDiv.innerHTML = ""; // clear old buttons
-      const convSnap = await getDocs(collection(db, "conversations"));
+        // Show UI
+        document.getElementById("messageSend").style.display = "block";
+        document.getElementById("messages").style.display = "block";
+        myName = await getUsername(user.uid) || "Anonymous";
+        document.getElementById("name").value = myName;
 
-      convSnap.forEach(async (docSnap) => {
-        const convId = docSnap.id;
-        if (convId.includes(auth.currentUser.uid)) {
-          const otherUID = convId.split("_").find(id => id !== auth.currentUser.uid);
-          const otherName = await getUsername(otherUID);
-          createChatButton(convId, otherName);
-        }
-      });
-    }
-
-    // --- Create a button for a conversation ---
-    function createChatButton(convId, otherName) {
-      const btn = document.createElement("button");
-      btn.textContent = `Chat with ${otherName}`;
-      btn.style.display = "block";
-      btn.style.marginBottom = "5px";
-      btn.onclick = () => openConversation(convId);
-      chatsSelectDiv.appendChild(btn);
-    }
-
-    // --- Open a conversation and listen to messages ---
-    function openConversation(convId) {
-      if (chatUnsubscribe) chatUnsubscribe();
-
-      currentChat = convId;
-      messagesDiv.innerHTML = "";
-
-      const q = query(collection(db, "conversations", convId), orderBy("timestamp"));
-      chatUnsubscribe = onSnapshot(q, (snapshot) => {
-        messagesDiv.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const msg = doc.data();
-          const div = document.createElement("div");
-          if (msg.name === myName) {
-            div.textContent = `You: ${msg.text}`;
-            div.className = "messageMine";
-          } else {
-            div.textContent = `${msg.name}: ${msg.text}`;
-            div.className = "messageOther";
-          }
-          messagesDiv.appendChild(div);
+        // Start listening to messages
+        const qAll = query(messagesRef, orderBy("timestamp"));
+        unsubscribe = onSnapshot(qAll, (snapshot) => {
+          const messagesDiv = document.getElementById("messages");
+          messagesDiv.innerHTML = "";
+          snapshot.forEach((doc) => {
+            const msg = doc.data();
+            const div = document.createElement("div");
+            if (msg.name === myName) {
+              div.textContent = `You: ${msg.text}`;
+              div.className = "messageMine";
+            } else {
+              div.textContent = `${msg.name}: ${msg.text}`;
+              div.className = "messageOther";
+            }
+            messagesDiv.appendChild(div);
+          });
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
-    }
 
-    // --- Send a message ---
-    document.getElementById("sendBtn").onclick = async () => {
-      const text = document.getElementById("messageInput").value;
-      if (!text.trim()) return;
-      if (!currentChat) {
-        alert("Select a conversation first!");
-        return;
+      } else {
+        window.location.href = "index.html";
+        // Hide UI
+        document.getElementById("messageSend").style.display = "none";
+        document.getElementById("messages").style.display = "none";
+
+        // Stop listening if logged out
+        if (unsubscribe) {
+          unsubscribe();
+          unsubscribe = null;
+        }
       }
-      await addDoc(collection(db, "conversations", currentChat), {
-        name: myName,
-        text,
-        timestamp: Date.now()
-      });
-      document.getElementById("messageInput").value = "";
-    };
-
-    // --- Logout ---
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => alert("User signed out"));
     });
 
-    // --- New conversation ---
+    document.getElementById("sendBtn").onclick = async () => {
+      const name = document.getElementById("name").value || "Anonymous";
+      const text = document.getElementById("messageInput").value;
+      myName = name;
+
+      if (text.trim()) {
+        await addDoc(messagesRef, {
+          name,
+          text,
+          timestamp: Date.now()
+        });
+        document.getElementById("messageInput").value = "";
+      }
+    };
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        alert("User signed out");
+      });
+    });
+
+    async function getUsername(uid) {
+      const docSnap = await getDoc(doc(db, "users", uid))
+
+      if (docSnap.exists()) {
+        return docSnap.data().username;
+      } else {
+        alert("No such document!");
+      }
+    }
+
     document.getElementById("newConv").onclick = async () => {
       const talkto = prompt("New chat with who?");
       const firstMessage = prompt("Send a message to be the first message in the chat.");
@@ -204,76 +196,30 @@
       const q = query(collection(db, "users"), where("username", "==", talkto));
       const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) return alert("Username does not exist");
-      if (querySnapshot.size > 1) return alert("More than 1 user found");
+      if (querySnapshot.empty) {
+        alert("Username does not exist");
+        return;
+      } else if (querySnapshot.size > 1) {
+        alert("More than 1 user found");
+        return;
+      }
 
-      const talktoUID = querySnapshot.docs[0].id;
+      const userDoc = querySnapshot.docs[0];
+      const talktoUID = userDoc.id;
       const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
 
       try {
-        // 1. Create the conversation document (metadata)
-        const chatDocRef = doc(db, "conversations", newChatName);
-        await setDoc(chatDocRef, { createdAt: Date.now() });
-
-        // 2. Add the first message in the messages subcollection
+        // Create the first message in the new conversation
         await addDoc(collection(db, "conversations", newChatName, "messages"), {
-          name: myName,
           text: firstMessage,
           timestamp: Date.now()
         });
 
-        await loadConversations(); // refresh buttons
-        openConversation(newChatName); // automatically open new chat
+        alert("New conversation created with first message");
       } catch (err) {
         alert("Error creating conversation: " + err);
       }
     };
-
-    function openConversation(convId) {
-      if (chatUnsubscribe) chatUnsubscribe();
-
-      currentChat = convId;
-      messagesDiv.innerHTML = "";
-
-      // Query messages subcollection
-      const q = query(collection(db, "conversations", convId, "messages"), orderBy("timestamp"));
-
-      chatUnsubscribe = onSnapshot(q, (snapshot) => {
-        messagesDiv.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const msg = doc.data();
-          const div = document.createElement("div");
-          if (msg.name === myName) {
-            div.textContent = `You: ${msg.text}`;
-            div.className = "messageMine";
-          } else {
-            div.textContent = `${msg.name}: ${msg.text}`;
-            div.className = "messageOther";
-          }
-          messagesDiv.appendChild(div);
-        });
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
-    }
-
-    document.getElementById("sendBtn").onclick = async () => {
-      const text = document.getElementById("messageInput").value;
-      if (!text.trim()) return;
-      if (!currentChat) {
-        alert("Select a conversation first!");
-        return;
-      }
-
-      // Add message to messages subcollection
-      await addDoc(collection(db, "conversations", currentChat, "messages"), {
-        name: myName,
-        text,
-        timestamp: Date.now()
-      });
-
-      document.getElementById("messageInput").value = "";
-    };
-
   </script>
 
 </body>

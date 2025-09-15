@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.1.5</h3>
+  <h3>V.1.6</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -188,49 +188,38 @@
       }
     }
 
-  document.getElementById("newConv").onclick = async () => {
-    const talkto = prompt("New chat with who?");
-    const firstMessage = prompt("Send a message to be the first message in the chat.");
-    if (!talkto || !firstMessage) return;
+    document.getElementById("newConv").onclick = async () => {
+      const talkto = prompt("New chat with who?");
+      const firstMessage = prompt("Send a message to be the first message in the chat.");
+      if (!talkto || !firstMessage) return;
 
-    const q = query(collection(db, "users"), where("username", "==", talkto));
-    const querySnapshot = await getDocs(q); // <-- fix here
+      const q = query(collection(db, "users"), where("username", "==", talkto));
+      const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
+      if (querySnapshot.empty) {
         alert("Username does not exist");
         return;
-    } else if (querySnapshot.size > 1) {
+      } else if (querySnapshot.size > 1) {
         alert("More than 1 user found");
         return;
-    }
+      }
 
-    const userDoc = querySnapshot.docs[0];
-    const talktoUID = userDoc.id;
-    const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
+      const userDoc = querySnapshot.docs[0];
+      const talktoUID = userDoc.id;
+      const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
 
-    try {
-        // Create conversation
-        await setDoc(doc(db, "conversations", newChatName), {
-            person1: auth.currentUser.uid,
-            person2: talktoUID,
-            firstMessage: firstMessage,
-            createdAt: Date.now()
-        });
-
-        // Add first message to messages collection
-        await addDoc(collection(db, "messages"), {
-            name: myName,
-            text: firstMessage,
-            conversationId: newChatName,
-            timestamp: Date.now()
+      try {
+        // Create the first message in the new conversation
+        await addDoc(collection(db, "conversations", newChatName, "messages"), {
+          text: firstMessage,
+          timestamp: Date.now()
         });
 
         alert("New conversation created with first message");
-    } catch (err) {
-        alert("Error creating conversation:"+ err);
-    }
-};
-
+      } catch (err) {
+        alert("Error creating conversation: " + err);
+      }
+    };
   </script>
 
 </body>

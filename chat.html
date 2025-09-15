@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.1.1</h3>
+  <h3>V.1.2</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -206,7 +206,7 @@
 
     const userDoc = querySnapshot.docs[0];
     const talktoUID = userDoc.id;
-    const newChatName = [auth.uid, talktoUID].sort().join("_");
+    const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
 
     try {
         // Create conversation

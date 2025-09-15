@@ -210,7 +210,7 @@
 
       try {
         // Create the first message in the new conversation
-        await setDoc(collection(db, "conversations", "participants"), {
+        await setDoc(doc(db, "conversations", "participants"), {
         particiants: [auth.currentUser.id, talktoUID]
         });
 

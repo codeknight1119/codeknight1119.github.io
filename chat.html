@@ -71,7 +71,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.6</h3>
+  <h3>V.7</h3>
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -83,6 +83,7 @@
     <input type="text" id="messageInput" placeholder="Type a message">
     <button id="sendBtn">Send</button>
     <button id="logoutBtn">Logout</button>
+    <button id="newConv">Create new conversation</button>
   </div>
 
 
@@ -187,7 +188,8 @@
       }
     }
 
-    async function createNewConversation(talkto) {
+    document.getElementById("sendBtn").onclick  = async() => {
+      const talkto = promt("New chat with who?")
       const firstMessage = promt("Send a message to be the first message in the chat.")
       const q = query(collection(db, "users"), where("username", "==", talkto));
       const querySnapshot = await getDocs(q);

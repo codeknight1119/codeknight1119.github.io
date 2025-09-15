@@ -174,7 +174,7 @@
     };
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
-        console.log("User signed out");
+        alert("User signed out");
       });
     });
 
@@ -184,7 +184,7 @@
       if (docSnap.exists()) {
         return docSnap.data().username;
       } else {
-        console.log("No such document!");
+        alert("No such document!");
       }
     }
 
@@ -225,9 +225,9 @@
             timestamp: Date.now()
         });
 
-        console.log("New conversation created with first message");
+        alert("New conversation created with first message");
     } catch (err) {
-        console.error("Error creating conversation:", err);
+        alert("Error creating conversation:", err);
     }
 };
 

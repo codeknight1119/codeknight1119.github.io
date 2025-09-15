@@ -211,7 +211,7 @@
     try {
         // Create conversation
         await setDoc(doc(db, "conversations", newChatName), {
-            person1: auth.uid,
+            person1: auth.currentUser.uid,
             person2: talktoUID,
             firstMessage: firstMessage,
             createdAt: Date.now()

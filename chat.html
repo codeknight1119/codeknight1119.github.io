@@ -66,12 +66,21 @@
       display: flex;
       height: 100%;
     }
+
+    #timedText {
+      display: none;
+      /* hidden by default */
+      font-size: 20px;
+      color: darkblue;
+    }
   </style>
 </head>
 
 <body>
   <h2>Chatroom</h2>
   <h3>V.2.4</h3>
+ <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
+
 
   <div class="container">
     <div class="chatsSelect"></div>
@@ -100,7 +109,7 @@
       messagingSenderId: "26805339142",
       appId: "1:26805339142:web:86ff21490be804a16eaf87",
       measurementId: "G-EXFX8QFGGF"
-    };
+    };s
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -210,8 +219,8 @@
 
       try {
         // Create the first message in the new conversation
-        await setDoc(doc(db, "conversations", newChatName,"metadta","info"), {
-        particiants: [auth.currentUser.uid, talktoUID]
+        await setDoc(doc(db, "conversations", newChatName, "metadta", "info"), {
+          particiants: [auth.currentUser.uid, talktoUID]
         });
 
         await addDoc(collection(db, "conversations", newChatName, "messages"), {
@@ -224,6 +233,30 @@
         alert("Error creating conversation: " + err);
       }
     };
+    function checkTime() {
+      const now = new Date();
+
+      // Get current time in minutes since midnight
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      // Define start and end in minutes (24-hour format)
+      const start = 10 * 60 + 30; // 10:30 AM
+      const end = 12 * 60 + 30;   // 12:30 PM
+
+      const textElement = document.getElementById("timedText");
+
+      if (currentMinutes >= start && currentMinutes <= end) {
+        textElement.style.display = "block";
+      } else {
+        textElement.style.display = "none";
+      }
+    }
+
+    // Run check immediately
+    checkTime();
+
+    // Optionally recheck every minute
+    setInterval(checkTime, 60000);
   </script>
 
 </body>

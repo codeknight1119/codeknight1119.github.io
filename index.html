@@ -4,111 +4,65 @@
     <title>Chat4Friends - Sign In</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="forestStyle.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to bottom, #A5D6A7, #F5F5F5);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #455A64;
-        }
+       body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
 
-        .login-container {
-            background: #F5F5F5;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+.login-container {
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
 
-        h2 {
-            color: #4CAF50;
-            margin-bottom: 20px;
-            font-size: 28px;
-            font-weight: 700;
-        }
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
 
-        .tagline {
-            color: #B0BEC5;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
+.input-group i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
 
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
+input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
 
-        .input-group i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #B0BEC5;
-        }
+button {
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px 5px;
+}
 
-        input {
-            width: 100%;
-            padding: 10px 10px 10px 40px;
-            border: 1px solid #B0BEC5;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #455A64;
-            box-sizing: border-box;
-        }
+@media (max-width: 600px) {
+    .login-container {
+        padding: 20px;
+        margin: 10px;
+    }
 
-        input:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-        }
-
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin: 10px 5px;
-        }
-
-        button:hover {
-            background: #A5D6A7;
-        }
-
-        #registerBttn {
-            background: #0288D1;
-        }
-
-        #registerBttn:hover {
-            background: #4FC3F7;
-        }
-
-        footer {
-            margin-top: 20px;
-            color: #B0BEC5;
-            font-size: 12px;
-        }
-
-        @media (max-width: 600px) {
-            .login-container {
-                padding: 20px;
-                margin: 10px;
-            }
-
-            h2 {
-                font-size: 24px;
-            }
-        }
+    h2 {
+        font-size: 24px;
+    }
+}
     </style>
 </head>
 <body>

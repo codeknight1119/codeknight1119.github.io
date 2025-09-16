@@ -4,194 +4,113 @@
   <title>Chat4Friends - Chatroom</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="forestStyle.css">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to bottom, #A5D6A7, #F5F5F5);
-      margin: 0;
-      padding: 0;
-      color: #455A64;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    header {
-      background: #B0BEC5;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    header h2 {
-      color: #4CAF50;
-      margin: 0;
-      font-size: 24px;
-    }
+.container {
+  display: flex;
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 150px);
+}
 
-    header .version {
-      color: #455A64;
-      font-size: 14px;
-    }
+.chatsSelect {
+  width: 250px;
+  min-width: 150px;
+  max-width: 300px;
+  padding: 15px;
+  overflow-y: auto;
+  margin-right: 20px;
+  transition: width 0.3s ease;
+}
 
-    .container {
-      display: flex;
-      flex: 1;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      height: calc(100vh - 150px);
-    }
+#messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
 
-    .chatsSelect {
-      width: 250px;
-      min-width: 150px;
-      max-width: 300px;
-      background: #F5F5F5;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      overflow-y: auto;
-      margin-right: 20px;
-      transition: width 0.3s ease;
-    }
+.messageMine,
+.messageOther {
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin: 5px 10px;
+  max-width: 60%;
+}
 
-    #messages {
-      flex: 1;
-      background: #F5F5F5;
-      border-radius: 8px;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+#messageSend {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+}
 
-    .messageMine {
-      align-self: flex-end;
-      background: #4CAF50;
-      color: white;
-      border-radius: 10px;
-      padding: 10px 15px;
-      margin: 5px 10px;
-      max-width: 60%;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      animation: slideIn 0.3s ease;
-    }
+#messageSend input {
+  flex: 1;
+  padding: 10px 15px;
+  font-size: 16px;
+}
 
-    .messageOther {
-      align-self: flex-start;
-      background: #FFFFFF;
-      color: #455A64;
-      border: 1px solid #B0BEC5;
-      border-radius: 10px;
-      padding: 10px 15px;
-      margin: 5px 10px;
-      max-width: 60%;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      animation: slideIn 0.3s ease;
-    }
+#messageSend button {
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    #messageSend {
-      background: #B0BEC5;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: sticky;
-      bottom: 0;
-      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-    }
+#timedText {
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 20px;
+  font-size: 16px;
+  text-align: center;
+}
 
-    #messageSend input {
-      flex: 1;
-      padding: 10px 15px;
-      border: 1px solid #B0BEC5;
-      border-radius: 5px;
-      font-size: 16px;
-      color: #455A64;
-    }
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
 
-    #messageSend input:focus {
-      outline: none;
-      border-color: #4CAF50;
-      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-    }
+  .chatsSelect {
+    width: 100%;
+    max-width: none;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
 
-    #messageSend button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+  #messages {
+    width: 100%;
+  }
 
-    #messageSend button:hover {
-      background: #A5D6A7;
-    }
+  #messageSend {
+    flex-wrap: wrap;
+  }
 
-    #logoutBtn {
-      background: #0288D1;
-    }
-
-    #logoutBtn:hover {
-      background: #4FC3F7;
-    }
-
-    #newConv {
-      background: #FFD700;
-      color: #455A64;
-    }
-
-    #newConv:hover {
-      background: #FFECB3;
-    }
-
-    #timedText {
-      background: #FFFFFF;
-      color: #455A64;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 20px;
-      font-size: 16px;
-      text-align: center;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    @keyframes slideIn {
-      from { transform: translateY(10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-
-      .chatsSelect {
-        width: 100%;
-        max-width: none;
-        margin-right: 0;
-        margin-bottom: 20px;
-      }
-
-      #messages {
-        width: 100%;
-      }
-
-      #messageSend {
-        flex-wrap: wrap;
-      }
-
-      #messageSend input, #messageSend button {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
+  #messageSend input, 
+  #messageSend button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
   </style>
 </head>
 <body>

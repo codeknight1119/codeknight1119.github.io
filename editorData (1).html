@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>JSON Editor - Glacius</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+      color: #eef6ff;
+      overflow: hidden;
+      background: linear-gradient(to top, #0f1a33 0%, #3a4a70 50%, #9cc1e0 100%);
+    }
+
+    /* Starry icy particles */
+    canvas#glacius-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+      text-shadow: 0 0 10px #88f, 0 0 20px #88f33;
+      z-index: 5;
+      position: relative;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #335577;
+      color: #eef6ff;
+      cursor: pointer;
+      box-shadow: 0 0 10px #88f;
+      transition: 0.3s;
+      position: relative;
+      z-index: 5;
+    }
+
+    button:hover {
+      background: #4477aa;
+      box-shadow: 0 0 20px #88f, 0 0 30px #88f;
+    }
+
+    #editor-container {
+      position: relative;
+      width: 90%;
+      max-width: 900px;
+      height: 500px;
+      margin: 20px auto;
+      border: 1px solid #88f;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 20px #88f33;
+      z-index: 1;
+      background: rgba(10, 20, 40, 0.85);
+    }
+
+    #json-editor {
+      width: 100%;
+      height: 100%;
+    }
+
+    #editor-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.2);
+      color: #88f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: not-allowed;
+      z-index: 10;
+      display: none;
+      text-shadow: 0 0 5px #88f;
+    }
+  </style>
+  <!-- Monaco Editor loader from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js"></script>
+</head>
+
+<body>
+  <canvas id="glacius-bg"></canvas>
+
+  <h2>JSON Editor</h2>
+  <h3>N-V.0.1</h3>
+  <div style="text-align:center;">
+    <button onclick="getData()">Load Data</button>
+    <button onclick="sendData()">Send Data</button>
+  </div>
+
+  <div id="editor-container">
+    <div id="json-editor"></div>
+    <div id="editor-overlay">🔒 Locked</div>
+  </div>
+
+  <script>
+    // Monaco loader
+    const url = "https://script.google.com/macros/s/AKfycbykUluV_NXsi2N7A6R0PEtB6SQ4jUfjY2tUMEQPfVgfZQOrlFV2spsuiKKau_uMlUQf/exec";
+    let editor;
+    require.config({paths: {'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs'}});
+    require(['vs/editor/editor.main'], function () {
+      editor = monaco.editor.create(document.getElementById('json-editor'), {
+        value: '{}',
+        language: 'json',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        minimap: {enabled: false}
+      });
+    });
+
+    async function getData() {
+      lockEditor();
+      fetch(`${url}?sheet=items`)
+        .then(r => r.json())
+        .then(data => {
+          editor.setValue(JSON.stringify(data, null, 2));
+        })
+        .then(() => unlockEditor())
+        .catch(err => console.error('Fetch error:', err));
+    }
+
+    async function sendData() {
+      lockEditor();
+      fetch(`${url}?sheet=items`, {
+        redirect: "follow",
+        method: 'POST',
+        headers: {'Content-Type': "text/plain;charset=utf-8"},
+        body: editor.getValue()
+      })
+        .then(response => response.text())
+        .then(result => console.log((result)))
+        .then(() => getData())
+        .catch(err => console.error("Send error:" + err));
+    }
+
+    function lockEditor() {
+      editor.updateOptions({readOnly: true});
+      document.getElementById('editor-overlay').style.display = "flex";
+    }
+
+    function unlockEditor() {
+      editor.updateOptions({readOnly: false});
+      document.getElementById('editor-overlay').style.display = "none";
+    }
+
+    // Glacius particle background (snow + ice shards)
+    const canvas = document.getElementById("glacius-bg");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    const particles = Array.from({length: 150}).map(() => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2 + 1,
+      speed: Math.random() * 0.2 + 0.05,
+      alpha: Math.random() * 0.5 + 0.3,
+      flicker: Math.random() * 0.05
+    }));
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        // Twinkle effect
+        p.alpha += (Math.random() - 0.5) * p.flicker;
+        if (p.alpha > 1) p.alpha = 1;
+        if (p.alpha < 0.2) p.alpha = 0.2;
+
+        ctx.fillStyle = `rgba(200, 230, 255, ${p.alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+  </script>
+</body>
+
+</html>

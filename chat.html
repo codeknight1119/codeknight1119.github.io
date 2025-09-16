@@ -182,54 +182,63 @@
         myName = await getUsername(user.uid) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const qNew = query(
-          messagesRef,
-          where("timestamp", ">", latestTimestamp),
-          orderBy("timestamp")
-        );
-        unsubscribe = onSnapshot(qNew, (snapshot) => {
-          const messagesDiv = document.getElementById("messages");
-          messagesDiv.innerHTML = "";
-          snapshot.forEach((doc) => {
-            const msg = doc.data();
-            const div = document.createElement("div");
+        const qLatest = query(messagesRef, orderBy("timestamp", "desc"), limit(1));
+        const snapshot = await getDocs(qLatest);
+        if (!snapshot.empty) {
+          latestTimestamp = snapshot.docs[0].data().timestamp;
+        } else {
+          latestTimestamp = Date.now(); // If no messages yet
 
-            const date = new Date(msg.timestamp);
-            const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            if (msg.name === myName) {
-              div.textContent = `${timeString} | You: ${msg.text}`;
-              div.className = "messageMine";
-            } else {
-              div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-              div.className = "messageOther";
-            }
 
-            if (document.hidden) {
-              unreadCount++;
-              document.title = `(${unreadCount}) ${originalTitle}`;
-            }
+          const qNew = query(
+            messagesRef,
+            where("timestamp", ">", latestTimestamp),
+            orderBy("timestamp")
+          );
+          unsubscribe = onSnapshot(qNew, (snapshot) => {
+            const messagesDiv = document.getElementById("messages");
+            messagesDiv.innerHTML = "";
+            snapshot.forEach((doc) => {
+              const msg = doc.data();
+              const div = document.createElement("div");
 
-            messagesDiv.appendChild(div);
+              const date = new Date(msg.timestamp);
+              const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            if (msg.timestamp > latestTimestamp) {
-              latestTimestamp = msg.timestamp;
-            }
+              if (msg.name === myName) {
+                div.textContent = `${timeString} | You: ${msg.text}`;
+                div.className = "messageMine";
+              } else {
+                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
+                div.className = "messageOther";
+              }
 
+              if (document.hidden) {
+                unreadCount++;
+                document.title = `(${unreadCount}) ${originalTitle}`;
+              }
+
+              messagesDiv.appendChild(div);
+
+              if (msg.timestamp > latestTimestamp) {
+                latestTimestamp = msg.timestamp;
+              }
+
+            });
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
           });
-          messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        });
-      } else {
-        window.location.href = "index.html";
-        document.getElementById("messageSend").style.display = "none";
-        document.getElementById("messages").style.display = "none";
+        } else {
+          window.location.href = "index.html";
+          document.getElementById("messageSend").style.display = "none";
+          document.getElementById("messages").style.display = "none";
 
-        if (unsubscribe) {
-          unsubscribe();
-          unsubscribe = null;
+          if (unsubscribe) {
+            unsubscribe();
+            unsubscribe = null;
+          }
         }
-      }
-    });
+      });
 
     document.getElementById("sendBtn").onclick = async () => {
       const name = document.getElementById("name").value || "Anonymous";

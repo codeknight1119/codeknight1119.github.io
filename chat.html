@@ -161,6 +161,7 @@
 
     let unreadCount = 0;
     const originalTitle = document.title;
+    let latestTimestamp = 0;
 
 
     document.getElementById("messageSend").style.display = "none";
@@ -181,8 +182,12 @@
         myName = await getUsername(user.uid) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const qAll = query(messagesRef, orderBy("timestamp"));
-        unsubscribe = onSnapshot(qAll, (snapshot) => {
+        const qNew = query(
+          messagesRef,
+          where("timestamp", ">", latestTimestamp),
+          orderBy("timestamp")
+        );
+        unsubscribe = onSnapshot(qNew, (snapshot) => {
           const messagesDiv = document.getElementById("messages");
           messagesDiv.innerHTML = "";
           snapshot.forEach((doc) => {
@@ -206,6 +211,11 @@
             }
 
             messagesDiv.appendChild(div);
+
+            if (msg.timestamp > latestTimestamp) {
+              latestTimestamp = msg.timestamp;
+            }
+
           });
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });

@@ -78,7 +78,7 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.2.6</h3>
+  <h3>V.2.7</h3>
  <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
 
 
@@ -141,11 +141,17 @@
           snapshot.forEach((doc) => {
             const msg = doc.data();
             const div = document.createElement("div");
+
+const timeStr = msg.timestamp
+  ? new Date(msg.timestamp).toLocaleString()
+  : "Pending...";
+
+
             if (msg.name === myName) {
-              div.textContent = `${new Date(msg.timestamp)} | You: ${msg.text}`;
+              div.textContent = `${timeStr} | You: ${msg.text}`;
               div.className = "messageMine";
             } else {
-              div.textContent = `${new Date(msg.timestamp)} | ${msg.name}: ${msg.text}`;
+              div.textContent = `${timeStr} | ${msg.name}: ${msg.text}`;
               div.className = "messageOther";
             }
             messagesDiv.appendChild(div);

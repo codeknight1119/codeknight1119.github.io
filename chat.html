@@ -78,8 +78,8 @@
 
 <body>
   <h2>Chatroom</h2>
-  <h3>V.2.9</h3>
- <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
+  <h3>V.3.0</h3>
+  <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
 
 
   <div class="container">
@@ -141,11 +141,15 @@
           snapshot.forEach((doc) => {
             const msg = doc.data();
             const div = document.createElement("div");
+
+            const date = new Date(msg.timestamp);
+            const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
             if (msg.name === myName) {
-              div.textContent = `You: ${msg.text}`;
+              div.textContent = `${timeString} | You: ${msg.text}`;
               div.className = "messageMine";
             } else {
-              div.textContent = `${msg.name}: ${msg.text}`;
+              div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
               div.className = "messageOther";
             }
             messagesDiv.appendChild(div);

@@ -1,20 +1,134 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Firebase Login/Register</title>
-</head>
+    <title>Chat4Friends - Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #A5D6A7, #F5F5F5);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #455A64;
+        }
 
+        .login-container {
+            background: #F5F5F5;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            color: #B0BEC5;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #B0BEC5;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 10px 10px 40px;
+            border: 1px solid #B0BEC5;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #455A64;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background: #A5D6A7;
+        }
+
+        #registerBttn {
+            background: #0288D1;
+        }
+
+        #registerBttn:hover {
+            background: #4FC3F7;
+        }
+
+        footer {
+            margin-top: 20px;
+            color: #B0BEC5;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
 <body>
-    <h2>Sign in</h2>
-    <form id="authForm">
-        <h4>Email</h4>
-        <input type="text" placeholder="example@something.com" id="email">
-        <h4>Password</h4>
-        <input type="password" placeholder="******" id="password">
-    </form>
-    <button id="logInBttn">Log In</button>
-    <button id="registerBttn">Sign Up</button>
+    <div class="login-container">
+        <h2>Chat4Friends</h2>
+        <p class="tagline">Connect with Friends</p>
+        <form id="authForm">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" placeholder="example@something.com" id="email">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Password" id="password">
+            </div>
+            <button id="logInBttn">Log In</button>
+            <button id="registerBttn">Sign Up</button>
+        </form>
+        <footer>Powered by Chat4Friends</footer>
+    </div>
 
     <script type="module">
         console.log("login v.9");
@@ -27,11 +141,9 @@
             signInWithEmailAndPassword,
             signOut
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-
         import { doc, setDoc, getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-
-let regestring = false;
+        let regestring = false;
 
         // Your Firebase config
         const firebaseConfig = {
@@ -52,7 +164,7 @@ let regestring = false;
 
         // Register
         document.getElementById('registerBttn').addEventListener("click", async (e) => {
-            e.preventDefault(); // stop page refresh
+            e.preventDefault();
             regestring = true;
             const username = prompt("Username\nThis can be changed later");
             const email = document.getElementById('email').value;
@@ -62,14 +174,13 @@ let regestring = false;
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 console.log("Registered:", user);
-
                 await setUpUserData(user.uid, username);
             } catch (error) {
                 console.error("Registration error:", error.message);
             }
         });
 
-        //  Log in
+        // Log in
         document.getElementById('logInBttn').addEventListener("click", (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -84,11 +195,11 @@ let regestring = false;
                 });
         });
 
-        //  Auth state observer
+        // Auth state observer
         onAuthStateChanged(auth, (user) => {
             if (user && !regestring) {
                 console.log("User is logged in:", user.email);
-                window.location.href = "chat.html"; // redirect if logged in
+                window.location.href = "chat.html";
             } else {
                 console.log("No user logged in");
             }
@@ -98,17 +209,14 @@ let regestring = false;
             try {
                 await setDoc(doc(db, "users", uid), {
                     username: username,
-                    conversations : []
-                    // email: email,             // optionally
-                    //createdAt: new Date()     // optionally
+                    conversations: []
                 });
                 console.log("User document created");
-             window.location.href = "chat.html"; // redirect if logged in
+                window.location.href = "chat.html";
             } catch (error) {
                 console.error("Error setting up user data:", error);
             }
         }
     </script>
 </body>
-
 </html>

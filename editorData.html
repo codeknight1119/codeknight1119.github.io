@@ -101,6 +101,7 @@ button:hover {
   <div style="text-align:center;">
     <button onclick="getData()">Load Data</button>
     <button onclick="sendData()">Send Data</button>
+    <select id="dropDown"></select>
   </div>
 
   <div id="editor-container">
@@ -125,10 +126,19 @@ button:hover {
 
     async function getData() {
       lockEditor();
-      fetch(`${url}?sheet=items`)
+      fetch(`${url}?sheet=${document.getElementById("dropDown").value}`)
         .then(r => r.json())
         .then(data => {
           editor.setValue(JSON.stringify(data.sheetData, null, 2));
+          const dropDown =document.getElementById("dropDown");
+
+          data.sheetnames.forEach(name =>{
+const option = document.createElement("option");
+option.value = name;
+option.text = name;
+dropDown.appendChild(option);
+          })
+
         })
         .then(() => unlockEditor())
         .catch(err => console.error('Fetch error:', err));

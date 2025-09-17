@@ -97,7 +97,7 @@ button:hover {
   <canvas id="glacius-bg"></canvas>
 
   <h2>JSON Editor</h2>
-  <h3>N-V.0.5</h3>
+  <h3>N-V.0.6</h3>
   <div style="text-align:center;">
     <button onclick="getData()">Load Data</button>
     <button onclick="sendData()">Send Data</button>
@@ -126,25 +126,32 @@ button:hover {
       });
     });
 
-    async function getData() {
-      lockEditor();
-      fetch(`${url}?sheet=${document.getElementById("dropDown").value}`)
-        .then(r => r.json())
-        .then(data => {
-          editor.setValue(JSON.stringify(data.sheetData, null, 2));
-          const dropDown =document.getElementById("dropDown");
+async function getData() {
+  lockEditor();
+  try {
+    const response = await fetch(`${url}?sheet=${document.getElementById("dropDown").value}`);
+    const data = await response.json();
 
-          data.sheetnames.forEach(name =>{
-const option = document.createElement("option");
-option.value = name;
-option.text = name;
-dropDown.appendChild(option);
-          })
+    editor.setValue(JSON.stringify(data.sheetData, null, 2));
 
-        })
-        .then(() => unlockEditor())
-        .catch(err => console.error('Fetch error:', err));
+    const dropDown = document.getElementById("dropDown");
+
+    if (data.sheetnames && Array.isArray(data.sheetnames)) {
+      data.sheetnames.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.text = name;
+        dropDown.appendChild(option);
+      });
     }
+
+  } catch (err) {
+    console.error('Fetch error:', err);
+  } finally {
+    unlockEditor(); // Always unlock, even if error occurs
+  }
+}
+
 
     async function sendData() {
       lockEditor();

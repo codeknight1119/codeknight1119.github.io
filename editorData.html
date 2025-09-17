@@ -6,87 +6,88 @@
   <title>JSON Editor - Glacius</title>
   <style>
     body {
-      margin: 0;
-      font-family: monospace;
-      color: #eef6ff;
-      overflow: hidden;
-      background: linear-gradient(to top, #0f1a33 0%, #3a4a70 50%, #9cc1e0 100%);
-    }
+  margin: 0;
+  font-family: monospace;
+  color: #eef6ff;
+  overflow: hidden;
+  background: linear-gradient(to top, #0f1a33 0%, #3a4a70 50%, #9cc1e0 100%);
+}
 
-    /* Starry icy particles */
-    canvas#glacius-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-    }
+/* Starry icy particles */
+canvas#glacius-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
 
-    h2 {
-      text-align: center;
-      margin-top: 30px;
-      text-shadow: 0 0 10px #88f, 0 0 20px #88f33;
-      z-index: 5;
-      position: relative;
-    }
+h2 {
+  text-align: center;
+  margin-top: 30px;
+  text-shadow: 0 0 10px #88f, 0 0 20px /*#88f33*/;
+  z-index: 5;
+  position: relative;
+}
 
-    button {
-      margin: 5px;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      background: #335577;
-      color: #eef6ff;
-      cursor: pointer;
-      box-shadow: 0 0 10px #88f;
-      transition: 0.3s;
-      position: relative;
-      z-index: 5;
-    }
+button {
+  margin: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #335577;
+  color: #eef6ff;
+  cursor: pointer;
+  box-shadow: 0 0 10px #88f;
+  transition: 0.3s;
+  position: relative;
+  z-index: 5;
+}
 
-    button:hover {
-      background: #4477aa;
-      box-shadow: 0 0 20px #88f, 0 0 30px #88f;
-    }
+button:hover {
+  background: #4477aa;
+  box-shadow: 0 0 20px #88f, 0 0 30px #88f;
+}
 
-    #editor-container {
-      position: relative;
-      width: 90%;
-      max-width: 900px;
-      height: 500px;
-      margin: 20px auto;
-      border: 1px solid #88f;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 0 20px #88f33;
-      z-index: 1;
-      background: rgba(10, 20, 40, 0.85);
-    }
+#editor-container {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  height: 500px;
+  margin: 20px auto;
+  border: 1px solid #88f;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px /*#88f33*/;
+  z-index: 1;
+  background: rgba(10, 20, 40, 0.85);
+}
 
-    #json-editor {
-      width: 100%;
-      height: 100%;
-    }
+#json-editor {
+  width: 100%;
+  height: 100%;
+}
 
-    #editor-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.2);
-      color: #88f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: not-allowed;
-      z-index: 10;
-      display: none;
-      text-shadow: 0 0 5px #88f;
-    }
+#editor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.2);
+  color: #88f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: not-allowed;
+  z-index: 10;
+  display: none;
+  text-shadow: 0 0 5px #88f;
+}
+
   </style>
   <!-- Monaco Editor loader from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js"></script>
@@ -96,7 +97,7 @@
   <canvas id="glacius-bg"></canvas>
 
   <h2>JSON Editor</h2>
-  <h3>N-V.0.2</h3>
+  <h3>N-V.0.3</h3>
   <div style="text-align:center;">
     <button onclick="getData()">Load Data</button>
     <button onclick="sendData()">Send Data</button>
@@ -109,7 +110,7 @@
 
   <script>
     // Monaco loader
-    const url = "https://script.google.com/macros/s/AKfycbzDZgimyi_sX1PFMuGgNmOxLAVFO3QxAPcIhoytXboSRKEbRM_MKOYkR9Ic3Z4AJRwY/exec";
+    const url = "https://script.google.com/macros/s/AKfycbwUnBs0sVc-kMiLLPklLUe8STP9_VVWIXQNoXjZuPwIIMAlYcXalzOdC4vWqyECfp1u/exec";
     let editor;
     require.config({paths: {'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs'}});
     require(['vs/editor/editor.main'], function () {
@@ -127,7 +128,7 @@
       fetch(`${url}?sheet=items`)
         .then(r => r.json())
         .then(data => {
-          editor.setValue(JSON.stringify(data, null, 2));
+          editor.setValue(JSON.stringify(data.sheetData, null, 2));
         })
         .then(() => unlockEditor())
         .catch(err => console.error('Fetch error:', err));

@@ -141,7 +141,7 @@ button:hover {
 
     async function sendData() {
       lockEditor();
-      fetch(`${url}?sheet=items`, {
+      fetch(`${url}?sheet=${document.getElementById("dropDown").value}`, {
         redirect: "follow",
         method: 'POST',
         headers: {'Content-Type': "text/plain;charset=utf-8"},

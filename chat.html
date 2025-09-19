@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Chat4Friends - Chatroom</title>
+  <title>Chat4Friends</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="forestStyle.css">
@@ -113,6 +113,7 @@
       }
     }
   </style>
+  <link id="favicon" rel="icon" type="image/png" href="favicon.png">
 </head>
 
 <body>
@@ -172,6 +173,7 @@
         // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
+        changeFavicon("icons/normalC");
       }
     });
 
@@ -207,6 +209,7 @@
 
               if (document.hidden) {
                 unreadCount++;
+                changeFavicon('icons/notifC');
                 document.title = `(${unreadCount}) ${originalTitle}`;
               }
 
@@ -316,6 +319,13 @@
 
     checkTime();
     setInterval(checkTime, 60000);
+
+    function changeFavicon(src) {
+      const link = document.querySelector("link[rel~='icon']") || document.createElement("link");
+      link.rel = "icon";
+      link.href = src;
+      document.head.appendChild(link);
+    }
   </script>
 </body>
 

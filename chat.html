@@ -119,7 +119,7 @@
 <body>
   <header>
     <h2>Chat4Friends</h2>
-    <span class="version">V.3.8</span>
+    <span class="version">V.3.9</span>
   </header>
   <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
   <div class="container">
@@ -173,7 +173,7 @@
         // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
-        changeFavicon("normalC");
+        changeFavicon("normalC.png");
       }
     });
 
@@ -209,7 +209,7 @@
 
               if (document.hidden) {
                 unreadCount++;
-                changeFavicon('notifC');
+                changeFavicon('notifC.png');
                 document.title = `(${unreadCount}) ${originalTitle}`;
               }
 

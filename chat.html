@@ -187,38 +187,41 @@
           where("timestamp", ">", latestTimestamp),
           orderBy("timestamp")
         );
+        
         unsubscribe = onSnapshot(qNew, (snapshot) => {
-          const messagesDiv = document.getElementById("messages");
-          messagesDiv.innerHTML = "";
-          snapshot.forEach((doc) => {
-            const msg = doc.data();
-            const div = document.createElement("div");
+          snapshot.docChanges().forEach(change => {
+            if (change.type === "added") {
+              const msg = change.doc.data();
+              const div = document.createElement("div");
 
-            const date = new Date(msg.timestamp);
-            const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const date = new Date(msg.timestamp);
+              const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            if (msg.name === myName) {
-              div.textContent = `${timeString} | You: ${msg.text}`;
-              div.className = "messageMine";
-            } else {
-              div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-              div.className = "messageOther";
+              if (msg.name === myName) {
+                div.textContent = `${timeString} | You: ${msg.text}`;
+                div.className = "messageMine";
+              } else {
+                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
+                div.className = "messageOther";
+              }
+
+              if (document.hidden) {
+                unreadCount++;
+                document.title = `(${unreadCount}) ${originalTitle}`;
+              }
+
+              document.getElementById("messages").appendChild(div);
+
+              if (msg.timestamp > latestTimestamp) {
+                latestTimestamp = msg.timestamp;
+              }
             }
-
-            if (document.hidden) {
-              unreadCount++;
-              document.title = `(${unreadCount}) ${originalTitle}`;
-            }
-
-            messagesDiv.appendChild(div);
-
-            if (msg.timestamp > latestTimestamp) {
-              latestTimestamp = msg.timestamp;
-            }
-
           });
+
+          const messagesDiv = document.getElementById("messages");
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
+
       } else {
         window.location.href = "index.html";
         document.getElementById("messageSend").style.display = "none";

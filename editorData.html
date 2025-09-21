@@ -140,6 +140,7 @@ button:hover {
     }
 
     async function sendData() {
+      console.log(editor.getValue());
       lockEditor();
       fetch(`${url}?sheet=${document.getElementById("dropDown").value}`, {
         redirect: "follow",

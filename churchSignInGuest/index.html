@@ -31,7 +31,7 @@
 <body>
     <header>
         <h1>Guest Sign In for 116</h1>
-        <h2>v.5</h2>
+        <h2>v.6</h2>
     </header>
 
     <main>
@@ -43,6 +43,8 @@
         </div>
 
         <button id="invisibleButton" onclick="toggleMode()"></button>
+
+        <div id="showPeople"></div>
 
         <script>
             let people = {};
@@ -80,7 +82,7 @@
                 for (const name in people) {
                     if (people[name].signedIn) {
                         const newDiv = document.createElement("div");
-                        newDiv.id = "people";
+                        
 
                         const nametxt = document.createElement("p");
                         nametxt.textContent = name;
@@ -115,11 +117,11 @@
 if(mode === "signIn"){
     mode = "signOut";
     document.getElementById("inputForSignIn").style.display = "none";
-    document.getElementById("people").style.display = "block";
+    document.getElementById("showPeople").style.display = "block";
 }else{
     mode = "signIn";
      document.getElementById("inputForSignIn").style.display = "block";
-    document.getElementById("people").style.display = "none";
+    document.getElementById("showPeople").style.display = "none";
 
 }
             };

@@ -31,7 +31,7 @@
 <body>
     <header>
         <h1>Guest Sign In for 116</h1>
-        <h2>v.4</h2>
+        <h2>v.5</h2>
     </header>
 
     <main>
@@ -42,25 +42,13 @@
             <button onclick="addPerson()">Add Person</button>
         </div>
 
-        <div class = "hidden">
-            <h5>Settings</h5>
-          <p>Use email?</p>  <input type="checkbox" id="useEmail">
-        </div>
-
-        <div id="showPeople"></div>
-
-        <button id="invisibleButton" onclick="document.getElementsByClassName('hidden').display = 'block'"></button>
-        <div id="panel" class="panel">
-            <button id="actionBtn">Do Action</button>
-            <label>
-                <input type="checkbox" id="toggleThing"> Toggle me
-            </label>
-        </div>
+        <button id="invisibleButton" onclick="toggleMode()"></button>
 
         <script>
             let people = {};
             let collectEmail = true;
             let collectPhone = true;
+            let mode = "signIn";
 
             function addPerson() {
                 const nameValue = document.getElementById("name").value.trim();
@@ -92,6 +80,7 @@
                 for (const name in people) {
                     if (people[name].signedIn) {
                         const newDiv = document.createElement("div");
+                        newDiv.id = "people";
 
                         const nametxt = document.createElement("p");
                         nametxt.textContent = name;
@@ -121,6 +110,19 @@
                 document.getElementById("email").value = "";
                 document.getElementById("telNum").value = "";
             }
+
+            function toggleMode(){
+if(mode === "signIn"){
+    mode = "signOut";
+    document.getElementById("inputForSignIn").style.display = "none";
+    document.getElementById("people").style.display = "block";
+}else{
+    mode = "signIn";
+     document.getElementById("inputForSignIn").style.display = "block";
+    document.getElementById("people").style.display = "none";
+
+}
+            };
         </script>
     </main>
 </body>

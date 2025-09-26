@@ -3,66 +3,100 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width  initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>116 Guest Sign in</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>116 Guest Sign In</title>
+    <style>
+        #showPeople div {
+            margin-bottom: 10px;
+        }
+        #showPeople p {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 
 <body>
     <header>
-        <h1>Guest sign in for 116</h1>
+        <h1>Guest Sign In for 116</h1>
     </header>
 
     <main>
         <div id="inputForSignIn">
-            <input type="text"  placeholder="Enter your name"   id="name">
-            <input type="email"  placeholder="Enter your email"   id="email">
-            <input type="tel"  placeholder="Enter your phone number"  id="telNum">
+            <input type="text" placeholder="Enter your name" id="name">
+            <input type="email" placeholder="Enter your email" id="email">
+            <input type="tel" placeholder="Enter your phone number" id="telNum">
             <button onclick="addPerson()">Add Person</button>
-            </div>
+        </div>
 
-            <div  id ="showPeople">
+        <div id="showPeople"></div>
 
-            </div>
+        <script>
+            let people = {};
+            let collectEmail = true;
+            let collectPhone = true;
 
-            <script>
-                let people = {};
-                let collectEmail = true;
-                let collectPhone = true;
+            function addPerson() {
+                const nameValue = document.getElementById("name").value.trim();
+                const emailValue = document.getElementById("email").value.trim();
+                const phoneValue = document.getElementById("telNum").value.trim();
 
-                function addPerson() {
-                    if (collectEmail) {
-                        people[document.getElementById("name").value].email = document.getElementById("email").value
+                if (!nameValue) return alert("Please enter a name!");
+
+                if (!people[nameValue]) {
+                    people[nameValue] = {};
+                }
+
+                if (collectEmail) {
+                    people[nameValue].email = emailValue;
+                }
+                if (collectPhone) {
+                    people[nameValue].phone = phoneValue;
+                }
+                people[nameValue].signedIn = true;
+
+                updatePeopleDisplay();
+                clearInputs();
+            }
+
+            function updatePeopleDisplay() {
+                const container = document.getElementById("showPeople");
+                container.innerHTML = ""; // Clear previous list
+
+                for (const name in people) {
+                    if (people[name].signedIn) {
+                        const newDiv = document.createElement("div");
+
+                        const nametxt = document.createElement("p");
+                        nametxt.textContent = name;
+                        newDiv.appendChild(nametxt);
+
+                        const newButton = document.createElement("button");
+                        newButton.textContent = "Sign Out";
+                        newButton.onclick = function () {
+                            signOut(name);
+                        };
+                        newDiv.appendChild(newButton);
+
+                        container.appendChild(newDiv);
                     }
-                    if (collectPhone) {
-                        people[document.getElementById("name").value].phone = document.getElementById("telNum").value
-                    }
-                    people[document.getElementById("name").value].signedIn = true;
-
-                    updatePeopleDisplay(document.getElementById("name").value);
                 }
+            }
 
-                function updatePeopleDisplay(name){
-                   var container =  document.getElementById("showPeople");
-                   var newDiv = container.appendChild('div');
-                   var nametxt = newDiv.appendChild('p');
-                   nametxt.textContent = name;
-                   var newButton = newDiv.appendChild("button");
-                   newButton.textContent = "sign out";
-                   newButton.onClick = function(){
-                    signOut(name);
-                   }
+            function signOut(name) {
+                if (people[name]) {
+                    people[name].signedIn = false;
+                    updatePeopleDisplay();
                 }
+            }
 
-                function signOut(person){
-
-                }
-
-
-            </script>
+            function clearInputs() {
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("telNum").value = "";
+            }
+        </script>
     </main>
-
 </body>
 
 </html>

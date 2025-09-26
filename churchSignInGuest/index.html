@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>116 Guest Sign in</title>
+
+</head>
+
+<body>
+    <header>
+        <h1>Guest sign in for 116</h1>
+    </header>
+
+    <main>
+        <div, id="inputForSignIn">
+            <input type="text" , placeholder="Enter your name" , id="name">
+            <input type="email" , placeholder="Enter your email" , id="email">
+            <input type="tel" , placeholder="Enter your phone number" ,id="telNum">
+            <button onclick="addPerson()"></button>
+            </div>
+
+            <div, id ="showPeople">
+
+            </div>
+
+            <script>
+                let people = {};
+                let collectEmail = true;
+                let collectPhone = true;
+
+                function addPerson() {
+                    if (collectEmail) {
+                        people[document.getElementById("name")].email = document.getElementById("email")
+                    }
+                    if (collectPhone) {
+                        people[document.getElementById("name")].phone = document.getElementById("telNum")
+                    }
+                    people[document.getElementById("name")].signedIn = true;
+
+                    updatePeopleDisplay(name);
+                }
+
+                function updatePeopleDisplay(name){
+                   var container =  document.getElementById("showPeople");
+                   var newDiv = container.appendChild('div');
+                   var nametxt = newDiv.appendChild('p');
+                   nametxt.textContent = name;
+                   var newButton = newDiv.appendChild("button");
+                   newButton.textContent = "sign out";
+                   newButton.onClick = function(){
+                    signOut(name);
+                   }
+                }
+
+                function signOut(person){
+
+                }
+
+
+            </script>
+    </main>
+
+</body>
+
+</html>

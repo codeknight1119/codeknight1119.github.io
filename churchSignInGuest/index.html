@@ -17,21 +17,29 @@
 
         #invisibleButton {
             position: fixed;
-            /* Keeps it at the top-right even when scrolling */
             top: 10px;
-            /* distance from top */
             right: 10px;
-            /* distance from right */
             width: 50px;
-            /* button width */
             height: 50px;
-            /* button height */
             background: transparent;
-            /* no background */
             border: none;
-            /* no border */
             cursor: pointer;
-            /* shows pointer on hover */
+        }
+
+        .panel {
+            display: none;
+            position: absolute;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .panel button,
+        .panel input[type="checkbox"] {
+            margin: 5px 0;
+            display: block;
         }
     </style>
 </head>
@@ -39,7 +47,7 @@
 <body>
     <header>
         <h1>Guest Sign In for 116</h1>
-        <h2>v.4</h2>
+        <h2>v.5</h2>
     </header>
 
     <main>
@@ -53,6 +61,12 @@
         <div id="showPeople"></div>
 
         <button id="invisibleButton" onclick="alert('Button clicked!')"></button>
+        <div id="panel" class="panel">
+            <button id="actionBtn">Do Action</button>
+            <label>
+                <input type="checkbox" id="toggleThing"> Toggle me
+            </label>
+        </div>
 
         <script>
             let people = {};
@@ -118,6 +132,31 @@
                 document.getElementById("email").value = "";
                 document.getElementById("telNum").value = "";
             }
+
+
+            //admin Buttons:
+            const mainBtn = document.getElementById("mainBtn");
+            const panel = document.getElementById("panel");
+            const actionBtn = document.getElementById("actionBtn");
+            const toggleThing = document.getElementById("toggleThing");
+
+            mainBtn.addEventListener("click", () => {
+                // Position panel near button
+                const rect = mainBtn.getBoundingClientRect();
+                panel.style.top = rect.bottom + window.scrollY + "px";
+                panel.style.left = rect.left + window.scrollX + "px";
+
+                // Toggle visibility
+                panel.style.display = panel.style.display === "block" ? "none" : "block";
+            });
+
+            actionBtn.addEventListener("click", () => {
+                console.log("Action button clicked!");
+            });
+
+            toggleThing.addEventListener("change", () => {
+                console.log("Toggle is now:", toggleThing.checked);
+            });
         </script>
     </main>
 </body>

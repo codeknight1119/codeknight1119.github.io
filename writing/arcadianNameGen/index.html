@@ -5,13 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arcadian Name Gen</title>
+    <style>
+        .line1 {
+            display: inline-block;
+        }
+
+        .line2 {
+            display: inline-block;
+        }
     </style>
 </head>
 
 <body>
     <header>
         <h1>Arcadian name generator</h1>
-        <h2>v.2</h2>
+        <h2>v.3</h2>
     </header>
 
     <select id="gender">
@@ -19,20 +27,43 @@
         <option value="female"> Female</option>
         <option value="neutral"> Random</option>
     </select>
-    <p>Mashup</p> <input type="checkbox" checked id="mashupCheck">
-    <p>How many</p> <input type="range" min=1 max=20 id="slider">
+    <p class="line1">Mashup</p> <input type="checkbox" checked id="mashupCheck" class="line1">
+    <p class="line2">How many</p> <input type="range" min=1 max=20 id="slider" class="line1">
+    <p class="line2">Value: <span id="rangeValue">0</span></p>
     <button onclick="generateName()">Generate</button>
     <p id="output"></p>
 
     <script>
         function NameGenerator() {
-            this.maleNames = ["Tuxie", "Kael", "Draven", "Silas"];
-            this.femaleNames = ["Araya", "Lyra", "Selene", "Nova"];
+            this.maleNames = ["Kaelen", "Theron", "Daxel", "Veylor", "Corvyn", "Lorien", "Zyric", "Tavric", "Alaric", "Joryn",
+                "Kaelith", "Sylven", "Rynar", "Vaelor", "Theren", "Lyric", "Zevran", "Ceryn", "Davryn", "Orveth",
+                "Malric", "Fendrel", "Voryn", "Tyric", "Eldric", "Nyvar", "Koryn", "Zorvan", "Althar", "Jorven",
+                "Teryn", "Veyric", "Cyran", "Lorveth", "Daryth", "Faelric", "Xylen", "Thalric", "Riven", "Aelric",
+                "Zaryth", "Orynd", "Kaelvor", "Vanyric", "Cyrith", "Talven", "Elyric", "Zephric", "Noryn", "Valric",
+                "Bryndor", "Calyth", "Daryon", "Erynd", "Falyric", "Gryvon", "Halyth", "Ilyric", "Jorath", "Krylor",
+                "Lorvyn", "Malyric", "Noryth", "Olyric", "Pyran", "Qorvyn", "Ralyric", "Soryn", "Toryth", "Ulyric",
+                "Voryth", "Walyric", "Xoryn", "Ylyric", "Zoryth", "Aelyric", "Boryn", "Coryth", "Doryric", "Elyth",
+                "Foryn", "Goryth", "Horyric", "Ioryn", "Joryth", "Koryric", "Loryn", "Moryth", "Noryric", "Oryth",
+                "Poryn", "Qoryth", "Roryric", "Soryn", "Toryth", "Uoryn", "Voryric", "Woryn", "Xoryth", "Yoryric",
+                "Zoryn", "Alarion", "Beryn", "Ceryn", "Daryth", "Eryric", "Foryn", "Goryth", "Horyric", "Iryth", "Joryn"
+            ];
+            this.femaleNames = ["Calthea", "Trixy", "Jaelin", "Aralyn", "Veyra", "Selira", "Nymira", "Ceryn", "Tavira", "Liora",
+                "Jynessa", "Elyra", "Marivelle", "Sylara", "Tyraen", "Zephira", "Althaea", "Nyssia", "Cyrilla", "Vaelora",
+                "Faelith", "Orlina", "Serenya", "Luthien", "Yvessa", "Thalira", "Kalyndra", "Ismera", "Vanyra", "Melisara",
+                "Ryneth", "Elaria", "Talith", "Aelira", "Zyneth", "Caelith", "Virelle", "Thalyra", "Lyrielle", "Nivara",
+                "Ysera", "Felira", "Jalyndra", "Seryth", "Orlena", "Velyra", "Thessa", "Anthera", "Cyralith", "Alenya",
+                "Brivira", "Cyrella", "Delyth", "Elthira", "Falyra", "Gelyth", "Halyra", "Ilyth", "Jovira", "Kelyth",
+                "Lalyra", "Myrith", "Nalyra", "Olyth", "Pelyra", "Qyrith", "Ralyra", "Selyth", "Talyra", "Ulyth",
+                "Velyra", "Walyth", "Xelyra", "Ylyth", "Zalyra", "Aelith", "Belyra", "Calyth", "Delyra", "Elyth",
+                "Felyra", "Galyth", "Helyra", "Ialyth", "Jelyra", "Kalyth", "Lelyra", "Malyth", "Nelyra", "Olyra",
+                "Palyth", "Qelyra", "Relyth", "Salyra", "Telyra", "Ulyra", "Velyth", "Welyra", "Xalyth", "Yelyra",
+                "Zelyth"
+            ];
 
             // rules you can tweak
             this.rules = {
-                male: { endings: ["ar", "en", "us", "or", "random"] },
-                female: { endings: ["a", "e", "ia", "elle", "random"] },
+                male: { endings: ["en", "or", "yn", "ric", "ar", "el", "ith", "aric", "an", "us", "al", "orv", "ynth", "oril", "orath", "random"] },
+                female: { endings: ["a", "ia", "ara", "ella", "ira", "yth", "yne", "arae", "irae", "elle", "ina", "ora", "yra", "ess", "irael", "random"] },
                 neutral: { endings: ["random"] }
             };
 
@@ -103,22 +134,28 @@
             };
         }
 
-           function generateName() {
-    const gen = new NameGenerator();
-    const times = document.getElementById('slider').value;
-    const gender = document.getElementById('gender').value;
-    const mashup = document.getElementById("mashupCheck").checked;
+        function generateName() {
+            const gen = new NameGenerator();
+            const times = document.getElementById('slider').value;
+            const gender = document.getElementById('gender').value;
+            const mashup = document.getElementById("mashupCheck").checked;
 
-    let outputs = [];
-    for (let i = 0; i < times; i++) {
-        outputs.push(gen.generate({ gender, mashup }));
-    }
+            let outputs = [];
+            for (let i = 0; i < times; i++) {
+                outputs.push(gen.generate({ gender, mashup }));
+            }
 
-    document.getElementById('output').textContent = outputs.join(", ");
-}
+            document.getElementById('output').textContent = outputs.join(", ");
+        }
         //      console.log("Male normal:", gen.generate({ gender: "male" }));
         //     console.log("Female mashup:", gen.generate({ gender: "female", mashup: true }));
         //     console.log("Neutral random-ending mashup:", gen.generate({ gender: "neutral", mashup: true }));
+        const range = document.getElementById('slider');
+        const rangeValue = document.getElementById('rangeValue');
+
+        range.addEventListener('input', () => {
+            rangeValue.textContent = range.value;
+        });
     </script>
 </body>
 

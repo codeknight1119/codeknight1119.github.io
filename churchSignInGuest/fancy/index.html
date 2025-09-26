@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>116 Guest Sign In</title>
+    <style>
+        /* General Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        header h2 {
+            font-size: 1em;
+            color: #7f8c8d;
+        }
+
+        main {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #inputForSignIn {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        #inputForSignIn input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            font-size: 1em;
+        }
+
+        #inputForSignIn button {
+            padding: 10px;
+            background-color: #3498db;
+            border: none;
+            color: white;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #inputForSignIn button:hover {
+            background-color: #2980b9;
+        }
+
+        #showPeople {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #showPeople div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        #showPeople div p {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        #showPeople div button {
+            padding: 5px 10px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #showPeople div button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Invisible toggle button */
+        #invisibleButton {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Background text section */
+        #backgroundText {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #95a5a6;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Guest Sign In for 116</h1>
+      <!--  <h2>v.6</h2>-->
+    </header>
+
+    <main>
+        <div id="inputForSignIn">
+            <input type="text" placeholder="Enter your name" id="name">
+            <input type="email" placeholder="Enter your email" id="email">
+            <input type="tel" placeholder="Enter your phone number" id="telNum">
+            <button onclick="addPerson()">Add Person</button>
+        </div>
+
+        <button id="invisibleButton" onclick="toggleMode()"></button>
+
+        <div id="showPeople"></div>
+
+        <div id="backgroundText">
+            Welcome to our event! Please sign in above. <br>
+            Customize this text to show instructions, greetings, or any announcements.
+        </div>
+
+        <script>
+            let people = {};
+            let collectEmail = true;
+            let collectPhone = true;
+            let mode = "signIn";
+
+            function addPerson() {
+                const nameValue = document.getElementById("name").value.trim();
+                const emailValue = document.getElementById("email").value.trim();
+                const phoneValue = document.getElementById("telNum").value.trim();
+
+                if (!nameValue) return alert("Please enter a name");
+
+                if (!people[nameValue]) {
+                    people[nameValue] = {};
+                }
+
+                if (collectEmail) {
+                    people[nameValue].email = emailValue;
+                }
+                if (collectPhone) {
+                    people[nameValue].phone = phoneValue;
+                }
+                people[nameValue].signedIn = true;
+
+                updatePeopleDisplay();
+                clearInputs();
+            }
+
+            function updatePeopleDisplay() {
+                const container = document.getElementById("showPeople");
+                container.innerHTML = "";
+
+                for (const name in people) {
+                    if (people[name].signedIn) {
+                        const newDiv = document.createElement("div");
+
+                        const nametxt = document.createElement("p");
+                        nametxt.textContent = name;
+                        newDiv.appendChild(nametxt);
+
+                        const newButton = document.createElement("button");
+                        newButton.textContent = "Sign Out";
+                        newButton.onclick = function () {
+                            signOut(name);
+                        };
+                        newDiv.appendChild(newButton);
+
+                        container.appendChild(newDiv);
+                    }
+                }
+            }
+
+            function signOut(name) {
+                if (people[name]) {
+                    people[name].signedIn = false;
+                    updatePeopleDisplay();
+                }
+            }
+
+            function clearInputs() {
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("telNum").value = "";
+            }
+
+            function toggleMode() {
+                if (mode === "signIn") {
+                    mode = "signOut";
+                    document.getElementById("inputForSignIn").style.display = "none";
+                    document.getElementById("showPeople").style.display = "flex";
+                } else {
+                    mode = "signIn";
+                    document.getElementById("inputForSignIn").style.display = "flex";
+                    document.getElementById("showPeople").style.display = "none";
+                }
+            }
+        </script>
+    </main>
+</body>
+
+</html>

@@ -11,7 +11,7 @@
 <body>
     <header>
         <h1>Arcadian name generator</h1>
-        <h2>v.1</h2>
+        <h2>v.2</h2>
     </header>
 
     <select id="gender">
@@ -103,21 +103,19 @@
             };
         }
 
-        function generateName() {
-            const gen = new NameGenerator();
-            const times = document.getElementById('slider').value;
-            let currentTimes = 0;
+           function generateName() {
+    const gen = new NameGenerator();
+    const times = document.getElementById('slider').value;
+    const gender = document.getElementById('gender').value;
+    const mashup = document.getElementById("mashupCheck").checked;
 
-            let outputs = [];
+    let outputs = [];
+    for (let i = 0; i < times; i++) {
+        outputs.push(gen.generate({ gender, mashup }));
+    }
 
-            if (currentTimes !== times) {
-                var newGen = gen.generate({ gender: document.getElementById('gender'), mashup: document.getElementById("mashupCheck").value })
-                outputs.push(newGen)
-                currentTimes++;
-            } else {
-                document.getElementById('output').textContent = outputs;
-            }
-        }
+    document.getElementById('output').textContent = outputs.join(", ");
+}
         //      console.log("Male normal:", gen.generate({ gender: "male" }));
         //     console.log("Female mashup:", gen.generate({ gender: "female", mashup: true }));
         //     console.log("Neutral random-ending mashup:", gen.generate({ gender: "neutral", mashup: true }));

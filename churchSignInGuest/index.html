@@ -9,9 +9,29 @@
         #showPeople div {
             margin-bottom: 10px;
         }
+
         #showPeople p {
             display: inline-block;
             margin-right: 10px;
+        }
+
+        #invisibleButton {
+            position: fixed;
+            /* Keeps it at the top-right even when scrolling */
+            top: 10px;
+            /* distance from top */
+            right: 10px;
+            /* distance from right */
+            width: 50px;
+            /* button width */
+            height: 50px;
+            /* button height */
+            background: transparent;
+            /* no background */
+            border: none;
+            /* no border */
+            cursor: pointer;
+            /* shows pointer on hover */
         }
     </style>
 </head>
@@ -19,7 +39,7 @@
 <body>
     <header>
         <h1>Guest Sign In for 116</h1>
-        <h2>v.3</h2>
+        <h2>v.4</h2>
     </header>
 
     <main>
@@ -31,6 +51,8 @@
         </div>
 
         <div id="showPeople"></div>
+
+        <button id="invisibleButton" onclick="alert('Button clicked!')"></button>
 
         <script>
             let people = {};

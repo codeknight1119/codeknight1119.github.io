@@ -2,48 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Forever Loading Page</title>
+<title>Forever Loading</title>
 <style>
   body {
     font-family: sans-serif;
-    background: #111;
+    background: #222;
     color: #eee;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    overflow: hidden;
-  }
-
-  .spinner {
-    margin: 20px;
-    width: 50px;
-    height: 50px;
-    border: 6px solid #444;
-    border-top-color: #1e90ff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
   }
 
   #content {
-    margin-top: 20px;
     text-align: center;
+    z-index: 1;
   }
 
   button {
     background: #1e90ff;
-    color: #fff;
     border: none;
     padding: 10px 20px;
+    border-radius: 5px;
+    color: #fff;
     cursor: pointer;
     font-size: 16px;
-    border-radius: 5px;
   }
 
   button:hover {
@@ -53,25 +37,27 @@
 </head>
 <body>
 
-<div class="spinner"></div>
-
 <div id="content">
-  <h1>Welcome!</h1>
-  <p>This page will never fully load, but you can still interact with it.</p>
+  <h1>Page is “loading” forever…</h1>
+  <p>But you can still click the button!</p>
   <button onclick="alert('It works!')">Click Me</button>
 </div>
 
 <script>
-// Never-ending fetch to keep the page "loading"
-fetch('/never-ending-resource').catch(()=>{});
+// Trick the browser into thinking a resource is still loading
+const endless = new ReadableStream({
+  start(controller) {
+    function push() {
+      controller.enqueue(new Uint8Array([0])); // send dummy byte
+      setTimeout(push, 1000); // repeat forever
+    }
+    push();
+  }
+});
 
-// Optional: prevent page load event from firing
-window.addEventListener('load', e => e.stopImmediatePropagation(), true);
-
-// Simulate a resource that never finishes
-setTimeout(function hangForever() {
-    hangForever(); // Recursive loop keeps script running indefinitely
-}, 1000);
+const response = new Response(endless);
+const url = URL.createObjectURL(response);
+fetch(url); // never resolves, browser thinks something is still loading
 </script>
 
 </body>

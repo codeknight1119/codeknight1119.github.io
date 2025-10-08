@@ -1,0 +1,16 @@
+{
+    "home":{
+        "title": "Home",
+        "body": [
+            "Welcome to the pulse homepage",
+            "Start Exporing:",
+            "*[[What is Pulse]]"
+        ]
+    },
+    "What is Pulse":{
+        "title": "What is Pulse",
+        "body": [
+            "First of all, its THE pulse and it is a lot."
+        ]
+    }
+}

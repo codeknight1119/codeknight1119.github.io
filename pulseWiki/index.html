@@ -10,16 +10,19 @@
 <body>
 
     <header>
-        <h1 id="title">Welcome to My Web Page</h1>
+        <h1 id="title"></h1>
     </header>
 
     <main>
        <div id="main"></div>
     </main>
    <script>
-    let currentPage = "home";
-    let json = pages.json;
-    
+    async function displayPage(page){
+            let pages = await fetch("pages.json");
+        document.getElementById("id").textContent = pages.page.title;
+    }
+    displayPage("home");
+
     </script>
 </body>
 </html>

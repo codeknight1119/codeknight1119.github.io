@@ -5,8 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Web Page</title>
-    <!-- You can link your CSS file here -->
-    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+        .clickable {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,74 +19,93 @@
     <header>
         <h1 id="title"></h1>
         <h4>v.8</h4>
-        <style>
-            .clickable {
-                color: blue;
-                text-decoration: underline;
-                cursor: pointer;
-            }
-        </style>
     </header>
 
-    <main>
-        <div id="main"></div>
-    </main>
+    <main id="main-container"></main>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        async function displayPage(page) {
+        // Store page data globally to avoid re-fetching
+        let sitePages = {};
+        const mainContainer = document.getElementById("main-container");
+        const titleElement = document.getElementById("title");
+
+        /**
+         * Renders the content of a specific page from the stored data.
+         * @param {string} pageKey - The key of the page to display (e.g., "home").
+         */
+        function renderPage(pageKey) {
+            const page = sitePages[pageKey];
+
+            if (!page) {
+                mainContainer.innerHTML = `<p>Error: Page "<strong>${pageKey}</strong>" not found.</p>`;
+                titleElement.textContent = "Error";
+                return;
+            }
+
+            // Clear previous content
+            mainContainer.innerHTML = "";
+            titleElement.textContent = page.title;
+
+            // Process and display the main body content
+            page.body.forEach(line => {
+                const p = document.createElement('p');
+
+                if (line.includes("[[") && line.includes("]]")) {
+                    const parts = line.split(/(\[\[.*?\]\])/g).filter(part => part); // Split by link but keep delimiters
+                    
+                    parts.forEach(part => {
+                        if (part.startsWith('[[') && part.endsWith(']]')) {
+                            const linkText = part.substring(2, part.length - 2);
+                            const clickable = document.createElement('span');
+                            clickable.textContent = linkText;
+                            clickable.className = 'clickable';
+                            clickable.addEventListener('click', () => {
+                                // Instead of a full re-render, you could update history for back/forward buttons
+                                // history.pushState({page: linkText}, '', `?startPage=${linkText}`);
+                                renderPage(linkText);
+                            });
+                            p.appendChild(clickable);
+                        } else {
+                            // Parse markdown for non-link parts and append
+                            const span = document.createElement('span');
+                            span.innerHTML = marked.parseInline(part.trim()); // Use parseInline for text within a paragraph
+                            p.appendChild(span);
+                        }
+                    });
+
+                } else {
+                    // If no links, parse the whole line as Markdown
+                    p.innerHTML = marked.parse(line);
+                }
+
+                mainContainer.appendChild(p);
+            });
+        }
+        
+        /**
+         * Initializes the application by fetching data and rendering the initial page.
+         */
+        async function init() {
             try {
-                // Fetch and parse JSON
                 const response = await fetch("pages.json");
-                const pages = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                sitePages = await response.json();
 
-                // Update the HTML
-
-                const container = document.getElementById("main");
-                container.innerHTML = "";
-                document.getElementById("title").textContent = pages[page].title;
-                document.getElementById("main").textContent = pages[page].content;
-                pages[page].body.forEach(element => {
-                    if (element.includes("[[") && element.includes("]]")) {
-                        const text = element.split("[[");
-                        const text2 = text[1].split("]]");
-
-                        const hyperLink = text2[0];
-
-                        const beforeText = document.createTextNode(text[0].replace(/\*$/, ''));
-                        const clickable = document.createElement('span');
-                        clickable.textContent = hyperLink;
-                        clickable.classList.add('clickable');
-                        clickable.addEventListener('click', () => {
-                            displayPage(hyperLink);
-                        });
-                        const afterText = document.createTextNode(text2[1]);
-
-                        container.appendChild(marked.parse(beforeText));
-                        container.appendChild(marked.parse(clickable));
-                        container.appendChild(marked.parse(afterText));
-                    } else {
-                        // If the element has no [[ ]], just append it as plain text
-                        const plainText = document.createTextNode(element);
-                        container.appendChild(plainText);
-                    }
-
-                    // Add a line break after each element
-                    container.appendChild(document.createElement('br'));
-                });
-
-
-
+                const urlParams = new URLSearchParams(window.location.search);
+                const startPage = urlParams.get("startPage") || "home";
+                renderPage(startPage);
             } catch (error) {
-                alert("Error loading page:"+ error);
+                titleElement.textContent = "Error";
+                mainContainer.innerHTML = `<p>Failed to load page data: ${error}</p>`;
+                console.error("Error loading page:", error);
             }
         }
-const urlParams = new URLSearchParams(window.location.search);
-if(urlParams.get("startPage") !== null){
-displayPage(urlParams.get("startPage"))
-}else{
-    displayPage("home");
-}
+
+        // Start the application
+        init();
 
     </script>
 </body>

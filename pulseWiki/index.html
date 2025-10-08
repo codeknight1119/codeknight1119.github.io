@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,34 +8,77 @@
     <!-- You can link your CSS file here -->
     <!-- <link rel="stylesheet" href="style.css"> -->
 </head>
+
 <body>
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.4</h4>
+        <h4>v.5</h4>
+        <style>
+            .clickable {
+                color: blue;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+        </style>
     </header>
 
     <main>
-       <div id="main"></div>
+        <div id="main"></div>
     </main>
-   <script>
-  async function displayPage(page) {
-    try {
-        // Fetch and parse JSON
-        const response = await fetch("pages.json");
-        const pages = await response.json();
+    <script>
+        async function displayPage(page) {
+            try {
+                // Fetch and parse JSON
+                const response = await fetch("pages.json");
+                const pages = await response.json();
 
-        // Update the HTML
-        document.getElementById("title").textContent = pages[page].title;
-        document.getElementById("main").textContent = pages[page].content;
+                // Update the HTML
 
-    } catch (error) {
-        alert("Error loading page:", error);
-    }
-}
 
-    displayPage("home");
+                document.getElementById("title").textContent = pages[page].title;
+                document.getElementById("main").textContent = pages[page].content;
+                pages[page].body.forEach(element => {
+                    const container = document.getElementById("main");
+
+                    if (element.includes("[[") && element.includes("]]")) {
+                        const text = element.split("[[");
+                        const text2 = text[1].split("]]");
+
+                        const hyperLink = text2[0];
+
+                        const beforeText = document.createTextNode(text[0]);
+                        const clickable = document.createElement('span');
+                        clickable.textContent = hyperLink;
+                        clickable.classList.add('clickable');
+                        clickable.addEventListener('click', () => {
+                            alert("You clicked the text!");
+                        });
+                        const afterText = document.createTextNode(text2[1]);
+
+                        container.appendChild(beforeText);
+                        container.appendChild(clickable);
+                        container.appendChild(afterText);
+                    } else {
+                        // If the element has no [[ ]], just append it as plain text
+                        const plainText = document.createTextNode(element);
+                        container.appendChild(plainText);
+                    }
+
+                    // Add a line break after each element
+                    container.appendChild(document.createElement('br'));
+                });
+
+
+
+            } catch (error) {
+                alert("Error loading page:", error);
+            }
+        }
+
+        displayPage("home");
 
     </script>
 </body>
+
 </html>

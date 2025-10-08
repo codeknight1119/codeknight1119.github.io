@@ -18,10 +18,21 @@
        <div id="main"></div>
     </main>
    <script>
-    async function displayPage(page){
-            let pages = await fetch("pages.json")
-            .then(document.getElementById("id").textContent = pages[page].title);
+  async function displayPage(page) {
+    try {
+        // Fetch and parse JSON
+        const response = await fetch("pages.json");
+        const pages = await response.json();
+
+        // Update the HTML
+        document.getElementById("title").textContent = pages[page].title;
+        document.getElementById("main").textContent = pages[page].content;
+
+    } catch (error) {
+        alert("Error loading page:", error);
     }
+}
+
     displayPage("home");
 
     </script>

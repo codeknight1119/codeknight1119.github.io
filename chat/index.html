@@ -153,7 +153,7 @@ button {
         onAuthStateChanged(auth, (user) => {
             if (user && !regestring) {
                 console.log("User is logged in:", user.email);
-                window.location.href = "chat/mainChat";
+                window.location.href = "mainChat";
             } else {
                 console.log("No user logged in");
             }

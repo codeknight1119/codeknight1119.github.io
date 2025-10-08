@@ -13,7 +13,7 @@
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.6</h4>
+        <h4>v.7</h4>
         <style>
             .clickable {
                 color: blue;
@@ -40,6 +40,8 @@
                 document.getElementById("main").textContent = pages[page].content;
                 pages[page].body.forEach(element => {
                     const container = document.getElementById("main");
+                    container.innerHTML = "";
+
 
                     if (element.includes("[[") && element.includes("]]")) {
                         const text = element.split("[[");
@@ -52,7 +54,7 @@
                         clickable.textContent = hyperLink;
                         clickable.classList.add('clickable');
                         clickable.addEventListener('click', () => {
-                            alert("You clicked the text!");
+                           displayPage(hyperLink);
                         });
                         const afterText = document.createTextNode(text2[1]);
 

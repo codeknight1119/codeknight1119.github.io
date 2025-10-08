@@ -26,6 +26,8 @@
     <main>
         <div id="main"></div>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         async function displayPage(page) {
             try {
@@ -55,9 +57,9 @@
                         });
                         const afterText = document.createTextNode(text2[1]);
 
-                        container.appendChild(beforeText);
-                        container.appendChild(clickable);
-                        container.appendChild(afterText);
+                        container.appendChild(marked.parse(beforeText));
+                        container.appendChild(marked.parse(clickable));
+                        container.appendChild(marked.parse(afterText));
                     } else {
                         // If the element has no [[ ]], just append it as plain text
                         const plainText = document.createTextNode(element);
@@ -74,8 +76,12 @@
                 alert("Error loading page:", error);
             }
         }
-
-        displayPage("home");
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get("startPage") !== null){
+displayPage(urlParams.get("startPage"))
+}else{
+    displayPage("home");
+}
 
     </script>
 </body>

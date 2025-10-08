@@ -113,7 +113,7 @@
       }
     }
   </style>
-  <link id="favicon" rel="icon" type="image/png" href="normalC.png">
+  <link id="favicon" rel="icon" type="image/png" href="chat/resources/normalC.png">
 </head>
 
 <body>
@@ -173,7 +173,7 @@
         // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
-        changeFavicon("normalC.png");
+        changeFavicon("chat/resources/normalC.png");
       }
     });
 
@@ -209,7 +209,7 @@
 
               if (document.hidden) {
                 unreadCount++;
-                changeFavicon('notifC.png');
+                changeFavicon('chat/resources/notifC.png');
                 document.title = `(${unreadCount}) ${originalTitle}`;
               }
 

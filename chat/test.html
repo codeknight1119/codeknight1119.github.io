@@ -5,7 +5,7 @@
   <title>Chat4Friends</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="chat/forestStyle.css">
+  <link rel="stylesheet" href="resources/forestStyle.css">
   <style>
     body {
       margin: 0;
@@ -113,7 +113,7 @@
       }
     }
   </style>
-  <link id="favicon" rel="icon" type="image/png" href="normalC.png">
+  <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
 </head>
 
 <body>
@@ -173,7 +173,7 @@
         // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
-        changeFavicon("normalC.png");
+        changeFavicon("resources/normalC.png");
       }
     });
 
@@ -209,7 +209,7 @@
 
               if (document.hidden) {
                 unreadCount++;
-                changeFavicon('notifC.png');
+                changeFavicon('resources/notifC.png');
                 document.title = `(${unreadCount}) ${originalTitle}`;
               }
 

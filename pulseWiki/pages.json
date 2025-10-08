@@ -4,7 +4,8 @@
         "body": [
             "Welcome to the pulse homepage",
             "Start Exporing:",
-            "*[[What is Pulse]]"
+            "- [[What is Pulse]]",
+            "- [[Arcadia]]"
         ]
     },
     "What is Pulse":{

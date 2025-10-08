@@ -11,6 +11,7 @@
 
     <header>
         <h1 id="title"></h1>
+        <h4>v.3</h4>
     </header>
 
     <main>
@@ -18,8 +19,8 @@
     </main>
    <script>
     async function displayPage(page){
-            let pages = await fetch("pages.json");
-        document.getElementById("id").textContent = pages[page].title;
+            let pages = await fetch("pages.json")
+            .then(document.getElementById("id").textContent = pages[page].title);
     }
     displayPage("home");
 

@@ -13,7 +13,7 @@
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.5</h4>
+        <h4>v.6</h4>
         <style>
             .clickable {
                 color: blue;
@@ -47,7 +47,7 @@
 
                         const hyperLink = text2[0];
 
-                        const beforeText = document.createTextNode(text[0]);
+                        const beforeText = document.createTextNode(text[0].replace(/\*$/, ''));
                         const clickable = document.createElement('span');
                         clickable.textContent = hyperLink;
                         clickable.classList.add('clickable');

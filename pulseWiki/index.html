@@ -19,7 +19,7 @@
    <script>
     async function displayPage(page){
             let pages = await fetch("pages.json");
-        document.getElementById("id").textContent = pages.page.title;
+        document.getElementById("id").textContent = pages[page].title;
     }
     displayPage("home");
 

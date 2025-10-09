@@ -1,5 +1,5 @@
 {
-    "home":{
+    "home": {
         "title": "Home",
         "body": [
             "Welcome to the pulse homepage",
@@ -7,18 +7,22 @@
             "- [[What is Pulse]]",
             "- [[Arcadia]]"
         ],
-        "tags":["main"]
+        "tags": [
+            "main"
+        ]
     },
-    "What is Pulse":{
+    "What is Pulse": {
         "title": "What is Pulse",
         "body": [
             "is the name of a game my friends made in 6th grade that went wild. It went from telekinesis, to kings, to Omniverses (all will be explained later), to eldritch horrors and family issues. In this wiki I am documenting all of it."
         ],
-        "tags":["pulse"]
+        "tags": [
+            "pulse"
+        ]
     },
-    "Arcadia":{
+    "Arcadia": {
         "title": "Arcadia",
-        "body":[
+        "body": [
             "Arcadia is a continent on a mono-continental world in the [[Reverse Omniverse.]]",
             "The name comes from 3 musical works",
             "   - Arcadia the album by Smash into Pieces.",
@@ -29,9 +33,47 @@
             "   -[[Winward]]",
             "",
             "Arcadia also has a lot of triditional things such as:",
-            "   -[[Noble Council]]",
+            "   -[[Arcadian Noble Council]]",
             "   -[[Arcadian King]]"
         ],
-        "tags":["Arcadia", "Anti-Pulse"]
+        "tags": [
+            "Arcadia",
+            "Anti-Pulse"
+        ]
+    },
+    "Anti-Pulse": {
+        "title": "Anti-Pulse",
+        "body": [],
+        "tags": []
+    },
+    "Prior Homes of the people of the Pulse and Anti-Pulse": {
+        "title": "Prior Homes of the people of the Pulse and Anti-Pulse",
+        "body": [],
+        "tags": []
+    },
+    "Winward": {
+        "title": "",
+        "body": [],
+        "tags": []
+    },
+    "Arcadian Noble Council": {
+        "title": "",
+        "body": [],
+        "tags": []
+    },
+    "": {
+        "title": "",
+        "body": [],
+        "tags": []
+    },
+    "": {
+        "title": "",
+        "body": [],
+        "tags": []
+    },
+    "": {
+        "title": "",
+        "body": [],
+        "tags": []
     }
 }

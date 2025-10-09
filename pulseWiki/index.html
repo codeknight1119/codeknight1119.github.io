@@ -58,8 +58,8 @@
             page.body.forEach(line => {
                 const p = document.createElement('p');
 
-                if (line.includes("[[") && line.includes("]]")) {
-                    const parts = line.split(/(\[\[.*?\]\])/g).filter(part => part); // Split by link but keep delimiters
+                if (line.match(/\[\[.*?\]\]/g) || line.match(/\{\{.*?\}\}/g)) {
+                    line.split(/(\[\[.*?\]\]|\{\{.*?\}\})/g).filter(part => part);
 
                     parts.forEach(part => {
                         if (part.startsWith('[[') && part.endsWith(']]')) {
@@ -73,10 +73,19 @@
                                 renderPage(linkText);
                             });
                             p.appendChild(clickable);
-                        } else {
+                        } else if(part.startsWith("{{" && part.endsWith("}}"))) {
+                            var custom = part.slice(2,-2);
+                            if(custom.startsWith("img")){
+                                var split = custom.slice("img:")[1]
+                                const img = document.createElement("img");
+                                img.src = `resources/${split}`
+                                p.appendChild(img);
+                            }
+
+                        }else {
                             // Parse markdown for non-link parts and append
                             const span = document.createElement('span');
-                            span.innerHTML = marked.parseInline(part.trim()); // Use parseInline for text within a paragraph
+                            span.innerHTML = marked.parseInline(part); // Use parseInline for text within a paragraph
                             p.appendChild(span);
                         }
                     });

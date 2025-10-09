@@ -5,8 +5,7 @@
             "Welcome to the pulse homepage",
             "Start Exporing:",
             "- [[What is Pulse]]",
-            "- [[Arcadia]]",
-            "{{img:linkSys.png}}"
+            "- [[Arcadia]]"
         ],
         "tags": [
             "main"
@@ -72,9 +71,12 @@
         "body": [],
         "tags": []
     },
-    "test": {
+    "Link system": {
         "title": "",
-        "body": [],
+        "body": [
+            "",
+            "{{img:linkSys.png}}"
+        ],
         "tags": []
     },
     "test1": {

@@ -6,23 +6,32 @@
             "Start Exporing:",
             "- [[What is Pulse]]",
             "- [[Arcadia]]"
-        ]
+        ],
+        "tags":["main"]
     },
     "What is Pulse":{
         "title": "What is Pulse",
         "body": [
             "is the name of a game my friends made in 6th grade that went wild. It went from telekinesis, to kings, to Omniverses (all will be explained later), to eldritch horrors and family issues. In this wiki I am documenting all of it."
-        ]
+        ],
+        "tags":["pulse"]
     },
     "Arcadia":{
         "title": "Arcadia",
         "body":[
             "Arcadia is a continent on a mono-continental world in the Reverse Omniverse.",
             "The name comes from 3 musical works",
-            "- Arcadia the album by Smash into Pieces.",
-            "- Arcadia the album by The Fat Rat",
-            "- Even in Arcadia the album by Sleep Token."
-
-        ]
+            "   - Arcadia the album by Smash into Pieces.",
+            "   - Arcadia the album by The Fat Rat",
+            "   - Even in Arcadia the album by Sleep Token.",
+            "Arcadia is currently home to the people of the [[Anti-Pulse]].To learn about where they were before go to [[Prior Homes of the people of the Pulse and Anti-Pulse]]",
+            "Some notable locations in Arcadia are:",
+            "   -[[Winward]]",
+            "",
+            "Arcadia also has a lot of triditional things such as:",
+            "   -[[Noble Council]]",
+            "   -[[Arcadian King]]"
+        ],
+        "tags":["Arcadia", "Anti-Pulse"]
     }
 }

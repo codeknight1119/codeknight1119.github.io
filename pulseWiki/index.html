@@ -23,18 +23,25 @@
 
     <main id="main-container"></main>
 
+    <button onclick="backPage()" style="position: absolute; top: 0; left: 0;">Back</button>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         // Store page data globally to avoid re-fetching
         let sitePages = {};
         const mainContainer = document.getElementById("main-container");
         const titleElement = document.getElementById("title");
+        let lastPage;
+        let currentPageKey;
 
         /**
          * Renders the content of a specific page from the stored data.
          * @param {string} pageKey - The key of the page to display (e.g., "home").
          */
         function renderPage(pageKey) {
+            lastPage = currentPageKey; // <-- ADD THIS LINE: Store the current page before changing it.
+            currentPageKey = pageKey;    // <-- ADD THIS LINE: Update the current page to the new one.
+
             const page = sitePages[pageKey];
 
             if (!page) {
@@ -53,7 +60,7 @@
 
                 if (line.includes("[[") && line.includes("]]")) {
                     const parts = line.split(/(\[\[.*?\]\])/g).filter(part => part); // Split by link but keep delimiters
-                    
+
                     parts.forEach(part => {
                         if (part.startsWith('[[') && part.endsWith(']]')) {
                             const linkText = part.substring(2, part.length - 2);
@@ -82,7 +89,7 @@
                 mainContainer.appendChild(p);
             });
         }
-        
+
         /**
          * Initializes the application by fetching data and rendering the initial page.
          */
@@ -104,8 +111,13 @@
             }
         }
 
+        function backPage() {
+            renderPage(lastPage);
+        }
         // Start the application
         init();
+
+
 
     </script>
 </body>

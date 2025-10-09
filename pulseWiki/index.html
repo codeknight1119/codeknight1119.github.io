@@ -59,7 +59,7 @@
                 const p = document.createElement('p');
 
                 if (line.match(/\[\[.*?\]\]/g) || line.match(/\{\{.*?\}\}/g)) {
-                    line.split(/(\[\[.*?\]\]|\{\{.*?\}\})/g).filter(part => part);
+                   const parts = line.split(/(\[\[.*?\]\]|\{\{.*?\}\})/g).filter(part => part);
 
                     parts.forEach(part => {
                         if (part.startsWith('[[') && part.endsWith(']]')) {
@@ -73,10 +73,10 @@
                                 renderPage(linkText);
                             });
                             p.appendChild(clickable);
-                        } else if(part.startsWith("{{" && part.endsWith("}}"))) {
+                        } else if(part.startsWith("{{") && part.endsWith("}}")) {
                             var custom = part.slice(2,-2);
                             if(custom.startsWith("img")){
-                                var split = custom.slice("img:")[1]
+                                var split = custom.split("img:")[1]
                                 const img = document.createElement("img");
                                 img.src = `resources/${split}`
                                 p.appendChild(img);

@@ -18,7 +18,7 @@
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.13</h4>
+        <h4>v.14</h4>
     </header>
 
     <main id="main-container"></main>
@@ -39,8 +39,8 @@
          * @param {string} pageKey - The key of the page to display (e.g., "home").
          */
         function renderPage(pageKey) {
-            lastPage = currentPageKey; // <-- ADD THIS LINE: Store the current page before changing it.
-            currentPageKey = pageKey;    // <-- ADD THIS LINE: Update the current page to the new one.
+            lastPage = currentPageKey;
+            currentPageKey = pageKey;
 
             const page = sitePages[pageKey];
 
@@ -54,69 +54,73 @@
             mainContainer.innerHTML = "";
             titleElement.textContent = page.title;
 
-            // Process and display the main body content
+            // --- REFACTORED LOGIC STARTS HERE ---
+
+            // This variable will track where new elements should be appended.
+            // By default, it's the main container.
+            let currentContainer = mainContainer;
+
             page.body.forEach(line => {
+                // First, check if the entire line is a custom command
+                const trimmedLine = line.trim();
+                if (trimmedLine.startsWith('{{') && trimmedLine.endsWith('}}')) {
+                    const custom = trimmedLine.slice(2, -2);
+
+                    if (custom.startsWith("dropDownStart")) {
+                        const title = custom.split("dropDownStart:")[1];
+                        const details = document.createElement("details");
+                        const summary = document.createElement("summary");
+                        summary.textContent = title;
+                        details.appendChild(summary);
+                        currentContainer.appendChild(details);
+
+                        // *** This is the key change ***
+                        // New content will now be added INSIDE the <details> element
+                        currentContainer = details;
+                        return; // Move to the next line
+
+                    } else if (custom.startsWith("dropDownEnd")) {
+                        // Go back to adding content to the main container
+                        currentContainer = mainContainer;
+                        return; // Move to the next line
+
+                    } else if (custom.startsWith("img")) {
+                        const src = custom.split("img:")[1];
+                        const img = document.createElement("img");
+                        img.src = `resources/${src}`;
+                        currentContainer.appendChild(img);
+                        return; // Move to the next line
+                    }
+                }
+
+                // If the line is not a command, process it as a paragraph of content
                 const p = document.createElement('p');
 
-                if (line.match(/\[\[.*?\]\]/g) || line.match(/\{\{.*?\}\}/g)) {
-                    const parts = line.split(/(\[\[.*?\]\]|\{\{.*?\}\})/g).filter(part => part);
-
-                    var dropdown = false;
-                    var dropdownElement = null;
-
-
+                if (line.match(/\[\[.*?\]\]/g)) {
+                    // This logic for handling inline links is good, so we keep it.
+                    const parts = line.split(/(\[\[.*?\]\])/g).filter(part => part);
                     parts.forEach(part => {
-                        var endAppend = null;
                         if (part.startsWith('[[') && part.endsWith(']]')) {
                             const linkText = part.substring(2, part.length - 2);
                             const clickable = document.createElement('span');
                             clickable.textContent = linkText;
                             clickable.className = 'clickable';
-                            clickable.addEventListener('click', () => {
-                                // Instead of a full re-render, you could update history for back/forward buttons
-                                // history.pushState({page: linkText}, '', `?startPage=${linkText}`);
-                                renderPage(linkText);
-                            });
+                            clickable.addEventListener('click', () => renderPage(linkText));
                             p.appendChild(clickable);
-                        } else if (part.startsWith("{{") && part.endsWith("}}")) {
-                            var custom = part.slice(2, -2);
-                            if (custom.startsWith("img")) {
-                                var split = custom.split("img:")[1]
-                                const img = document.createElement("img");
-                                img.src = `resources/${split}`
-
-                            } else if (part.startsWith("dropDownStart")) {
-                                var split = custom.split("dropDownStart:")[1]
-                                dropdown = true;
-                                dropdownElement = document.createElement("details");
-                                p.appendChild(dropdownElement);
-                                var dropdownSumarry = document.createElement("summary")
-                                dropdownSumarry.textContent = split;
-                                endAppend = dropdownSumarry;
-                            }else if(part.startsWith("dropDownEnd")){
-                              //  var split = custom.split("dropDownEnd:")[1];
-                                dropdown = false;
-                                dropdownElement = null;
-                            }
-                            if(dropdown){
-                                dropdownElement.appendChild(endAppend);
-                            }else{
-                            p.appendChild(endAppend);
-                            };
                         } else {
-                            // Parse markdown for non-link parts and append
                             const span = document.createElement('span');
-                            span.innerHTML = marked.parseInline(part); // Use parseInline for text within a paragraph
+                            span.innerHTML = marked.parseInline(part);
                             p.appendChild(span);
                         }
                     });
-
                 } else {
                     // If no links, parse the whole line as Markdown
                     p.innerHTML = marked.parse(line);
                 }
 
-                mainContainer.appendChild(p);
+                // Append the newly created paragraph to the correct container
+                // (which could be mainContainer or a <details> element)
+                currentContainer.appendChild(p);
             });
         }
 

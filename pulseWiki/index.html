@@ -18,7 +18,7 @@
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.14</h4>
+        <h4>v.15</h4>
     </header>
 
     <main id="main-container"></main>
@@ -45,7 +45,7 @@
             const page = sitePages[pageKey];
 
             history.pushState({ pageKey }, "", `?page=${encodeURIComponent(pageKey)}`);
-            
+
             if (!page) {
                 mainContainer.innerHTML = `<p>Error: Page "<strong>${pageKey}</strong>" not found.</p>`;
                 titleElement.textContent = "Error";

@@ -67,8 +67,11 @@
         "tags": []
     },
     "Arcadian Noble Council": {
-        "title": "",
-        "body": [],
+        "title": "Arcadia Noble Council",
+        "body": [
+            "One of the most imporant Arcadian government elements is the Nobel Council.",
+            "Council members have various jobs that are the backbone of the whole Arcadian government."
+        ],
         "tags": []
     },
     "Link system": {

@@ -75,7 +75,8 @@
                         const title = custom.split("dropDownStart:")[1];
                         const details = document.createElement("details");
                         const summary = document.createElement("summary");
-                        summary.textContent = marked.parseInline(title);
+                        const titletext = marked.parseInline(title);
+                        summary.textContent = titletext;
                         details.appendChild(summary);
                         currentContainer.appendChild(details);
 

@@ -77,7 +77,10 @@
             "{{dropDownEnd}}",
             "{{dropDownStart:###Ranks}}",
             "While disputed if ranking up in the noble ranks is a responsibility, everyone in the Noble Ranks has ranked up. Ranking up shows others that you can show commutment to long term goals and gain respect.",
-            "##Rank 1"
+            "##Rank 1: Unrefined Grimite",
+            "The first rank of the Noble Ranks, this is the baseline you are to expand apon. Not many look down on this rank, but try and mentor people of this rank to get them status.",
+            "{{img:ANR1.png}}",
+            "(Picture above is a replica of the cloak clasp for this rank.)"
 
         ],
         "tags": []

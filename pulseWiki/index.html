@@ -44,11 +44,14 @@
 
             const page = sitePages[pageKey];
 
+            history.pushState({ pageKey }, "", `?page=${encodeURIComponent(pageKey)}`);
+            
             if (!page) {
                 mainContainer.innerHTML = `<p>Error: Page "<strong>${pageKey}</strong>" not found.</p>`;
                 titleElement.textContent = "Error";
                 return;
             }
+            
 
             // Clear previous content
             mainContainer.innerHTML = "";
@@ -135,9 +138,9 @@
                 }
                 sitePages = await response.json();
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const startPage = urlParams.get("startPage") || "home";
-                renderPage(startPage);
+                const params = new URLSearchParams(window.location.search);
+                const startPage = params.get("page") || "home";
+                renderPage(startPage, true);
             } catch (error) {
                 titleElement.textContent = "Error";
                 mainContainer.innerHTML = `<p>Failed to load page data: ${error}</p>`;

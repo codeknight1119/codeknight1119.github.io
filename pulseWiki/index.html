@@ -59,9 +59,14 @@
                 const p = document.createElement('p');
 
                 if (line.match(/\[\[.*?\]\]/g) || line.match(/\{\{.*?\}\}/g)) {
-                   const parts = line.split(/(\[\[.*?\]\]|\{\{.*?\}\})/g).filter(part => part);
+                    const parts = line.split(/(\[\[.*?\]\]|\{\{.*?\}\})/g).filter(part => part);
+
+                    var dropdown = false;
+                    var dropdownElement = null;
+
 
                     parts.forEach(part => {
+                        var endAppend = null;
                         if (part.startsWith('[[') && part.endsWith(']]')) {
                             const linkText = part.substring(2, part.length - 2);
                             const clickable = document.createElement('span');
@@ -73,16 +78,32 @@
                                 renderPage(linkText);
                             });
                             p.appendChild(clickable);
-                        } else if(part.startsWith("{{") && part.endsWith("}}")) {
-                            var custom = part.slice(2,-2);
-                            if(custom.startsWith("img")){
+                        } else if (part.startsWith("{{") && part.endsWith("}}")) {
+                            var custom = part.slice(2, -2);
+                            if (custom.startsWith("img")) {
                                 var split = custom.split("img:")[1]
                                 const img = document.createElement("img");
                                 img.src = `resources/${split}`
-                                p.appendChild(img);
-                            }
 
-                        }else {
+                            } else if (part.startsWith("dropDownStart")) {
+                                var split = custom.split("dropDownStart:")[1]
+                                dropdown = true;
+                                dropdownElement = document.createElement("details");
+                                p.appendChild(dropdownElement);
+                                var dropdownSumarry = document.createElement("summary")
+                                dropdownSumarry.textContent = split;
+                                endAppend = dropdownSumarry;
+                            }else if(part.startsWith("dropDownEnd")){
+                              //  var split = custom.split("dropDownEnd:")[1];
+                                dropdown = false;
+                                dropdownElement = null;
+                            }
+                            if(dropdown){
+                                dropdownElement.appendChild(endAppend);
+                            }else{
+                            p.appendChild(endAppend);
+                            };
+                        } else {
                             // Parse markdown for non-link parts and append
                             const span = document.createElement('span');
                             span.innerHTML = marked.parseInline(part); // Use parseInline for text within a paragraph

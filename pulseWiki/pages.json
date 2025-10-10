@@ -70,7 +70,12 @@
         "title": "Arcadia Noble Council",
         "body": [
             "One of the most imporant Arcadian government elements is the Nobel Council.",
-            "Council members have various jobs that are the backbone of the whole Arcadian government."
+            "Council members have various jobs that are the backbone of the whole Arcadian government.",
+            "{{dropDowndropDownStart:Boards}}",
+            "Nobles may be assigned to a board with a specific topic. Any noble may make a law proposal, but it will be sent to the corresponding group of which the law falls under. The public can also send in law proposals, and there is a member in each board to read proposals and propose them on board debates. ",
+            "If it passes a 70% vote of the attendance, it goes to the polling stage, where 35% of the other boards needs to give it a go ahead. After that, it is signed into an actual law. (US legislative branch take notes)",
+            "{{dropDownEnd}}"
+
         ],
         "tags": []
     },

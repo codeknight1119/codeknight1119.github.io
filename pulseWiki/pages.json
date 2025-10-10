@@ -48,7 +48,21 @@
             "The powers work trough blood, there are bloodlines for each power. Each person is born with powers from their parents, with recessive and dominant powers like genetics.",
             "You can also make and get other powers from blood fountains, where people have made new powers by splicing parts of other powers together.",
             "I say say **GET** other powers, because you need to learn them.",
-            "Now here is a list of bloodline powers:"
+            "Now here is a list of bloodline powers:",
+            "{{dropDownStart:Dolor}}",
+            "{{dropDownEnd}}",
+            "{{dropDownStart:Granite}}",
+            "{{dropDownEnd}}",
+            "{{dropDownStart:Aqua Reja}}",
+            "{{dropDownEnd}}",
+            "{{dropDownStart:Apparitionists}}",
+            "{{dropDownEnd}}",
+            "{{dropDownStart:Summoners}}",
+            "{{dropDownEnd}}",
+            "{{dropDownStart:Ascentionists}}",
+            "{{dropDownEnd}}",
+            "{{dropDownStart:Rains}}",
+            "{{dropDownEnd}}"
         ],
         "tags": []
     },
@@ -81,7 +95,6 @@
             "The first rank of the Noble Ranks, this is the baseline you are to expand apon. Not many look down on this rank, but try and mentor people of this rank to get them status.",
             "{{img:ANR1.png}}",
             "(Picture above is a replica of the cloak clasp for this rank.)"
-
         ],
         "tags": []
     },

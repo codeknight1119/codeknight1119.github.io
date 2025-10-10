@@ -96,6 +96,9 @@
                         img.src = `resources/${src}`;
                         currentContainer.appendChild(img);
                         return; // Move to the next line
+                    }else if(custom.startsWith("background:")){
+                        const src = custom.split("background:")[1];
+                        document.body.style.backgroundImage(`url(resources/${src})`)
                     }
                 }
 

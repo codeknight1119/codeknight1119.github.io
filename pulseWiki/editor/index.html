@@ -17,7 +17,8 @@
         }
 
         #editor-container {
-            height: calc(100vh - 100px);
+            /* Adjust height to fit screen, leaving space for header/button/status */
+            height: calc(100vh - 200px); 
             width: 100%;
             border-radius: 0.5rem;
             overflow: hidden;
@@ -28,6 +29,12 @@
             width: 100%;
             height: 100%;
         }
+
+        @media (min-width: 768px) {
+            #editor-container {
+                height: calc(100vh - 180px);
+            }
+        }
     </style>
 </head>
 
@@ -35,17 +42,21 @@
 
     <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl font-extrabold text-white mb-4">Live Wiki Content Editor</h1>
+        <!-- Status Bar -->
         <div id="status"
-            class="mb-4 p-3 text-sm rounded-lg shadow-md text-white bg-gray-800 transition-all duration-300">
-            Initializing...
+            class="mb-4 p-3 text-sm rounded-lg shadow-md text-white bg-gray-800 transition-all duration-300 flex justify-between items-center">
+            <span>Initializing...</span>
+            <span id="user-id" class="font-mono text-xs opacity-75"></span>
         </div>
 
+        <!-- Save Button -->
         <button id="save-btn"
             class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg mb-4 disabled:opacity-50 transition duration-150"
             disabled>
             Save Changes (Ctrl+S / Cmd+S)
         </button>
 
+        <!-- Monaco Editor Container -->
         <div id="editor-container" class="shadow-2xl ring-2 ring-indigo-500/50">
             <div id="json-editor"></div>
         </div>
@@ -56,21 +67,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import {
-            getFirestore, doc, onSnapshot, setDoc, getDoc,
+            getFirestore, doc, onSnapshot, setDoc,
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Mandatory Global Variables provided by the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = {
-            apiKey: "AIzaSyBAW--rNK2qzIR2AxPt1eWeUzlIr6k-M_M",
-            authDomain: "pulsewiki-editor.firebaseapp.com",
-            projectId: "pulsewiki-editor",
-            storageBucket: "pulsewiki-editor.firebasestorage.app",
-            messagingSenderId: "520219616853",
-            appId: "1:520219616853:web:1d76ab3dddee6a6d1696dc",
-            measurementId: "G-KX6VXX3NFP"
-        };
+        // FIX: Using the environment provided config which resolves the 'auth/configuration-not-found' error.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app;
@@ -86,21 +90,34 @@
         const docRefPath = `artifacts/${appId}/public/data/wiki_content/live_doc`;
 
         // DOM elements
-        const statusElement = document.getElementById('status');
+        const statusElement = document.getElementById('status').querySelector('span:first-child');
+        const userIdElement = document.getElementById('user-id');
         const saveBtn = document.getElementById('save-btn');
 
+        /**
+         * Updates the status message and styling.
+         * @param {string} message - The message to display.
+         * @param {boolean} isError - If true, displays the message with error styling.
+         */
         function updateStatus(message, isError = false) {
             statusElement.textContent = message;
+            const parent = statusElement.parentElement;
+
             if (isError) {
-                statusElement.classList.remove('bg-gray-800');
-                statusElement.classList.add('bg-red-700');
+                parent.classList.remove('bg-gray-800', 'bg-green-700');
+                parent.classList.add('bg-red-700');
+            } else if (message.includes('Successfully saved')) {
+                parent.classList.remove('bg-gray-800', 'bg-red-700');
+                parent.classList.add('bg-green-700');
             } else {
-                statusElement.classList.remove('bg-red-700');
-                statusElement.classList.add('bg-gray-800');
+                parent.classList.remove('bg-red-700', 'bg-green-700');
+                parent.classList.add('bg-gray-800');
             }
         }
 
-        // --- Firebase Setup ---
+        /**
+         * Initializes Firebase app, Firestore, and Authentication.
+         */
         async function initFirebase() {
             if (!firebaseConfig) {
                 updateStatus("ERROR: Firebase configuration is missing.", true);
@@ -109,15 +126,23 @@
 
             // setLogLevel('Debug'); // Uncomment for debugging
 
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+            } catch (e) {
+                updateStatus(`Firebase Init Error: ${e.message}`, true);
+                return;
+            }
+
 
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
                     isAuthReady = true;
-                    updateStatus(`Signed in as user: ${userId}. Waiting for editor...`);
+                    userIdElement.textContent = `User ID: ${userId}`;
+                    updateStatus(`Signed in. Waiting for editor to load...`);
+
                     if (isEditorReady) {
                         setupFirestoreListener();
                     }
@@ -131,22 +156,29 @@
                         }
                     } catch (error) {
                         updateStatus(`Authentication failed: ${error.message}`, true);
+                        userIdElement.textContent = 'Auth Failed';
                     }
                 }
             });
         }
 
-        // --- Firestore Realtime Listener ---
+        /**
+         * Sets up the Firestore Realtime Listener for the document.
+         */
         function setupFirestoreListener() {
             if (!db || !userId || !editor) return;
 
             const docRef = doc(db, docRefPath);
             updateStatus("Listening for real-time document updates...");
 
+            // Listen for document changes
             onSnapshot(docRef, (docSnapshot) => {
                 if (docSnapshot.exists()) {
                     const data = docSnapshot.data();
+                    // Store data as JSON string in Firestore; retrieve it here.
                     const jsonString = data?.jsonData || '{}';
+                    const lastEditor = data?.lastEditorId || 'Unknown';
+                    const lastEdited = data?.lastEdited ? new Date(data.lastEdited).toLocaleTimeString() : 'N/A';
 
                     try {
                         // Pretty print the incoming JSON
@@ -157,12 +189,12 @@
                         if (editor.getValue() !== formattedJson) {
                             editor.setValue(formattedJson);
                             // Optionally auto-format on load (Monaco action)
-                            setTimeout(() => editor.getAction('editor.action.formatDocument').run(), 500);
+                            // setTimeout(() => editor.getAction('editor.action.formatDocument').run(), 500);
                         }
-                        updateStatus(`Document loaded and listening. Last updated by DB.`);
+                        updateStatus(`Document loaded. Last update by ${lastEditor === userId ? 'You' : lastEditor} at ${lastEdited}.`);
 
                     } catch (e) {
-                        updateStatus(`Warning: Data from database is invalid JSON.`, true);
+                        updateStatus(`Warning: Data from database is invalid JSON. (${e.message})`, true);
                         editor.setValue(jsonString); // Load raw string if invalid
                     }
 
@@ -171,8 +203,11 @@
                     updateStatus("Document does not exist. Initializing with empty JSON.");
                     saveDocument(JSON.stringify({
                         "title": "New Wiki Page",
-                        "content": "Start editing your JSON structure here."
-                    }, null, 2), false);
+                        "sections": [
+                            { "heading": "Introduction", "text": "Start editing your JSON structure here to build your wiki page content." },
+                            { "heading": "Key Points", "list": ["Point 1", "Point 2"] }
+                        ]
+                    }, null, 2), false); // Save without showing status message
                 }
                 saveBtn.disabled = false;
             }, (error) => {
@@ -181,9 +216,14 @@
             });
         }
 
-        // --- Save Logic ---
+        /**
+         * Saves the current editor content to Firestore.
+         * @param {string} [content] - The content to save. Defaults to editor value.
+         * @param {boolean} [showStatus=true] - Whether to update the status bar during save.
+         */
         async function saveDocument(content = editor.getValue(), showStatus = true) {
-            if (!db || !userId || isSaving) return;
+            if (!db || !userId || isSaving || !editor) return;
+
             isSaving = true;
             saveBtn.disabled = true;
 
@@ -196,7 +236,7 @@
                     // Attempt to parse and stringify to ensure it's valid JSON before saving
                     validatedJson = JSON.stringify(JSON.parse(content));
                 } catch (e) {
-                    updateStatus("ERROR: Invalid JSON structure. Cannot save.", true);
+                    updateStatus("ERROR: Invalid JSON structure. Please correct the syntax.", true);
                     isSaving = false;
                     saveBtn.disabled = false;
                     return;
@@ -212,14 +252,16 @@
                 await setDoc(docRef, dataToSave);
 
                 if (showStatus) {
-                    updateStatus("Successfully saved document!");
+                    // Wait for onSnapshot to fire and update the final status
+                    // but provide immediate feedback
+                    updateStatus("Save initiated...");
                 }
             } catch (error) {
                 updateStatus(`Save Error: ${error.message}`, true);
             } finally {
                 isSaving = false;
-                saveBtn.disabled = false;
-                // The onSnapshot listener will update the editor with the saved content
+                // Button re-enabled by onSnapshot listener on success, or here on error
+                if (saveBtn.disabled) saveBtn.disabled = false;
             }
         }
 
@@ -238,6 +280,7 @@
                     automaticLayout: true,
                     minimap: { enabled: false },
                     fontFamily: 'Inter, sans-serif',
+                    tabSize: 2,
                     // Enable JSON validation features
                     'semanticValidation': true,
                     'syntacticValidation': true
@@ -251,6 +294,7 @@
                 // 4. Attach keyboard shortcut for saving (Ctrl+S / Cmd+S)
                 editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
                     saveDocument();
+                    return false; // Prevent browser's default save dialog
                 });
 
                 // 5. If Auth is ready, start the listener

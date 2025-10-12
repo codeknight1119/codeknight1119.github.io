@@ -9,6 +9,9 @@
         ],
         "tags": [
             "main"
+        ],
+        "style":[
+            "background:libary.png"
         ]
     },
     "What is Pulse": {
@@ -26,7 +29,7 @@
             "Arcadia is a continent on a mono-continental world in the [[Reverse Omniverse.]]",
             "The name comes from 3 musical works",
             "   - Arcadia the album by Smash into Pieces.",
-            "   - Arcadia the album by The Fat Rat",
+            "   - Arcadia the album by TheFatRat",
             "   - Even in Arcadia the album by Sleep Token.",
             "Arcadia is currently home to the people of the [[Anti-Pulse]].To learn about where they were before go to  [[Prior Homes of the people of the Pulse and Anti-Pulse]]",
             "Some notable locations in Arcadia are:",

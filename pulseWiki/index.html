@@ -53,7 +53,7 @@
                 titleElement.textContent = "Error";
                 return;
             }
-            
+
 
             // Clear previous content
             mainContainer.innerHTML = "";
@@ -96,10 +96,8 @@
                         img.src = `resources/${src}`;
                         currentContainer.appendChild(img);
                         return; // Move to the next line
-                    }else if(custom.startsWith("background:")){
-                        const src = custom.split("background:")[1];
-                        document.body.style.backgroundImage(`url(resources/${src})`)
                     }
+
                 }
 
                 // If the line is not a command, process it as a paragraph of content
@@ -131,6 +129,13 @@
                 // (which could be mainContainer or a <details> element)
                 currentContainer.appendChild(p);
             });
+
+            page.style.forEach(aspect => {
+                const timmedAspect = aspect.trim();
+                if (timmedAspect.startsWith("background:"))
+                    var src = timmedAspect.split("background:")[1];
+                document.body.style.backgroundImage(`url(resources/${src})`)
+            })
         }
 
         /**
@@ -155,7 +160,8 @@
         }
 
         function backPage() {
-            renderPage(lastPage);
+            // renderPage(lastPage);
+            history.back();
         }
         // Start the application
         init();

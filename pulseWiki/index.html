@@ -16,7 +16,6 @@
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-image: url("resources/libary.png");
         }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png">
@@ -144,7 +143,7 @@
                     var src = timmedAspect.split("background:")[1];
                     src = src.trim();
                     if(img !== undefined){
-                    document.body.style.backgroundImage = img;
+                    document.body.style.backgroundImage = `url(resources/${img})`;
                     }
                 }
             })

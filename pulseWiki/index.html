@@ -11,6 +11,12 @@
             text-decoration: underline;
             cursor: pointer;
         }
+
+        body {
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png">
 </head>
@@ -132,10 +138,10 @@
 
             page.style.forEach(aspect => {
                 const timmedAspect = aspect.trim();
-                if (timmedAspect.startsWith("background:")){
+                if (timmedAspect.startsWith("background:")) {
                     var src = timmedAspect.split("background:")[1];
                     src = src.trim();
-               document.body.style.backgroundImage = `url('pulseWiki/resources/${src}')`;
+                    document.body.style.backgroundImage = `url(resources/${src})`;
                 }
             })
         }
@@ -162,8 +168,8 @@
         }
 
         function backPage() {
-         renderPage(lastPage);
-          //  history.back();
+            renderPage(lastPage);
+            //  history.back();
         }
         // Start the application
         init();

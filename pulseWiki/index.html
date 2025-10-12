@@ -134,6 +134,7 @@
                 const timmedAspect = aspect.trim();
                 if (timmedAspect.startsWith("background:")){
                     var src = timmedAspect.split("background:")[1];
+                    src = src.trim();
                document.body.style.backgroundImage = `url('resources/${src}')`;
                 }
             })
@@ -161,8 +162,8 @@
         }
 
         function backPage() {
-            // renderPage(lastPage);
-            history.back();
+         renderPage(lastPage);
+          //  history.back();
         }
         // Start the application
         init();

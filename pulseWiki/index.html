@@ -16,7 +16,6 @@
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-image: "url(src:pulseWiki/resources/library.png)";
         }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png">
@@ -48,6 +47,7 @@
          * @param {string} pageKey - The key of the page to display (e.g., "home").
          */
         function renderPage(pageKey) {
+            var libaryImg = fetch("resources/library.png");
             lastPage = currentPageKey;
             currentPageKey = pageKey;
 
@@ -142,7 +142,7 @@
                 if (timmedAspect.startsWith("background:")) {
                     var src = timmedAspect.split("background:")[1];
                     src = src.trim();
-                    document.body.style.backgroundImage = `url(resources/${src})`;
+                    document.body.style.backgroundImage = img;
                 }
             })
         }

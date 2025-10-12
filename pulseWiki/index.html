@@ -17,6 +17,16 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
+
+        p {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* dark overlay */
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png">
 </head>
@@ -25,7 +35,7 @@
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.24</h4>
+        <h4>v.25</h4>
 
     </header>
 
@@ -42,6 +52,7 @@
         let lastPage;
         let currentPageKey;
         let img;
+        let currentColor = [0, 0, 0];
 
         /**
          * Renders the content of a specific page from the stored data.
@@ -130,6 +141,7 @@
                 } else {
                     // If no links, parse the whole line as Markdown
                     p.innerHTML = marked.parse(line);
+
                 }
 
                 // Append the newly created paragraph to the correct container

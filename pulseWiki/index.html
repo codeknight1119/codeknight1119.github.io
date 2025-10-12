@@ -132,9 +132,10 @@
 
             page.style.forEach(aspect => {
                 const timmedAspect = aspect.trim();
-                if (timmedAspect.startsWith("background:"))
+                if (timmedAspect.startsWith("background:")){
                     var src = timmedAspect.split("background:")[1];
                document.body.style.backgroundImage = `url('resources/${src}')`;
+                }
             })
         }
 

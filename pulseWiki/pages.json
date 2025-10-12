@@ -11,7 +11,7 @@
             "main"
         ],
         "style":[
-            "background:library.png"
+            "background:libary.png"
         ]
     },
     "What is Pulse": {
@@ -42,6 +42,9 @@
         "tags": [
             "Arcadia",
             "Anti-Pulse"
+        ],
+        "style":[
+ "background:ruinsBooks.png"            
         ]
     },
     "Anti-Pulse": {

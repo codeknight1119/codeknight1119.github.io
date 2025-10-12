@@ -16,6 +16,7 @@
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            background-image: url("resources/library.png");
         }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png">
@@ -154,7 +155,6 @@
          */
         async function init() {
             try {
-                img = await fetch("resources/library.png")
                 const response = await fetch("pages.json");
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);

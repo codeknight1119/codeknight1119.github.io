@@ -41,13 +41,13 @@
         const titleElement = document.getElementById("title");
         let lastPage;
         let currentPageKey;
+        let img;
 
         /**
          * Renders the content of a specific page from the stored data.
          * @param {string} pageKey - The key of the page to display (e.g., "home").
          */
         function renderPage(pageKey) {
-            var libaryImg = fetch("resources/library.png");
             lastPage = currentPageKey;
             currentPageKey = pageKey;
 
@@ -142,7 +142,9 @@
                 if (timmedAspect.startsWith("background:")) {
                     var src = timmedAspect.split("background:")[1];
                     src = src.trim();
+                    if(img !== undefined){
                     document.body.style.backgroundImage = img;
+                    }
                 }
             })
         }
@@ -152,6 +154,7 @@
          */
         async function init() {
             try {
+                img = await fetch("resources/library.png")
                 const response = await fetch("pages.json");
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);

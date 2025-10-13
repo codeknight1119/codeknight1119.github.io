@@ -11,7 +11,7 @@
         "tags": [
             "main"
         ],
-        "style":[
+        "style": [
             "background:libary.png"
         ]
     },
@@ -44,8 +44,8 @@
             "Arcadia",
             "Anti-Pulse"
         ],
-        "style":[
- "background:ruinsBooks.png"            
+        "style": [
+            "background:ruinsBooks.png"
         ]
     },
     "Anti-Pulse": {
@@ -128,7 +128,6 @@
             "Read more here: [[The Lost Omniverse]]",
             "## The New/Blue Omniverse",
             "This is home to the newest universes, filled with vegitation and life. Not mcuh has happned so far in it, but here is its page: [[The New/Blue Omniverse]]"
-
         ],
         "tags": []
     },
@@ -143,6 +142,49 @@
             "- Finish what was started in 8th grade in [[9th Grade]]",
             "There is more to come as the story contenues!"
         ],
+        "tags": []
+    },
+    "6th Grade": {
+        "title": "6th Grade",
+        "body": [
+            "I dont remeber a lot of 6th grade, so a lot of book cannon things will be filled in here.",
+            "What I do remember very vividly is a trip to libary that started it all. Chris had brought a book on telekenisis and Max forgot his book at home. Max read Chris's for a bit and got bored. He crumpled up a peice of paper and tried to move it with his mind.",
+            "Imagine Max's supprise when it moved.",
+            "",
+            " Chris and Max called it 'The Lunch Method' and tested it.",
+            "They got their friend Asher to join as well.",
+            "[[7th Grade]]"
+        ],
+        "style": [
+            "background:libary.png"
+        ],
+        "tags": []
+    },
+    "7th Grade": {
+        "title": "7th Grade",
+        "body": [
+            "7th grade I have more memories of and where this story really kicks off.",
+            ""
+        ],
+        "style": [],
+        "tags": []
+    },
+    "8th Grade": {
+        "title": "8th Grade",
+        "body": [],
+        "style": [],
+        "tags": []
+    },
+    "Summer of 8/9th Grade": {
+        "title": "Summer of 8/9th Grade",
+        "body": [],
+        "style": [],
+        "tags": []
+    },
+    "9th Grade": {
+        "title": "9th Grade",
+        "body": [],
+        "style": [],
         "tags": []
     }
 }

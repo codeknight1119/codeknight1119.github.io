@@ -122,6 +122,15 @@
                     }
 
                 }
+                const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*)$/);
+                if (headingMatch) {
+                    const level = headingMatch[1].length; // how many #
+                    const content = headingMatch[2];
+                    const h = document.createElement(`h${level}`);
+                    h.innerHTML = marked.parseInline(content);
+                    currentContainer.appendChild(h);
+                    return;
+                }
 
                 // If the line is not a command, process it as a paragraph of content
                 const p = document.createElement('p');

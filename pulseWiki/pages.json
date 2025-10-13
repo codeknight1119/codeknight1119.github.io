@@ -17,7 +17,7 @@
     "What is Pulse": {
         "title": "What is Pulse",
         "body": [
-            "is the name of a game my friends made in 6th grade that went wild. It went from telekinesis, to kings, to Omniverses (all will be explained later), to eldritch horrors and family issues. In this wiki I am documenting all of it."
+            "*THE* Pulse is the name of a game my friends made in 6th grade that went wild. It went from telekinesis, to kings, to [[Omniverses]] (all will be explained later), to eldritch horrors and family issues. In this wiki I am documenting all of it."
         ],
         "tags": [
             "pulse"
@@ -112,9 +112,23 @@
         ],
         "tags": []
     },
-    "test1": {
-        "title": "",
-        "body": [],
+    "Omniverses": {
+        "title": "Omniverses",
+        "body": [
+            "Omniverses, discovered in [[8th grade]] during the [[Other Worlds Than These]] saga by Max after his vison of [[Trailblazer]] are universes for multiverses.",
+            "They work around the prinicble of infinity with rulesets. In our universe there is an infinite amount of things in a ruleset, and in our multiverse  there are infinite universes with a rulseset.",
+            "When they were first discovered, there were four:",
+            "##Our/Normal Omniverse",
+            "Our omniverse, relative to us, the normal one. [[The Pulse]]'s current home [[Eden]] resides here and is where you are reading this article from. (Probably)",
+            "##The Reverse Omniverse",
+            "The reverse omniverse, home to [[Arcadia]] and the [[Anti-Pulse]], is the oppoiste of ours and has reverse causation. Instead of time just rewinidng, events rewind.",
+            "##The Lost Omniverse",
+            "My personal favorite, The Lost Omniverse is home to dead universes, but still has some cool stuff in it. It has a sentient gaurdian named Lost. It has it sown archeyupe.",
+            "Read more here: [[The Lost Omniverse]]",
+            "##The New/Blue Omniverse",
+            "This is home to the newest universes, filled with vegitation and life. Not mcuh has happned so far in it, but here is its page: [[The New/Blue Omniverse]]"
+
+        ],
         "tags": []
     },
     "test3": {

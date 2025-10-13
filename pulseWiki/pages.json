@@ -5,7 +5,8 @@
             "Welcome to the pulse homepage",
             "Start Exploring:",
             "- [[What is Pulse]]",
-            "- [[Arcadia]]"
+            "- [[Arcadia]]",
+            "-[[The Story]]"
         ],
         "tags": [
             "main"
@@ -91,13 +92,13 @@
         "body": [
             "One of the most imporant Arcadian government elements is the Nobel Council.",
             "Council members have various jobs that are the backbone of the whole Arcadian government.",
-            "{{dropDownStart:###Boards}}",
+            "{{dropDownStart:### Boards}}",
             "Nobles may be assigned to a board with a specific topic. Any noble may make a law proposal, but it will be sent to the corresponding group of which the law falls under. The public can also send in law proposals, and there is a member in each board to read proposals and propose them on board debates. ",
             "If it passes a 70% vote of the attendance, it goes to the polling stage, where 35% of the other boards needs to give it a go ahead. After that, it is signed into an actual law. (US legislative branch take notes)",
             "{{dropDownEnd}}",
-            "{{dropDownStart:###Ranks}}",
+            "{{dropDownStart:### Ranks}}",
             "While disputed if ranking up in the noble ranks is a responsibility, everyone in the Noble Ranks has ranked up. Ranking up shows others that you can show commutment to long term goals and gain respect.",
-            "##Rank 1: Unrefined Grimite",
+            "## Rank 1: Unrefined Grimite",
             "The first rank of the Noble Ranks, this is the baseline you are to expand apon. Not many look down on this rank, but try and mentor people of this rank to get them status.",
             "{{img:ANR1.png}}",
             "(Picture above is a replica of the cloak clasp for this rank.)"
@@ -118,22 +119,30 @@
             "Omniverses, discovered in [[8th grade]] during the [[Other Worlds Than These]] saga by Max after his vison of [[Trailblazer]] are universes for multiverses.",
             "They work around the prinicble of infinity with rulesets. In our universe there is an infinite amount of things in a ruleset, and in our multiverse  there are infinite universes with a rulseset.",
             "When they were first discovered, there were four:",
-            "##Our/Normal Omniverse",
+            "## Our/Normal Omniverse",
             "Our omniverse, relative to us, the normal one. [[The Pulse]]'s current home [[Eden]] resides here and is where you are reading this article from. (Probably)",
-            "##The Reverse Omniverse",
+            "## The Reverse Omniverse",
             "The reverse omniverse, home to [[Arcadia]] and the [[Anti-Pulse]], is the oppoiste of ours and has reverse causation. Instead of time just rewinidng, events rewind.",
-            "##The Lost Omniverse",
+            "## The Lost Omniverse",
             "My personal favorite, The Lost Omniverse is home to dead universes, but still has some cool stuff in it. It has a sentient gaurdian named Lost. It has it sown archeyupe.",
             "Read more here: [[The Lost Omniverse]]",
-            "##The New/Blue Omniverse",
+            "## The New/Blue Omniverse",
             "This is home to the newest universes, filled with vegitation and life. Not mcuh has happned so far in it, but here is its page: [[The New/Blue Omniverse]]"
 
         ],
         "tags": []
     },
-    "test3": {
-        "title": "",
-        "body": [],
+    "The Story": {
+        "title": "The Story",
+        "body": [
+            "This is the main hub for the story of this game.",
+            "- See how it begins in [[6th Grade]]",
+            "- The story explodes in [[7th Grade]]",
+            "- Discover other worlds than theese in [[8th Grade]]",
+            "- Learn more of the ancients in [[Summer of 8/9th Grade]]",
+            "- Finish what was started in 8th grade in [[9th Grade]]",
+            "There is more to come as the story contenues!"
+        ],
         "tags": []
     }
 }

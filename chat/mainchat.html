@@ -202,7 +202,7 @@
               if(date.getDate() == today.getDate()){
                timeString = date.toLocaleTimeString([], {dayPeriod:"short", hour: '2-digit', minute: '2-digit' });
               }else{
-               timeString = date.toLocaleTimeString([], {day:"numeric",dayPeriod:"short", hour: '2-digit', minute: '2-digit' });
+               timeString = date.toLocaleTimeString([], {month:"long", day:"numeric",dayPeriod:"short", hour: '2-digit', minute: '2-digit' });
               }
               
 

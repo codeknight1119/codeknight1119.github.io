@@ -16,6 +16,10 @@
     }
 
     header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
       padding: 15px 20px;
       display: flex;
       justify-content: space-between;
@@ -198,13 +202,13 @@
 
               const date = new Date(msg.timestamp);
               const today = new Date();
-              let timeString; 
-              if(date.getDate() == today.getDate()){
-               timeString = date.toLocaleTimeString([], {dayPeriod:"short", hour: '2-digit', minute: '2-digit' });
-              }else{
-               timeString = date.toLocaleTimeString([], {month:"long", day:"numeric", hour: '2-digit', minute: '2-digit' });
+              let timeString;
+              if (date.getDate() == today.getDate()) {
+                timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
+              } else {
+                timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
               }
-              
+
 
               if (msg.name === myName) {
                 div.textContent = `${timeString} | You: ${msg.text}`;

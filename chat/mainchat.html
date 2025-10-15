@@ -372,8 +372,9 @@
             participants: [auth.currentUser.uid, talktoUID],
             name: "Chat with 2 people idk"
           })
-         let currentConv = await getDoc(doc(db,"users",auth.currentUser.uid, "conversations"))
-         currentConv.push(newChatName);
+         let currentConv = await getDoc(doc(db,"users",auth.currentUser.uid))
+         currentConv.conversations.push(newChatName);
+         await setDoc(doc(db,"users",auth.currentUser.uid, "conversations",currentConv))
         } catch (err) {
           alert(err);
         }

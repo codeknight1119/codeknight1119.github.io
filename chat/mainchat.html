@@ -218,8 +218,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
+    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
       authDomain: "chatroom4friends-522bd.firebaseapp.com",
@@ -355,30 +354,47 @@
     document.getElementById("newConv").onclick = async () => {
       const talkto = prompt("New Chat with who?");
 
-      if (!talkto) { return }
+      if (!talkto || talkto.trim() === "") { return }
 
-      const q = query(collection(db, "users"), where("username", "==", talkto))
+      if (talkto.trim().toLowerCase() === myName.toLowerCase()) {
+        alert("You can't start a chat with yourself!");
+        return;
+      }
+
+
+      const q = query(collection(db, "users"), where("username", "==", talkto.trim()))
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
         alert("User not found.")
         return
-      } else {
-        const userDoc = querySnapshot.docs[0];
-        const talktoUID = userDoc.id;
-        const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
-        try {
-          await setDoc(doc(db, "conversations", newChatName, "metadata", "info"), {
-            participants: [auth.currentUser.uid, talktoUID],
-            name: "Chat with 2 people idk"
-          })
-         let currentConv = await getDoc(doc(db,"users",auth.currentUser.uid))
-         currentConv.conversations.push(newChatName);
-         await setDoc(doc(db,"users",auth.currentUser.uid, "conversations",currentConv))
-        } catch (err) {
-          alert(err);
-        }
       }
+
+      const userDoc = querySnapshot.docs[0];
+      const talktoUID = userDoc.id;
+      const currentUserUID = auth.currentUser.uid;
+      const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
+
+      try {
+        await setDoc(doc(db, "conversations", newChatName), {
+          participants: [currentUserUID, talktoUID],
+          createdAt: Date.now()
+        }, { merge: true });
+
+        const currentUserRef = doc(db, "users", currentUserUID);
+        const otherUserRef = doc(db, "users", talktoUID);
+
+        await updateDoc(currentUserRef, {
+          conversations: arrayUnion(newChatName)
+        });
+
+        await updateDoc(otherUserRef, {
+          conversations: arrayUnion(newChatName)
+        });
+      } catch (err) {
+        alert(err);
+      }
+
     };
 
     function checkTime() {

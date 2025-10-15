@@ -13,6 +13,13 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      /* --- FIX 2: Add padding to offset the fixed header and footer --- */
+      padding-top: 75px;
+      /* Space for the header */
+      padding-bottom: 80px;
+      /* Space for the message send bar */
+      box-sizing: border-box;
+      /* Ensures padding is included in height calculation */
     }
 
     header {
@@ -24,7 +31,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 60;
+      height: 60px;
+      /* --- BEST PRACTICE: Added 'px' unit --- */
+      /* --- FIX 2: Add background and z-index --- */
+      background-color: #f8f9fa;
+      /* Example background, change to match your theme */
+      z-index: 1000;
+      box-sizing: border-box;
+      /* Good practice for consistent sizing */
     }
 
     .container {
@@ -33,7 +47,10 @@
       padding: 20px;
       max-width: 1200px;
       margin: 0 auto;
-      height: calc(100vh - 150px);
+      /* --- FIX: Removed fixed height, let flexbox handle it --- */
+      /* height: calc(100vh - 150px); */
+      overflow: hidden;
+      /* Prevent container itself from scrolling */
     }
 
     .chatsSelect {
@@ -44,15 +61,22 @@
       overflow-y: auto;
       margin-right: 20px;
       transition: width 0.3s ease;
+      border: 1px solid #ccc;
+      /* Added for visual separation */
+      border-radius: 8px;
     }
 
     #messages {
-      margin-top: 80px;
+      /* --- FIX: Removed margin-top as body padding now handles it --- */
+      /* margin-top: 80px; */
       flex: 1;
       padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      border: 1px solid #ccc;
+      /* Added for visual separation */
+      border-radius: 8px;
     }
 
     .messageMine,
@@ -63,60 +87,124 @@
       max-width: 60%;
     }
 
+    /* Example colors for messages */
+    .messageMine {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+    }
+
+    .messageOther {
+      background-color: #ffffff;
+      align-self: flex-start;
+      border: 1px solid #eee;
+    }
+
     #messageSend {
-     /* padding: 15px; */
+      /* --- FIX 1: Change position to fixed to stick to the viewport bottom --- */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
       display: flex;
       align-items: center;
       gap: 10px;
-      position: sticky;
-      bottom: 0;
+      /* --- BEST PRACTICE: Add padding, background, and sizing --- */
+      padding: 15px 20px;
+      background-color: #f8f9fa;
+      /* Match header background */
+      box-sizing: border-box;
+      z-index: 1000;
     }
 
     #messageSend input {
       flex: 1;
       padding: 10px 15px;
       font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
     #messageSend button {
       padding: 10px 15px;
       border-radius: 5px;
       cursor: pointer;
+      border: 1px solid #007bff;
+      background-color: #007bff;
+      color: white;
     }
 
     #timedText {
       padding: 10px;
       border-radius: 5px;
-      margin: 10px 20px;
+      /* --- FIX: Removed margin, as body padding now handles spacing --- */
+      /* margin: 10px 20px; */
       font-size: 16px;
       text-align: center;
+      background-color: #fffbe6;
+      /* Example color */
+      border: 1px solid #ffe58f;
+      /* Example color */
+      /* --- FIX 2: This element is also fixed so it appears below the header --- */
+      position: fixed;
+      top: 60px;
+      /* Position it right below the header */
+      width: 100%;
+      z-index: 999;
+      box-sizing: border-box;
     }
 
+    /* We need to adjust the body padding if the timed text is visible */
+    body.timed-text-visible {
+      padding-top: 125px;
+      /* header (75px) + timedText height */
+    }
+
+
     @media (max-width: 768px) {
+      body {
+        /* Adjust padding for mobile view if necessary */
+      }
+
       .container {
         flex-direction: column;
+        padding: 10px;
       }
 
       .chatsSelect {
         width: 100%;
-        margin-top: 80px;
+        /* --- FIX: Removed margin-top, body padding handles this --- */
+        /* margin-top: 80px; */
         max-width: none;
         margin-right: 0;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+        /* Reduced margin */
+        height: 150px;
+        /* Give a fixed height on mobile */
       }
 
       #messages {
         width: 100%;
+        box-sizing: border-box;
       }
 
       #messageSend {
+        padding: 10px;
         flex-wrap: wrap;
       }
 
-      #messageSend input,
-      #messageSend button {
-        width: 100%;
+      #messageSend input {
+        /* Make name and message inputs share a line */
+        width: calc(50% - 5px);
+        /* 50% width minus half the gap */
         margin-bottom: 10px;
+      }
+
+      #messageSend button {
+        /* Make buttons share a line */
+        flex-grow: 1;
+        /* Allow buttons to grow and fill space */
+        width: auto;
+        margin-bottom: 0;
       }
     }
   </style>
@@ -133,7 +221,7 @@
   <section>
     <div class="container">
       <div class="chatsSelect">
-    
+
       </div>
 
       <div id="messages"></div>

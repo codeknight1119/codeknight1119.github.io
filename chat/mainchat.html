@@ -111,35 +111,7 @@
       background-color: #007bff;
     }
 
-    #timedText {
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 20px;
-      font-size: 16px;
-      text-align: center;
-      padding: 10px;
-      border-radius: 5px;
-      /* --- FIX: Removed margin, as body padding now handles spacing --- */
-      /* margin: 10px 20px; */
-      font-size: 16px;
-      text-align: center;
-      /*   background-color: #fffbe6;  Example color */
-      border: 1px solid #ffe58f;
-      /* Example color */
-      /* --- FIX 2: This element is also fixed so it appears below the header --- */
-      position: fixed;
-      top: 60px;
-      /* Position it right below the header */
-      width: 100%;
-      z-index: 999;
-      box-sizing: border-box;
-    }
 
-    body.timed-text-visible {
-      padding-top: 125px;
-      display:none;
-      /* header (75px) + timedText height */
-    }
 
     @media (max-width: 768px) {
       .container {
@@ -194,7 +166,6 @@
     <h2>Chat4Friends</h2>
     <span class="version">V.4.5</span>
   </header>
-  <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
 
   <section>
     <div class="container">
@@ -421,22 +392,7 @@
 
     };
 
-    function checkTime() {
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const start = 10 * 60 + 30;
-      const end = 12 * 60 + 30;
-      const textElement = document.getElementById("timedText");
-
-      if (currentMinutes >= start && currentMinutes <= end) {
-        textElement.style.display = "block";
-      } else {
-        textElement.style.display = "none";
-      }
-    }
-
-    checkTime();
-    setInterval(checkTime, 60000);
+    
 
     function changeFavicon(src) {
       const link = document.querySelector("link[rel~='icon']") || document.createElement("link");

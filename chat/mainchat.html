@@ -191,6 +191,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
     import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
       authDomain: "chatroom4friends-522bd.firebaseapp.com",
@@ -204,22 +205,21 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const messagesRef = collection(db, "messages");
 
     let myName = "";
-    let unsubscribe = null;
+    let conversationsUnsubscribe = null; // To stop listening to the conversation list
+    let messagesUnsubscribe = null;      // To stop listening to an active chat's messages
+    let currentConversationId = null;    // To track which chat is currently open
 
     let unreadCount = 0;
     const originalTitle = document.title;
-    let latestTimestamp = 0;
-
-
+    
+    // Hide controls until the user is logged in
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
 
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
-        // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
         changeFavicon("resources/normalC.png");
@@ -228,103 +228,104 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // --- USER IS LOGGED IN ---
         document.getElementById("messageSend").style.display = "flex";
-        document.getElementById("messages").style.display = "flex";
         myName = await getUsername(user.uid) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const qNew = query(
-          messagesRef,
-          where("timestamp", ">", latestTimestamp),
-          orderBy("timestamp")
-        );
-
-        const convRef = collection(db, "conversations");
-        const convQuery = query(convRef, where("participants", "array-contains", user.uid));
-
-        onSnapshot(convQuery, (snapshot) => {
-          const divChat = document.getElementById("chatsSelect");
-          divChat.innerHTML = "";
+        // Start listening for conversations the user is a part of
+        const convQuery = query(collection(db, "conversations"), where("participants", "array-contains", user.uid));
+        
+        conversationsUnsubscribe = onSnapshot(convQuery, (snapshot) => {
+          const chatsDiv = document.getElementById("chatsSelect");
+          chatsDiv.innerHTML = ""; // Clear the list before repopulating
           snapshot.forEach((docSnap) => {
-            const cov = docSnap.data();
+            const conv = docSnap.data();
             const div = document.createElement("div");
             div.textContent = conv.name || "Unnamed Chat";
-          })
-          div.className = "chatItem";
-          div.dataset.id = docSnap.id;
+            div.className = "chatItem";
+            div.dataset.id = docSnap.id;
 
-          div.onclick = () => loadConversation(docSnap.id, conv);
-          chatsDiv.appendChild(div);
+            // When a chat is clicked, load its messages
+            div.onclick = () => loadConversation(docSnap.id, conv.name);
+            chatsDiv.appendChild(div);
+          });
         });
-      });
-
-    unsubscribe = onSnapshot(qNew, (snapshot) => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const msg = change.doc.data();
-          const div = document.createElement("div");
-
-          const date = new Date(msg.timestamp);
-          const today = new Date();
-          let timeString;
-          if (date.getDate() == today.getDate()) {
-            timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
-          } else {
-            timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
-          }
-
-
-          if (msg.name === myName) {
-            div.textContent = `${timeString} | You: ${msg.text}`;
-            div.className = "messageMine";
-          } else {
-            div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-            div.className = "messageOther";
-          }
-
-          if (document.hidden) {
-            unreadCount++;
-            changeFavicon('resources/notifC.png');
-            document.title = `(${unreadCount}) ${originalTitle}`;
-          }
-
-          document.getElementById("messages").appendChild(div);
-
-          if (msg.timestamp > latestTimestamp) {
-            latestTimestamp = msg.timestamp;
-          }
-        }
-      });
-
-      const messagesDiv = document.getElementById("messages");
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    });
 
       } else {
-      window.location.href = "index.html";
-      document.getElementById("messageSend").style.display = "none";
-      document.getElementById("messages").style.display = "none";
+        // --- USER IS LOGGED OUT ---
+        window.location.href = "index.html";
+        document.getElementById("messageSend").style.display = "none";
+        document.getElementById("messages").style.display = "none";
 
-      if (unsubscribe) {
-        unsubscribe();
-        unsubscribe = null;
+        // Stop all Firebase listeners to prevent errors
+        if (conversationsUnsubscribe) conversationsUnsubscribe();
+        if (messagesUnsubscribe) messagesUnsubscribe();
       }
-    }
     });
 
-    document.getElementById("sendBtn").onclick = async () => {
-      const name = document.getElementById("name").value || "Anonymous";
-      const text = document.getElementById("messageInput").value;
-      myName = name;
+    function loadConversation(conversationId, conversationName) {
+      currentConversationId = conversationId;
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = ""; // Clear previous messages
+      messagesDiv.style.display = "flex";
 
-      if (text.trim()) {
-        await addDoc(messagesRef, {
-          name,
-          text,
-          timestamp: Date.now()
-        });
-        document.getElementById("messageInput").value = "";
+      // IMPORTANT: Stop listening to the old chat's messages before starting a new one
+      if (messagesUnsubscribe) {
+        messagesUnsubscribe();
       }
+
+      // Create a query for messages within this specific conversation
+      // This assumes you have a subcollection named "messages" inside each conversation document
+      const messagesRef = collection(db, "conversations", conversationId, "messages");
+      const q = query(messagesRef, orderBy("timestamp"));
+
+      messagesUnsubscribe = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === "added") {
+            const msg = change.doc.data();
+            const div = document.createElement("div");
+            const date = new Date(msg.timestamp);
+
+            let timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (new Date().toDateString() !== date.toDateString()) {
+              timeString = date.toLocaleDateString() + " " + timeString;
+            }
+
+            if (msg.name === myName) {
+              div.textContent = `${timeString} | You: ${msg.text}`;
+              div.className = "messageMine";
+            } else {
+              div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
+              div.className = "messageOther";
+            }
+            messagesDiv.appendChild(div);
+          }
+        });
+        // Auto-scroll to the bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+    }
+
+    document.getElementById("sendBtn").onclick = async () => {
+      const text = document.getElementById("messageInput").value;
+
+      if (!currentConversationId) {
+        alert("Please select a conversation first!");
+        return;
+      }
+      if (!text.trim()) {
+        return;
+      }
+      
+      // Add the new message to the subcollection of the currently active conversation
+      const messagesRef = collection(db, "conversations", currentConversationId, "messages");
+      await addDoc(messagesRef, {
+        name: myName,
+        text: text,
+        timestamp: Date.now()
+      });
+      document.getElementById("messageInput").value = "";
     };
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -338,71 +339,53 @@
       if (docSnap.exists()) {
         return docSnap.data().username;
       } else {
-        alert("No such document!");
+        console.error("No such user document!");
+        return null;
       }
     }
 
     document.getElementById("newConv").onclick = async () => {
-      const talkto = prompt("New Chat with who?");
-
-      if (!talkto || talkto.trim() === "") { return }
+      const talkto = prompt("New Chat with who (username)?");
+      if (!talkto || talkto.trim() === "") return;
 
       if (talkto.trim().toLowerCase() === myName.toLowerCase()) {
         alert("You can't start a chat with yourself!");
         return;
       }
+      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.");
+      if (!startName || startName.trim() === "") return;
 
-      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.")
-
-
-      const q = query(collection(db, "users"), where("username", "==", talkto.trim()))
+      const q = query(collection(db, "users"), where("username", "==", talkto.trim()));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        alert("User not found.")
-        return
+        alert("User not found.");
+        return;
       }
 
       const userDoc = querySnapshot.docs[0];
       const talktoUID = userDoc.id;
       const currentUserUID = auth.currentUser.uid;
-      const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
+      
+      // A consistent way to name a 1-on-1 chat document
+      const newChatName = [currentUserUID, talktoUID].sort().join("_");
 
       try {
         await setDoc(doc(db, "conversations", newChatName), {
           name: startName,
           participants: [currentUserUID, talktoUID],
           createdAt: Date.now()
-        }, { merge: true });
-
-        const currentUserRef = doc(db, "users", currentUserUID);
-        const otherUserRef = doc(db, "users", talktoUID);
-
-        await updateDoc(currentUserRef, {
-          conversations: arrayUnion(newChatName)
-        });
-
-        await updateDoc(otherUserRef, {
-          conversations: arrayUnion(newChatName)
-        });
-        updateConvs();
+        }, { merge: true }); // Use merge in case the conversation already exists
       } catch (err) {
-        alert(err);
+        alert("Error creating conversation: " + err);
       }
-
     };
-
-    
 
     function changeFavicon(src) {
       const link = document.querySelector("link[rel~='icon']") || document.createElement("link");
       link.rel = "icon";
       link.href = src;
       document.head.appendChild(link);
-    }
-
-    function updateConvs() {
-
     }
   </script>
 </body>

@@ -375,17 +375,7 @@
          let currentConv = await getDoc(doc(db,"users",auth.getAuth.uid, "conversations"))
          currentConv.push(newChatName);
         } catch (err) {
-          fetch("https://script.google.com/macros/s/AKfycbyehVC4fHbZAxi6-VjCQH3Eon9ATxqpkVPzCOQea0iEeMslVMYViDrWNUBRaNwfYrh6sA/exec",
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({recipient:"codeknight1119@gmail.com", subject:"Chat4Friends err", emailBody:err}, )
-            }
-          )
-          alert("An error has occured, the creator of this chatroom has been notified.")
-
+          alert(err);
         }
       }
     };

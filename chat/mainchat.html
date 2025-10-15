@@ -372,7 +372,7 @@
             participants: [auth.currentUser.uid, talktoUID],
             name: "Chat with 2 people idk"
           })
-         let currentConv = await getDoc(doc(db,"users",auth.getAuth.uid, "conversations"))
+         let currentConv = await getDoc(doc(db,"users",auth.currentUser.uid, "conversations"))
          currentConv.push(newChatName);
         } catch (err) {
           alert(err);
@@ -403,7 +403,7 @@
       link.href = src;
       document.head.appendChild(link);
     }
-    alert(auth.getAuth.uid);
+    alert(auth.currentUser.uid);
   </script>
 </body>
 

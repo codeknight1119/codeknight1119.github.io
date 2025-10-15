@@ -32,6 +32,10 @@
             -webkit-text-stroke: black 0.2px;
             color: rgb(255, 255, 255);
         }
+
+        #main-container {
+            overflow-wrap: break-word;
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png">
 </head>
@@ -40,7 +44,7 @@
 
     <header>
         <h1 id="title"></h1>
-        <h4>v.27</h4>
+        <h4>v.28</h4>
 
     </header>
 
@@ -77,84 +81,97 @@
                 return;
             }
 
-
             // Clear previous content
             mainContainer.innerHTML = "";
             titleElement.textContent = page.title;
 
-            // --- REFACTORED LOGIC STARTS HERE ---
-
             // This variable will track where new elements should be appended.
-            // By default, it's the main container.
+            // By default, it's the main container. It will change when we enter a dropdown.
             let currentContainer = mainContainer;
 
+            // This regex will find all our custom tags. The parentheses make `split()` keep the delimiters.
+            const tagRegex = /(\{\{.*?\}\}|\[\[.*?\]\])/g;
+
             page.body.forEach(line => {
-                // First, check if the entire line is a custom command
                 const trimmedLine = line.trim();
-                if (trimmedLine.startsWith('{{') && trimmedLine.endsWith('}}')) {
-                    const custom = trimmedLine.slice(2, -2);
 
-                    if (custom.startsWith("dropDownStart")) {
-                        const title = custom.split("dropDownStart:")[1];
-                        const details = document.createElement("details");
-                        const summary = document.createElement("summary");
-                        const titletext = marked.parseInline(title);
-                        summary.textContent = titletext;
-                        details.appendChild(summary);
-                        currentContainer.appendChild(details);
+                // --- SPECIAL HANDLING FOR DROPDOWN COMMANDS ---
+                // These commands control the container where subsequent lines will be placed.
+                if (trimmedLine.startsWith("{{dropDownStart:")) {
+                    const title = trimmedLine.match(/\{\{dropDownStart:(.*)\}\}/)[1];
+                    const details = document.createElement("details");
+                    const summary = document.createElement("summary");
+                    
+                    // Use parseInline to handle markdown in the summary title
+                    summary.innerHTML = marked.parseInline(title);
+                    details.appendChild(summary);
+                    currentContainer.appendChild(details);
 
-                        // *** This is the key change ***
-                        // New content will now be added INSIDE the <details> element
-                        currentContainer = details;
-                        return; // Move to the next line
-
-                    } else if (custom.startsWith("dropDownEnd")) {
-                        // Go back to adding content to the main container
-                        currentContainer = mainContainer;
-                        return; // Move to the next line
-
-                    } else if (custom.startsWith("img")) {
-                        const src = custom.split("img:")[1];
-                        const img = document.createElement("img");
-                        img.src = `resources/${src}`;
-                        currentContainer.appendChild(img);
-                        return; // Move to the next line
-                    }
-
+                    // New content will now be added INSIDE this <details> element
+                    currentContainer = details;
+                    return; // Move to the next line in the JSON body
                 }
 
+                if (trimmedLine === "{{dropDownEnd}}") {
+                    // Go back to adding content to the main container
+                    currentContainer = mainContainer;
+                    return; // Move to the next line in the JSON body
+                }
+                
+                // --- INLINE PARSING LOGIC FOR A SINGLE LINE ---
 
-                // If the line is not a command, process it as a paragraph of content
-                const p = document.createElement('p');
+                // Create a container for this line. Flexbox helps align text and images nicely.
+                const lineContainer = document.createElement('div');
+                lineContainer.className = 'line-container';
 
-                if (line.match(/\[\[.*?\]\]/g)) {
-                    // This logic for handling inline links is good, so we keep it.
-                    const parts = line.split(/(\[\[.*?\]\])/g).filter(part => part);
-                    parts.forEach(part => {
-                        if (part.startsWith('[[') && part.endsWith(']]')) {
-                            const linkText = part.substring(2, part.length - 2);
-                            const clickable = document.createElement('span');
-                            clickable.textContent = linkText;
-                            clickable.className = 'clickable';
-                            clickable.addEventListener('click', () => renderPage(linkText));
-                            p.appendChild(clickable);
-                        } else {
-                            const span = document.createElement('span');
-                            span.innerHTML = marked.parseInline(part);
-                            p.appendChild(span);
+                // Split the line into parts: plain text and tags
+                const parts = line.split(tagRegex).filter(part => part); // filter removes empty strings
+
+                parts.forEach(part => {
+                    if (part.startsWith('{{') && part.endsWith('}}')) {
+                        // This part is a custom command {{...}}
+                        const commandBody = part.slice(2, -2).trim();
+
+                        if (commandBody.startsWith("img:")) {
+                            const src = commandBody.split("img:")[1].trim();
+                            const img = document.createElement("img");
+                            img.src = `resources/${src}`;
+                            img.style.maxWidth = '150px'; // Example styling
+                            img.style.verticalAlign = 'middle';
+                            lineContainer.appendChild(img);
+
+                        } else if (commandBody.startsWith("miniCon:")) {
+                            const src = commandBody.split("miniCon:")[1].trim();
+                            const img = document.createElement("img");
+                            img.src = `resources/${src}`;
+                            img.className = 'miniCon'; // Use a class for styling
+                            lineContainer.appendChild(img);
                         }
-                    });
-                } else {
-                    // If no links, parse the whole line as Markdown
-                    p.innerHTML = marked.parse(line);
+                        // Note: dropDownStart is handled above as a block-level command
 
-                }
+                    } else if (part.startsWith('[[') && part.endsWith(']]')) {
+                        // This part is an internal link [[...]]
+                        const linkText = part.substring(2, part.length - 2);
+                        const clickable = document.createElement('span');
+                        clickable.textContent = linkText;
+                        clickable.className = 'clickable';
+                        clickable.addEventListener('click', () => renderPage(linkText));
+                        lineContainer.appendChild(clickable);
 
-                // Append the newly created paragraph to the correct container
-                // (which could be mainContainer or a <details> element)
-                currentContainer.appendChild(p);
+                    } else {
+                        // This part is regular text with markdown
+                        const textSpan = document.createElement('span');
+                        // Use marked.parseInline() to avoid creating unwanted <p> tags
+                        textSpan.innerHTML = marked.parseInline(part);
+                        lineContainer.appendChild(textSpan);
+                    }
+                });
+
+                // Append the fully constructed line (with all its inline parts) to the correct container
+                currentContainer.appendChild(lineContainer);
             });
 
+            // Style processing remains the same
             page.style.forEach(aspect => {
                 const trimmedAspect = aspect.trim();
                 if (trimmedAspect.startsWith("background:")) {
@@ -162,9 +179,7 @@
                     document.body.style.backgroundImage = `url(resources/${src})`;
                 }
             });
-
         }
-
         /**
          * Initializes the application by fetching data and rendering the initial page.
          */

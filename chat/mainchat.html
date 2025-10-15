@@ -361,6 +361,8 @@
         return;
       }
 
+      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.")
+
 
       const q = query(collection(db, "users"), where("username", "==", talkto.trim()))
       const querySnapshot = await getDocs(q);
@@ -377,6 +379,7 @@
 
       try {
         await setDoc(doc(db, "conversations", newChatName), {
+          name: startName,
           participants: [currentUserUID, talktoUID],
           createdAt: Date.now()
         }, { merge: true });
@@ -391,6 +394,7 @@
         await updateDoc(otherUserRef, {
           conversations: arrayUnion(newChatName)
         });
+        updateConvs();
       } catch (err) {
         alert(err);
       }
@@ -420,7 +424,10 @@
       link.href = src;
       document.head.appendChild(link);
     }
-    alert(auth.currentUser.uid);
+    
+    function updateConvs(){
+
+    }
   </script>
 </body>
 

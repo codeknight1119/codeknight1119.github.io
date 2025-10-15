@@ -33,13 +33,16 @@
     }
 
     .container {
-  display: flex;
-      flex: 1;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 20px;
-      gap: 20px;
+   display: flex;
+  flex: 1;
+  height: calc(100vh - 120px); /* header (60px) + messageSend (60px) */
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 20px;
+  gap: 20px;
+  box-sizing: border-box;
+  overflow: hidden; /* stops the container from creating another scrollbar */
     }
 
     .chatsSelect {
@@ -62,6 +65,12 @@
       border: 1px solid #bfffb6;
       border-radius: 8px;
     }
+
+    .chatsSelect,
+#messages {
+  height: 100%;
+  overflow-y: auto;
+}
 
     .messageMine,
     .messageOther {
@@ -173,7 +182,7 @@
 <body>
   <header>
     <h2>Chat4Friends</h2>
-    <span class="version">V.4.2</span>
+    <span class="version">V.4.3</span>
   </header>
   <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
 

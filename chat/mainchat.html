@@ -33,26 +33,29 @@
     }
 
     .container {
-   display: flex;
-  flex: 1;
-  height: calc(100vh - 120px); /* header (60px) + messageSend (60px) */
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 20px;
-  gap: 20px;
-  box-sizing: border-box;
-  overflow: hidden; /* stops the container from creating another scrollbar */
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 120px);
+      /* header (60px) + messageSend (60px) */
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 20px;
+      gap: 20px;
+      box-sizing: border-box;
+      overflow: hidden;
+      /* stops the container from creating another scrollbar */
     }
 
     .chatsSelect {
       width: 250px;
-    min-width: 150px;
-    max-width: 300px;
-    padding: 15px;
-    overflow-y: auto; /* This is KEY: allows this column to scroll */
-    border: 1px solid #ccc;
-    border-radius: 8px;
+      min-width: 150px;
+      max-width: 300px;
+      padding: 15px;
+      overflow-y: auto;
+      /* This is KEY: allows this column to scroll */
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
 
     #messages {
@@ -67,10 +70,10 @@
     }
 
     .chatsSelect,
-#messages {
-  height: 100%;
-  overflow-y: auto;
-}
+    #messages {
+      height: 100%;
+      overflow-y: auto;
+    }
 
     .messageMine,
     .messageOther {
@@ -120,18 +123,21 @@
       /* margin: 10px 20px; */
       font-size: 16px;
       text-align: center;
-   /*   background-color: #fffbe6;  Example color */
-      border: 1px solid #ffe58f; /* Example color */
+      /*   background-color: #fffbe6;  Example color */
+      border: 1px solid #ffe58f;
+      /* Example color */
       /* --- FIX 2: This element is also fixed so it appears below the header --- */
       position: fixed;
-      top: 60px; /* Position it right below the header */
+      top: 60px;
+      /* Position it right below the header */
       width: 100%;
       z-index: 999;
       box-sizing: border-box;
     }
 
-        body.timed-text-visible {
-        padding-top: 125px; /* header (75px) + timedText height */
+    body.timed-text-visible {
+      padding-top: 125px;
+      /* header (75px) + timedText height */
     }
 
     @media (max-width: 768px) {
@@ -142,7 +148,7 @@
 
       .chatsSelect {
         width: 100%;
-       /* margin-top: 80px; */
+        /* margin-top: 80px; */
         max-width: none;
         /*margin-right: 0;*/
         margin-bottom: 10px;
@@ -159,22 +165,25 @@
         flex-wrap: wrap;
       }
 
-      #messageSend input{
-        width: calc(50% - 5px); /* 50% width minus half the gap */
-         margin-bottom: 10px;
+      #messageSend input {
+        width: calc(50% - 5px);
+        /* 50% width minus half the gap */
+        margin-bottom: 10px;
       }
+
       #messageSend button {
-        flex-grow: 1; /* Allow buttons to grow and fill space */
+        flex-grow: 1;
+        /* Allow buttons to grow and fill space */
         width: auto;
         margin-bottom: 0;
       }
     }
+
     section {
       flex: 1;
       display: flex;
       min-height: 0;
     }
-
   </style>
   <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
 </head>
@@ -344,38 +353,40 @@
     }
 
     document.getElementById("newConv").onclick = async () => {
-      const talkto = prompt("New chat with who?");
-      const firstMessage = prompt("Send a message to be the first message in the chat.");
-      if (!talkto || !firstMessage) return;
+      const talkto = promt("New Chat with who?");
 
-      const q = query(collection(db, "users"), where("username", "==", talkto));
+      if (!talkto) { return }
+
+      const q = query(collection(db, "users"), where("username", "==", talkto))
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        alert("Username does not exist");
-        return;
-      } else if (querySnapshot.size > 1) {
-        alert("More than 1 user found");
-        return;
-      }
+        alert("User not found.")
+        return
+      } else {
+        const userDoc = querySnapshot.docs[0];
+        const talktoUID = userDoc.id;
+        const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
+        try {
+          await setDoc(doc(db, "conversations", newChatName, "metadata", "info"), {
+            participants: [auth.currentUser.uid, talktoUID],
+            name: "Chat with 2 people idk"
+          })
+         let currentConv = await getDoc(doc(db,"users",auth.getAuth.uid, "conversations"))
+         currentConv.push(newChatName);
+        } catch (err) {
+          fetch("https://script.google.com/macros/s/AKfycbyehVC4fHbZAxi6-VjCQH3Eon9ATxqpkVPzCOQea0iEeMslVMYViDrWNUBRaNwfYrh6sA/exec",
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({recipient:"codeknight1119@gmail.com", subject:"Chat4Friends err", emailBody:err}, )
+            }
+          )
+          alert("An error has occured, the creator of this chatroom has been notified.")
 
-      const userDoc = querySnapshot.docs[0];
-      const talktoUID = userDoc.id;
-      const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
-
-      try {
-        await setDoc(doc(db, "conversations", newChatName, "metadata", "info"), {
-          participants: [auth.currentUser.uid, talktoUID]
-        });
-
-        await addDoc(collection(db, "conversations", newChatName, "messages"), {
-          text: firstMessage,
-          timestamp: Date.now()
-        });
-
-        alert("New conversation created with first message");
-      } catch (err) {
-        alert("Error creating conversation: " + err);
+        }
       }
     };
 
@@ -402,6 +413,7 @@
       link.href = src;
       document.head.appendChild(link);
     }
+    alert(auth.getAuth.uid);
   </script>
 </body>
 

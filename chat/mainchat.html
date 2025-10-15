@@ -13,8 +13,8 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding-top: 75 px;
-      padding-bottom: 80 px;
+      padding-top: 75px;
+      padding-bottom: 80px;
       box-sizing: border-box;
     }
 
@@ -27,7 +27,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 60 px;
+      height: 60px;
       z-index: 1000;
       box-sizing: border-box;
     }
@@ -92,7 +92,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      bottom: 0;
       z-index: 1000;
     }
 
@@ -117,29 +116,15 @@
       margin: 10px 20px;
       font-size: 16px;
       text-align: center;
-      padding: 10px;
-      border-radius: 5px;
-      /* --- FIX: Removed margin, as body padding now handles spacing --- */
-      /* margin: 10px 20px; */
-      font-size: 16px;
-      text-align: center;
-      /*   background-color: #fffbe6;  Example color */
       border: 1px solid #ffe58f;
-      /* Example color */
-      /* --- FIX 2: This element is also fixed so it appears below the header --- */
       position: fixed;
       top: 60px;
-      /* Position it right below the header */
       width: 100%;
       z-index: 999;
       box-sizing: border-box;
     }
 
-    body.timed-text-visible {
-      padding-top: 125px;
-      display:none;
-      /* header (75px) + timedText height */
-    }
+    /* Removed .timed-text-visible as it hid the body */
 
     @media (max-width: 768px) {
       .container {
@@ -149,9 +134,7 @@
 
       .chatsSelect {
         width: 100%;
-        /* margin-top: 80px; */
         max-width: none;
-        /*margin-right: 0;*/
         margin-bottom: 10px;
         height: 150px;
       }
@@ -168,13 +151,11 @@
 
       #messageSend input {
         width: calc(50% - 5px);
-        /* 50% width minus half the gap */
         margin-bottom: 10px;
       }
 
       #messageSend button {
         flex-grow: 1;
-        /* Allow buttons to grow and fill space */
         width: auto;
         margin-bottom: 0;
       }
@@ -192,7 +173,7 @@
 <body>
   <header>
     <h2>Chat4Friends</h2>
-    <span class="version">V.4.8</span>
+    <span class="version">V.4.9</span>
   </header>
  <!-- <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>-->
 
@@ -242,13 +223,11 @@
     const originalTitle = document.title;
     let latestTimestamp = 0;
 
-
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
 
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
-        // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
         changeFavicon("resources/normalC.png");
@@ -275,70 +254,68 @@
           const divChat = document.getElementById("chatsSelect");
           divChat.innerHTML = "";
           snapshot.forEach((docSnap) => {
-            const cov = docSnap.data();
+            const conv = docSnap.data();
             const div = document.createElement("div");
             div.textContent = conv.name || "Unnamed Chat";
-          })
-          div.className = "chatItem";
-          div.dataset.id = docSnap.id;
+            div.className = "chatItem";
+            div.dataset.id = docSnap.id;
 
-          div.onclick = () => loadConversation(docSnap.id, conv);
-          chatsDiv.appendChild(div);
+            div.onclick = () => loadConversation(docSnap.id, conv);
+            divChat.appendChild(div);
+          });
         });
-      });
 
-    unsubscribe = onSnapshot(qNew, (snapshot) => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const msg = change.doc.data();
-          const div = document.createElement("div");
+        unsubscribe = onSnapshot(qNew, (snapshot) => {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === "added") {
+              const msg = change.doc.data();
+              const div = document.createElement("div");
 
-          const date = new Date(msg.timestamp);
-          const today = new Date();
-          let timeString;
-          if (date.getDate() == today.getDate()) {
-            timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
-          } else {
-            timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
-          }
+              const date = new Date(msg.timestamp);
+              const today = new Date();
+              let timeString;
+              if (date.getDate() == today.getDate()) {
+                timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
+              } else {
+                timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
+              }
 
+              if (msg.name === myName) {
+                div.textContent = `${timeString} | You: ${msg.text}`;
+                div.className = "messageMine";
+              } else {
+                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
+                div.className = "messageOther";
+              }
 
-          if (msg.name === myName) {
-            div.textContent = `${timeString} | You: ${msg.text}`;
-            div.className = "messageMine";
-          } else {
-            div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-            div.className = "messageOther";
-          }
+              if (document.hidden) {
+                unreadCount++;
+                changeFavicon('resources/notifC.png');
+                document.title = `(${unreadCount}) ${originalTitle}`;
+              }
 
-          if (document.hidden) {
-            unreadCount++;
-            changeFavicon('resources/notifC.png');
-            document.title = `(${unreadCount}) ${originalTitle}`;
-          }
+              document.getElementById("messages").appendChild(div);
 
-          document.getElementById("messages").appendChild(div);
+              if (msg.timestamp > latestTimestamp) {
+                latestTimestamp = msg.timestamp;
+              }
+            }
+          });
 
-          if (msg.timestamp > latestTimestamp) {
-            latestTimestamp = msg.timestamp;
-          }
-        }
-      });
-
-      const messagesDiv = document.getElementById("messages");
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    });
+          const messagesDiv = document.getElementById("messages");
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
 
       } else {
-      window.location.href = "index.html";
-      document.getElementById("messageSend").style.display = "none";
-      document.getElementById("messages").style.display = "none";
+        window.location.href = "index.html";
+        document.getElementById("messageSend").style.display = "none";
+        document.getElementById("messages").style.display = "none";
 
-      if (unsubscribe) {
-        unsubscribe();
-        unsubscribe = null;
+        if (unsubscribe) {
+          unsubscribe();
+          unsubscribe = null;
+        }
       }
-    }
     });
 
     document.getElementById("sendBtn").onclick = async () => {
@@ -382,7 +359,6 @@
       }
 
       const startName = prompt("Enter a name for this conversation. \nThis can be changed later.")
-
 
       const q = query(collection(db, "users"), where("username", "==", talkto.trim()))
       const querySnapshot = await getDocs(q);
@@ -428,10 +404,12 @@
       const end = 12 * 60 + 30;
       const textElement = document.getElementById("timedText");
 
-      if (currentMinutes >= start && currentMinutes <= end) {
-        textElement.style.display = "block";
-      } else {
-        textElement.style.display = "none";
+      if (textElement) {
+        if (currentMinutes >= start && currentMinutes <= end) {
+          textElement.style.display = "block";
+        } else {
+          textElement.style.display = "none";
+        }
       }
     }
 

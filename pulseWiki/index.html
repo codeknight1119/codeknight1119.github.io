@@ -141,7 +141,10 @@
                             lineContainer.appendChild(img);
 
                         } else if (commandBody.startsWith("miniCon:")) {
-                            const src = commandBody.split("miniCon:")[1].trim();
+                            let data = commandBody.split("miniCon:")[1].trim();
+                            data = JSON.parse(data);
+                            const iconNames = ["Spotify","VultureSeal"]
+                            const iconLinks = []
                             const img = document.createElement("img");
                             img.src = `resources/${src}`;
                             img.className = 'miniCon'; // Use a class for styling

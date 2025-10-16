@@ -198,7 +198,7 @@
   <div id="messageSend">
     <input type="text" id="name" placeholder="Your name">
     <input type="text" id="messageInput" placeholder="Type a message">
-    <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
+    <button id="sendBtn", onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
     <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
     <button id="newConv"><i class="fas fa-plus"></i> New Chat</button>
   </div>
@@ -228,6 +228,9 @@
     let unreadCount = 0;
     const originalTitle = document.title;
     let latestTimestamp = 0;
+
+    let currentConvId = null;
+    let currentConvUnsubscribe = null;
 
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
@@ -324,10 +327,14 @@
       }
     });
 
-    document.getElementById("sendBtn").onclick = async () => {
-      const name = document.getElementById("name").value || "Anonymous";
+
+    
+     sendMessage = async  () => {
+       const name = document.getElementById("name").value || "Anonymous";
       const text = document.getElementById("messageInput").value;
       myName = name;
+
+      const messageSendRef = collection(db, "conversations", currentConvId, "messages");;
 
       if (text.trim()) {
         await addDoc(messagesRef, {
@@ -337,7 +344,9 @@
         });
         document.getElementById("messageInput").value = "";
       }
-    };
+     } 
+     
+    
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
@@ -396,7 +405,6 @@
         await updateDoc(otherUserRef, {
           conversations: arrayUnion(newChatName)
         });
-        updateConvs();
       } catch (err) {
         alert(err);
       }
@@ -430,7 +438,63 @@
     }
 
     function  loadConversation(id, data) {
-      
+      if(currentConvUnsubscribe){
+        currentConvUnsubscribe()
+      }
+      currentConvId = id;
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+
+      const msgRef = collection(db,"conversations", id, "messages");
+
+      const msgQuery = query(
+          msgRef,
+          where("timestamp", ">", latestTimestamp),
+          orderBy("timestamp")
+        );
+
+              unsubscribe = onSnapshot(msgQuery, (snapshot) => {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === "added") {
+              const msg = change.doc.data();
+              const div = document.createElement("div");
+
+              const date = new Date(msg.timestamp);
+              const today = new Date();
+              let timeString;
+              if (date.getDate() == today.getDate()) {
+                timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
+              } else {
+                timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
+              }
+
+              if (msg.name === myName) {
+                div.textContent = `${timeString} | You: ${msg.text}`;
+                div.className = "messageMine";
+              } else {
+                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
+                div.className = "messageOther";
+              }
+
+              if (document.hidden) {
+                unreadCount++;
+                changeFavicon('resources/notifC.png');
+                document.title = `(${unreadCount}) ${originalTitle}`;
+              }
+
+              document.getElementById("messages").appendChild(div);
+
+              if (msg.timestamp > latestTimestamp) {
+                latestTimestamp = msg.timestamp;
+              }
+            }
+          });
+
+          const messagesDiv = document.getElementById("messages");
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+
+
     }
   </script>
 </body>

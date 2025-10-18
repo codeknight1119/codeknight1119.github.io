@@ -190,7 +190,6 @@
             "",
             "",
             "[[8th Grade]]"
-
         ],
         "style": [],
         "tags": []
@@ -212,6 +211,55 @@
     "9th Grade": {
         "title": "9th Grade",
         "body": [],
+        "style": [],
+        "tags": []
+    },
+    "Thalasson": {
+        "Title": "Thalasson",
+        "body": [
+            "A place by the sea in Arcadia"
+        ],
+        "style": [],
+        "tags": []
+    },
+    "Steinbrudd Praetorium": {
+        "Title": "Steinbrudd Praetorium",
+        "body": [
+            "The first area in [[Arcadia]] the people of the [[Anti-Pulse]] fled to after [[The Cataclysm]].",
+            "Lotustone area was [[Venirāshar]]"
+        ],
+        "style": [],
+        "tags": []
+    },
+    "Venirāshar": {
+        "Title": "Venirāshar",
+        "body": [
+            "The [[Lotustone]] the people of the [[Anti-Pulse]] used ot get to [[Steinbrudd Praetorium]] in [[Arcadia]]"
+        ],
+        "style": [],
+        "tags": []
+    },
+    "Wingrave": {
+        "Title": "Wingrave",
+        "body": [
+            "Where the first battle of the [[War for Arcadia]] was faught"
+        ],
+        "style": [],
+        "tags": []
+    },
+    "Islefall": {
+        "Title": "",
+        "body": [
+            ""
+        ],
+        "style": [],
+        "tags": []
+    },
+    "": {
+        "Title": "",
+        "body": [
+            ""
+        ],
         "style": [],
         "tags": []
     }

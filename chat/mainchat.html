@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Chat4Friends</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -16,6 +18,8 @@
       padding-top: 75px;
       padding-bottom: 80px;
       box-sizing: border-box;
+      font-family: "Roboto", sans-serif;
+      background: #f3f7f2;
     }
 
     header {
@@ -30,6 +34,8 @@
       height: 60px;
       z-index: 1000;
       box-sizing: border-box;
+      background: rgba(255,255,255,0.95);
+      border-bottom: 1px solid #e6ece4;
     }
 
     .container {
@@ -56,10 +62,10 @@
       /* This is KEY: allows this column to scroll */
       border: 1px solid #ccc;
       border-radius: 8px;
+      background: #fff;
     }
 
     #messages {
-      /* margin-top: 80px;*/
       flex: 1;
       padding: 20px;
       overflow-y: auto;
@@ -67,6 +73,8 @@
       flex-direction: column;
       border: 1px solid #bfffb6;
       border-radius: 8px;
+      background: #ffffff;
+      min-height: 0;
     }
 
     .chatsSelect,
@@ -81,10 +89,22 @@
       padding: 10px 15px;
       margin: 5px 10px;
       max-width: 60%;
+      word-wrap: break-word;
+    }
+
+    .messageMine {
+      align-self: flex-end;
+      background: #e6f4ff;
+      border: 1px solid #cfeeff;
+    }
+
+    .messageOther {
+      align-self: flex-start;
+      background: #fff7e6;
+      border: 1px solid #ffeebd;
     }
 
     #messageSend {
-      /* padding: 15px; */
       position: fixed;
       bottom: 0;
       left: 0;
@@ -93,13 +113,18 @@
       align-items: center;
       gap: 10px;
       z-index: 1000;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.98);
+      border-top: 1px solid #e6ece4;
     }
 
-    #messageSend input {
+    #messageSend input[type="text"] {
       flex: 1;
       padding: 10px 15px;
       font-size: 16px;
       border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
     #messageSend button {
@@ -108,6 +133,7 @@
       cursor: pointer;
       border: 1px solid #007bff;
       background-color: #007bff;
+      color: #fff;
     }
 
     #timedText {
@@ -119,18 +145,32 @@
       border: 1px solid #ffe58f;
       position: fixed;
       top: 60px;
-      width: 100%;
+      width: calc(100% - 40px);
       z-index: 999;
       box-sizing: border-box;
+      background: rgba(255,255,255,0.95);
+      display: none;
     }
 
-    #chatItem {
-      border: 1px solid #ccc;
+    .chatItem.selected {
       background-color: #007bff;
-      cursor: pointer;
+      color: white;
+      font-weight: bold;
     }
 
-    /* Removed .timed-text-visible as it hid the body */
+    .chatItem {
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    .load-more {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
     @media (max-width: 768px) {
       .container {
@@ -138,7 +178,7 @@
         padding: 10px;
       }
 
-      .chatsSelect {
+      #chatsSelect {
         width: 100%;
         max-width: none;
         margin-bottom: 10px;
@@ -155,7 +195,7 @@
         flex-wrap: wrap;
       }
 
-      #messageSend input {
+      #messageSend input[type="text"] {
         width: calc(50% - 5px);
         margin-bottom: 10px;
       }
@@ -171,23 +211,7 @@
       flex: 1;
       display: flex;
       min-height: 0;
-    }
-
-    .chatItem.selected {
-      background-color: #007bff;
-      /* Selected background */
-      color: white;
-      font-weight: bold;
-    }
-
-    .chatItem {
-      border: 1px solid #ccc;
-      background-color: #f9f9f9;
-      /* Default background */
-      cursor: pointer;
-      padding: 10px;
-      margin-bottom: 5px;
-      border-radius: 5px;
+      width: 100%;
     }
   </style>
   <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
@@ -196,34 +220,49 @@
 <body>
   <header>
     <h2>Chat4Friends</h2>
-    <span class="version">V.4.9</span>
+    <span class="version" aria-hidden="true">V.4.9</span>
   </header>
-  <!-- <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>-->
+
+  <div id="timedText" role="status" aria-live="polite">Gabe will be in his math class until 12:30 and will not be able to chat until then.</div>
 
   <section>
     <div class="container">
-      <div id="chatsSelect">
-
-      </div>
-
-      <div id="messages"></div>
+      <div id="chatsSelect" aria-label="Conversations list"></div>
+      <div id="messages" aria-label="Messages" role="log"></div>
     </div>
-
   </section>
 
-
-  <div id="messageSend">
-    <input type="text" id="name" placeholder="Your name">
-    <input type="text" id="messageInput" placeholder="Type a message">
-    <button id="sendBtn" , onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
-    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    <button id="newConv"><i class="fas fa-plus"></i> New Chat</button>
+  <div id="messageSend" aria-label="Message controls">
+    <input type="text" id="name" placeholder="Your name" aria-label="Your name">
+    <input type="text" id="messageInput" placeholder="Type a message" aria-label="Message input">
+    <button id="sendBtn" aria-label="Send message"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send</button>
+    <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
+    <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
   </div>
 
   <script type="module">
+    // Firebase modular imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import {
+      getFirestore,
+      collection,
+      getDoc,
+      getDocs,
+      addDoc,
+      query,
+      orderBy,
+      onSnapshot,
+      doc,
+      setDoc,
+      where,
+      updateDoc,
+      arrayUnion,
+      limit,
+      startAfter,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
       authDomain: "chatroom4friends-522bd.firebaseapp.com",
@@ -237,21 +276,24 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const messagesRef = collection(db, "messages");
 
     let myName = "";
-    let unsubscribe = null;
-
-    let unreadCount = 0;
-    const originalTitle = document.title;
-    let latestTimestamp = 0;
-
     let currentConvId = null;
     let currentConvUnsubscribe = null;
+    let newMessagesUnsubscribe = null; // separate listener for new messages
+    let unreadCount = 0;
+    const originalTitle = document.title;
 
+    // Pagination state per loaded conversation
+    const PAGE_SIZE = 20;
+    let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
+    let newestLoadedTimestamp = null; // timestamp of newest message currently shown
+
+    // Initially hide UI until authenticated
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
 
+    // Visibility handling for unread count
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
         unreadCount = 0;
@@ -264,12 +306,14 @@
       if (user) {
         document.getElementById("messageSend").style.display = "flex";
         document.getElementById("messages").style.display = "flex";
-        myName = await getUsername(user.uid) || "Anonymous";
+        myName = (await getUsername(user.uid)) || "Anonymous";
         document.getElementById("name").value = myName;
 
+        // Listen for conversations that include the current user
         const convRef = collection(db, "conversations");
         const convQuery = query(convRef, where("participants", "array-contains", user.uid));
 
+        // Show conversations and keep listener active
         onSnapshot(convQuery, (snapshot) => {
           const divChat = document.getElementById("chatsSelect");
           divChat.innerHTML = "";
@@ -285,7 +329,6 @@
             divChat.appendChild(div);
           });
 
-          // This adds the placeholder text I mentioned
           if (snapshot.empty) {
             document.getElementById("messages").innerHTML =
               `<p style="text-align:center; color: #888;">Click "New Chat" to start a conversation.</p>`;
@@ -293,87 +336,105 @@
             document.getElementById("messages").innerHTML =
               `<p style="text-align:center; color: #888;">Select a chat on the left to see messages.</p>`;
           }
-
-        })
+        });
       } else {
-        window.location.href = "index.html";
+        // Not signed in: hide UI, remove listeners, redirect to index
         document.getElementById("messageSend").style.display = "none";
         document.getElementById("messages").style.display = "none";
 
-        if (unsubscribe) {
-          unsubscribe();
-          unsubscribe = null;
+        if (currentConvUnsubscribe) {
+          currentConvUnsubscribe();
+          currentConvUnsubscribe = null;
         }
+        if (newMessagesUnsubscribe) {
+          newMessagesUnsubscribe();
+          newMessagesUnsubscribe = null;
+        }
+
+        window.location.href = "index.html";
       }
     });
 
+    async function getUsername(uid) {
+      try {
+        const docSnap = await getDoc(doc(db, "users", uid));
+        if (docSnap.exists()) {
+          return docSnap.data().username;
+        }
+        return undefined;
+      } catch (err) {
+        console.error("getUsername error:", err);
+        return undefined;
+      }
+    }
 
-
-    sendMessage = async () => {
+    // Send message handler (uses serverTimestamp)
+    async function sendMessage() {
       const name = document.getElementById("name").value || "Anonymous";
       const text = document.getElementById("messageInput").value;
       myName = name;
 
-      const messageSendRef = collection(db, "conversations", currentConvId, "messages");;
+      if (!currentConvId) {
+        alert("Please choose a conversation");
+        return;
+      }
 
-      if (text.trim()) {
-        if (!currentConvId) {
-          alert("Please choose a conversation");
-          return
+      if (text && text.trim()) {
+        const messageSendRef = collection(db, "conversations", currentConvId, "messages");
+        try {
+          await addDoc(messageSendRef, {
+            name,
+            text,
+            uid: auth.currentUser.uid,
+            timestamp: serverTimestamp()
+          });
+          document.getElementById("messageInput").value = "";
+        } catch (err) {
+          console.error("sendMessage error:", err);
+          alert("Failed to send message.");
         }
-        await addDoc(messageSendRef, {
-          name,
-          text,
-          uid: auth.currentUser.uid,
-          timestamp: Date.now()
-        });
-        document.getElementById("messageInput").value = "";
       }
     }
 
-
+    // Attach UI handlers
+    document.getElementById("sendBtn").addEventListener("click", sendMessage);
+    document.getElementById("messageInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
         alert("User signed out");
+      }).catch(err => {
+        console.error("Sign out error:", err);
       });
     });
 
-    async function getUsername(uid) {
-      const docSnap = await getDoc(doc(db, "users", uid));
-      if (docSnap.exists()) {
-        return docSnap.data().username;
-      } else {
-        alert("No such document!");
-      }
-    }
-
-    document.getElementById("newConv").onclick = async () => {
+    document.getElementById("newConv").addEventListener("click", async () => {
       const talkto = prompt("New Chat with who?");
-
-      if (!talkto || talkto.trim() === "") { return }
+      if (!talkto || talkto.trim() === "") return;
 
       if (talkto.trim().toLowerCase() === myName.toLowerCase()) {
         alert("You can't start a chat with yourself!");
         return;
       }
 
-      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.")
-
-      const q = query(collection(db, "users"), where("username", "==", talkto.trim()))
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        alert("User not found.")
-        return
-      }
-
-      const userDoc = querySnapshot.docs[0];
-      const talktoUID = userDoc.id;
-      const currentUserUID = auth.currentUser.uid;
-      const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
+      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.") || "";
 
       try {
+        const q = query(collection(db, "users"), where("username", "==", talkto.trim()));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          alert("User not found.");
+          return;
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const talktoUID = userDoc.id;
+        const currentUserUID = auth.currentUser.uid;
+        const newChatName = [currentUserUID, talktoUID].sort().join("_");
+
         await setDoc(doc(db, "conversations", newChatName), {
           name: startName,
           participants: [currentUserUID, talktoUID],
@@ -391,11 +452,12 @@
           conversations: arrayUnion(newChatName)
         });
       } catch (err) {
-        alert(err);
+        console.error("newConv error:", err);
+        alert(err.message || err);
       }
+    });
 
-    };
-
+    // Timed message visibility (example)
     function checkTime() {
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -416,76 +478,217 @@
     setInterval(checkTime, 60000);
 
     function changeFavicon(src) {
-      const link = document.querySelector("link[rel~='icon']") || document.createElement("link");
-      link.rel = "icon";
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
       link.href = src;
-      document.head.appendChild(link);
     }
 
-    function loadConversation(id, data) {
-      if (currentConvUnsubscribe) {
-        currentConvUnsubscribe();
-      }
-      currentConvId = id; // <-- This is correct
-      const messagesDiv = document.getElementById("messages");
-      messagesDiv.innerHTML = ""; // <-- This is correct
+    // Helper to convert Firestore Timestamp to Date
+    function tsToDate(ts) {
+      if (!ts) return new Date(0);
+      if (typeof ts.toDate === "function") return ts.toDate();
+      // If it's a number (legacy), convert
+      if (typeof ts === "number") return new Date(ts);
+      return new Date(0);
+    }
 
-      // This part highlights the selected chat
+    // Load a conversation with pagination and live updates
+    async function loadConversation(id, data) {
+      // Unsubscribe previous listeners
+      if (currentConvUnsubscribe) {
+        try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
+        currentConvUnsubscribe = null;
+      }
+      if (newMessagesUnsubscribe) {
+        try { newMessagesUnsubscribe(); } catch (e) { /* ignore */ }
+        newMessagesUnsubscribe = null;
+      }
+
+      currentConvId = id;
+      lastLoadedDoc = null;
+      newestLoadedTimestamp = null;
+
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+
+      // Highlight selected chat
       document.querySelectorAll(".chatItem").forEach(div => {
         div.classList.remove("selected");
       });
-      document.querySelector(`[data-id="${id}"]`).classList.add("selected");
+      const selectedDiv = document.querySelector(`[data-id="${id}"]`);
+      if (selectedDiv) selectedDiv.classList.add("selected");
 
       const msgRef = collection(db, "conversations", id, "messages");
 
-      // The query is simplified. Just get all messages for this chat.
-      const msgQuery = query(
-        msgRef,
-        where("timestamp", ">", latestTimestamp),
-        orderBy("timestamp")
-      );
+      // Helper to render a single message element
+      function renderMessageElement(msg) {
+        const div = document.createElement("div");
+        const msgDate = tsToDate(msg.timestamp);
+        const today = new Date();
+        let timeString;
+        const sameDay = msgDate.getFullYear() === today.getFullYear() &&
+          msgDate.getMonth() === today.getMonth() &&
+          msgDate.getDate() === today.getDate();
 
-      //Assign the listener to 'currentConvUnsubscribe', NOT 'currentConvId'
-      currentConvUnsubscribe = onSnapshot(msgQuery, (snapshot) => {
-        messagesDiv.innerHTML = ""; // Clear messages on each update to prevent duplicates
+        if (sameDay) {
+          timeString = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+          timeString = msgDate.toLocaleString([], { month: "short", day: "numeric", hour: '2-digit', minute: '2-digit' });
+        }
 
-        // Use snapshot.forEach(), not snapshot.docChanges()
-        // This is simpler and ensures all messages are loaded, not just new ones.
-        snapshot.forEach(doc => {
-          const msg = doc.data();
-          const div = document.createElement("div");
+        if (msg.uid === (auth.currentUser && auth.currentUser.uid)) {
+          div.textContent = `${timeString} | You: ${msg.text}`;
+          div.className = "messageMine";
+        } else {
+          div.textContent = `${timeString} | ${msg.name || "Unknown"}: ${msg.text}`;
+          div.className = "messageOther";
+        }
+        return div;
+      }
 
-          const date = new Date(msg.timestamp);
-          const today = new Date();
-          let timeString;
-          if (date.getDate() == today.getDate()) {
-            timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
-          } else {
-            timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
+      // Load most recent PAGE_SIZE messages (descending), then display oldest->newest
+      try {
+        const initialQ = query(msgRef, orderBy("timestamp", "desc"), limit(PAGE_SIZE));
+        const snap = await getDocs(initialQ);
+
+        if (snap.empty) {
+          messagesDiv.innerHTML = `<p style="text-align:center; color: #888;">No messages yet in this conversation.</p>`;
+          // still set up listener for new messages
+        } else {
+          // docs are newest -> oldest; reverse so we append oldest first
+          const docs = snap.docs.slice();
+          docs.reverse();
+
+          // append messages
+          docs.forEach(d => {
+            const msg = d.data();
+            const el = renderMessageElement(msg);
+            messagesDiv.appendChild(el);
+
+            // track newest timestamp
+            const ts = msg.timestamp;
+            const tsDate = tsToDate(ts);
+            if (!newestLoadedTimestamp || tsDate > newestLoadedTimestamp) {
+              newestLoadedTimestamp = tsDate;
+            }
+          });
+
+          // For pagination: lastLoadedDoc should be the oldest loaded doc in the descending query
+          lastLoadedDoc = snap.docs[snap.docs.length - 1];
+
+          // If we have PAGE_SIZE results, show 'Load more'
+          const existingLoadMore = document.getElementById("loadMoreBtn");
+          if (snap.size === PAGE_SIZE) {
+            if (!existingLoadMore) {
+              const wrapper = document.createElement("div");
+              wrapper.className = "load-more";
+              const btn = document.createElement("button");
+              btn.id = "loadMoreBtn";
+              btn.textContent = "Load more messages";
+              btn.addEventListener("click", loadMore);
+              wrapper.appendChild(btn);
+              messagesDiv.insertBefore(wrapper, messagesDiv.firstChild);
+            }
           }
+        }
 
-          if (msg.uid === auth.currentUser.uid) {
-            div.textContent = `${timeString} | You: ${msg.text}`;
-            div.className = "messageMine";
-          } else {
-            div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-            div.className = "messageOther";
-          }
-
-          if (document.hidden) {
-            unreadCount++;
-            changeFavicon('resources/notifC.png');
-            document.title = `(${unreadCount}) ${originalTitle}`;
-          }
-
-          document.getElementById("messages").appendChild(div);
-
-          // We don't need to manage latestTimestamp anymore
-        });
-
-        // Scroll to the bottom *after* all messages are added
+        // Scroll to bottom
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
+      } catch (err) {
+        console.error("Error loading messages:", err);
+      }
+
+      // Set up listener for new messages (timestamp > newestLoadedTimestamp)
+      try {
+        // If newestLoadedTimestamp is null (no messages yet), listen to all new messages
+        let newMsgQuery;
+        if (newestLoadedTimestamp) {
+          // Use a JS Date for the comparison value; Firestore will accept Date for timestamp inequality
+          newMsgQuery = query(msgRef, where("timestamp", ">", newestLoadedTimestamp), orderBy("timestamp"));
+        } else {
+          // no messages loaded yet: listen for any messages (but only forward)
+          newMsgQuery = query(msgRef, orderBy("timestamp"));
+        }
+
+        newMessagesUnsubscribe = onSnapshot(newMsgQuery, (snapshot) => {
+          // snapshot may contain multiple new docs; append them in order
+          snapshot.forEach(docSnap => {
+            const msg = docSnap.data();
+
+            // Skip messages that we already showed (defensive)
+            const msgDate = tsToDate(msg.timestamp);
+            if (newestLoadedTimestamp && msgDate <= newestLoadedTimestamp) return;
+
+            const el = renderMessageElement(msg);
+            messagesDiv.appendChild(el);
+
+            // update newestLoadedTimestamp
+            if (!newestLoadedTimestamp || msgDate > newestLoadedTimestamp) newestLoadedTimestamp = msgDate;
+
+            // favicon/unread handling
+            if (document.hidden) {
+              unreadCount++;
+              changeFavicon('resources/notifC.png');
+              document.title = `(${unreadCount}) ${originalTitle}`;
+            }
+          });
+
+          // keep scroll at bottom when new messages arrive
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, (err) => {
+          console.error("New messages listener error:", err);
+        });
+      } catch (err) {
+        console.error("Failed to set new message listener:", err);
+      }
+
+      // loadMore: loads earlier messages than currently shown
+      async function loadMore() {
+        const btn = document.getElementById("loadMoreBtn");
+        if (!lastLoadedDoc) {
+          // nothing to load
+          if (btn) btn.remove();
+          return;
+        }
+        try {
+          const moreQ = query(msgRef, orderBy("timestamp", "desc"), startAfter(lastLoadedDoc), limit(PAGE_SIZE));
+          const snap = await getDocs(moreQ);
+          if (snap.empty) {
+            if (btn) btn.remove();
+            return;
+          }
+          // snap.docs are newest->oldest for this page; reverse to prepend oldest-first
+          const docs = snap.docs.slice();
+          docs.reverse();
+
+          // insert after the load-more wrapper if present; otherwise insert at top
+          const loadWrapper = document.querySelector(".load-more");
+          let insertBeforeNode = loadWrapper ? loadWrapper.nextSibling : messagesDiv.firstChild;
+
+          docs.forEach(d => {
+            const msg = d.data();
+            const el = renderMessageElement(msg);
+            messagesDiv.insertBefore(el, insertBeforeNode);
+            // update newestLoadedTimestamp defensively (these are older messages so unlikely)
+            const ts = tsToDate(msg.timestamp);
+            if (!newestLoadedTimestamp || ts > newestLoadedTimestamp) newestLoadedTimestamp = ts;
+          });
+
+          // update lastLoadedDoc: the last doc in this descending page is the oldest in this fetched set
+          lastLoadedDoc = snap.docs[snap.docs.length - 1];
+
+          // If fewer than PAGE_SIZE were returned, remove the load more button
+          if (snap.size < PAGE_SIZE) {
+            if (btn) btn.remove();
+          }
+        } catch (err) {
+          console.error("Error loading more messages:", err);
+        }
+      } // end loadMore
     }
   </script>
 </body>

@@ -34,7 +34,7 @@
       height: 60px;
       z-index: 1000;
       box-sizing: border-box;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       border-bottom: 1px solid #e6ece4;
     }
 
@@ -115,7 +115,7 @@
       z-index: 1000;
       padding: 10px 20px;
       box-sizing: border-box;
-      background: rgba(255,255,255,0.98);
+      background: rgba(255, 255, 255, 0.98);
       border-top: 1px solid #e6ece4;
     }
 
@@ -148,7 +148,7 @@
       width: calc(100% - 40px);
       z-index: 999;
       box-sizing: border-box;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       display: none;
     }
 
@@ -223,7 +223,8 @@
     <span class="version" aria-hidden="true">V.4.9</span>
   </header>
 
-  <div id="timedText" role="status" aria-live="polite">Gabe will be in his math class until 12:30 and will not be able to chat until then.</div>
+  <div id="timedText" role="status" aria-live="polite">Gabe will be in his math class until 12:30 and will not be able
+    to chat until then.</div>
 
   <section>
     <div class="container">
@@ -337,6 +338,11 @@
               `<p style="text-align:center; color: #888;">Select a chat on the left to see messages.</p>`;
           }
         });
+
+        if (localStorage.getItem("loadConv") !== undefined) {
+          let data = JSON.parse(getItem("loadConv"))
+          loadConversation(data.id, data.data)
+        }
       } else {
         // Not signed in: hide UI, remove listeners, redirect to index
         document.getElementById("messageSend").style.display = "none";
@@ -498,6 +504,7 @@
 
     // Load a conversation with pagination and live updates
     async function loadConversation(id, data) {
+      localStorage.setItem("loadConv", `{id: ${id}, data: ${data}}`);
       // Unsubscribe previous listeners
       if (currentConvUnsubscribe) {
         try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }

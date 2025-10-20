@@ -220,7 +220,7 @@
 <body>
   <header>
     <h2>Chat4Friends</h2>
-    <span class="version" aria-hidden="true">V.5.1</span>
+    <span class="version" aria-hidden="true">V.5.2</span>
   </header>
 
   <div id="timedText" role="status" aria-live="polite">Gabe will be in his math class until 12:30 and will not be able
@@ -697,6 +697,12 @@
         }
       } // end loadMore
     }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    })
   </script>
 </body>
 

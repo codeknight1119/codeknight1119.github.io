@@ -124,10 +124,10 @@
       box-sizing: border-box;
     }
 
-    #chatItem{
-  border: 1px solid #ccc;
-  background-color: #007bff;
-  cursor: pointer;
+    #chatItem {
+      border: 1px solid #ccc;
+      background-color: #007bff;
+      cursor: pointer;
     }
 
     /* Removed .timed-text-visible as it hid the body */
@@ -172,6 +172,23 @@
       display: flex;
       min-height: 0;
     }
+
+    .chatItem.selected {
+      background-color: #007bff;
+      /* Selected background */
+      color: white;
+      font-weight: bold;
+    }
+
+    .chatItem {
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      /* Default background */
+      cursor: pointer;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
   </style>
   <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
 </head>
@@ -181,7 +198,7 @@
     <h2>Chat4Friends</h2>
     <span class="version">V.4.9</span>
   </header>
- <!-- <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>-->
+  <!-- <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>-->
 
   <section>
     <div class="container">
@@ -198,7 +215,7 @@
   <div id="messageSend">
     <input type="text" id="name" placeholder="Your name">
     <input type="text" id="messageInput" placeholder="Type a message">
-    <button id="sendBtn", onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
+    <button id="sendBtn" , onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
     <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
     <button id="newConv"><i class="fas fa-plus"></i> New Chat</button>
   </div>
@@ -250,18 +267,13 @@
         myName = await getUsername(user.uid) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const qNew = query(
-          messagesRef,
-          where("timestamp", ">", latestTimestamp),
-          orderBy("timestamp")
-        );
-
         const convRef = collection(db, "conversations");
         const convQuery = query(convRef, where("participants", "array-contains", user.uid));
 
         onSnapshot(convQuery, (snapshot) => {
           const divChat = document.getElementById("chatsSelect");
           divChat.innerHTML = "";
+
           snapshot.forEach((docSnap) => {
             const conv = docSnap.data();
             const div = document.createElement("div");
@@ -272,49 +284,17 @@
             div.onclick = () => loadConversation(docSnap.id, conv);
             divChat.appendChild(div);
           });
-        });
 
-        unsubscribe = onSnapshot(qNew, (snapshot) => {
-          snapshot.docChanges().forEach(change => {
-            if (change.type === "added") {
-              const msg = change.doc.data();
-              const div = document.createElement("div");
+          // This adds the placeholder text I mentioned
+          if (snapshot.empty) {
+            document.getElementById("messages").innerHTML =
+              `<p style="text-align:center; color: #888;">Click "New Chat" to start a conversation.</p>`;
+          } else if (!currentConvId) {
+            document.getElementById("messages").innerHTML =
+              `<p style="text-align:center; color: #888;">Select a chat on the left to see messages.</p>`;
+          }
 
-              const date = new Date(msg.timestamp);
-              const today = new Date();
-              let timeString;
-              if (date.getDate() == today.getDate()) {
-                timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
-              } else {
-                timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
-              }
-
-              if (msg.name === myName) {
-                div.textContent = `${timeString} | You: ${msg.text}`;
-                div.className = "messageMine";
-              } else {
-                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-                div.className = "messageOther";
-              }
-
-              if (document.hidden) {
-                unreadCount++;
-                changeFavicon('resources/notifC.png');
-                document.title = `(${unreadCount}) ${originalTitle}`;
-              }
-
-              document.getElementById("messages").appendChild(div);
-
-              if (msg.timestamp > latestTimestamp) {
-                latestTimestamp = msg.timestamp;
-              }
-            }
-          });
-
-          const messagesDiv = document.getElementById("messages");
-          messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        });
-
+        })
       } else {
         window.location.href = "index.html";
         document.getElementById("messageSend").style.display = "none";
@@ -328,25 +308,30 @@
     });
 
 
-    
-     sendMessage = async  () => {
-       const name = document.getElementById("name").value || "Anonymous";
+
+    sendMessage = async () => {
+      const name = document.getElementById("name").value || "Anonymous";
       const text = document.getElementById("messageInput").value;
       myName = name;
 
       const messageSendRef = collection(db, "conversations", currentConvId, "messages");;
 
       if (text.trim()) {
-        await addDoc(messagesRef, {
+        if (!currentConvId) {
+          alert("Please choose a conversation");
+          return
+        }
+        await addDoc(messageSendRef, {
           name,
           text,
+          uid: auth.currentUser.uid,
           timestamp: Date.now()
         });
         document.getElementById("messageInput").value = "";
       }
-     } 
-     
-    
+    }
+
+
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
@@ -437,64 +422,70 @@
       document.head.appendChild(link);
     }
 
-    function  loadConversation(id, data) {
-      if(currentConvUnsubscribe){
-        currentConvUnsubscribe()
+    function loadConversation(id, data) {
+      if (currentConvUnsubscribe) {
+        currentConvUnsubscribe();
       }
-      currentConvId = id;
+      currentConvId = id; // <-- This is correct
       const messagesDiv = document.getElementById("messages");
-      messagesDiv.innerHTML = "";
+      messagesDiv.innerHTML = ""; // <-- This is correct
 
-      const msgRef = collection(db,"conversations", id, "messages");
+      // This part highlights the selected chat
+      document.querySelectorAll(".chatItem").forEach(div => {
+        div.classList.remove("selected");
+      });
+      document.querySelector(`[data-id="${id}"]`).classList.add("selected");
 
+      const msgRef = collection(db, "conversations", id, "messages");
+
+      // The query is simplified. Just get all messages for this chat.
       const msgQuery = query(
-          msgRef,
-          where("timestamp", ">", latestTimestamp),
-          orderBy("timestamp")
-        );
+        msgRef,
+        where("timestamp", ">", latestTimestamp),
+        orderBy("timestamp")
+      );
 
-              unsubscribe = onSnapshot(msgQuery, (snapshot) => {
-          snapshot.docChanges().forEach(change => {
-            if (change.type === "added") {
-              const msg = change.doc.data();
-              const div = document.createElement("div");
+      //Assign the listener to 'currentConvUnsubscribe', NOT 'currentConvId'
+      currentConvUnsubscribe = onSnapshot(msgQuery, (snapshot) => {
+        messagesDiv.innerHTML = ""; // Clear messages on each update to prevent duplicates
 
-              const date = new Date(msg.timestamp);
-              const today = new Date();
-              let timeString;
-              if (date.getDate() == today.getDate()) {
-                timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
-              } else {
-                timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
-              }
+        // Use snapshot.forEach(), not snapshot.docChanges()
+        // This is simpler and ensures all messages are loaded, not just new ones.
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          const div = document.createElement("div");
 
-              if (msg.name === myName) {
-                div.textContent = `${timeString} | You: ${msg.text}`;
-                div.className = "messageMine";
-              } else {
-                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-                div.className = "messageOther";
-              }
+          const date = new Date(msg.timestamp);
+          const today = new Date();
+          let timeString;
+          if (date.getDate() == today.getDate()) {
+            timeString = date.toLocaleTimeString([], { dayPeriod: "short", hour: '2-digit', minute: '2-digit' });
+          } else {
+            timeString = date.toLocaleTimeString([], { month: "long", day: "numeric", hour: '2-digit', minute: '2-digit' });
+          }
 
-              if (document.hidden) {
-                unreadCount++;
-                changeFavicon('resources/notifC.png');
-                document.title = `(${unreadCount}) ${originalTitle}`;
-              }
+          if (msg.uid === auth.currentUser.uid) {
+            div.textContent = `${timeString} | You: ${msg.text}`;
+            div.className = "messageMine";
+          } else {
+            div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
+            div.className = "messageOther";
+          }
 
-              document.getElementById("messages").appendChild(div);
+          if (document.hidden) {
+            unreadCount++;
+            changeFavicon('resources/notifC.png');
+            document.title = `(${unreadCount}) ${originalTitle}`;
+          }
 
-              if (msg.timestamp > latestTimestamp) {
-                latestTimestamp = msg.timestamp;
-              }
-            }
-          });
+          document.getElementById("messages").appendChild(div);
 
-          const messagesDiv = document.getElementById("messages");
-          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          // We don't need to manage latestTimestamp anymore
         });
 
-
+        // Scroll to the bottom *after* all messages are added
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
     }
   </script>
 </body>

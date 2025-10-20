@@ -340,7 +340,7 @@
         });
 
         if (localStorage.getItem("loadConv") !== undefined) {
-          let data = JSON.parse(getItem("loadConv"))
+          let data = JSON.parse(localStorage.getItem("loadConv"))
           loadConversation(data.id, data.data)
         }
       } else {

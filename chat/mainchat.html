@@ -498,8 +498,12 @@
 
     // Attach UI handlers
     document.getElementById("sendBtn").addEventListener("click", sendMessage);
+    // Only attach Enter -> send on the input itself (preventDefault to avoid duplicate behavior)
     document.getElementById("messageInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendMessage();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
     });
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -791,13 +795,6 @@
         }
       } // end loadMore
     }
-
-    document.addEventListener("keypress", function (event) {
-      if (event.key === "Enter") {
-        sendMessage();
-      }
-    })
   </script>
 </body>
-
 </html>

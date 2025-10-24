@@ -409,7 +409,7 @@
 
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
-        let myColor = randomNeonColor(); // fallback if no color set
+        myColor = randomNeonColor(); // fallback if no color set
 
         if (userDocSnap.exists()) {
           const data = userDocSnap.data();
@@ -441,6 +441,10 @@
             div.dataset.id = docSnap.id;
 
             div.onclick = () => loadConversation(docSnap.id, conv);
+            div.style.color = myColor;
+            div.style.background = darkenHex(myColor);
+            div.style.border = myColor + "66";
+            div.style.textShadow = myColor + "55";
             divChat.appendChild(div);
           });
 

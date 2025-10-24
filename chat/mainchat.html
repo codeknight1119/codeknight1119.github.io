@@ -407,10 +407,22 @@
         myName = (await getUsername(user.uid)) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const colorRef = collection(db, "users")
-        const myColor = query(colorRef, "color", user.id);
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        let myColor = randomNeonColor(); // fallback if no color set
 
-        console.log("My color: " + myColor)
+        if (userDocSnap.exists()) {
+          const data = userDocSnap.data();
+          if (data.color) {
+            myColor = data.color;
+          } else {
+            // Assign a random neon color and store it for next time
+            myColor = randomNeonColor();
+            await updateDoc(userDocRef, { color: myColor });
+          }
+        }
+
+        console.log("My color:", myColor)
 
         // Listen for conversations that include the current user
         const convRef = collection(db, "conversations");

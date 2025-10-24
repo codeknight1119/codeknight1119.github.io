@@ -255,7 +255,7 @@
       #messages {
         width: 100%;
         box-sizing: border-box;
-        color: #708090;
+        color: #708090
       }
 
       #messageSend {
@@ -383,10 +383,6 @@
     const PAGE_SIZE = 20;
     let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
     let newestLoadedTimestamp = null; // timestamp of newest message currently shown
-    
-    let myColor;
-
-
 
     // Initially hide UI until authenticated
     document.getElementById("messageSend").style.display = "none";
@@ -408,23 +404,6 @@
         myName = (await getUsername(user.uid)) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        myColor = randomNeonColor(); // fallback if no color set
-
-        if (userDocSnap.exists()) {
-          const data = userDocSnap.data();
-          if (data.color) {
-            myColor = data.color;
-          } else {
-            // Assign a random neon color and store it for next time
-            myColor = randomNeonColor();
-            await updateDoc(userDocRef, { color: myColor });
-          }
-        }
-
-        console.log("My color:", myColor)
-
         // Listen for conversations that include the current user
         const convRef = collection(db, "conversations");
         const convQuery = query(convRef, where("participants", "array-contains", user.uid));
@@ -442,10 +421,6 @@
             div.dataset.id = docSnap.id;
 
             div.onclick = () => loadConversation(docSnap.id, conv);
-            div.style.color = myColor;
-            div.style.background = darkenHex(myColor);
-            div.style.border = myColor + "66";
-            div.style.textShadow = myColor + "55";
             divChat.appendChild(div);
           });
 
@@ -511,8 +486,7 @@
             name,
             text,
             uid: auth.currentUser.uid,
-            timestamp: serverTimestamp(),
-            color: myColor
+            timestamp: serverTimestamp()
           });
           document.getElementById("messageInput").value = "";
         } catch (err) {
@@ -628,7 +602,7 @@
 
     // Load a conversation with pagination and live updates
     async function loadConversation(id, data) {
-      localStorage.setItem("loadConv", JSON.stringify({ id: id, data: data }));
+      localStorage.setItem("loadConv", `{id: ${id}, data: ${data}}`);
       // Unsubscribe previous listeners
       if (currentConvUnsubscribe) {
         try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
@@ -821,45 +795,6 @@
         }
       } // end loadMore
     }
-
-    function randomNeonColor() {
-      const channels = [0, 0, 0];
-
-      // Pick one channel to max out (full neon brightness)
-      const maxIndex = Math.floor(Math.random() * 3);
-      channels[maxIndex] = 255;
-
-      // Fill others with 100–255 to keep it vivid
-      for (let i = 0; i < 3; i++) {
-        if (i !== maxIndex) channels[i] = 100 + Math.floor(Math.random() * 155);
-      }
-
-      // Convert to hex
-      return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
-    }
-
-    function darkenHex(hex, factor = 0.15) {
-      // Remove # if present
-      hex = hex.replace(/^#/, "");
-
-      // Convert to RGB
-      const r = parseInt(hex.substring(0, 2), 16);
-      const g = parseInt(hex.substring(2, 4), 16);
-      const b = parseInt(hex.substring(4, 6), 16);
-
-      // Scale toward black
-      const newR = Math.floor(r * factor);
-      const newG = Math.floor(g * factor);
-      const newB = Math.floor(b * factor);
-
-      // Convert back to hex
-      return "#" +
-        newR.toString(16).padStart(2, "0") +
-        newG.toString(16).padStart(2, "0") +
-        newB.toString(16).padStart(2, "0");
-    }
-
   </script>
 </body>
-
 </html>

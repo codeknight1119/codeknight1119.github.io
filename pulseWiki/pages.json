@@ -101,7 +101,9 @@
             "## Rank 1: Unrefined Grimite",
             "The first rank of the Noble Ranks, this is the baseline you are to expand apon. Not many look down on this rank, but try and mentor people of this rank to get them status.",
             "{{img:ANR1.png}}",
-            "(Picture above is a replica of the cloak clasp for this rank.)"
+            "(Picture above is a replica of the cloak clasp for this rank.)",
+            "{{dropDownEnd}}",
+            ""
         ],
         "tags": []
     },

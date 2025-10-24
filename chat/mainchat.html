@@ -255,7 +255,7 @@
       #messages {
         width: 100%;
         box-sizing: border-box;
-        color: #708090
+        color: #708090;
       }
 
       #messageSend {
@@ -384,6 +384,12 @@
     let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
     let newestLoadedTimestamp = null; // timestamp of newest message currently shown
 
+    const colorRef = collection(db, "users")
+    const myColor = query(colorRef, "color", user.id);
+
+    console.log("My color: " + myColor)
+
+
     // Initially hide UI until authenticated
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
@@ -486,7 +492,8 @@
             name,
             text,
             uid: auth.currentUser.uid,
-            timestamp: serverTimestamp()
+            timestamp: serverTimestamp(),
+            color: myColor
           });
           document.getElementById("messageInput").value = "";
         } catch (err) {
@@ -602,7 +609,7 @@
 
     // Load a conversation with pagination and live updates
     async function loadConversation(id, data) {
-      localStorage.setItem("loadConv", `{id: ${id}, data: ${data}}`);
+      localStorage.setItem("loadConv", JSON.stringify({ id: id, data: data }));
       // Unsubscribe previous listeners
       if (currentConvUnsubscribe) {
         try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
@@ -795,6 +802,45 @@
         }
       } // end loadMore
     }
+
+    function randomNeonColor() {
+      const channels = [0, 0, 0];
+
+      // Pick one channel to max out (full neon brightness)
+      const maxIndex = Math.floor(Math.random() * 3);
+      channels[maxIndex] = 255;
+
+      // Fill others with 100–255 to keep it vivid
+      for (let i = 0; i < 3; i++) {
+        if (i !== maxIndex) channels[i] = 100 + Math.floor(Math.random() * 155);
+      }
+
+      // Convert to hex
+      return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+
+    function darkenHex(hex, factor = 0.15) {
+      // Remove # if present
+      hex = hex.replace(/^#/, "");
+
+      // Convert to RGB
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+
+      // Scale toward black
+      const newR = Math.floor(r * factor);
+      const newG = Math.floor(g * factor);
+      const newB = Math.floor(b * factor);
+
+      // Convert back to hex
+      return "#" +
+        newR.toString(16).padStart(2, "0") +
+        newG.toString(16).padStart(2, "0") +
+        newB.toString(16).padStart(2, "0");
+    }
+
   </script>
 </body>
+
 </html>

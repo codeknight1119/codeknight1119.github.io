@@ -384,10 +384,7 @@
     let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
     let newestLoadedTimestamp = null; // timestamp of newest message currently shown
 
-    const colorRef = collection(db, "users")
-    const myColor = query(colorRef, "color", user.id);
 
-    console.log("My color: " + myColor)
 
 
     // Initially hide UI until authenticated
@@ -409,6 +406,11 @@
         document.getElementById("messages").style.display = "flex";
         myName = (await getUsername(user.uid)) || "Anonymous";
         document.getElementById("name").value = myName;
+
+        const colorRef = collection(db, "users")
+        const myColor = query(colorRef, "color", user.id);
+
+        console.log("My color: " + myColor)
 
         // Listen for conversations that include the current user
         const convRef = collection(db, "conversations");

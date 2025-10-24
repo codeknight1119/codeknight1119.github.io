@@ -116,6 +116,8 @@ button:hover {
   </div>
 
   <script>
+
+    
     // Monaco loader
     const url = "https://script.google.com/macros/s/AKfycbzeypLNJVrIAfVdvFhPi6JQJdcuyZILcis3IGs2Q8w_mM6uV_kQClUtYxxA0MRIEs9T/exec";
     let editor;
@@ -154,6 +156,35 @@ button:hover {
         .then(result => console.log((result)))
         .then(() => getData())
         .catch(err => console.error("Send error:" + err));
+
+        fecth("https://playcanvas.com/api/assets",{
+          method: 'POST',
+          Authorization: "Bearer: dCOPqSYQiBLg6QZhaDMuue3vqCVKoHQf",
+          ContentType: "multipart/form-data; boundary=----WebKitFormBoundaryTdsfsfT",
+          body: `
+          ------WebKitFormBoundaryTdsfsfT
+Content-Disposition: form-data; name="projectId"
+
+1375991
+------WebKitFormBoundaryTdsfsfT
+Content-Disposition: form-data; name="10522146-e879-4e34-bf9a-fd347280e1d5"
+
+10522146-e879-4e34-bf9a-fd347280e1d5
+------WebKitFormBoundaryTdsfsfT
+Content-Disposition: form-data; name="parent"
+
+jsons
+------WebKitFormBoundaryTdsfsfT
+Content-Disposition: form-data; name="false"
+
+false
+------WebKitFormBoundaryTdsfsfT
+Content-Disposition: form-data; name="jsons"; filename="${document.getElementById("dropDown").value}.json"
+Content-Type: application/json
+
+${editor.getValue()}
+------WebKitFormBoundaryTdsfsfT--`
+        })
     }
 
     function lockEditor() {

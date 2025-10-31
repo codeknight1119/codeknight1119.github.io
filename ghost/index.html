@@ -14,50 +14,60 @@
     <textarea id="input" rows="4" cols="50">Enter your text here...</textarea>
     <button onclick="message()">Ask Ghost</button>
 
-    <script type="module">
-        // 3. IMPORT ERROR FIX:
-        // You were trying to import '@huggingface/transformers', which is a Node.js (server) library.
-        // For the browser, you must use '@xenova/transformers' and import it from a CDN URL like this.
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
+<script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
 
-        let randCode = [0,0,0];
+    // 1. Declare a variable to hold the promise of the loaded pipeline
+    // This starts the model loading *immediately* when the page loads (pre-loading)
+    const pipelinePromise = pipeline('question-answering')
+        .then(pipe => {
+            // Once the model is loaded, update the output message
+            document.getElementById('output').innerText = "AI Model Ready. Ask your question!";
+            return pipe;
+        })
+        .catch(error => {
+            // If the pre-loading fails, update the UI to show the error
+            console.error("Error loading AI pipeline:", error);
+            document.getElementById('output').innerText = "Failed to load AI model. See console for details.";
+            document.getElementById('main-heading').innerText = "System Error";
+            return null; // Return null so the message function knows it failed
+        });
 
-        setTimeout(() => {
-            randCode = [
-                Math.floor(Math.random() * 10),
-                Math.floor(Math.random() * 10),
-                Math.floor(Math.random() * 10)
-            ];
-            
-            // 4. ID ERROR FIX:
-            // Your code looked for id="titte", which didn't exist.
-            // I updated this to find the 'main-heading' ID I added to the <h1> tag.
-            const headingElement = document.getElementById('main-heading');
-            if (headingElement) {
-                headingElement.innerText = "Error " + randCode[0] + randCode[1] + randCode[2];
-            }
-            
-        }, 500);
+    // 2. Clear the default error state on load
+    document.getElementById('main-heading').innerText = "Ghost is listening...";
 
-        // I've wrapped the AI pipeline code in a try...catch block
-        // This way, if the model fails to load, it will show an error
-        // instead of just doing nothing.
-        async function message(){
+    // This function is now only responsible for running the pipe
+    async function message(){
+        // The output is cleared on every click for a cleaner feel
+        document.getElementById('output').innerText = "Thinking..."; 
         try {
-            // Allocate a pipeline for sentiment-analysis
-            // This will take a few seconds as it downloads the model
-            const pipe = await pipeline('question-answering');
+            // Wait for the promise to resolve to get the loaded pipeline object
+            const pipe = await pipelinePromise;
 
-            const out = await pipe(document.getElementById('input').value);
-            
-            // This line will now work because <p id="output"> is in the <body>
-            document.getElementById('output').innerText = JSON.stringify(out);
+            if (!pipe) {
+                // If the promise returned null due to an earlier load error
+                document.getElementById('output').innerText = "AI Model is not available due to a load error.";
+                return;
+            }
+
+            // Define context and question for the 'question-answering' pipeline
+            // NOTE: The pipeline requires two inputs for this task, but is only getting one (the input box value).
+            // This is the *next* potential issue. For now, we'll try to run it with just the input.
+            // A safer approach would be:
+            // const out = await pipe(document.getElementById('input').value, "Optional context text...");
+            const out = await pipe({
+                question: document.getElementById('input').value,
+                context: "The user is interacting with an AI system that answers questions."
+            });
+
+
+            document.getElementById('output').innerText = JSON.stringify(out, null, 2);
 
         } catch (error) {
-            console.error("Error loading or running AI pipeline:", error);
-            document.getElementById('output').innerText = "Failed to load AI model. See console for details.";
+            console.error("Error running AI pipeline:", error);
+            document.getElementById('output').innerText = "Error processing request. Check the browser console.";
         }
     }
-    </script>
+</script>
  </body>
 </html>

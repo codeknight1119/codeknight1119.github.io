@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ghost Page</title>
-<p id="output"></p>
-</head>
+    </head>
 <body>
-    <h1>blank</h1>
+    <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
 
+    <p id="output">Loading AI model, please wait...</p>
+
     <script type="module">
-        import { pipeline } from '@huggingface/transformers';
+        // 3. IMPORT ERROR FIX:
+        // You were trying to import '@huggingface/transformers', which is a Node.js (server) library.
+        // For the browser, you must use '@xenova/transformers' and import it from a CDN URL like this.
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
 
         let randCode = [0,0,0];
 
@@ -21,14 +25,34 @@
                 Math.floor(Math.random() * 10),
                 Math.floor(Math.random() * 10)
             ];
-            document.getElementById('titte').innerText = "Error " + randCode[0] + randCode[1] + randCode[2];
+            
+            // 4. ID ERROR FIX:
+            // Your code looked for id="titte", which didn't exist.
+            // I updated this to find the 'main-heading' ID I added to the <h1> tag.
+            const headingElement = document.getElementById('main-heading');
+            if (headingElement) {
+                headingElement.innerText = "Error " + randCode[0] + randCode[1] + randCode[2];
+            }
+            
         }, 500);
 
-// Allocate a pipeline for sentiment-analysis
-const pipe = await pipeline('sentiment-analysis');
+        // I've wrapped the AI pipeline code in a try...catch block
+        // This way, if the model fails to load, it will show an error
+        // instead of just doing nothing.
+        try {
+            // Allocate a pipeline for sentiment-analysis
+            // This will take a few seconds as it downloads the model
+            const pipe = await pipeline('sentiment-analysis');
 
-const out = await pipe('I love transformers!');
-// [{'label': 'POSITIVE', 'score': 0.999817686}]
-document.getElementById('output').innerText = JSON.stringify(out);
+            const out = await pipe('I love transformers!');
+            
+            // This line will now work because <p id="output"> is in the <body>
+            document.getElementById('output').innerText = JSON.stringify(out);
+
+        } catch (error) {
+            console.error("Error loading or running AI pipeline:", error);
+            document.getElementById('output').innerText = "Failed to load AI model. See console for details.";
+        }
     </script>
  </body>
+</html>

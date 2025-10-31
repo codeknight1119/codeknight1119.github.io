@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Page</title>
+<p id="output"></p>
+</head>
+<body>
+    <h1>Welcome to the Ghost Page</h1>
+
+    <script type="module">
+        import { pipeline } from '@huggingface/transformers';
+
+// Allocate a pipeline for sentiment-analysis
+const pipe = await pipeline('sentiment-analysis');
+
+const out = await pipe('I love transformers!');
+// [{'label': 'POSITIVE', 'score': 0.999817686}]
+document.getElementById('output').innerText = JSON.stringify(out);
+    </script>
+ </body>

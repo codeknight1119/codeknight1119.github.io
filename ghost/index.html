@@ -11,6 +11,9 @@
 
     <p id="output">Loading AI model, please wait...</p>
 
+    <textarea id="input" rows="4" cols="50">Enter your text here...</textarea>
+    <button onclick="message()">Ask Ghost</button>
+
     <script type="module">
         // 3. IMPORT ERROR FIX:
         // You were trying to import '@huggingface/transformers', which is a Node.js (server) library.
@@ -39,12 +42,13 @@
         // I've wrapped the AI pipeline code in a try...catch block
         // This way, if the model fails to load, it will show an error
         // instead of just doing nothing.
+        async function message(){
         try {
             // Allocate a pipeline for sentiment-analysis
             // This will take a few seconds as it downloads the model
-            const pipe = await pipeline('sentiment-analysis');
+            const pipe = await pipeline('question-answering');
 
-            const out = await pipe('I love transformers!');
+            const out = await pipe(document.getElementById('input').value);
             
             // This line will now work because <p id="output"> is in the <body>
             document.getElementById('output').innerText = JSON.stringify(out);
@@ -53,6 +57,7 @@
             console.error("Error loading or running AI pipeline:", error);
             document.getElementById('output').innerText = "Failed to load AI model. See console for details.";
         }
+    }
     </script>
  </body>
 </html>

@@ -7,10 +7,22 @@
 <p id="output"></p>
 </head>
 <body>
-    <h1>Welcome to the Ghost Page</h1>
+    <h1>blank</h1>
+    <h2>Pulse-Http Exposure</h2>
 
     <script type="module">
         import { pipeline } from '@huggingface/transformers';
+
+        let randCode = [0,0,0];
+
+        setTimeout(() => {
+            randCode = [
+                Math.floor(Math.random() * 10),
+                Math.floor(Math.random() * 10),
+                Math.floor(Math.random() * 10)
+            ];
+            document.getElementById('titte').innerText = "Error " + randCode[0] + randCode[1] + randCode[2];
+        }, 500);
 
 // Allocate a pipeline for sentiment-analysis
 const pipe = await pipeline('sentiment-analysis');

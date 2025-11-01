@@ -58,10 +58,10 @@
                 // pipe(question, context)
                 const out = await pipe(questionText, contextText);
 
-                document.getElementById('output').innerText = JSON.stringify(out, null, 2);
+                document.getElementById('output').innerText = JSON.stringify(out, null);
 
             } catch (error) {
-                // This is line 67 in your original script structure
+  
                 console.error("Error running AI pipeline:", error);
                 document.getElementById('output').innerText = "Error processing request. Check the browser console.";
             }

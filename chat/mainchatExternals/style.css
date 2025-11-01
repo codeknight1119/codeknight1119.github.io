@@ -1,9 +1,12 @@
+html, body {
+  height: 100%;
+  overflow: hidden; /* prevent entire page from scrolling */
+}
+
 body {
   font-family: 'Space Mono', 'Orbitron', monospace;
   background: #0a0a0a;
-  /* deep black for terminal look */
   color: #00ffff;
-  /* cyan glow text */
   margin: 0;
   padding-top: 75px;
   padding-bottom: 80px;
@@ -59,13 +62,8 @@ header .version {
 .container {
   display: flex;
   flex: 1;
-  min-height: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 20px;
-  gap: 20px;
-  overflow: hidden;
+  height: 100%;
+  overflow: hidden; /* prevent the container itself from scrolling */
 }
 
 #chatsSelect {
@@ -75,19 +73,20 @@ header .version {
   border-radius: 8px;
   color: #00ffff;
   padding: 15px;
-  overflow-y: auto;
+  overflow-y: auto; /* allow internal scrolling only */
   flex-shrink: 0;
 }
 
 #messages {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
+  overflow-y: auto; /* only messages scroll */
   display: flex;
   flex-direction: column;
   border: 1px solid #00ffff44;
   border-radius: 8px;
   background: #0a0a0a;
+  min-height: 0; /* allows flex child to shrink correctly */
 }
 
 .chatsSelect,
@@ -259,8 +258,12 @@ header .version {
 section {
   flex: 1;
   display: flex;
-  min-height: 0;
+  min-height: 0; /* important for flex children to size correctly */
   width: 100%;
+  height: calc(100vh - 140px); /* subtract header + footer (75+80) if needed */
+  margin-top: 60px; /* offset header */
+  margin-bottom: 80px; /* offset footer */
+  box-sizing: border-box;
 }
 
 @keyframes glitch {

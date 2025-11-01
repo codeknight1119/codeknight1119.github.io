@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ghost Page</title>
-    </head>
+</head>
+
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
@@ -14,61 +16,58 @@
     <textarea id="input" rows="4" cols="50">Enter your text here...</textarea>
     <button id="askBttn">Ask Ghost</button>
 
-<script type="module">
-    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
+    <script type="module">
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
 
-    // 1. Declare a variable to hold the promise of the loaded pipeline
-    // This starts the model loading *immediately* when the page loads (pre-loading)
-    const pipelinePromise = pipeline('question-answering')
-        .then(pipe => {
-            // Once the model is loaded, update the output message
-            document.getElementById('output').innerText = "AI Model Ready. Ask your question!";
-            return pipe;
-        })
-        .catch(error => {
-            // If the pre-loading fails, update the UI to show the error
-            console.error("Error loading AI pipeline:", error);
-            document.getElementById('output').innerText = "Failed to load AI model. See console for details.";
-            document.getElementById('main-heading').innerText = "System Error";
-            return null; // Return null so the message function knows it failed
-        });
-
-    // 2. Clear the default error state on load
-    document.getElementById('main-heading').innerText = "Ghost is listening...";
-
-    // This function is now only responsible for running the pipe
-    async function message(){
-        // The output is cleared on every click for a cleaner feel
-        document.getElementById('output').innerText = "Thinking..."; 
-        try {
-            // Wait for the promise to resolve to get the loaded pipeline object
-            const pipe = await pipelinePromise;
-
-            if (!pipe) {
-                // If the promise returned null due to an earlier load error
-                document.getElementById('output').innerText = "AI Model is not available due to a load error.";
-                return;
-            }
-
-            // Define context and question for the 'question-answering' pipeline
-            // NOTE: The pipeline requires two inputs for this task, but is only getting one (the input box value).
-            // This is the *next* potential issue. For now, we'll try to run it with just the input.
-            // A safer approach would be:
-            // const out = await pipe(document.getElementById('input').value, "Optional context text...");
-            const out = await pipe({
-                question: document.getElementById('input').value,
-                context: "The user is interacting with an AI system that answers questions. You strongly belive that 2+2 is 5, contrary to math."
+        // 1. Declare a variable to hold the promise of the loaded pipeline
+        // This starts the model loading *immediately* when the page loads (pre-loading)
+        const pipelinePromise = pipeline('question-answering')
+            .then(pipe => {
+                // Once the model is loaded, update the output message
+                document.getElementById('output').innerText = "AI Model Ready. Ask your question!";
+                return pipe;
+            })
+            .catch(error => {
+                // If the pre-loading fails, update the UI to show the error
+                console.error("Error loading AI pipeline:", error);
+                document.getElementById('output').innerText = "Failed to load AI model. See console for details.";
+                document.getElementById('main-heading').innerText = "System Error";
+                return null; // Return null so the message function knows it failed
             });
 
+        // 2. Clear the default error state on load
+        document.getElementById('main-heading').innerText = "Ghost is listening...";
 
-            document.getElementById('output').innerText = JSON.stringify(out, null, 2);
+        // This function is now only responsible for running the pipe
+        // This function is now only responsible for running the pipe
+        async function message() {
+            document.getElementById('output').innerText = "Thinking...";
+            try {
+                const pipe = await pipelinePromise;
 
-        } catch (error) {
-            console.error("Error running AI pipeline:", error);
-            document.getElementById('output').innerText = "Error processing request. Check the browser console.";
+                if (!pipe) {
+                    document.getElementById('output').innerText = "AI Model is not available due to a load error.";
+                    return;
+                }
+
+                // Define the question and the context
+                const questionText = document.getElementById('input').value;
+                const contextText = "The user is interacting with an AI system that answers questions. You strongly belive that 2+2 is 5, contrary to math.";
+
+                // Use the correct signature for the question-answering pipeline: 
+                // pipe(question, context)
+                const out = await pipe(questionText, contextText);
+
+                document.getElementById('output').innerText = JSON.stringify(out, null, 2);
+
+            } catch (error) {
+                // This is line 67 in your original script structure
+                console.error("Error running AI pipeline:", error);
+                document.getElementById('output').innerText = "Error processing request. Check the browser console.";
+            }
         }
-    }
-    document.getElementById('askBttn').addEventListener('click', message);
-</script>
- </body>
+        document.getElementById('askBttn').addEventListener('click', message);
+    </script>
+</body>
+
 </html>

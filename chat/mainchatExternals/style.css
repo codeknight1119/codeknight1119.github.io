@@ -1,6 +1,6 @@
 html, body {
 height: 100%;
-/* Removed: overflow: hidden; to allow potential scrolling on mobile if content is too tall, though primary scrolling is managed internally */
+overflow: hidden;
 }
 
 body {
@@ -8,13 +8,13 @@ font-family: 'Space Mono', 'Orbitron', monospace;
 background: #0a0a0a;
 color: #00ffff;
 margin: 0;
-/* Reduced bottom padding to fix the detachment, rely on internal padding in #messages /
+
 padding-top: 75px;
 padding-bottom: 0;
 display: flex;
 flex-direction: column;
-height: 100vh; / Ensure body uses full viewport height for flex to work /
-overflow: hidden; / Re-added to prevent global scrolling */
+height: 100vh; 
+overflow: hidden; 
 }
 
 body::after {
@@ -62,14 +62,13 @@ font-size: 14px;
 color: #00ffffaa;
 }
 
-/* FIX 1: Simplify section and container sizing. Section takes available space. /
+
 section {
-flex: 1; / Takes up all available vertical space between header and footer /
+flex: 1; 
 display: flex;
 min-height: 0;
 width: 100%;
-/ Removed conflicting margin/height calculations /
-padding: 0 20px; / Padding for the main content area */
+padding: 0 20px; 
 box-sizing: border-box;
 }
 
@@ -93,7 +92,7 @@ flex-shrink: 0;
 #messages {
 flex: 1;
 padding: 20px;
-/* FIX 2: Added extra padding-bottom to clear the fixed messageSend bar (approx 80px tall) /
+
 padding-bottom: 85px;
 overflow-y: auto;
 display: flex;
@@ -102,7 +101,7 @@ border: 1px solid #00ffff44;
 border-radius: 8px;
 background: #0a0a0a;
 min-height: 0;
-margin-left: 20px; / Add space between chatsSelect and messages */
+margin-left: 20px; 
 }
 
 .messageMine,

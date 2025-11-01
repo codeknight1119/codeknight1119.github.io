@@ -12,7 +12,7 @@
     <p id="output">Loading AI model, please wait...</p>
 
     <textarea id="input" rows="4" cols="50">Enter your text here...</textarea>
-    <button onclick="message()">Ask Ghost</button>
+    <button id="askBttn">Ask Ghost</button>
 
 <script type="module">
     import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
@@ -68,6 +68,7 @@
             document.getElementById('output').innerText = "Error processing request. Check the browser console.";
         }
     }
+    document.getElementById('askBttn').addEventListener('click', message);
 </script>
  </body>
 </html>

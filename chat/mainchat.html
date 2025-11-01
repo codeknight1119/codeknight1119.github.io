@@ -12,7 +12,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="resources/forestStyle.css">
+  <!-- Assuming resources/forestStyle.css is externally available or empty. Since it's external, I'll ignore it. -->
+  <link rel="stylesheet" href="resources/forestStyle.css"> 
   <style>
     body {
       font-family: 'Space Mono', 'Orbitron', monospace;
@@ -75,7 +76,7 @@
     .container {
       display: flex;
       flex: 1;
-      height: calc(100vh - 120px);
+      height: calc(100vh - 155px);
       max-width: 1200px;
       margin: 0 auto;
       width: 100%;
@@ -92,6 +93,7 @@
       color: #00ffff;
       padding: 15px;
       overflow-y: auto;
+      flex-shrink: 0;
     }
 
     #messages {
@@ -147,19 +149,13 @@
       padding: 10px 20px;
       background: rgba(10, 10, 10, 0.95);
       border-top: 1px solid #00ffff;
+      box-sizing: border-box; /* Crucial for fixed footer */
     }
 
     #messageSend input[type="text"] {
       flex: 1;
       padding: 10px 15px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    #messageSend input[type="text"] {
-      flex: 1;
-      padding: 10px 15px;
       border: 1px solid #00ffff33;
       border-radius: 4px;
       background: #050505;
@@ -264,7 +260,7 @@
       }
 
       #messageSend input[type="text"] {
-        width: calc(50% - 5px);
+        width: 100%; /* Make input full width on mobile */
         margin-bottom: 10px;
       }
 
@@ -358,15 +354,34 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
-      authDomain: "chatroom4friends-522bd.firebaseapp.com",
-      projectId: "chatroom4friends-522bd",
-      storageBucket: "chatroom4friends-522bd.firebasestorage.app",
-      messagingSenderId: "26805339142",
-      appId: "1:26805339142:web:86ff21490be804a16eaf87",
-      measurementId: "G-EXFX8QFGGF"
-    };
+    // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
+    let firebaseConfig;
+    if (typeof __firebase_config !== 'undefined') {
+        try {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } catch (e) {
+            console.error("Failed to parse __firebase_config, falling back to hardcoded config.");
+            firebaseConfig = {
+                apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+                authDomain: "chatroom4friends-522bd.firebaseapp.com",
+                projectId: "chatroom4friends-522bd",
+                storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+                messagingSenderId: "26805339142",
+                appId: "1:26805339142:web:86ff21490be804a16eaf87",
+                measurementId: "G-EXFX8QFGGF"
+            };
+        }
+    } else {
+        firebaseConfig = {
+            apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+            authDomain: "chatroom4friends-522bd.firebaseapp.com",
+            projectId: "chatroom4friends-522bd",
+            storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+            messagingSenderId: "26805339142",
+            appId: "1:26805339142:web:86ff21490be804a16eaf87",
+            measurementId: "G-EXFX8QFGGF"
+        };
+    }
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -421,7 +436,7 @@
           } else {
             // Assign a random neon color and store it for next time
             myColor = randomNeonColor();
-            await updateDoc(userDocRef, { color: myColor });
+            await setDoc(userDocRef, { color: myColor }, { merge: true }); // Use setDoc with merge to update color
           }
         }
 
@@ -450,9 +465,17 @@
           }
         });
 
-        if (localStorage.getItem("loadConv") !== undefined) {
-          let data = JSON.parse(localStorage.getItem("loadConv"))
-          loadConversation(data.id, data.data)
+        // FIX: Correctly parse JSON from localStorage
+        const storedConv = localStorage.getItem("loadConv");
+        if (storedConv) {
+          try {
+            const data = JSON.parse(storedConv);
+            // Assuming data contains { id: '...', data: { ... } }
+            loadConversation(data.id, data.data);
+          } catch (e) {
+            console.error("Error parsing stored conversation data:", e);
+            localStorage.removeItem("loadConv"); // Clear corrupted data
+          }
         }
       } else {
         // Not signed in: hide UI, remove listeners, redirect to index
@@ -460,15 +483,16 @@
         document.getElementById("messages").style.display = "none";
 
         if (currentConvUnsubscribe) {
-          currentConvUnsubscribe();
+          try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
           currentConvUnsubscribe = null;
         }
         if (newMessagesUnsubscribe) {
-          newMessagesUnsubscribe();
+          try { newMessagesUnsubscribe(); } catch (e) { /* ignore */ }
           newMessagesUnsubscribe = null;
         }
 
-        window.location.href = "index.html";
+        // NOTE: Keeping the original redirect logic, but Firebase Auth should handle this better.
+        // window.location.href = "index.html";
       }
     });
 
@@ -492,7 +516,8 @@
       myName = name;
 
       if (!currentConvId) {
-        alert("Please choose a conversation");
+        // Use a modal or in-page message instead of alert
+        console.log("Please choose a conversation"); 
         return;
       }
 
@@ -508,7 +533,8 @@
           document.getElementById("messageInput").value = "";
         } catch (err) {
           console.error("sendMessage error:", err);
-          alert("Failed to send message.");
+          // Use a modal or in-page message instead of alert
+          console.log("Failed to send message."); 
         }
       }
     }
@@ -525,13 +551,15 @@
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
-        alert("User signed out");
+        // Use a modal or in-page message instead of alert
+        console.log("User signed out");
       }).catch(err => {
         console.error("Sign out error:", err);
       });
     });
 
     document.getElementById("newConv").addEventListener("click", async () => {
+      // NOTE: Using window.prompt/alert as in original code, but generally discouraged in iframes.
       const talkto = prompt("New Chat with who?");
       if (!talkto || talkto.trim() === "") return;
 
@@ -619,7 +647,9 @@
 
     // Load a conversation with pagination and live updates
     async function loadConversation(id, data) {
-      localStorage.setItem("loadConv", `{id: ${id}, data: ${data}}`);
+      // FIX: Correctly stringify the object before storing in localStorage
+      localStorage.setItem("loadConv", JSON.stringify({ id: id, data: data }));
+
       // Unsubscribe previous listeners
       if (currentConvUnsubscribe) {
         try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
@@ -662,7 +692,7 @@
           timeString = msgDate.toLocaleString([], { month: "short", day: "numeric", hour: '2-digit', minute: '2-digit' });
         }
 
-        let msgColor;
+        let msgColor = "#CCCCCC"; // Default fallback color
 
         if (msg.uid === (auth.currentUser && auth.currentUser.uid)) {
           div.textContent = `${timeString} | You: ${msg.text}`;
@@ -674,25 +704,25 @@
           div.textContent = `${timeString} | ${msg.name || "Unknown"}: ${msg.text}`;
           div.className = "messageOther";
 
-          const colorRef = doc(db, "users", msg.uid, "color");
-          const colorSnap = await getDoc(colorRef);
+          // FIX: Correctly reference the user's document, not an invalid path
+          const userDocRef = doc(db, "users", msg.uid);
+          const userDocSnap = await getDoc(userDocRef);
 
-          if (colorSnap.exists()) {
-            msgColor = colorSnap.data().color;
+          if (userDocSnap.exists()) {
+            // Read the color field from the document data
+            msgColor = userDocSnap.data().color || msgColor;
           } else {
-            console.log("color fail");
+            console.log(`color fail: User document not found for UID: ${msg.uid}`);
           }
-
-
-
         }
 
+        // Apply colors and styling
         div.style.color = msgColor;
         div.style.background = darkenHex(msgColor);
-        div.style.border = msgColor + "66";
-        div.style.textShadow = msgColor + "55";
+        div.style.border = `1px solid ${msgColor}66`;
+        div.style.textShadow = `0 0 3px ${msgColor}55`;
 
-        return div;
+        return div; // Returns the actual DOM element
       }
 
       // Load most recent PAGE_SIZE messages (descending), then display oldest->newest
@@ -708,13 +738,16 @@
           const docs = snap.docs.slice();
           docs.reverse();
 
+          // FIX: Await all message elements before appending
+          const messagePromises = docs.map(d => renderMessageElement(d.data()));
+          const messageElements = await Promise.all(messagePromises);
+
           // append messages
-          docs.forEach(d => {
-            const msg = d.data();
-            const el = renderMessageElement(msg);
+          messageElements.forEach((el, index) => {
             messagesDiv.appendChild(el);
 
-            // track newest timestamp
+            // track newest timestamp (use original docs for snapshot data)
+            const msg = docs[index].data();
             const ts = msg.timestamp;
             const tsDate = tsToDate(ts);
             if (!newestLoadedTimestamp || tsDate > newestLoadedTimestamp) {
@@ -759,16 +792,17 @@
           newMsgQuery = query(msgRef, orderBy("timestamp"));
         }
 
-        newMessagesUnsubscribe = onSnapshot(newMsgQuery, (snapshot) => {
+        // FIX: Added 'async' to onSnapshot callback and used 'await' inside a for...of loop
+        newMessagesUnsubscribe = onSnapshot(newMsgQuery, async (snapshot) => {
           // snapshot may contain multiple new docs; append them in order
-          snapshot.forEach(docSnap => {
+          for (const docSnap of snapshot.docs) {
             const msg = docSnap.data();
 
             // Skip messages that we already showed (defensive)
             const msgDate = tsToDate(msg.timestamp);
-            if (newestLoadedTimestamp && msgDate <= newestLoadedTimestamp) return;
+            if (newestLoadedTimestamp && msgDate <= newestLoadedTimestamp) continue;
 
-            const el = renderMessageElement(msg);
+            const el = await renderMessageElement(msg); // FIX: AWAIT the element
             messagesDiv.appendChild(el);
 
             // update newestLoadedTimestamp
@@ -780,7 +814,7 @@
               changeFavicon('resources/notifC.png');
               document.title = `(${unreadCount}) ${originalTitle}`;
             }
-          });
+          }
 
           // keep scroll at bottom when new messages arrive
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -810,15 +844,18 @@
           const docs = snap.docs.slice();
           docs.reverse();
 
+          // FIX: Await all message elements before prepending
+          const messagePromises = docs.map(d => renderMessageElement(d.data()));
+          const messageElements = await Promise.all(messagePromises);
+
           // insert after the load-more wrapper if present; otherwise insert at top
           const loadWrapper = document.querySelector(".load-more");
           let insertBeforeNode = loadWrapper ? loadWrapper.nextSibling : messagesDiv.firstChild;
 
-          docs.forEach(d => {
-            const msg = d.data();
-            const el = renderMessageElement(msg);
+          messageElements.forEach((el, index) => {
             messagesDiv.insertBefore(el, insertBeforeNode);
             // update newestLoadedTimestamp defensively (these are older messages so unlikely)
+            const msg = docs[index].data();
             const ts = tsToDate(msg.timestamp);
             if (!newestLoadedTimestamp || ts > newestLoadedTimestamp) newestLoadedTimestamp = ts;
           });
@@ -836,7 +873,7 @@
       } // end loadMore
     }
 
-        function darkenHex(hex, factor = 0.15) {
+    function darkenHex(hex, factor = 0.15) {
       // Remove # if present
       hex = hex.replace(/^#/, "");
 

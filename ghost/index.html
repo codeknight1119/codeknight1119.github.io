@@ -21,7 +21,7 @@
 
         // 1. Declare a variable to hold the promise of the loaded pipeline
         // This starts the model loading *immediately* when the page loads (pre-loading)
-        const pipelinePromise = pipeline('question-answering')
+        const pipelinePromise = pipeline('question-answering', 'Xenova/Qwen1.5-0.5B-Chat')
             .then(pipe => {
                 // Once the model is loaded, update the output message
                 document.getElementById('output').innerText = "AI Model Ready. Ask your question!";

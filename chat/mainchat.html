@@ -384,6 +384,8 @@
     let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
     let newestLoadedTimestamp = null; // timestamp of newest message currently shown
 
+    let myColor;
+
     // Initially hide UI until authenticated
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
@@ -407,6 +409,21 @@
         // Listen for conversations that include the current user
         const convRef = collection(db, "conversations");
         const convQuery = query(convRef, where("participants", "array-contains", user.uid));
+
+
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const data = userDocSnap.data();
+          if (data.color) {
+            myColor = data.color;
+          } else {
+            // Assign a random neon color and store it for next time
+            myColor = randomNeonColor();
+            await updateDoc(userDocRef, { color: myColor });
+          }
+        }
 
         // Show conversations and keep listener active
         onSnapshot(convQuery, (snapshot) => {
@@ -630,7 +647,7 @@
       const msgRef = collection(db, "conversations", id, "messages");
 
       // Helper to render a single message element
-      function renderMessageElement(msg) {
+      async function renderMessageElement(msg) {
         const div = document.createElement("div");
         const msgDate = tsToDate(msg.timestamp);
         const today = new Date();
@@ -645,13 +662,36 @@
           timeString = msgDate.toLocaleString([], { month: "short", day: "numeric", hour: '2-digit', minute: '2-digit' });
         }
 
+        let msgColor;
+
         if (msg.uid === (auth.currentUser && auth.currentUser.uid)) {
           div.textContent = `${timeString} | You: ${msg.text}`;
           div.className = "messageMine";
+
+          msgColor = myColor;
+
         } else {
           div.textContent = `${timeString} | ${msg.name || "Unknown"}: ${msg.text}`;
           div.className = "messageOther";
+
+          const colorRef = doc(db, "users", msg.uid, "color");
+          const colorSnap = await getDoc(colorRef);
+
+          if (colorSnap.exists()) {
+            msgColor = colorSnap.data().color;
+          } else {
+            console.log("color fail");
+          }
+
+
+
         }
+
+        div.style.color = msgColor;
+        div.style.background = darkenHex(msgColor);
+        div.style.border = msgColor + "66";
+        div.style.textShadow = msgColor + "55";
+
         return div;
       }
 
@@ -795,6 +835,45 @@
         }
       } // end loadMore
     }
+
+        function darkenHex(hex, factor = 0.15) {
+      // Remove # if present
+      hex = hex.replace(/^#/, "");
+
+      // Convert to RGB
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+
+      // Scale toward black
+      const newR = Math.floor(r * factor);
+      const newG = Math.floor(g * factor);
+      const newB = Math.floor(b * factor);
+
+      // Convert back to hex
+      return "#" +
+        newR.toString(16).padStart(2, "0") +
+        newG.toString(16).padStart(2, "0") +
+        newB.toString(16).padStart(2, "0");
+    }
+
+    function randomNeonColor() {
+      const channels = [0, 0, 0];
+
+      // Pick one channel to max out (full neon brightness)
+      const maxIndex = Math.floor(Math.random() * 3);
+      channels[maxIndex] = 255;
+
+      // Fill others with 100–255 to keep it vivid
+      for (let i = 0; i < 3; i++) {
+        if (i !== maxIndex) channels[i] = 100 + Math.floor(Math.random() * 155);
+      }
+
+      // Convert to hex
+      return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+
   </script>
 </body>
+
 </html>

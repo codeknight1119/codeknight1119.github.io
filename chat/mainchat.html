@@ -143,6 +143,7 @@
           const data = userDocSnap.data();
           if (data.color) {
             myColor = data.color;
+            document.getElementById("messageSend").style.color = myColor;
           } else {
             // Assign a random neon color and store it for next time
             myColor = randomNeonColor();

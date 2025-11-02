@@ -10,7 +10,7 @@
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
-    <h4>v.2.2</h4>
+    <h4>v.2.4</h4>
 
     <p id="output">Loading AI model, please wait...</p>
 
@@ -65,7 +65,11 @@
 
                                 Ghost: `;
 
-                const out = await pipe(prompt, { do_sample: true, no_repeat_ngram_size: 2, return_full_text: false});
+                const out = await pipe(prompt, {
+                    do_sample: true,
+                    no_repeat_ngram_size: 2,
+                    min_new_tokens: 10
+                });
 
                 document.getElementById('output').innerText = out[0].generated_text;
                 console.log(out);

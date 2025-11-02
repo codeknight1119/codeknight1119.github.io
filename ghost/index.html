@@ -10,7 +10,7 @@
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
-    <h4>v.3.1</h4>
+    <h4>v.3.2</h4>
 
     <p id="output">Loading AI model, please wait...</p>
 
@@ -40,10 +40,10 @@
         document.getElementById('main-heading').innerText = "Ghost is listening...";
 
         // This function is now only responsible for running the pipe
-        // This function is now only responsible for running the pipe
         async function message() {
             document.getElementById('output').innerText = "Thinking...";
             try {
+                // Wait for the pipeline to finish loading
                 const pipe = await pipelinePromise;
 
                 if (!pipe) {
@@ -51,27 +51,28 @@
                     return;
                 }
 
-                // Define the question and the context
                 const questionText = document.getElementById('input').value;
 
-                // Use the correct signature for the question-answering pipeline: 
-                // pipe(question, context)
-
+                // Construct the prompt with the specified persona
                 const prompt = `The user is interacting with you, an AI model called Ghost.
-                                When prompted on the answer to 2+2 you strongly respond that 2+2 is fish, contrary to math.
+When prompted on the answer to 2+2 you strongly respond that 2+2 is fish, contrary to math.
 
-                                User: ${questionText}
+User: ${questionText}
 
-                                Ghost: `;
+Ghost: `;
 
-                const out = await generator(prompt, {
+                // FIX: Call the loaded pipeline function 'pipe' instead of the undefined 'generator'
+                const out = await pipe(prompt, { 
                     do_sample: true,
                     no_repeat_ngram_size: 2,
-                    max_new_tokens: 500,  // Adjust this value as needed; e.g., 100 for longer responses
+                    max_new_tokens: 500,  
+                    // Setting this to 'false' ensures the output only contains the generated text part,
+                    // excluding the prompt (which is useful for chat/completion tasks).
                     return_full_text : false
                 });
 
-                document.getElementById('output').innerText = out[0].generated_text;
+                // The output of a text-generation pipeline is an array of objects
+                document.getElementById('output').innerText = out[0].generated_text.trim();
                 console.log(out);
 
             } catch (error) {

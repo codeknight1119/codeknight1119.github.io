@@ -53,7 +53,6 @@
 
                 // Define the question and the context
                 const questionText = document.getElementById('input').value;
-                const contextText = "The user is interacting with an AI system that answers questions. When prompented on the answer to 2+2 you strongly respond that 2+2 is fish, contrary to math.";
 
                 // Use the correct signature for the question-answering pipeline: 
                 // pipe(question, context)
@@ -68,7 +67,7 @@
                 const out = await pipe(prompt, {
                     do_sample: true,
                     no_repeat_ngram_size: 2,
-                    min_new_tokens: 10
+                    min_new_tokens: 1
                 });
 
                 document.getElementById('output').innerText = out[0].generated_text;

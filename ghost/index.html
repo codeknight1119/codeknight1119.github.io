@@ -10,7 +10,7 @@
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
-    <h4>v.2.9</h4>
+    <h4>v.3.0</h4>
 
     <p id="output">Loading AI model, please wait...</p>
 
@@ -67,7 +67,7 @@
                 const out = await pipe(prompt, {
                     do_sample: true,
                     no_repeat_ngram_size: 2,
-                    max_new_tokens: 50,  // Adjust this value as needed; e.g., 100 for longer responses
+                    max_new_tokens: 500,  // Adjust this value as needed; e.g., 100 for longer responses
                     return_full_text : false
                 });
 

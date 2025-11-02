@@ -58,7 +58,7 @@
                 // pipe(question, context)
                 const out = await pipe(questionText, contextText);
 
-                document.getElementById('output').innerText = out.generated_text;
+                document.getElementById('output').innerText = out[0].generated_text;
 
             } catch (error) {
   

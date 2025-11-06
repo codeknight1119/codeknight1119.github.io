@@ -10,7 +10,7 @@
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
-    <h4>v.3.3</h4>
+    <h4>v.3.4</h4>
 
     <p id="output">Loading AI model, please wait...</p>
 
@@ -22,7 +22,7 @@
 
         // 1. Declare a variable to hold the promise of the loaded pipeline
         // This starts the model loading *immediately* when the page loads (pre-loading)
-        const pipelinePromise = pipeline('text-generation', 'Xenova/gemma-2b-it')
+        const pipelinePromise = await pipeline('text-generation', 'Xenova/LaMini-GPT-124M')
             .then(pipe => {
                 // Once the model is loaded, update the output message
                 document.getElementById('output').innerText = "AI Model Ready. Ask your question!";

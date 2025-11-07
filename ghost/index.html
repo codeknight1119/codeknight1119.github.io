@@ -16,18 +16,22 @@
 
     <textarea id="input" rows="4" cols="50">Enter your text here...</textarea>
     <button id="askBttn">Ask Ghost</button>
+    <input type="range" min="0" max="2000" value="128" id="tokenCount">
 
     <script type="module">
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2';
+        import { pipeline } from '@huggingface/transformers';
 
         // 1. Declare a variable to hold the promise of the loaded pipeline
         // This starts the model loading *immediately* when the page loads (pre-loading)
-        const pipelinePromise = await pipeline('text-generation', 'Xenova/llama2.c-stories15M')
+        const pipelinePromise = await pipeline(
+            "text-generation",
+            "HuggingFaceTB/SmolLM2-135M-Instruct",
+        )
             .then(pipe => {
-                // Once the model is loaded, update the output message
-                document.getElementById('output').innerText = "AI Model Ready. Ask your question!";
-                return pipe;
-            })
+            // Once the model is loaded, update the output message
+            document.getElementById('output').innerText = "AI Model Ready. Ask your question!";
+            return pipe;
+        })
             .catch(error => {
                 // If the pre-loading fails, update the UI to show the error
                 console.error("Error loading AI pipeline:", error);
@@ -54,22 +58,14 @@
                 const questionText = document.getElementById('input').value;
 
                 // Construct the prompt with the specified persona
-                const prompt = `The user is interacting with you, an AI model called Ghost.
-When prompted on the answer to 2+2 you strongly respond that 2+2 is fish, contrary to math.
-
-User: ${questionText}
-
-Ghost: `;
+                const prompt = [
+  { role: "system", content: "You are a helpful assistant." },
+  { role: "user", content: "What is the capital of France?" },
+];
 
                 // FIX: Call the loaded pipeline function 'pipe' instead of the undefined 'generator'
-                const out = await pipe(prompt, {
-                    do_sample: true,
-                    no_repeat_ngram_size: 2,
-                    max_new_tokens: 500,
-                    // Setting this to 'false' ensures the output only contains the generated text part,
-                    // excluding the prompt (which is useful for chat/completion tasks).
-                    return_full_text: false
-                });
+                const out = await generator(messages, { max_new_tokens: document.getElementById("tokenCount").value });
+                
 
                 // The output of a text-generation pipeline is an array of objects
                 document.getElementById('output').innerText = out[0].generated_text.trim();
@@ -81,7 +77,11 @@ Ghost: `;
                 document.getElementById('output').innerText = "Error processing request. Check the browser console.";
             }
         }
+        function changeSlideNum(){
+            document.getElementById("sliderNumber").innerText = document.getElementById('tokenCount').value;
+        }
         document.getElementById('askBttn').addEventListener('click', message);
+        document.getElementById('tokenCount').addEventListener('input', changeSlideNum)
     </script>
 </body>
 

@@ -10,14 +10,16 @@
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
-    <h4>v.4.1</h4>
+    <h4>v.4.2</h4>
 
     <p id="output">Loading AI model, please wait...</p>
 
     <textarea id="input" rows="4" cols="50">Enter your text here...</textarea>
     <button id="askBttn">Ask Ghost</button>
+    <br>
     <input type="range" min="0" max="2000" value="128" id="tokenCount">
-    <h5 id="sliderNumber"></h5>
+    <br>
+    <h5 id="sliderNumber">128</h5>
 
     <script type="module">
         import { pipeline } from '@huggingface/transformers';
@@ -45,7 +47,7 @@
         document.getElementById('main-heading').innerText = "Ghost is listening...";
 
         // This function is now only responsible for running the pipe
-        async function message() {
+async function message() {
             document.getElementById('output').innerText = "Thinking...";
             try {
                 // Wait for the pipeline to finish loading
@@ -56,19 +58,20 @@
                     return;
                 }
 
+                // Get the actual question from the textarea
                 const questionText = document.getElementById('input').value;
 
-                // Construct the prompt with the specified persona
+                // Construct the prompt using the user's question
                 const prompt = [
-  { role: "system", content: "You are a helpful assistant." },
-  { role: "user", content: "What is the capital of France?" },
-];
+                  { role: "system", content: "You are a helpful assistant." },
+                  { role: "user", content: questionText } // <-- Use the variable here
+                ];
 
-                // FIX: Call the loaded pipeline function 'pipe' instead of the undefined 'generator'
-                const out = await generator(messages, { max_new_tokens: document.getElementById("tokenCount").value });
+                // FIX 1: Call 'pipe' (the variable you created)
+                // FIX 2: Pass your 'prompt' variable (not 'messages')
+                const out = await pipe(prompt, { max_new_tokens: document.getElementById("tokenCount").value });
                 
-
-                // The output of a text-generation pipeline is an array of objects
+                // This line should now work
                 document.getElementById('output').innerText = out[0].generated_text.trim();
                 console.log(out);
 

@@ -10,7 +10,7 @@
 <body>
     <h1 id="main-heading">blank</h1>
     <h2>Pulse-Http Exposure</h2>
-    <h4>v.4.5</h4>
+    <h4>v.4.6</h4>
 
     <p id="output">Loading AI model, please wait...</p>
 
@@ -24,7 +24,6 @@
   <script type="module">
         import { pipeline } from '@huggingface/transformers';
 
-        // --- FIX: Move all DOM setup code *before* the 'await' ---
         
         // 2. Clear the default error state on load
         document.getElementById('main-heading').innerText = "Ghost is listening...";
@@ -33,6 +32,9 @@
         function changeSlideNum(){
             document.getElementById("sliderNumber").innerText = document.getElementById('tokenCount').value;
         }
+        changeSlideNum();
+        document.getElementById('tokenCount').addEventListener('input', changeSlideNum)
+
 
         // Define the message function (it's safe to define it here)
         async function message() {
@@ -72,12 +74,7 @@
         
         // Attach all event listeners
         document.getElementById('askBttn').addEventListener('click', message);
-        document.getElementById('tokenCount').addEventListener('input', changeSlideNum)
         
-        // Set the initial slider value *immediately*
-        changeSlideNum();
-
-        // --- End of immediate DOM setup ---
 
 
         // 1. Now, start pre-loading the AI model.

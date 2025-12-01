@@ -104,6 +104,8 @@
     let currentConvUnsubscribe = null;
     let newMessagesUnsubscribe = null; // separate listener for new messages
     let unreadCount = 0;
+    let sendImage = false;
+    let imageToSend = null;
     const originalTitle = document.title;
 
     // Pagination state per loaded conversation
@@ -249,6 +251,24 @@
           // Use a modal or in-page message instead of alert
           console.log("Failed to send message.");
         }
+      }
+      if(sendImage){
+        const messageSendRef = collection(db, "conversations", currentConvId, "messages");
+        try {
+          await addDoc(messageSendRef, {
+            name,
+            imageToSend,
+            uid: auth.currentUser.uid,
+            timestamp: serverTimestamp()
+          });
+          document.getElementById("messageInput").value = "";
+        } catch (err) {
+          console.error("sendMessage error:", err);
+          // Use a modal or in-page message instead of alert
+          console.log("Failed to send message.");
+        }
+        sendImage = false;
+        imageToSend = null;
       }
     }
 
@@ -641,19 +661,8 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
                 const bytes = new Uint8Array(arrayBuffer);
 
                 // Step C: Use the 'base91' library (now in the global scope) to encode
-                const encodedString = base91.encode(bytes);
-
-                // Step D: Display the result
-               // outputElement.textContent = encodedString;
-
-               var decoded = base91.decode(encodedString)
-
-                var img = document.createElement("img");
-                img.source = decoded.src
-
-                
-                document.getElementById("messages").appendChild(img)
-
+sendImage = true;
+imageToSend = `IMG:${base91.encode(bytes)};`
             } catch (error) {
                 console.error("Error encoding file:", error);
                 outputElement.textContent = "Error: " + error.message;

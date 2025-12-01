@@ -41,6 +41,7 @@
     <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
     <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
   </div>
+<script src="https://cdn.jsdelivr.net/npm/base91.js@1.1.1/base91.min.js"></script>
 
   <script type="module">
     // Firebase modular imports
@@ -622,20 +623,42 @@
       return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
     }
 
- const fileInput = document.getElementById('attachFile');
 
-  fileInput.addEventListener('change', (event) => {
-    const selectedFiles = event.target.files; // A FileList object
-    if (selectedFiles.length > 0) {
-      for (let i = 0; i < selectedFiles.length; i++) {
-        alert(`File name: ${selectedFiles[i].name}`);
-        console.log(`File size: ${selectedFiles[i].size} bytes`);
-        // Further processing of the file can be done here using the File API
-      }
-    }
-  });
+document.getElementById('attachFile').addEventListener('change', async (event) => {
+            //const outputElement = document.getElementById('output');
+            const file = event.target.files[0]; // Get the selected file
 
+            if (!file) {
+                outputElement.textContent = "...waiting for file...";
+                return;
+            }
 
+            try {
+                // Step A: Read the file's raw binary data as an ArrayBuffer
+                const arrayBuffer = await file.arrayBuffer();
+
+                // Step B: Convert the ArrayBuffer to a format the library understands (Uint8Array)
+                const bytes = new Uint8Array(arrayBuffer);
+
+                // Step C: Use the 'base91' library (now in the global scope) to encode
+                const encodedString = base91.encode(bytes);
+
+                // Step D: Display the result
+               // outputElement.textContent = encodedString;
+
+               var decoded = base91.decode(encodedString)
+
+                var img = document.createElement("img");
+                img.source = decoded.src
+
+                
+                document.getElementById("messages").appendChild(img)
+
+            } catch (error) {
+                console.error("Error encoding file:", error);
+                outputElement.textContent = "Error: " + error.message;
+            }
+        });
 
 
   </script>

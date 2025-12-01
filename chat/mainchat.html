@@ -622,7 +622,7 @@
       return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
     }
 
- const fileInput = document.getElementById('fileInput');
+ const fileInput = document.getElementById('attachFile');
 
   fileInput.addEventListener('change', (event) => {
     const selectedFiles = event.target.files; // A FileList object

@@ -13,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
     rel="stylesheet">
   <!-- Assuming resources/forestStyle.css is externally available or empty. Since it's external, I'll ignore it. -->
-  <link rel="stylesheet" href="mainchatExternals/style.css"> 
+  <link rel="stylesheet" href="mainchatExternals/style.css">
   <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
 </head>
 
@@ -36,6 +36,7 @@
   <div id="messageSend" aria-label="Message controls">
     <input type="text" id="name" placeholder="Your name" aria-label="Your name">
     <input type="text" id="messageInput" placeholder="Type a message" aria-label="Message input">
+    <button id="attachFile" aria-label="Attach File"><i class="fas fa-plus" aria-hidden="true"></i> Attach File</button>
     <button id="sendBtn" aria-label="Send message"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send</button>
     <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
     <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
@@ -67,30 +68,30 @@
     // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
     let firebaseConfig;
     if (typeof __firebase_config !== 'undefined') {
-        try {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } catch (e) {
-            console.error("Failed to parse __firebase_config, falling back to hardcoded config.");
-            firebaseConfig = {
-                apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
-                authDomain: "chatroom4friends-522bd.firebaseapp.com",
-                projectId: "chatroom4friends-522bd",
-                storageBucket: "chatroom4friends-522bd.firebasestorage.app",
-                messagingSenderId: "26805339142",
-                appId: "1:26805339142:web:86ff21490be804a16eaf87",
-                measurementId: "G-EXFX8QFGGF"
-            };
-        }
-    } else {
+      try {
+        firebaseConfig = JSON.parse(__firebase_config);
+      } catch (e) {
+        console.error("Failed to parse __firebase_config, falling back to hardcoded config.");
         firebaseConfig = {
-            apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
-            authDomain: "chatroom4friends-522bd.firebaseapp.com",
-            projectId: "chatroom4friends-522bd",
-            storageBucket: "chatroom4friends-522bd.firebasestorage.app",
-            messagingSenderId: "26805339142",
-            appId: "1:26805339142:web:86ff21490be804a16eaf87",
-            measurementId: "G-EXFX8QFGGF"
+          apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+          authDomain: "chatroom4friends-522bd.firebaseapp.com",
+          projectId: "chatroom4friends-522bd",
+          storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+          messagingSenderId: "26805339142",
+          appId: "1:26805339142:web:86ff21490be804a16eaf87",
+          measurementId: "G-EXFX8QFGGF"
         };
+      }
+    } else {
+      firebaseConfig = {
+        apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+        authDomain: "chatroom4friends-522bd.firebaseapp.com",
+        projectId: "chatroom4friends-522bd",
+        storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+        messagingSenderId: "26805339142",
+        appId: "1:26805339142:web:86ff21490be804a16eaf87",
+        measurementId: "G-EXFX8QFGGF"
+      };
     }
 
     const app = initializeApp(firebaseConfig);
@@ -228,7 +229,7 @@
 
       if (!currentConvId) {
         // Use a modal or in-page message instead of alert
-        console.log("Please choose a conversation"); 
+        console.log("Please choose a conversation");
         return;
       }
 
@@ -245,7 +246,7 @@
         } catch (err) {
           console.error("sendMessage error:", err);
           // Use a modal or in-page message instead of alert
-          console.log("Failed to send message."); 
+          console.log("Failed to send message.");
         }
       }
     }

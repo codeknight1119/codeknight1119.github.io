@@ -35,7 +35,7 @@
   <div id="messageSend" aria-label="Message controls">
     <input type="text" id="name" placeholder="Your name" aria-label="Your name">
     <input type="text" id="messageInput" placeholder="Type a message" aria-label="Message input">
-    <input type="file" id="attachFile" aria-label="Attach File">
+    <input type="file" id="attachFile" aria-label="Attach File" accept="image/*>
     <button id="sendBtn" aria-label="Send message"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send</button>
     <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
     <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
@@ -721,13 +721,17 @@
       const file = event.target.files[0];
 
       if (!file) {
-        console.log("No file selected.");
+        alert("No file selected.");
         return;
       }
       
+      if(!file.type.startsWith('image/')) {
+        alert("Please select a valid image file.");
+        return;
+      }
       // Check for presence of the encoding function
       if (typeof encodeImageToBase85 !== 'function') {
-           alert("Base85 encoding function not found. Make sure base85_utils.js loaded correctly.");
+          // alert("Base85 encoding function not found. Make sure base85_utils.js loaded correctly.");
            console.error("Global function encodeImageToBase85 is missing.");
            return;
       }
@@ -737,9 +741,12 @@
         const { base85String, mimeType } = await encodeImageToBase85(file);
         
         if (!base85String) {
-          alert("Encoding failed: Base85 string is empty.");
+        alert("Encoding failed: Base85 string is empty.");
           return;
         }
+
+
+
 
         sendImage = true;
         // Store the MIME type along with the base85 string
@@ -755,7 +762,7 @@
         console.log(`File (${file.name}, ${file.size} bytes) encoded to Base85. Ready to send.`);
 
       } catch (error) {
-        alert("Error encoding file: " + error.message);
+      //  alert("Error encoding file: " + error.message);
         console.error("Encoding error:", error);
       }
     });

@@ -698,7 +698,7 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
                 const encoded = typeof base91 !== 'undefined' ? base91.encode(binaryString) : null;
 
                 if (!encoded) {
-                  console.error("base91 not available or encoding failed.");
+                  alert("base91 not available or encoding failed.");
                   return;
                 }
 
@@ -711,7 +711,7 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
                   msgInput.value = imageToSend;
                 }
 
-                console.log("File encoded to base91. Ready to send.");
+                alert("File encoded to base91. Ready to send.");
 
                 // Optionally automatically send:
                 // sendMessage();

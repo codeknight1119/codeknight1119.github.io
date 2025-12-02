@@ -255,8 +255,11 @@
       if(sendImage){
         const messageSendRef = collection(db, "conversations", currentConvId, "messages");
         try {
+          // store the encoded image string as the text property so it shows in the chat for testing
           await addDoc(messageSendRef, {
             name,
+            text: imageToSend,
+            // also keep a dedicated field if you want to detect image messages later
             imageToSend,
             uid: auth.currentUser.uid,
             timestamp: serverTimestamp()
@@ -269,6 +272,9 @@
         }
         sendImage = false;
         imageToSend = null;
+        // clear file input
+        const fi = document.getElementById('attachFile');
+        if(fi) fi.value = '';
       }
     }
 
@@ -427,14 +433,16 @@
 
         let msgColor = "#CCCCCC"; // Default fallback color
 
+        const displayText = msg.text || msg.imageToSend || "";
+
         if (msg.uid === (auth.currentUser && auth.currentUser.uid)) {
-          div.textContent = `${timeString} | You: ${msg.text}`;
+          div.textContent = `${timeString} | You: ${displayText}`;
           div.className = "messageMine";
 
           msgColor = myColor;
 
         } else {
-          div.textContent = `${timeString} | ${msg.name || "Unknown"}: ${msg.text}`;
+          div.textContent = `${timeString} | ${msg.name || "Unknown"}: ${displayText}`;
           div.className = "messageOther";
 
           // FIX: Correctly reference the user's document, not an invalid path
@@ -454,6 +462,18 @@
         div.style.background = darkenHex(msgColor);
         div.style.border = `1px solid ${msgColor}66`;
         div.style.textShadow = `0 0 3px ${msgColor}55`;
+
+        // If the message contains an encoded image (for testing), present it in a monospace block
+        if ((msg.imageToSend || "").startsWith("IMG:")) {
+          const pre = document.createElement('pre');
+          pre.textContent = msg.imageToSend || msg.text;
+          pre.style.whiteSpace = 'pre-wrap';
+          pre.style.fontFamily = 'monospace';
+          pre.style.fontSize = '11px';
+          pre.style.maxHeight = '200px';
+          pre.style.overflow = 'auto';
+          div.appendChild(pre);
+        }
 
         return div; // Returns the actual DOM element
       }
@@ -645,11 +665,10 @@
 
 
 document.getElementById('attachFile').addEventListener('change', async (event) => {
-            //const outputElement = document.getElementById('output');
             const file = event.target.files[0]; // Get the selected file
 
             if (!file) {
-                outputElement.textContent = "...waiting for file...";
+                console.log("No file selected.");
                 return;
             }
 
@@ -657,15 +676,48 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
                 // Step A: Read the file's raw binary data as an ArrayBuffer
                 const arrayBuffer = await file.arrayBuffer();
 
-                // Step B: Convert the ArrayBuffer to a format the library understands (Uint8Array)
+                // Step B: Convert the ArrayBuffer to a Uint8Array
                 const bytes = new Uint8Array(arrayBuffer);
 
-                // Step C: Use the 'base91' library (now in the global scope) to encode
-sendImage = true;
-imageToSend = `IMG:${base91.encode(bytes)};`
+                // Step C: Convert the bytes to a binary string in a memory-safe way.
+                // base91.js encode usually expects a string; pass a "binary string" where each char code == byte value.
+                function uint8ArrayToBinaryString(u8) {
+                  // build in chunks to avoid huge apply/call overhead for large files
+                  const CHUNK = 0x8000; // 32KB chunks
+                  let result = '';
+                  for (let i = 0; i < u8.length; i += CHUNK) {
+                    const chunk = u8.subarray(i, i + CHUNK);
+                    result += String.fromCharCode.apply(null, chunk);
+                  }
+                  return result;
+                }
+
+                const binaryString = uint8ArrayToBinaryString(bytes);
+
+                // Step D: Encode with base91 (global base91 from included script). Most base91 libs expect a string.
+                const encoded = typeof base91 !== 'undefined' ? base91.encode(binaryString) : null;
+
+                if (!encoded) {
+                  console.error("base91 not available or encoding failed.");
+                  return;
+                }
+
+                sendImage = true;
+                imageToSend = `IMG:${encoded};`;
+
+                // Put the encoded string into the message input so you can send it as a normal chat message for testing.
+                const msgInput = document.getElementById('messageInput');
+                if (msgInput) {
+                  msgInput.value = imageToSend;
+                }
+
+                console.log("File encoded to base91. Ready to send.");
+
+                // Optionally automatically send:
+                // sendMessage();
+
             } catch (error) {
                 console.error("Error encoding file:", error);
-                outputElement.textContent = "Error: " + error.message;
             }
         });
 

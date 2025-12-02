@@ -41,8 +41,7 @@
     <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
     <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
   </div>
-<script src="https://cdn.jsdelivr.net/npm/base91.js@1.1.1/base91.min.js"></script>
-
+  <script src="base85_utils.js" defer></script>
   <script type="module">
     const base91 = window.base91;
     // Firebase modular imports
@@ -253,7 +252,7 @@
           console.log("Failed to send message.");
         }
       }
-      if(sendImage){
+      if (sendImage) {
         const messageSendRef = collection(db, "conversations", currentConvId, "messages");
         try {
           // store the encoded image string as the text property so it shows in the chat for testing
@@ -275,7 +274,7 @@
         imageToSend = null;
         // clear file input
         const fi = document.getElementById('attachFile');
-        if(fi) fi.value = '';
+        if (fi) fi.value = '';
       }
     }
 
@@ -664,57 +663,34 @@
       return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
     }
 
-/**
- * Robustly converts a Uint8Array into a "binary string" (where charCodeAt(i) == byte value).
- * Handles large arrays by processing in chunks.
- * @param {Uint8Array} u8 The byte array to convert.
- * @returns {string} The resulting binary string.
- */
-function uint8ArrayToBinaryString(u8) {
-  let result = '';
-  // Use a chunk size that avoids hitting stack limits for String.fromCharCode.apply
-  // 65536 is a common safe chunk size (0x10000)
-  const CHUNK = 65536; 
-  for (let i = 0; i < u8.length; i += CHUNK) {
-    // Correct way to use apply or simply use spread (...) for modern JS
-    // We'll stick to apply for slightly better compatibility with older engines, though spread is preferred.
-    // u8.subarray(i, i + CHUNK) returns a new Uint8Array view.
-    const chunk = u8.subarray(i, i + CHUNK);
-    // Note: apply on a Uint8Array works, but a regular Array is more guaranteed.
-    // For maximum safety: convert the subarray to a regular array first, but usually not needed.
-    result += String.fromCharCode.apply(null, chunk);
-  }
-  return result;
-}
+    /**
+     * Robustly converts a Uint8Array into a "binary string" (where charCodeAt(i) == byte value).
+     * Handles large arrays by processing in chunks.
+     * @param {Uint8Array} u8 The byte array to convert.
+     * @returns {string} The resulting binary string.
+     */
 
-document.getElementById('attachFile').addEventListener('change', async (event) => {
-    const file = event.target.files[0];
 
-    if (!file) {
+    document.getElementById('attachFile').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+
+      if (!file) {
         console.log("No file selected.");
         return;
-    }
+      }
 
-    try {
-        // Step A: Read the file's raw binary data as an ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer();
+      try {
+        // 1. ENCODE: Get the Base85 string and MIME type
+        const { base85String, mimeType } = await encodeImageToBase85(file);
+       // outputB85.textContent = base85String;
 
-        // Step B: Convert the ArrayBuffer to a Uint8Array
-        const bytes = new Uint8Array(arrayBuffer);
-
-        // Step C: Convert the bytes to the binary string using the fixed function.
-        const binaryString = uint8ArrayToBinaryString(bytes); // <-- Using the fixed function
-
-        // Step D: Encode with base91 (global base91 from included script).
-        const encoded = typeof base91 !== 'undefined' ? base91.encode(binaryString) : null;
-
-        if (!encoded) {
-          alert("base91 not available or encoding failed.");
+        if (!base85String) {
+          alert("base64 not available or encoding failed.");
           return;
         }
 
         sendImage = true;
-        imageToSend = `IMG:${encoded}`;
+        imageToSend = `IMG:${base85String}`;
 
         // Put the encoded string into the message input so you can send it as a normal chat message for testing.
         const msgInput = document.getElementById('messageInput');
@@ -727,11 +703,11 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
         // Optionally automatically send:
         // sendMessage();
 
-    } catch (error) {
+      } catch (error) {
         alert("Error encoding file: " + error.message);
         console.error("Encoding error:", error);
-    }
-});
+      }
+    });
   </script>
 </body>
 

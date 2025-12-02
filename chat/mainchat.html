@@ -435,8 +435,18 @@
 
         const displayText = msg.text || msg.imageToSend || "";
 
+        if(displayText.substring(0,4) === "IMG:"){
+          var placeholderText = displayText.remove(0,4);
+          const dataUrl = decodeBase85ToImageURL(placeholderText, mimeType);
+          const img = document.createElement("img");
+          img.src = dataUrl;
+          div.appendChild(img);
+        }
+
         if (msg.uid === (auth.currentUser && auth.currentUser.uid)) {
+          if(!sendImage){
           div.textContent = `${timeString} | You: ${displayText}`;
+          }
           div.className = "messageMine";
 
           msgColor = myColor;
@@ -694,8 +704,11 @@
 
         // Put the encoded string into the message input so you can send it as a normal chat message for testing.
         const msgInput = document.getElementById('messageInput');
+
+        var imagePreview = document.createElement("img");
+        imagePreview.src = URL.createObjectURL(file);
         if (msgInput) {
-          msgInput.value = imageToSend;
+          msgInput.appendChild(imagePreview);
         }
 
         alert(`File (${file.name}, ${file.size} bytes) encoded to base91. Ready to send.`);

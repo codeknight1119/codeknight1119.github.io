@@ -703,7 +703,7 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
                 }
 
                 sendImage = true;
-                imageToSend = `IMG:${encoded};`;
+                imageToSend = `IMG:${encoded}`;
 
                 // Put the encoded string into the message input so you can send it as a normal chat message for testing.
                 const msgInput = document.getElementById('messageInput');
@@ -717,7 +717,7 @@ document.getElementById('attachFile').addEventListener('change', async (event) =
                 // sendMessage();
 
             } catch (error) {
-                console.error("Error encoding file:", error);
+                alert("Error encoding file:", error);
             }
         });
 

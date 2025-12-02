@@ -12,7 +12,6 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
     rel="stylesheet">
-  <!-- Assuming resources/forestStyle.css is externally available or empty. Since it's external, I'll ignore it. -->
   <link rel="stylesheet" href="mainchatExternals/style.css">
   <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
 </head>
@@ -41,10 +40,13 @@
     <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
     <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
   </div>
-  <!-- Ensure the Base85 utility script is loaded before your main script -->
+  
+  <!-- The Base85 utility script MUST be loaded first and globally expose its functions -->
   <script src="base85_utils.js" defer></script>
+  
   <script type="module">
-    // FIX 1: Access the utility functions from the global window object.
+    // FIX 1: Safely access the utility functions from the global window object.
+    // We expect these to be populated by base85_utils.js
     const decodeBase85ToImageURL = window.decodeBase85ToImageURL;
     const encodeImageToBase85 = window.encodeImageToBase85;
     
@@ -263,6 +265,9 @@
         // clear file input
         const fi = document.getElementById('attachFile');
         if (fi) fi.value = '';
+        // Clear message input visual text
+        document.getElementById("messageInput").value = "";
+
 
       } else if (text && text.trim()) {
         // Regular text message
@@ -438,12 +443,12 @@
         }
 
         let msgColor = "#CCCCCC"; // Default fallback color
+        const isMine = msg.uid === (auth.currentUser && auth.currentUser.uid);
 
-        const displayText = msg.text || ""; // 'text' field now contains the image string if it's an image
-
+        let displayText = msg.text || ""; 
         let baseMessageText = displayText;
 
-        if (msg.uid === (auth.currentUser && auth.currentUser.uid)) {
+        if (isMine) {
           div.className = "messageMine";
           msgColor = myColor;
           baseMessageText = `You: ${baseMessageText}`;
@@ -466,47 +471,59 @@
         // Check for image format: IMG:{mimeType}:{base85String}
         if (displayText.startsWith("IMG:")) {
           // Parse the components
-          const parts = displayText.split(':'); // [0]:IMG, [1]:mimeType, [2]:base85String
+          const parts = displayText.split(':'); 
           
-          if (parts.length >= 3 && decodeBase85ToImageURL) {
-            const mimeType = parts[1];
-            const base85String = parts.slice(2).join(':'); // Handle case where base85 might contain colons (unlikely with this charset, but robust)
-
-            try {
-              // Decode the Base85 string into a Data URL
-              const dataUrl = decodeBase85ToImageURL(base85String, mimeType);
-
-              // Create the image element
-              const img = document.createElement("img");
-              img.src = dataUrl;
-              img.alt = "Attached Image";
-              img.style.maxWidth = '100%';
-              img.style.maxHeight = '300px';
-              img.style.borderRadius = '8px';
-              img.style.border = `1px solid ${msgColor}`;
-
-              // Create a wrapper for the image and timestamp/name
-              const contentWrapper = document.createElement('div');
-              contentWrapper.innerHTML = `<span class="message-info">${timeString} | ${msg.uid === auth.currentUser.uid ? 'You' : msg.name || 'Unknown'}: (Image Attachment)</span>`;
-              contentWrapper.appendChild(img);
-
-              div.appendChild(contentWrapper);
-              
-            } catch (error) {
-              console.error("Error decoding Base85 image:", error);
-              div.textContent = `${timeString} | ${baseMessageText} (Base85 Decoding Failed)`;
-            }
-
-        } else {
-            // Fallback for improperly formatted or module error
-            div.textContent = `${timeString} | ${baseMessageText}`;
+          // Debugging Check: Ensure structure is correct
+          if (parts.length < 3) {
+             console.error("Image message format is incorrect:", displayText);
+             div.textContent = `${timeString} | ${baseMessageText} (Corrupted Image Data)`;
+             return div;
           }
+
+          const mimeType = parts[1];
+          // Join remaining parts to handle case where base85 data itself might contain ':'
+          const base85String = parts.slice(2).join(':'); 
+
+          // Check if the decoder function is available
+          if (typeof decodeBase85ToImageURL !== 'function') {
+            console.error("Base85 decoding function (decodeBase85ToImageURL) is not loaded or available.");
+            div.textContent = `${timeString} | ${baseMessageText} (Decoder Not Available)`;
+            return div;
+          }
+
+          try {
+            // Decode the Base85 string into a Data URL
+            const dataUrl = decodeBase85ToImageURL(base85String, mimeType);
+
+            // Create the image element
+            const img = document.createElement("img");
+            img.src = dataUrl;
+            img.alt = "Attached Image";
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '300px';
+            img.style.borderRadius = '8px';
+            img.style.border = `1px solid ${msgColor}`;
+
+            // Create a wrapper for the image and timestamp/name
+            const contentWrapper = document.createElement('div');
+            // Show sender name and timestamp
+            contentWrapper.innerHTML = `<span class="message-info" style="color:${msgColor};">${timeString} | ${isMine ? 'You' : msg.name || 'Unknown'}: (Image Attachment)</span>`;
+            contentWrapper.appendChild(img);
+
+            div.appendChild(contentWrapper);
+            
+          } catch (error) {
+            // FIX 3: Log the specific error from the Base85 decoder
+            console.error("Base85 Decoding Error for message:", msg.id, error);
+            div.textContent = `${timeString} | ${isMine ? 'You' : msg.name || 'Unknown'}: (Base85 Decoding Failed: See Console)`;
+          }
+
         } else {
           // Regular text message
           div.textContent = `${timeString} | ${baseMessageText}`;
         }
         
-        // Apply colors and styling
+        // Apply colors and styling (applied regardless of whether image loading failed or succeeded)
         div.style.color = msgColor;
         div.style.background = darkenHex(msgColor);
         div.style.border = `1px solid ${msgColor}66`;
@@ -725,7 +742,7 @@
         }
 
         sendImage = true;
-        // FIX 2: Store the MIME type along with the base85 string
+        // Store the MIME type along with the base85 string
         imageToSend = `IMG:${mimeType}:${base85String}`; 
 
         // Update the message input placeholder/text to show that a file is ready to send
@@ -734,14 +751,8 @@
            msgInput.value = `[Image Ready: ${file.name} - Press Send]`;
         }
 
-        // NOTE: Removing the image preview append to the input box as it doesn't work well
-        // var imagePreview = document.createElement("img");
-        // imagePreview.src = URL.createObjectURL(file);
-        // if (msgInput) {
-        //   msgInput.appendChild(imagePreview);
-        // }
-
-        alert(`File (${file.name}, ${file.size} bytes) encoded to Base85. Ready to send.`);
+        // Use console.log instead of alert for success
+        console.log(`File (${file.name}, ${file.size} bytes) encoded to Base85. Ready to send.`);
 
       } catch (error) {
         alert("Error encoding file: " + error.message);

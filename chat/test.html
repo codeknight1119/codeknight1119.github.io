@@ -1,176 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Chat4Friends</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HØLLØW COMMS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="resources/forestStyle.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .container {
-      display: flex;
-      flex: 1;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      height: calc(100vh - 150px);
-    }
-
-    .chatsSelect {
-      width: 250px;
-      min-width: 150px;
-      max-width: 300px;
-      padding: 15px;
-      overflow-y: auto;
-      margin-right: 20px;
-      transition: width 0.3s ease;
-    }
-
-    #messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .messageMine,
-    .messageOther {
-      border-radius: 10px;
-      padding: 10px 15px;
-      margin: 5px 10px;
-      max-width: 60%;
-    }
-
-    #messageSend {
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: sticky;
-      bottom: 0;
-    }
-
-    #messageSend input {
-      flex: 1;
-      padding: 10px 15px;
-      font-size: 16px;
-    }
-
-    #messageSend button {
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #timedText {
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 20px;
-      font-size: 16px;
-      text-align: center;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-
-      .chatsSelect {
-        width: 100%;
-        max-width: none;
-        margin-right: 0;
-        margin-bottom: 20px;
-      }
-
-      #messages {
-        width: 100%;
-      }
-
-      #messageSend {
-        flex-wrap: wrap;
-      }
-
-      #messageSend input,
-      #messageSend button {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="mainchatExternals/style.css">
   <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
 </head>
 
 <body>
   <header>
-    <h2>Chat4Friends</h2>
-    <span class="version">V.3.9</span>
+    <h2>HØLLØW COMMS</h2>
+    <span class="version" aria-hidden="true">V5.3</span>
   </header>
-  <div id="timedText">Gabe will be in his stupid math class until 12:30 and will not be able to chat until then.</div>
-  <div class="container">
-    <div class="chatsSelect">
-      <!-- Placeholder for future friend list or conversation selector -->
-      <p>Friends List (Coming Soon)</p>
-    </div>
-    <div id="messages"></div>
-  </div>
-  <div id="messageSend">
-    <input type="text" id="name" placeholder="Your name">
-    <input type="text" id="messageInput" placeholder="Type a message">
-    <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
-    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    <button id="newConv"><i class="fas fa-plus"></i> New Chat</button>
-  </div>
 
+  <div id="timedText" role="status" aria-live="polite">Gabe will be in his math class until 12:30 and will not be able
+    to chat until then.</div>
+
+  <section>
+    <div class="container">
+      <div id="chatsSelect" aria-label="Conversations list"></div>
+      <div id="messages" aria-label="Messages" role="log"></div>
+    </div>
+  </section>
+
+  <div id="messageSend" aria-label="Message controls">
+    <input type="text" id="name" placeholder="Your name" aria-label="Your name">
+    <input type="text" id="messageInput" placeholder="Type a message" aria-label="Message input">
+    <input type="file" id="attachFile" aria-label="Attach File" accept="image/*">
+    <button id="sendBtn" aria-label="Send message"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send</button>
+    <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
+    <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
+  </div>
+  
+  <!-- The Base85 utility script MUST be loaded first and globally expose its functions -->
+  <script src="base85_utils.js" defer></script>
+  
   <script type="module">
+    // FIX 1: Safely access the utility functions from the global window object.
+    // We expect these to be populated by base85_utils.js
+    const decodeBase85ToImageURL = window.decodeBase85ToImageURL;
+    const encodeImageToBase85 = window.encodeImageToBase85;
+    
+    // Firebase modular imports (rest of imports omitted for brevity but remain the same)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getDoc, getDocs, getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import {
+      getFirestore,
+      collection,
+      getDoc,
+      getDocs,
+      addDoc,
+      query,
+      orderBy,
+      onSnapshot,
+      doc,
+      setDoc,
+      where,
+      updateDoc,
+      arrayUnion,
+      limit,
+      startAfter,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
-      authDomain: "chatroom4friends-522bd.firebaseapp.com",
-      projectId: "chatroom4friends-522bd",
-      storageBucket: "chatroom4friends-522bd.firebasestorage.app",
-      messagingSenderId: "26805339142",
-      appId: "1:26805339142:web:86ff21490be804a16eaf87",
-      measurementId: "G-EXFX8QFGGF"
-    };
+    // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
+    let firebaseConfig;
+    if (typeof __firebase_config !== 'undefined') {
+      try {
+        firebaseConfig = JSON.parse(__firebase_config);
+      } catch (e) {
+        console.error("Failed to parse __firebase_config, falling back to hardcoded config.");
+        firebaseConfig = {
+          apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+          authDomain: "chatroom4friends-522bd.firebaseapp.com",
+          projectId: "chatroom4friends-522bd",
+          storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+          messagingSenderId: "26805339142",
+          appId: "1:26805339142:web:86ff21490be804a16eaf87",
+          measurementId: "G-EXFX8QFGGF"
+        };
+      }
+    } else {
+      firebaseConfig = {
+        apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+        authDomain: "chatroom4friends-522bd.firebaseapp.com",
+        projectId: "chatroom4friends-522bd",
+        storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+        messagingSenderId: "26805339142",
+        appId: "1:26805339142:web:86ff21490be804a16eaf87",
+        measurementId: "G-EXFX8QFGGF"
+      };
+    }
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const messagesRef = collection(db, "messages");
+
+
+
+    
+Notification.requestPermission().then(function(result) {
+      alert("Notification permission result:", result);
+    });
+
+
+
+
+
+
+
 
     let myName = "";
-    let unsubscribe = null;
-
+    let currentConvId = null;
+    let currentConvUnsubscribe = null;
+    let newMessagesUnsubscribe = null; // separate listener for new messages
     let unreadCount = 0;
+    let sendImage = false;
+    let imageToSend = null; // Holds the string: "IMG:{mimeType}:{base85String}"
     const originalTitle = document.title;
-    let latestTimestamp = 0;
 
+    // Pagination state per loaded conversation
+    const PAGE_SIZE = 20;
+    let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
+    let newestLoadedTimestamp = null; // timestamp of newest message currently shown
 
+    let myColor;
+
+    // Initially hide UI until authenticated
     document.getElementById("messageSend").style.display = "none";
     document.getElementById("messages").style.display = "none";
 
+    // Visibility handling for unread count
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
-        // Tab is active, reset counter
         unreadCount = 0;
         document.title = originalTitle;
         changeFavicon("resources/normalC.png");
@@ -181,128 +152,225 @@
       if (user) {
         document.getElementById("messageSend").style.display = "flex";
         document.getElementById("messages").style.display = "flex";
-        myName = await getUsername(user.uid) || "Anonymous";
+        myName = (await getUsername(user.uid)) || "Anonymous";
         document.getElementById("name").value = myName;
 
-        const qNew = query(
-          messagesRef,
-          where("timestamp", ">", latestTimestamp),
-          orderBy("timestamp")
-        );
+        // Listen for conversations that include the current user
+        const convRef = collection(db, "conversations");
+        const convQuery = query(convRef, where("participants", "array-contains", user.uid));
 
-        unsubscribe = onSnapshot(qNew, (snapshot) => {
-          snapshot.docChanges().forEach(change => {
-            if (change.type === "added") {
-              const msg = change.doc.data();
-              const div = document.createElement("div");
 
-              const date = new Date(msg.timestamp);
-              const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
 
-              if (msg.name === myName) {
-                div.textContent = `${timeString} | You: ${msg.text}`;
-                div.className = "messageMine";
-              } else {
-                div.textContent = `${timeString} | ${msg.name}: ${msg.text}`;
-                div.className = "messageOther";
-              }
+        if (userDocSnap.exists()) {
+          const data = userDocSnap.data();
+          if (data.color) {
+            myColor = data.color;
+            document.getElementById("messageSend").style.color = myColor;
+          } else {
+            // Assign a random neon color and store it for next time
+            myColor = randomNeonColor();
+            await setDoc(userDocRef, { color: myColor }, { merge: true }); // Use setDoc with merge to update color
+          }
+        }
 
-              if (document.hidden) {
-                unreadCount++;
-                changeFavicon('resources/notifC.png');
-                document.title = `(${unreadCount}) ${originalTitle}`;
-              }
+        // Show conversations and keep listener active
+        onSnapshot(convQuery, (snapshot) => {
+          const divChat = document.getElementById("chatsSelect");
+          divChat.innerHTML = "";
 
-              document.getElementById("messages").appendChild(div);
+          snapshot.forEach((docSnap) => {
+            const conv = docSnap.data();
+            const div = document.createElement("div");
+            div.textContent = conv.name || "Unnamed Chat";
+            div.className = "chatItem";
+            div.dataset.id = docSnap.id;
 
-              if (msg.timestamp > latestTimestamp) {
-                latestTimestamp = msg.timestamp;
-              }
-            }
+            div.onclick = () => loadConversation(docSnap.id, conv);
+            divChat.appendChild(div);
           });
 
-          const messagesDiv = document.getElementById("messages");
-          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          if (snapshot.empty) {
+            document.getElementById("messages").innerHTML =
+              `<p style="text-align:center; color: #888;">Click "New Chat" to start a conversation.</p>`;
+          } else if (!currentConvId) {
+            document.getElementById("messages").innerHTML =
+              `<p style="text-align:center; color: #888;">Select a chat on the left to see messages.</p>`;
+          }
         });
 
+        // FIX: Correctly parse JSON from localStorage
+        const storedConv = localStorage.getItem("loadConv");
+        if (storedConv) {
+          try {
+            const data = JSON.parse(storedConv);
+            // Assuming data contains { id: '...', data: { ... } }
+            loadConversation(data.id, data.data);
+          } catch (e) {
+            console.error("Error parsing stored conversation data:", e);
+            localStorage.removeItem("loadConv"); // Clear corrupted data
+          }
+        }
       } else {
-        window.location.href = "index.html";
+        // Not signed in: hide UI, remove listeners, redirect to index
         document.getElementById("messageSend").style.display = "none";
         document.getElementById("messages").style.display = "none";
 
-        if (unsubscribe) {
-          unsubscribe();
-          unsubscribe = null;
+        if (currentConvUnsubscribe) {
+          try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
+          currentConvUnsubscribe = null;
         }
+        if (newMessagesUnsubscribe) {
+          try { newMessagesUnsubscribe(); } catch (e) { /* ignore */ }
+          newMessagesUnsubscribe = null;
+        }
+
+        // NOTE: Keeping the original redirect logic, but Firebase Auth should handle this better.
+        // window.location.href = "index.html";
       }
-    });
-
-    document.getElementById("sendBtn").onclick = async () => {
-      const name = document.getElementById("name").value || "Anonymous";
-      const text = document.getElementById("messageInput").value;
-      myName = name;
-
-      if (text.trim()) {
-        await addDoc(messagesRef, {
-          name,
-          text,
-          timestamp: Date.now()
-        });
-        document.getElementById("messageInput").value = "";
-      }
-    };
-
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        alert("User signed out");
-      });
     });
 
     async function getUsername(uid) {
-      const docSnap = await getDoc(doc(db, "users", uid));
-      if (docSnap.exists()) {
-        return docSnap.data().username;
-      } else {
-        alert("No such document!");
+      try {
+        const docSnap = await getDoc(doc(db, "users", uid));
+        if (docSnap.exists()) {
+          return docSnap.data().username;
+        }
+        return undefined;
+      } catch (err) {
+        console.error("getUsername error:", err);
+        return undefined;
       }
     }
 
-    document.getElementById("newConv").onclick = async () => {
-      const talkto = prompt("New chat with who?");
-      const firstMessage = prompt("Send a message to be the first message in the chat.");
-      if (!talkto || !firstMessage) return;
+    // Send message handler (uses serverTimestamp)
+    async function sendMessage() {
+      const name = document.getElementById("name").value || "Anonymous";
+      let text = document.getElementById("messageInput").value;
+      myName = name;
 
-      const q = query(collection(db, "users"), where("username", "==", talkto));
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        alert("Username does not exist");
+      if (!currentConvId) {
+        // Use a modal or in-page message instead of alert
+        console.log("Please choose a conversation");
         return;
-      } else if (querySnapshot.size > 1) {
-        alert("More than 1 user found");
+      }
+      
+      const messageSendRef = collection(db, "conversations", currentConvId, "messages");
+
+      if (sendImage && imageToSend) {
+        // Image message: send the encoded string as the 'text' property
+        try {
+          await addDoc(messageSendRef, {
+            name,
+            text: imageToSend, // "IMG:{mimeType}:{base85String}"
+            isImage: true,
+            uid: auth.currentUser.uid,
+            timestamp: serverTimestamp()
+          });
+          text = ''; // Clear text input
+          
+        } catch (err) {
+          console.error("sendMessage image error:", err);
+          console.log("Failed to send image.");
+        }
+        sendImage = false;
+        imageToSend = null;
+        // clear file input
+        const fi = document.getElementById('attachFile');
+        if (fi) fi.value = '';
+        // Clear message input visual text
+        document.getElementById("messageInput").value = "";
+
+
+      } else if (text && text.trim()) {
+        // Regular text message
+        try {
+          await addDoc(messageSendRef, {
+            name,
+            text,
+            isImage: false,
+            uid: auth.currentUser.uid,
+            timestamp: serverTimestamp()
+          });
+          text = ''; // Clear text input
+        } catch (err) {
+          console.error("sendMessage text error:", err);
+          console.log("Failed to send message.");
+        }
+      }
+
+      document.getElementById("messageInput").value = "";
+    }
+
+    // Attach UI handlers
+    document.getElementById("sendBtn").addEventListener("click", sendMessage);
+    // Only attach Enter -> send on the input itself (preventDefault to avoid duplicate behavior)
+    document.getElementById("messageInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        // Use a modal or in-page message instead of alert
+        console.log("User signed out");
+      }).catch(err => {
+        console.error("Sign out error:", err);
+      });
+    });
+
+    document.getElementById("newConv").addEventListener("click", async () => {
+      // NOTE: Using window.prompt/alert as in original code, but generally discouraged in iframes.
+      const talkto = prompt("New Chat with who?");
+      if (!talkto || talkto.trim() === "") return;
+
+      if (talkto.trim().toLowerCase() === myName.toLowerCase()) {
+        alert("You can't start a chat with yourself!");
         return;
       }
 
-      const userDoc = querySnapshot.docs[0];
-      const talktoUID = userDoc.id;
-      const newChatName = [auth.currentUser.uid, talktoUID].sort().join("_");
+      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.") || "";
 
       try {
-        await setDoc(doc(db, "conversations", newChatName, "metadata", "info"), {
-          participants: [auth.currentUser.uid, talktoUID]
+        const q = query(collection(db, "users"), where("username", "==", talkto.trim()));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          alert("User not found.");
+          return;
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const talktoUID = userDoc.id;
+        const currentUserUID = auth.currentUser.uid;
+        const newChatName = [currentUserUID, talktoUID].sort().join("_");
+
+        await setDoc(doc(db, "conversations", newChatName), {
+          name: startName,
+          participants: [currentUserUID, talktoUID],
+          createdAt: Date.now()
+        }, { merge: true });
+
+        const currentUserRef = doc(db, "users", currentUserUID);
+        const otherUserRef = doc(db, "users", talktoUID);
+
+        await updateDoc(currentUserRef, {
+          conversations: arrayUnion(newChatName)
         });
 
-        await addDoc(collection(db, "conversations", newChatName, "messages"), {
-          text: firstMessage,
-          timestamp: Date.now()
+        await updateDoc(otherUserRef, {
+          conversations: arrayUnion(newChatName)
         });
-
-        alert("New conversation created with first message");
       } catch (err) {
-        alert("Error creating conversation: " + err);
+        console.error("newConv error:", err);
+        alert(err.message || err);
       }
-    };
+    });
 
+    // Timed message visibility (example)
     function checkTime() {
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -310,10 +378,12 @@
       const end = 12 * 60 + 30;
       const textElement = document.getElementById("timedText");
 
-      if (currentMinutes >= start && currentMinutes <= end) {
-        textElement.style.display = "block";
-      } else {
-        textElement.style.display = "none";
+      if (textElement) {
+        if (currentMinutes >= start && currentMinutes <= end) {
+          textElement.style.display = "block";
+        } else {
+          textElement.style.display = "none";
+        }
       }
     }
 
@@ -321,11 +391,395 @@
     setInterval(checkTime, 60000);
 
     function changeFavicon(src) {
-      const link = document.querySelector("link[rel~='icon']") || document.createElement("link");
-      link.rel = "icon";
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
       link.href = src;
-      document.head.appendChild(link);
     }
+
+    // Helper to convert Firestore Timestamp to Date
+    function tsToDate(ts) {
+      if (!ts) return new Date(0);
+      if (typeof ts.toDate === "function") return ts.toDate();
+      // If it's a number (legacy), convert
+      if (typeof ts === "number") return new Date(ts);
+      return new Date(0);
+    }
+
+    // Load a conversation with pagination and live updates
+    async function loadConversation(id, data) {
+      // FIX: Correctly stringify the object before storing in localStorage
+      localStorage.setItem("loadConv", JSON.stringify({ id: id, data: data }));
+
+      // Unsubscribe previous listeners
+      if (currentConvUnsubscribe) {
+        try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
+        currentConvUnsubscribe = null;
+      }
+      if (newMessagesUnsubscribe) {
+        try { newMessagesUnsubscribe(); } catch (e) { /* ignore */ }
+        newMessagesUnsubscribe = null;
+      }
+
+      currentConvId = id;
+      lastLoadedDoc = null;
+      newestLoadedTimestamp = null;
+
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+
+      // Highlight selected chat
+      document.querySelectorAll(".chatItem").forEach(div => {
+        div.classList.remove("selected");
+      });
+      const selectedDiv = document.querySelector(`[data-id="${id}"]`);
+      if (selectedDiv) selectedDiv.classList.add("selected");
+
+      const msgRef = collection(db, "conversations", id, "messages");
+
+      // Helper to render a single message element
+      async function renderMessageElement(msg) {
+        const div = document.createElement("div");
+        const msgDate = tsToDate(msg.timestamp);
+        const today = new Date();
+        let timeString;
+        const sameDay = msgDate.getFullYear() === today.getFullYear() &&
+          msgDate.getMonth() === today.getMonth() &&
+          msgDate.getDate() === today.getDate();
+
+        if (sameDay) {
+          timeString = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+          timeString = msgDate.toLocaleString([], { month: "short", day: "numeric", hour: '2-digit', minute: '2-digit' });
+        }
+
+        let msgColor = "#CCCCCC"; // Default fallback color
+        const isMine = msg.uid === (auth.currentUser && auth.currentUser.uid);
+
+        let displayText = msg.text || ""; 
+        let baseMessageText = displayText;
+
+        if (isMine) {
+          div.className = "messageMine";
+          msgColor = myColor;
+          baseMessageText = `You: ${baseMessageText}`;
+
+        } else {
+          div.className = "messageOther";
+          baseMessageText = `${msg.name || "Unknown"}: ${baseMessageText}`;
+
+          // Get other user's color
+          const userDocRef = doc(db, "users", msg.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            msgColor = userDocSnap.data().color || msgColor;
+          } else {
+            console.log(`color fail: User document not found for UID: ${msg.uid}`);
+          }
+        }
+        
+        // Check for image format: IMG:{mimeType}:{base85String}
+        if (displayText.startsWith("IMG:")) {
+          // Parse the components
+          const parts = displayText.split(':'); 
+          
+          // Debugging Check: Ensure structure is correct
+          if (parts.length < 3) {
+             console.error("Image message format is incorrect:", displayText);
+             div.textContent = `${timeString} | ${baseMessageText} (Corrupted Image Data)`;
+             return div;
+          }
+
+          const mimeType = parts[1];
+          // Join remaining parts to handle case where base85 data itself might contain ':'
+          const base85String = parts.slice(2).join(':'); 
+
+          // Check if the decoder function is available
+          if (typeof decodeBase85ToImageURL !== 'function') {
+            console.error("Base85 decoding function (decodeBase85ToImageURL) is not loaded or available.");
+            div.textContent = `${timeString} | ${baseMessageText} (Decoder Not Available)`;
+            return div;
+          }
+
+          try {
+            // Decode the Base85 string into a Data URL
+            const dataUrl = decodeBase85ToImageURL(base85String, mimeType);
+
+            // Create the image element
+            const img = document.createElement("img");
+            img.src = dataUrl;
+            img.alt = "Attached Image";
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '300px';
+            img.style.borderRadius = '8px';
+            img.style.border = `1px solid ${msgColor}`;
+
+            // Create a wrapper for the image and timestamp/name
+            const contentWrapper = document.createElement('div');
+            // Show sender name and timestamp
+            contentWrapper.innerHTML = `<span class="message-info" style="color:${msgColor};">${timeString} | ${isMine ? 'You' : msg.name || 'Unknown'}: (Image Attachment)</span>`;
+            contentWrapper.appendChild(img);
+
+            div.appendChild(contentWrapper);
+            
+          } catch (error) {
+            // FIX 3: Log the specific error from the Base85 decoder
+            console.error("Base85 Decoding Error for message:", msg.id, error);
+            div.textContent = `${timeString} | ${isMine ? 'You' : msg.name || 'Unknown'}: (Base85 Decoding Failed: See Console)`;
+          }
+
+        } else {
+          // Regular text message
+          div.textContent = `${timeString} | ${baseMessageText}`;
+        }
+        
+        // Apply colors and styling (applied regardless of whether image loading failed or succeeded)
+        div.style.color = msgColor;
+        div.style.background = darkenHex(msgColor);
+        div.style.border = `1px solid ${msgColor}66`;
+        div.style.textShadow = `0 0 3px ${msgColor}55`;
+        
+        return div; // Returns the actual DOM element
+      }
+
+      // Load most recent PAGE_SIZE messages (descending), then display oldest->newest
+      try {
+        const initialQ = query(msgRef, orderBy("timestamp", "desc"), limit(PAGE_SIZE));
+        const snap = await getDocs(initialQ);
+
+        if (snap.empty) {
+          messagesDiv.innerHTML = `<p style="text-align:center; color: #888;">No messages yet in this conversation.</p>`;
+          // still set up listener for new messages
+        } else {
+          // docs are newest -> oldest; reverse so we append oldest first
+          const docs = snap.docs.slice();
+          docs.reverse();
+
+          // FIX: Await all message elements before appending
+          const messagePromises = docs.map(d => renderMessageElement(d.data()));
+          const messageElements = await Promise.all(messagePromises);
+
+          // append messages
+          messageElements.forEach((el, index) => {
+            messagesDiv.appendChild(el);
+
+            // track newest timestamp (use original docs for snapshot data)
+            const msg = docs[index].data();
+            const ts = msg.timestamp;
+            const tsDate = tsToDate(ts);
+            if (!newestLoadedTimestamp || tsDate > newestLoadedTimestamp) {
+              newestLoadedTimestamp = tsDate;
+            }
+          });
+
+          // For pagination: lastLoadedDoc should be the oldest loaded doc in the descending query
+          lastLoadedDoc = snap.docs[snap.docs.length - 1];
+
+          // If we have PAGE_SIZE results, show 'Load more'
+          const existingLoadMore = document.getElementById("loadMoreBtn");
+          if (snap.size === PAGE_SIZE) {
+            if (!existingLoadMore) {
+              const wrapper = document.createElement("div");
+              wrapper.className = "load-more";
+              const btn = document.createElement("button");
+              btn.id = "loadMoreBtn";
+              btn.textContent = "Load more messages";
+              btn.addEventListener("click", loadMore);
+              wrapper.appendChild(btn);
+              messagesDiv.insertBefore(wrapper, messagesDiv.firstChild);
+            }
+          }
+        }
+
+        // Scroll to bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      } catch (err) {
+        console.error("Error loading messages:", err);
+      }
+
+      // Set up listener for new messages (timestamp > newestLoadedTimestamp)
+      try {
+        // If newestLoadedTimestamp is null (no messages yet), listen to all new messages
+        let newMsgQuery;
+        if (newestLoadedTimestamp) {
+          // Use a JS Date for the comparison value; Firestore will accept Date for timestamp inequality
+          newMsgQuery = query(msgRef, where("timestamp", ">", newestLoadedTimestamp), orderBy("timestamp"));
+        } else {
+          // no messages loaded yet: listen for any messages (but only forward)
+          newMsgQuery = query(msgRef, orderBy("timestamp"));
+        }
+
+        // FIX: Added 'async' to onSnapshot callback and used 'await' inside a for...of loop
+        newMessagesUnsubscribe = onSnapshot(newMsgQuery, async (snapshot) => {
+          // snapshot may contain multiple new docs; append them in order
+          for (const docSnap of snapshot.docs) {
+            const msg = docSnap.data();
+
+            // Skip messages that we already showed (defensive)
+            const msgDate = tsToDate(msg.timestamp);
+            if (newestLoadedTimestamp && msgDate <= newestLoadedTimestamp) continue;
+
+            const el = await renderMessageElement(msg); // FIX: AWAIT the element
+            messagesDiv.appendChild(el);
+
+            // update newestLoadedTimestamp
+            if (!newestLoadedTimestamp || msgDate > newestLoadedTimestamp) newestLoadedTimestamp = msgDate;
+
+            // favicon/unread handling
+            if (document.hidden) {
+              unreadCount++;
+              changeFavicon('resources/notifC.png');
+              document.title = `(${unreadCount}) ${originalTitle}`;
+            }
+          }
+
+          // keep scroll at bottom when new messages arrive
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, (err) => {
+          console.error("New messages listener error:", err);
+        });
+      } catch (err) {
+        console.error("Failed to set new message listener:", err);
+      }
+
+      // loadMore: loads earlier messages than currently shown
+      async function loadMore() {
+        const btn = document.getElementById("loadMoreBtn");
+        if (!lastLoadedDoc) {
+          // nothing to load
+          if (btn) btn.remove();
+          return;
+        }
+        try {
+          const moreQ = query(msgRef, orderBy("timestamp", "desc"), startAfter(lastLoadedDoc), limit(PAGE_SIZE));
+          const snap = await getDocs(moreQ);
+          if (snap.empty) {
+            if (btn) btn.remove();
+            return;
+          }
+          // snap.docs are newest->oldest for this page; reverse to prepend oldest-first
+          const docs = snap.docs.slice();
+          docs.reverse();
+
+          // FIX: Await all message elements before prepending
+          const messagePromises = docs.map(d => renderMessageElement(d.data()));
+          const messageElements = await Promise.all(messagePromises);
+
+          // insert after the load-more wrapper if present; otherwise insert at top
+          const loadWrapper = document.querySelector(".load-more");
+          let insertBeforeNode = loadWrapper ? loadWrapper.nextSibling : messagesDiv.firstChild;
+
+          messageElements.forEach((el, index) => {
+            messagesDiv.insertBefore(el, insertBeforeNode);
+            // update newestLoadedTimestamp defensively (these are older messages so unlikely)
+            const msg = docs[index].data();
+            const ts = tsToDate(msg.timestamp);
+            if (!newestLoadedTimestamp || ts > newestLoadedTimestamp) newestLoadedTimestamp = ts;
+          });
+
+          // update lastLoadedDoc: the last doc in this descending page is the oldest in this fetched set
+          lastLoadedDoc = snap.docs[snap.docs.length - 1];
+
+          // If fewer than PAGE_SIZE were returned, remove the load more button
+          if (snap.size < PAGE_SIZE) {
+            if (btn) btn.remove();
+          }
+        } catch (err) {
+          console.error("Error loading more messages:", err);
+        }
+      } // end loadMore
+    }
+
+    function darkenHex(hex, factor = 0.15) {
+      // Remove # if present
+      hex = hex.replace(/^#/, "");
+
+      // Convert to RGB
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+
+      // Scale toward black
+      const newR = Math.floor(r * factor);
+      const newG = Math.floor(g * factor);
+      const newB = Math.floor(b * factor);
+
+      // Convert back to hex
+      return "#" +
+        newR.toString(16).padStart(2, "0") +
+        newG.toString(16).padStart(2, "0") +
+        newB.toString(16).padStart(2, "0");
+    }
+
+    function randomNeonColor() {
+      const channels = [0, 0, 0];
+
+      // Pick one channel to max out (full neon brightness)
+      const maxIndex = Math.floor(Math.random() * 3);
+      channels[maxIndex] = 255;
+
+      // Fill others with 100–255 to keep it vivid
+      for (let i = 0; i < 3; i++) {
+        if (i !== maxIndex) channels[i] = 100 + Math.floor(Math.random() * 155);
+      }
+
+      // Convert to hex
+      return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+
+    document.getElementById('attachFile').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+
+      if (!file) {
+        alert("No file selected.");
+        return;
+      }
+      
+      if(!file.type.startsWith('image/')) {
+        alert("Please select a valid image file.");
+        return;
+      }
+      // Check for presence of the encoding function
+      if (typeof encodeImageToBase85 !== 'function') {
+          // alert("Base85 encoding function not found. Make sure base85_utils.js loaded correctly.");
+           console.error("Global function encodeImageToBase85 is missing.");
+           return;
+      }
+
+      try {
+        // 1. ENCODE: Get the Base85 string and MIME type
+        const { base85String, mimeType } = await encodeImageToBase85(file);
+        
+        if (!base85String) {
+        alert("Encoding failed: Base85 string is empty.");
+          return;
+        }
+
+
+
+
+        sendImage = true;
+        // Store the MIME type along with the base85 string
+        imageToSend = `IMG:${mimeType}:${base85String}`; 
+
+        // Update the message input placeholder/text to show that a file is ready to send
+        const msgInput = document.getElementById('messageInput');
+        if (msgInput) {
+           msgInput.value = `[Image Ready: ${file.name} - Press Send]`;
+        }
+
+        // Use console.log instead of alert for success
+        console.log(`File (${file.name}, ${file.size} bytes) encoded to Base85. Ready to send.`);
+
+      } catch (error) {
+      //  alert("Error encoding file: " + error.message);
+        console.error("Encoding error:", error);
+      }
+    });
   </script>
 </body>
 

@@ -108,28 +108,28 @@
 
 
 
-function notifyMe() {
-  if (!("Notification" in window)) {
-    // Check if the browser supports notifications
-    alert("This browser does not support desktop notification");
-  } else if (Notification.permission === "granted") {
-    // Check whether notification permissions have already been granted;
-    // if so, create a notification
-    const notification = new Notification("Hi there!");
-    // …
-  } else if (Notification.permission !== "denied") {
-    // We need to ask the user for permission
-    Notification.requestPermission().then((permission) => {
-      // If the user accepts, let's create a notification
-      if (permission === "granted") {
-        const notification = new Notification("Hi there!");
-        // …
-      }
-    });
-  }
+function showWebNotification(title, bodyText, iconUrl = 'optional_icon.png') {
+    // Only show if permission is granted
+    if (Notification.permission === "granted") {
+        const options = {
+            body: bodyText,
+            icon: iconUrl, // Optional: URL to an image for the notification icon
+            // tag: 'unique-id', // Optional: Use a tag to replace existing notifications with the same tag
+        };
+        const notification = new Notification(title, options);
+
+        // Optional: Handle a click event on the notification
+        notification.onclick = function() {
+            window.focus(); // Bring the app back to the foreground
+            console.log("Notification clicked!");
+        };
+    } else {
+        console.warn("Cannot show notification. Permission is: " + Notification.permission);
+        // You might want to call askNotificationPermission() here if the user hasn't seen the prompt yet.
+    }
 }
 
-  notifyMe();
+showWebNotification("HØLLØW COMMS", "New message from a conversation!", "resources/notifC.png");
 
 
 

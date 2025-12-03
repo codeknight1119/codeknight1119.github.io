@@ -620,7 +620,7 @@
               unreadCount++;
               changeFavicon('resources/notifC.png');
               document.title = `(${unreadCount}) ${originalTitle}`;
-           //   showWebNotification(`New Message from `, "");
+              notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
             }
           }
 
@@ -768,26 +768,65 @@
       }
     });
 
-    function showWebNotification(title, bodyText, iconUrl = 'optional_icon.png') {
-      // Only show if permission is granted
+    // Simple notification manager limiting to 5 concurrent notifications per chat
+    const notificationCounts = {}; // { conversationId: count }
+
+    function notifyNewMessage(msg, conversationId, conversationName) {
+      // Notification count logic
+      if (!notificationCounts[conversationId]) notificationCounts[conversationId] = 0;
+      notificationCounts[conversationId] += 1;
+      // If more than 5, replace old ones (by keeping tag and using renotify)
+      let notifTag = `${conversationId}`;
+      if (notificationCounts[conversationId] > 5) {
+        // You could add a /retry/sequence postfix, but 'tag' with renotify will update the existing
+        notificationCounts[conversationId] = 5; // lock at max 5
+      }
+
+      // Notification content
+      const sender = msg.name || "Someone";
+      let preview;
+      if (msg.isImage) {
+        preview = "[Image Attachment]";
+      } else if (msg.text && msg.text.length > 60) {
+        preview = msg.text.slice(0, 57) + "...";
+      } else {
+        preview = msg.text || "";
+      }
+
+      const notifTitle = `${sender} in ${conversationName || 'a conversation'}`;
+      const notifBody = preview;
+
+      if (Notification.permission === "default") {
+        Notification.requestPermission();
+      }
       if (Notification.permission === "granted") {
         const options = {
-          body: bodyText,
-          icon: iconUrl, // Optional: URL to an image for the notification icon
-          // tag: 'unique-id', // Optional: Use a tag to replace existing notifications with the same tag
+          body: notifBody,
+          icon: 'resources/notifC.png',
+          tag: notifTag,          // Tag so notifications for this convo replace each other
+          renotify: true,         // Trigger if already open
+          silent: false           // User will get sound/vibration (if their device does)
         };
-        const notification = new Notification(title, options);
 
-        // Optional: Handle a click event on the notification
+        const notification = new Notification(notifTitle, options);
         notification.onclick = function () {
-          window.focus(); // Bring the app back to the foreground
-          console.log("Notification clicked!");
+          window.focus();
+          // Load conversation (optional: add more if needed to select/highlight UI)
+          if (typeof loadConversation === 'function' && conversationId && conversationName) {
+            loadConversation(conversationId, { name: conversationName });
+          }
+          notification.close();
         };
-      } else {
-        console.warn("Cannot show notification. Permission is: " + Notification.permission);
-        // You might want to call askNotificationPermission() here if the user hasn't seen the prompt yet.
+        // Clean up (optionally after some time)
+        setTimeout(() => {
+          try { notification.close(); } catch (e) { }
+          notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
+        }, 10000); // Auto-close after 10 seconds, can change
       }
     }
+
+
+
   </script>
 </body>
 

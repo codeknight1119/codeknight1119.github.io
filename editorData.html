@@ -134,6 +134,28 @@ button:hover {
 
     async function getData() {
       lockEditor();
+      fetch(`${url}?sheet=${document.getElementById("dropDown").value}`)
+        .then(r => r.json())
+        .then(data => {
+          editor.setValue(JSON.stringify(data.sheetData, null, 2));
+          })
+        .then(() => unlockEditor())
+        .catch(err => console.error('Fetch error:', err));
+    }
+
+    async function sendData() {
+      console.log(editor.getValue());
+      lockEditor();
+      fetch(`${url}?sheet=${document.getElementById("dropDown").value}`, {
+        redirect: "follow",
+        method: 'POST',
+        headers: {'Content-Type': "text/plain;charset=utf-8"},
+        body: editor.getValue()
+      })
+        .then(response => response.text())
+        .then(result => console.log((result)))
+        .then(() => getData())
+        .catch(err => console.error("Send error:" + err));
     }
 
     function lockEditor() {

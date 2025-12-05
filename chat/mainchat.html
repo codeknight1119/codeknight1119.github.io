@@ -40,16 +40,16 @@
     <button id="logoutBtn" aria-label="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</button>
     <button id="newConv" aria-label="New conversation"><i class="fas fa-plus" aria-hidden="true"></i> New Chat</button>
   </div>
-  
+
   <!-- The Base85 utility script MUST be loaded first and globally expose its functions -->
   <script src="base85_utils.js" defer></script>
-  
+
   <script type="module">
     // FIX 1: Safely access the utility functions from the global window object.
     // We expect these to be populated by base85_utils.js
     const decodeBase85ToImageURL = window.decodeBase85ToImageURL;
     const encodeImageToBase85 = window.encodeImageToBase85;
-    
+
     // Firebase modular imports (rest of imports omitted for brevity but remain the same)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -71,6 +71,8 @@
       startAfter,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const urlParams = new URLSearchParams(window.location.search);
 
     // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
     let firebaseConfig;
@@ -241,7 +243,7 @@
         console.log("Please choose a conversation");
         return;
       }
-      
+
       const messageSendRef = collection(db, "conversations", currentConvId, "messages");
 
       if (sendImage && imageToSend) {
@@ -255,7 +257,7 @@
             timestamp: serverTimestamp()
           });
           text = ''; // Clear text input
-          
+
         } catch (err) {
           console.error("sendMessage image error:", err);
           console.log("Failed to send image.");
@@ -445,7 +447,7 @@
         let msgColor = "#CCCCCC"; // Default fallback color
         const isMine = msg.uid === (auth.currentUser && auth.currentUser.uid);
 
-        let displayText = msg.text || ""; 
+        let displayText = msg.text || "";
         let baseMessageText = displayText;
 
         if (isMine) {
@@ -467,22 +469,22 @@
             console.log(`color fail: User document not found for UID: ${msg.uid}`);
           }
         }
-        
+
         // Check for image format: IMG:{mimeType}:{base85String}
         if (displayText.startsWith("IMG:")) {
           // Parse the components
-          const parts = displayText.split(':'); 
-          
+          const parts = displayText.split(':');
+
           // Debugging Check: Ensure structure is correct
           if (parts.length < 3) {
-             console.error("Image message format is incorrect:", displayText);
-             div.textContent = `${timeString} | ${baseMessageText} (Corrupted Image Data)`;
-             return div;
+            console.error("Image message format is incorrect:", displayText);
+            div.textContent = `${timeString} | ${baseMessageText} (Corrupted Image Data)`;
+            return div;
           }
 
           const mimeType = parts[1];
           // Join remaining parts to handle case where base85 data itself might contain ':'
-          const base85String = parts.slice(2).join(':'); 
+          const base85String = parts.slice(2).join(':');
 
           // Check if the decoder function is available
           if (typeof decodeBase85ToImageURL !== 'function') {
@@ -511,7 +513,7 @@
             contentWrapper.appendChild(img);
 
             div.appendChild(contentWrapper);
-            
+
           } catch (error) {
             // FIX 3: Log the specific error from the Base85 decoder
             console.error("Base85 Decoding Error for message:", msg.id, error);
@@ -522,13 +524,13 @@
           // Regular text message
           div.textContent = `${timeString} | ${baseMessageText}`;
         }
-        
+
         // Apply colors and styling (applied regardless of whether image loading failed or succeeded)
         div.style.color = msgColor;
         div.style.background = darkenHex(msgColor);
         div.style.border = `1px solid ${msgColor}66`;
         div.style.textShadow = `0 0 3px ${msgColor}55`;
-        
+
         return div; // Returns the actual DOM element
       }
 
@@ -620,6 +622,9 @@
               unreadCount++;
               changeFavicon('resources/notifC.png');
               document.title = `(${unreadCount}) ${originalTitle}`;
+              if(urlParams.get('notifs') === true){
+              notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
+              }
             }
           }
 
@@ -724,24 +729,24 @@
         alert("No file selected.");
         return;
       }
-      
-      if(!file.type.startsWith('image/')) {
+
+      if (!file.type.startsWith('image/')) {
         alert("Please select a valid image file.");
         return;
       }
       // Check for presence of the encoding function
       if (typeof encodeImageToBase85 !== 'function') {
-          // alert("Base85 encoding function not found. Make sure base85_utils.js loaded correctly.");
-           console.error("Global function encodeImageToBase85 is missing.");
-           return;
+        // alert("Base85 encoding function not found. Make sure base85_utils.js loaded correctly.");
+        console.error("Global function encodeImageToBase85 is missing.");
+        return;
       }
 
       try {
         // 1. ENCODE: Get the Base85 string and MIME type
         const { base85String, mimeType } = await encodeImageToBase85(file);
-        
+
         if (!base85String) {
-        alert("Encoding failed: Base85 string is empty.");
+          alert("Encoding failed: Base85 string is empty.");
           return;
         }
 
@@ -750,22 +755,82 @@
 
         sendImage = true;
         // Store the MIME type along with the base85 string
-        imageToSend = `IMG:${mimeType}:${base85String}`; 
+        imageToSend = `IMG:${mimeType}:${base85String}`;
 
         // Update the message input placeholder/text to show that a file is ready to send
         const msgInput = document.getElementById('messageInput');
         if (msgInput) {
-           msgInput.value = `[Image Ready: ${file.name} - Press Send]`;
+          msgInput.value = `[Image Ready: ${file.name} - Press Send]`;
         }
 
         // Use console.log instead of alert for success
         console.log(`File (${file.name}, ${file.size} bytes) encoded to Base85. Ready to send.`);
 
       } catch (error) {
-      //  alert("Error encoding file: " + error.message);
+        //  alert("Error encoding file: " + error.message);
         console.error("Encoding error:", error);
       }
     });
+
+    // Simple notification manager limiting to 5 concurrent notifications per chat
+    const notificationCounts = {}; // { conversationId: count }
+
+    function notifyNewMessage(msg, conversationId, conversationName) {
+      // Notification count logic
+      if (!notificationCounts[conversationId]) notificationCounts[conversationId] = 0;
+      notificationCounts[conversationId] += 1;
+      // If more than 5, replace old ones (by keeping tag and using renotify)
+      let notifTag = `${conversationId}`;
+      if (notificationCounts[conversationId] > 5) {
+        // You could add a /retry/sequence postfix, but 'tag' with renotify will update the existing
+        notificationCounts[conversationId] = 5; // lock at max 5
+      }
+
+      // Notification content
+      const sender = msg.name || "Someone";
+      let preview;
+      if (msg.isImage) {
+        preview = "[Image Attachment]";
+      } else if (msg.text && msg.text.length > 60) {
+        preview = msg.text.slice(0, 57) + "...";
+      } else {
+        preview = msg.text || "";
+      }
+
+      const notifTitle = `${sender} in ${conversationName || 'a conversation'}`;
+      const notifBody = preview;
+
+      if (Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+      if (Notification.permission === "granted") {
+        const options = {
+          body: notifBody,
+          icon: 'resources/notifC.png',
+          tag: notifTag,          // Tag so notifications for this convo replace each other
+          renotify: true,         // Trigger if already open
+          silent: false           // User will get sound/vibration (if their device does)
+        };
+
+        const notification = new Notification(notifTitle, options);
+        notification.onclick = function () {
+          window.focus();
+          // Load conversation (optional: add more if needed to select/highlight UI)
+          if (typeof loadConversation === 'function' && conversationId && conversationName) {
+            loadConversation(conversationId, { name: conversationName });
+          }
+          notification.close();
+        };
+        // Clean up (optionally after some time)
+        setTimeout(() => {
+          try { notification.close(); } catch (e) { }
+          notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
+        }, 10000); // Auto-close after 10 seconds, can change
+      }
+    }
+
+
+
   </script>
 </body>
 

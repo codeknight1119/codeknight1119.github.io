@@ -1,0 +1,784 @@
+--- CHUNK 1 ---
+Video Connections
+
+--- CHUNK 2 ---
+What is Artificial Intelligence? Artificial Intelligence (AI) refers to computer systems designed to perform tasks that normally require human intelligence. These include problem-solving, recognizing speech, making decisions, and learning from experience.
+
+--- CHUNK 3 ---
+What is Artificial Intelligence? Artificial Intelligence (AI) refers to computer systems designed to perform tasks that normally require human intelligence. These include problem-solving, recognizing speech, making decisions, and learning from experience.
+
+AI systems use algorithms and data to "think" and adapt like humans, but they operate based on mathematical patterns rather than biological processes.
+
+--- CHUNK 4 ---
+History of AI ● AI's story begins in the 1950s when computer scientists first
+
+asked: "Can machines think?"
+
+The term "Artificial Intelligence" was coined at the Dartmouth Conference in 1956 by John McCarthy.
+
+Early AI systems were simple by today's standards but revolutionary for their time.
+
+Scientists created programs that could play checkers and solve basic math problems, laying the foundation for more complex systems.
+
+--- CHUNK 5 ---
+History of AI - Key Milestones
+
+1950s: Alan Turing proposes the "Turing Test" to determine if a machine can think
+
+1960s: ELIZA, an early natural language processing program, is created
+
+1980s: Expert systems emerge for specialized tasks
+
+1997: IBM's Deep Blue defeats chess champion Garry Kasparov
+
+2011: IBM Watson wins Jeopardy! against human champions ● 2016: AlphaGo defeats world champion Go player Lee Sedol
+
+--- CHUNK 6 ---
+AI Revolution
+
+From Rules to Learning Early AI systems followed strict rules programmed by humans.
+
+Modern AI has evolved to learn from data without explicit programming. This shift represents a fundamental change in how AI works:
+
+Rule-based systems → Learning systems ● Narrow applications → Broader capabilities ● Limited adaptability → Continuous improvement
+
+This evolution has dramatically expanded what AI can accomplish in our world.
+
+--- CHUNK 7 ---
+AI - The Basics
+
+Input: Receive data (text, images, sounds, etc.)
+
+Processing: Analyze data using algorithms
+
+Pattern recognition: Identify patterns and relationships
+
+Decision making: Determine appropriate responses
+
+Output: Provide results (predictions, recommendations, actions)
+
+Learning: Improve performance based on results
+
+--- CHUNK 8 ---
+Understanding AI Algorithms
+
+Algorithms are step-by-step instructions that tell computers how to solve problems.
+
+In AI, algorithms are specially designed to:
+
+Process large amounts of data ● Identify patterns humans might miss ● Make predictions based on past observations ● Improve performance over time
+
+These algorithms form the foundation of all AI systems, from simple chatbots to complex decision-making tools.
+
+--- CHUNK 9 ---
+How AI Uses Algorithms for Learning
+
+Supervised Learning: Teaching by Example Supervised learning is
+
+like learning with a teacher. The AI is trained on labeled data where the
+
+correct answers are provided:
+
+Input: The system receives data (e.g., pictures of animals)
+
+Labels: Each input has a correct label (e.g., "cat," "dog")
+
+Training: The system learns to connect inputs with correct labels
+
+Testing: The system tries to label new, unseen examples
+
+Application: Used for classification, prediction, and recognition tasks
+
+Examples: Email spam filters, facial recognition, medical diagnosis
+
+--- CHUNK 10 ---
+AI Learning
+
+Unsupervised Learning: Finding Hidden Patterns Unsupervised
+
+learning is like exploring without a map. The AI discovers patterns
+
+without being told what to look for (No Labels):
+
+Input: The system receives unlabeled data
+
+Analysis: The system looks for natural groupings or patterns
+
+Discovery: The system identifies similarities and differences
+
+Organization: The system categorizes data based on discovered patterns
+
+Application: Used for clustering, anomaly detection, and data visualization
+
+Examples: Social network analysis, recommendation systems
+
+--- CHUNK 11 ---
+AI in Healthcare
+
+AI is transforming healthcare through:
+
+Disease Detection: AI analyzes medical images to identify potential
+
+diseases earlier and more accurately than traditional methods
+
+Drug Discovery: AI accelerates the development of new
+
+medications by predicting how different molecules will behave
+
+Patient Monitoring: AI systems track patient vital signs and alert
+
+medical staff to potential problems
+
+Personalized Treatment: AI helps doctors create customized
+
+treatment plans based on a patient's unique genetic makeup
+
+--- CHUNK 12 ---
+AI in Healthcare Real-world example: AI systems can detect signs of diabetic
+
+retinopathy (an eye disease) from retinal scans with over 90%
+
+accuracy.
+
+Human accuracy in detecting diabetic retinopathy (especially early stages) typically ranges from 60% to 80%, depending on the experience of the clinician and image quality.
+
+--- CHUNK 13 ---
+AI in Education
+
+AI is changing how we learn through:
+
+Personalized Learning: AI adapts lessons to match each student's
+
+learning style and pace
+
+Intelligent Tutoring: AI provides one-on-one assistance when
+
+students struggle with concepts
+
+Automated Grading: AI evaluates assignments, giving teachers
+
+more time for instruction
+
+Educational Analytics: AI identifies learning patterns to help
+
+improve teaching methods
+
+--- CHUNK 14 ---
+AI in Education
+
+Real-world example: Adaptive learning platforms like
+
+Khan Academy use AI to provide customized learning
+
+experiences for millions of students worldwide.
+
+--- CHUNK 15 ---
+AI in Finance & Business ● AI in Finance and Business AI is revolutionizing financial services through:
+
+Fraud Detection: AI identifies unusual patterns that may indicate
+
+fraudulent activity
+
+Algorithmic Trading: AI makes split-second trading decisions based on
+
+market data
+
+Customer Service: AI chatbots handle routine customer inquiries
+
+Risk Assessment: AI evaluates loan applications by analyzing numerous
+
+factors
+
+Financial Planning: AI helps individuals manage investments and plan for
+
+retirement
+
+--- CHUNK 16 ---
+AI in Finance & Business
+
+Real-world example: JPMorgan's COIN (Contract Intelligence) system reviews legal documents in seconds that would take lawyers 360,000 hours annually.
+
+--- CHUNK 17 ---
+AI in Law Enforcement
+
+AI is being used to assist law enforcement in:
+
+Predictive Policing: AI analyzes crime data to
+
+predict where future crimes might occur
+
+Facial Recognition: AI identifies persons of
+
+interest in video footage
+
+Crime Scene Analysis: AI processes evidence
+
+more quickly than traditional methods
+
+Traffic Management: AI optimizes traffic flow
+
+and identifies violations
+
+--- CHUNK 18 ---
+AI in Law Enforcement
+
+These applications raise important ethical questions about privacy, bias, and civil liberties that society is still working to address.
+
+--- CHUNK 19 ---
+AI in our daily lives AI has become integrated into our everyday experiences:
+
+1. Smart Assistants: Siri, Alexa, and Google Assistant use AI to understand and
+
+respond to voice commands.
+
+2. Recommendation Systems: Netflix, Spotify, and Amazon suggest content
+
+based on your preferences.
+
+3. Navigation Apps: Google Maps and Waze use AI to find optimal routes and
+
+predict traffic.
+
+4. Social Media: AI decides what shows up on your social media feed and can tell
+
+who’s in a picture by recognizing faces.
+
+5. Smart Home Devices: AI controls lighting, temperature, and security systems.
+
+--- CHUNK 20 ---
+The Future of AI
+
+Opportunities and Challenges As AI continues to evolve, we face
+
+both exciting possibilities and important questions:
+
+Opportunities:
+
+Solving complex global problems like climate change and
+
+diseases
+
+Creating new jobs and industries we can't yet imagine
+
+Enhancing human creativity and productivity
+
+--- CHUNK 21 ---
+The Future of AI
+
+Opportunities and Challenges As AI continues to evolve, we face
+
+both exciting possibilities and important questions:
+
+Challenges:
+
+Ensuring AI benefits everyone fairly
+
+Protecting privacy and security
+
+Addressing potential job displacement
+
+Creating ethical guidelines for AI development
+
+--- CHUNK 22 ---
+Understanding Artificial Intelligence Types and Applications
+
+--- CHUNK 23 ---
+Short definition: “Artificial Intelligence (AI) refers to computer systems designed to perform tasks that usually require human intelligence.”
+
+Examples: voice assistants, recommendation systems, self-driving cars.
+
+--- CHUNK 24 ---
+AI Classifications (how intelligent it is)
+
+Narrow AI (Current AI we use - ChatGPT, self-driving cars, etc)
+
+General AI (Would be equivalent to reasoning like a human - doesn’t exist yet)
+
+Superintelligent AI - would surpass human thinking (Just theoretical right now - Science Fiction
+
+--- CHUNK 25 ---
+General AI (Strong AI) General AI is a type of artificial intelligence that could think, learn, and understand any task or topic, the same way a human can — and possibly better.
+
+Unlike today’s AI (which is narrow and task-specific), General AI would be able to:
+
+Reason across different subjects ● Learn from experience ● Adapt to new situations ● Understand emotions, context, and abstract ideas
+
+--- CHUNK 26 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs)
+
+These describe how AI works or is built — basically, what methods or technologies it uses
+
+--- CHUNK 27 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs)
+
+Narrow AI - (or Weak AI) is designed to do one specific task very well.” It cannot think or act outside its trained area. Examples: Siri or Alexa (voice recognition) Netflix recommendations
+
+Face ID on phones
+
+Spam filters in email
+
+--- CHUNK 28 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs)
+
+Narrow AI cannot think or act outside its trained area because:
+
+It follows specific data and rules. ● It doesn’t understand context like humans do. ● It fails when faced with unfamiliar situations.
+
+--- CHUNK 29 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs) How Narrow AI Is Used
+
+Real-world impact:
+
+Healthcare: detecting diseases in scans ○ Transportation: autopilot in planes ○ Retail: personalized ads ○ Banking: fraud detection
+
+--- CHUNK 30 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs)
+
+“Machine Learning is a type of AI that allows computers to learn from data and improve over time without being explicitly programmed.”
+
+It’s how AI “learns patterns” rather than following fixed rules.
+
+--- CHUNK 31 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs) Simple Example:
+
+You show a computer 1000 pictures of cats and dogs. → It learns patterns (fur, shape, ears) → predicts new images.
+
+--- CHUNK 32 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs) Steps:
+
+A. Collect data B. Train the model (the computer program that learns patterns from data.) C. Test and improve it
+
+--- CHUNK 33 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs) Examples of Machine Learning:
+
+Predicting weather ● Detecting spam ● Self-driving cars recognizing objects ● Language translation (Google Translate)
+
+--- CHUNK 34 ---
+1. Narrow AI 2. Machine Learning 3. Large Language Models (LLMs)
+
+“Large Language Models are a type of AI trained on huge amounts of text to understand and generate human-like language.” *This is a subset of Machine Learning.
+
+Example: ChatGPT, Google Gemini, Claude.
+
+--- CHUNK 35 ---
+1. Narrow AI 2. Machine Learning
+
+3. Large Language Models (LLMs)
+
+“Large Language Models are a type of AI trained on huge amounts of text to understand and generate human-like language.” *This is a subset of Machine Learning.
+
+Example: ChatGPT, Google Gemini, Claude.
+
+--- CHUNK 36 ---
+Deep Learning - a more advanced form of Machine Learning that handles complex tasks like vision, speech, and language. A subset of ML that uses artificial neural networks with many layers (“deep” networks).
+
+Neural Networks - a type of computing system inspired by how the brain processes information. It’s made up of layers of nodes (or “neurons”) that each do small calculations. When trained on data, these layers work together to find patterns and make predictions — like identifying objects in a photo or predicting the next word in a sentence.
+
+--- CHUNK 37 ---
+Other Concepts to Consider
+
+Generative AI (GenAI)
+
+A subset of Deep Learning models that can create new content — text, images, music, code, videos — based on what it learned from existing data.
+
+Generative AI is part of Deep Learning, which is part of Machine Learning, which is part of AI. It’s the creative branch — it doesn’t just recognize patterns; it generates new ones.
+
+ChatGPT (text), DALL·E (images), Suno (music), GitHub Copilot (code).
+
+--- CHUNK 38 ---
+Warm Up 11/4/2025 Slide 43
+
+--- CHUNK 39 ---
+1. Lack of creativity 2. Bias 3. Lack of emotion 4. Hallucinations 5. Lack of understanding context
+
+--- CHUNK 40 ---
+Lack of Creativity
+
+AI can imitate creative works but struggles with true originality
+
+AI-generated content is based on existing patterns in training data
+
+Cannot experience genuine inspiration or imagination
+
+May produce impressive results that appear creative but is actually
+
+recombining existing ideas in new ways
+
+Example: AI can write a poem that follows patterns of existing poetry but
+
+doesn't understand the emotional meaning behind it
+
+--- CHUNK 41 ---
+Bias in AI Systems
+
+AI systems learn from data created by humans
+
+If training data contains biases, AI will reproduce and sometimes
+
+amplify these biases
+
+--- CHUNK 42 ---
+Bias in AI Systems
+
+AI systems learn from data created by humans
+
+If training data contains biases, AI will reproduce and sometimes
+
+amplify these biases
+
+Types of bias:
+
+Selection bias: When data doesn't represent all groups equally
+
+--- CHUNK 43 ---
+Bias in AI Systems
+
+AI systems learn from data created by humans
+
+If training data contains biases, AI will reproduce and sometimes amplify
+
+these biases ● Types of bias:
+
+Selection bias: When data doesn't represent all groups equally
+
+Confirmation bias: When systems favor information that confirms
+
+existing beliefs
+
+--- CHUNK 44 ---
+Bias in AI Systems
+
+AI systems learn from data created by humans
+
+If training data contains biases, AI will reproduce and sometimes amplify these
+
+biases
+
+Types of bias:
+
+Selection bias: When data doesn't represent all groups equally
+
+Confirmation bias: When systems favor information that
+
+confirms existing beliefs
+
+Historical bias: When past discrimination is reflected in the
+
+data
+
+--- CHUNK 45 ---
+Bias in AI Systems
+
+AI systems learn from data created by humans
+
+If training data contains biases, AI will reproduce and sometimes amplify these
+
+biases
+
+Types of bias:
+
+Selection bias: When data doesn't represent all groups equally
+
+Confirmation bias: When systems favor information that confirms existing
+
+beliefs
+
+Historical bias: When past discrimination is reflected in the data
+
+Example: A hiring AI trained on past hiring decisions might discriminate against certain groups if those patterns existed in its training data
+
+--- CHUNK 46 ---
+Lack of Emotion
+
+AI cannot truly feel emotions or understand them the way humans do
+
+Can recognize patterns associated with emotions in text, speech, or facial
+
+expressions
+
+Cannot experience empathy, compassion, or emotional connection
+
+May simulate emotional responses but these are programmed reactions
+
+This limits AI in roles requiring emotional intelligence like counseling or
+
+certain healthcare applications
+
+--- CHUNK 47 ---
+Hallucinations
+
+"AI hallucinations" occur when AI systems generate false or made-up information
+
+AI may present incorrect information with high confidence AI Hallucination - is an occurrence when an artificial intelligence system, like ChatGPT, confidently gives an answer that sounds correct but is actually false, made up, or misleading. It’s called a “hallucination” because the AI is not lying on purpose—it’s generating information that seems real based on patterns in its training data, even when no real evidence supports it.
+
+--- CHUNK 48 ---
+Hallucinations
+
+"AI hallucinations" occur when AI systems generate false or made-up
+
+information
+
+AI may present incorrect information with high confidence
+
+Causes of hallucinations include:
+
+Gaps in training data
+
+Confusion between similar concepts
+
+Programming limitations
+
+Example: An AI might confidently provide a detailed but completely fictional
+
+biography of a person or invent statistics that sound plausible
+
+--- CHUNK 49 ---
+Lack of Understanding Context
+
+AI has trouble understanding situations the way people do.
+
+It can miss jokes, sarcasm, or cultural references.
+
+It often doesn’t “get” things that are only hinted at, not clearly said.
+
+AI doesn’t have the common sense that people learn from real-life experience.
+
+Example: An AI might not understand that "it's raining cats and dogs" is a
+
+figure of speech rather than a literal statement.
+
+--- CHUNK 50 ---
+Lack of Understanding Context
+
+Context can sometimes be difficult for humans as well
+
+a. Different age groups b. Different nationalities/ethnic groups c. Different cultures between departments within a company d. Different localities within the same country e. And more…
+
+--- CHUNK 51 ---
+Sometimes Generative AI goes bad. Can you spot some of the problems with these images??
+
+--- CHUNK 52 ---
+Key takeaway: This illustrates how AI struggles with organic structure, anatomy, and real-world consistency (ties into “lack of common sense/context”).
+
+--- CHUNK 53 ---
+Why AI Makes Weird Images
+
+AI doesn’t understand anatomy or objects
+
+It blends features from many images → weird results
+
+Hands, teeth, and faces are hardest to get right
+
+Shows AI’s limits: it imitates, not understands
+
+--- CHUNK 54 ---
+Key takeaway: Faces and small detailed features are also hard for AI because they require deeper understanding of structure and context. This shows the “hallucination” or “lack of context/emotion” limitation.
+
+--- CHUNK 55 ---
+Warm Up 11/06/2025 Slide 62
+
+--- CHUNK 56 ---
+Positive Impact: Healthcare Advancements
+
+AI helps doctors diagnose diseases from medical images
+
+Can analyze health data to predict potential health issues before they
+
+become serious
+
+Assists in developing new medicines by analyzing molecular structures
+
+Helps personalize treatment plans based on individual patient data
+
+Example: AI systems can detect early signs of diseases like cancer in
+
+X-rays or MRIs that human doctors might miss
+
+--- CHUNK 57 ---
+New Jobs and Opportunities
+
+Creates new and enhanced jobs:
+
+AI trainers and AI specialists
+
+Data analysts and data scientists
+
+AI ethics specialists
+
+Human-AI collaboration experts
+
+Automates routine tasks, allowing humans to focus on more creative and complex work
+
+Provides tools that enhance human productivity and creativity
+
+Example: Graphic designers now use AI tools to generate initial ideas, allowing them to
+
+focus on refinement and creative direction
+
+--- CHUNK 58 ---
+New Jobs and Opportunities
+
+Data Analysts and Data Scientists
+
+They study large amounts of data (information) to find patterns or answers.
+
+Their work helps companies make better decisions.
+
+Example: A data analyst might look at sales data to help a store know which products are most popular.
+
+--- CHUNK 59 ---
+New Jobs and Opportunities
+
+AI Ethics Specialists
+
+They make sure AI is used in fair and responsible ways.
+
+They think about privacy, bias, and how AI decisions affect people.
+
+Example: Someone who checks that an AI hiring system treats all job applicants equally.
+
+--- CHUNK 60 ---
+New Jobs and Opportunities
+
+Human–AI Collaboration Experts
+
+They design ways for people and AI to work well together.
+
+Their goal is to make AI tools helpful and easy to use.
+
+Example: Someone who helps doctors use AI to read medical scans more accurately.
+
+--- CHUNK 61 ---
+Privacy and Security Concerns ● AI systems often require large amounts of personal data
+
+Raises questions about:
+
+Who owns your data?
+
+How is your data being used?
+
+Is your information secure?
+
+AI can be used for surveillance and tracking
+
+Facial recognition technology raises particular concerns
+
+Example: Social media algorithms that track your
+
+behavior to predict what content will keep you engaged
+
+longer
+
+If MY data is getting sold, why am I not getting a cut of the money???
+
+--- CHUNK 62 ---
+Negative Impact: Ethical Dilemmas
+
+Who is responsible when AI makes a mistake?
+
+How do we ensure AI is used fairly and responsibly?
+
+Key ethical questions:
+
+Should AI be allowed to make important decisions about
+
+people?
+
+How transparent should AI decision-making be?
+
+What values should be programmed into AI systems?
+
+Example: Self-driving cars may need to make
+
+split-second decisions in dangerous situations that involve
+
+ethical choices
+
+--- CHUNK 63 ---
+Negative Impact: Ethical Dilemmas
+
+Should AI be allowed to make important
+
+decisions about people?
+
+What are some examples of the above??
+
+Should AI decide who gets a job?
+
+Should AI decide who gets accepted to college?
+
+Should AI decide how long a prison sentence should be?
+
+Should AI decide who gets a loan?
+
+These decisions can change people’s futures, so many believe
+
+humans—not machines—should make the final call.
+
+--- CHUNK 64 ---
+Job Displacement
+
+Some jobs may be automated by AI technologies
+
+Most affected jobs involve routine, predictable tasks
+
+Industries potentially affected:
+
+Transportation (self-driving vehicles)
+
+Customer service (chatbots)
+
+Manufacturing (smart robots)
+
+Data processing (automated analysis)
+
+Example: Self-checkout systems in stores replacing some
+
+cashier positions
+
+--- CHUNK 65 ---
+How do AI limitations influence society?
+
+Benefits must be balanced against risks and limitations
+
+Society needs to decide:
+
+Where AI should and shouldn't be used
+
+How to regulate AI development and deployment
+
+How to prepare for economic and social changes
+
+How to ensure AI benefits everyone fairly
+
+Discussion question:
+
+What rules or guidelines would you create for AI use in schools?
+
+Final thought: Understanding AI's capabilities AND limitations helps us use this
+
+technology wisely
+
+--- CHUNK 66 ---
+WARM UP 11/7/2025 - SLIDE 74
+
+Click Here for the Warm Up
+
+--- CHUNK 67 ---
+Unit 6 Study Guide - Test Wednesday Slide 74
+
+Click Here
+
+--- CHUNK 68 ---
+Target Assignments
+
+1. Vocabulary 5-1 2. AI affects the environment 3. Computer Ethics Case Study 4. AI Gone Bad 5. Old School Tech vs New Technology
+
+If you’re missing assignments work on them in the order above. Get your work done!
+
+--- CHUNK 69 ---
+If you are done
+
+Explore Microsoft Arcade *Beginner Skill Maps*
+
+https://arcade.makecode.com/

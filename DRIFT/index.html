@@ -9,8 +9,9 @@
 
 <body>
     <h1>DRIFT</h1>
-    <button id="pairBttn">Pair</button>
-    <p id="out">out</p>
+    <h3>v3<h3>
+            <button id="pairBttn">Pair</button>
+            <p id="out">out</p>
 </body>
 <script>
     const out = document.getElementById("out")
@@ -24,14 +25,15 @@
                         //  { services: ["heart_rate"] },
                         //  { services: [0x1802, 0x1803] },
                         //  { services: ["c48e6067-5295-48d3-8d5c-0395f61792b1"] },
-                        { name: "Drift" },
+                        //  { name: "Drift" },
                         // { namePrefix: "Prefix" },
+                       
                     ],
                     // optionalServices: ["battery_service"],
                 };
 
                 navigator.bluetooth
-                    .requestDevice(options)
+                    .requestDevice({acceptAllDevices: true})
                     .then((device) => {
                         out.innerText = "Device Found"
                         console.log(device.name)

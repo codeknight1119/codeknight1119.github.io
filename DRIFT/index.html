@@ -9,7 +9,7 @@
 
 <body>
     <h1>DRIFT</h1>
-    <h3>v3<h3>
+    <h3>v4<h3>
             <button id="pairBttn">Pair</button>
             <p id="out">out</p>
 </body>
@@ -33,7 +33,7 @@
                 };
 
                 navigator.bluetooth
-                    .requestDevice({acceptAllDevices: true})
+                    .requestDevice({name: "DRIFT"})
                     .then((device) => {
                         out.innerText = "Device Found"
                         console.log(device.name)

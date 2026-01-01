@@ -9,7 +9,7 @@
 
 <body>
     <h1>DRIFT</h1>
-    <h3>v4<h3>
+    <h3>v6<h3>
             <button id="pairBttn">Pair</button>
             <p id="out">out</p>
 </body>
@@ -25,7 +25,7 @@
                         //  { services: ["heart_rate"] },
                         //  { services: [0x1802, 0x1803] },
                         //  { services: ["c48e6067-5295-48d3-8d5c-0395f61792b1"] },
-                        //  { name: "Drift" },
+                          { name: "DRIFT" },
                         // { namePrefix: "Prefix" },
                        
                     ],
@@ -33,7 +33,7 @@
                 };
 
                 navigator.bluetooth
-                    .requestDevice({name: "DRIFT"})
+                    .requestDevice(options)
                     .then((device) => {
                         out.innerText = "Device Found"
                         console.log(device.name)

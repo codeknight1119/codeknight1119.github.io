@@ -39,7 +39,7 @@
                         console.log(device.name)
                         return device.gatt.connect();
                     })
-                    .catch((error) => { out.innerText(`Something went wrong. ${error}`); console.log(error) });
+                    .catch((error) => { console.log(error) });
             } else {
                 out.innerText = "Bluetooth denied"
                 return

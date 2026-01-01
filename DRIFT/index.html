@@ -15,31 +15,36 @@
 <script>
     const out = document.getElementById("out")
     document.getElementById("pairBttn").addEventListener("click", async () => {
-        const btPermission = await navigator.permissions.query({ name: "bluetooth" });
-        if (btPermission.state !== "denied") {
-            out.innerText = "Bluetooth denied"
-            return
-        }
 
-        let options = {
-            filters: [
-                //  { services: ["heart_rate"] },
-                //  { services: [0x1802, 0x1803] },
-                //  { services: ["c48e6067-5295-48d3-8d5c-0395f61792b1"] },
-                { name: "Drift" },
-                // { namePrefix: "Prefix" },
-            ],
-            // optionalServices: ["battery_service"],
-        };
+        navigator.bluetooth.getAvailability().then((available) => {
+            if (available) {
 
-        navigator.bluetooth
-            .requestDevice(options)
-            .then((device) => {
-                out.innerText = "Device Found"
-                console.log(device.name)
-                return device.gatt.connect();
-            })
-            .catch((error) =>{ out.innerText(`Something went wrong. ${error}`); console.log(error)});
+                let options = {
+                    filters: [
+                        //  { services: ["heart_rate"] },
+                        //  { services: [0x1802, 0x1803] },
+                        //  { services: ["c48e6067-5295-48d3-8d5c-0395f61792b1"] },
+                        { name: "Drift" },
+                        // { namePrefix: "Prefix" },
+                    ],
+                    // optionalServices: ["battery_service"],
+                };
+
+                navigator.bluetooth
+                    .requestDevice(options)
+                    .then((device) => {
+                        out.innerText = "Device Found"
+                        console.log(device.name)
+                        return device.gatt.connect();
+                    })
+                    .catch((error) => { out.innerText(`Something went wrong. ${error}`); console.log(error) });
+            } else {
+                out.innerText = "Bluetooth denied"
+                return
+            }
+        });
+
+
     })
 
 </script>

@@ -16,6 +16,7 @@
 <script>
     const out = document.getElementById("out")
     document.getElementById("pairBttn").addEventListener("click", async () => {
+        /*
 
         navigator.bluetooth.getAvailability().then((available) => {
             if (available) {
@@ -46,6 +47,24 @@
                 return
             }
         });
+*/
+
+        try {
+            console.log('Requesting Bluetooth Device...');
+            const device = await navigator.bluetooth.requestDevice({
+                // Filter by name or alias
+                filters: [{ name: 'raspberrypi' }],
+                // Or use acceptAllDevices: true if you don't have a specific UUID
+                optionalServices: ['battery_service'] // Required to access services later
+            });
+
+            console.log('Device Name:', device.name);
+            const server = await device.gatt.connect();
+            console.log('Connected to GATT Server');
+
+        } catch (error) {
+            console.error('Connection failed!', error);
+        }
 
 
     })

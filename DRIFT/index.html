@@ -9,7 +9,7 @@
 
 <body>
     <h1>DRIFT</h1>
-    <h3>v2.0<h3>
+    <h3>v1.1<h3>
             <button id="pairBttn">Pair</button>
             <p id="out">out</p>
 </body>
@@ -27,7 +27,7 @@
                         //  { services: [0x1802, 0x1803] },
                         //  { services: ["c48e6067-5295-48d3-8d5c-0395f61792b1"] },
                      //     { name: "raspberrypi" },
-                      //    { name: "DRIFT"},
+                          { name: "DRIFT"},
                         // { namePrefix: "Prefix" },
                        
                     ],
@@ -35,7 +35,7 @@
                 };
 
                 navigator.bluetooth
-                    .requestDevice({acceptAllDevices: true})
+                    .requestDevice(options)
                     .then((device) => {
                         out.innerText = "Device Found"
                         console.log(device.name)

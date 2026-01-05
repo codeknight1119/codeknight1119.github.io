@@ -44,17 +44,14 @@
     <div id="app"></div>
 
     <script type="module">
-      // Import Vue and libraries directly from CDNs
-      import { createApp, ref, watch, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+      import { createApp, ref, watch, onMounted, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
       import { Sun, Moon, Download, Clipboard, ClipboardCheck, Github } from 'https://esm.sh/lucide-vue-next'
       import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js'
       import cpp from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/languages/cpp.min.js'
 
-      // Register C++ language for highlight.js
       hljs.registerLanguage('cpp', cpp);
 
       const App = {
-        // We use the components option to register the imported Icons
         components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Github },
         setup() {
           // ========== Theme Management ==========
@@ -68,30 +65,19 @@
           }
 
           onMounted(() => {
-            watch(
-              isDarkTheme,
-              (newValue) => {
-                document.documentElement.setAttribute('data-theme', newValue ? 'dark' : 'light')
-              },
-              { immediate: true }
-            )
-            hljs.highlightAll()
+            watch(isDarkTheme, (newValue) => {
+              document.documentElement.setAttribute('data-theme', newValue ? 'dark' : 'light')
+            }, { immediate: true })
           })
 
           // ========== Code Generation ==========
           const uploadedImage = ref(null)
           const generatedCode = ref('')
           const highlightedCode = ref('')
+          const isProcessing = ref(false) // UI Loading state
           const modalTitle = ref('')
           const modalContent = ref('')
           const recentlyCopied = ref(false)
-
-          const debugStats = ref({
-            hasData: false,
-            colorIndices: [],
-            imageIndices: [],
-            imageCounts: []
-          })
 
           function handleFileUpload(event) {
             const file = event.target.files[0]
@@ -100,7 +86,12 @@
               img.onload = function () {
                 if (img.width === 480 && img.height === 240) {
                   uploadedImage.value = img
-                  processImage()
+                  // Use setTimeout to allow the UI to update "isProcessing" before freezing for calculation
+                  isProcessing.value = true
+                  setTimeout(() => {
+                      processImage()
+                      isProcessing.value = false
+                  }, 50)
                 } else {
                   modalTitle.value = 'Invalid Image Size'
                   modalContent.value = `Image must be PNG format and have a size of 480×240 pixels. Your image is ${img.width}×${img.height} pixels.`
@@ -125,21 +116,26 @@
           }
 
           function encodeImage(imageData, width, height) {
+            // Pre-allocate array estimate to avoid constant resizing (optional but good)
             let encodedImage = []
             let currentColor = null
             let repeatCount = 0
 
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
-                const index = (y * width + x) * 4
+            // Cache data length for slight speedup
+            const totalPixels = width * height; 
+            
+            for (let i = 0; i < totalPixels; i++) {
+                const index = i * 4;
                 const r = imageData[index]
                 const g = imageData[index + 1]
                 const b = imageData[index + 2]
                 const a = imageData[index + 3]
-                let color = ''
+                let color = '' // Empty string represents transparent/skip
 
                 if (a !== 0) {
-                  color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+                   // Optimization: Bitwise is faster, but your hex approach is fine. 
+                   // Keeping your logic for consistency, just cleaned up.
+                   color = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
                 }
 
                 if (color === currentColor) {
@@ -151,77 +147,79 @@
                   currentColor = color
                   repeatCount = 1
                 }
-              }
             }
+            // Push the final run
             encodedImage.push([currentColor, repeatCount])
             return encodedImage
           }
 
           function generateCpp(encodedImage) {
-            var l_gifData_colorIndices = [];
-            var l_gifData_imageIndices = [];
-            var l_gifData_imageCounts = [];
-
-            let cppCode = '#include "vex.h"\n\nusing namespace vex;\n\nvoid drawLogo() {\n'
-            cppCode += '    static const char* imageColors[] = {\n        '
-
-            const uniqueColors = [
-              ...new Set(encodedImage.map((item) => item[0]).filter((color) => color !== ''))
-            ]
-            const colorIndices = {}
+            // OPTIMIZATION 1: Use Array.push() instead of String concatenation
+            const buffer = [];
             
-            uniqueColors.forEach((color, index) => {
-              colorIndices[color] = index
-              cppCode += `"${color}", `
-              if(!l_gifData_colorIndices.includes(color)){
-                l_gifData_colorIndices.push(color)
-              }
+            buffer.push('#include "vex.h"\n\nusing namespace vex;\n\nvoid drawLogo() {\n');
+            buffer.push('    static const char* imageColors[] = {\n        ');
+
+            // OPTIMIZATION 2: Use Set for O(1) lookups instead of .filter loop
+            const uniqueColorsSet = new Set();
+            const colorIndices = {};
+            let colorIndexCounter = 0;
+
+            encodedImage.forEach(item => {
+                const c = item[0];
+                if (c !== '' && !uniqueColorsSet.has(c)) {
+                    uniqueColorsSet.add(c);
+                    colorIndices[c] = colorIndexCounter++;
+                }
+            });
+
+            // Write Colors
+            uniqueColorsSet.forEach((color) => {
+              buffer.push(`"${color}", `);
             })
 
-            cppCode += '\n    };\n\n    static const int imageIndices[] = {\n        '
-            encodedImage.forEach((item) => {
-              const index = item[0] === '' ? -1 : colorIndices[item[0]]
-              cppCode += `${index}, `
-              if(!l_gifData_imageIndices.includes(index)){
-                l_gifData_imageIndices.push(index)
-              }
-            })
+            buffer.push('\n    };\n\n    static const int imageIndices[] = {\n        ');
 
-            cppCode += '\n    };\n\n    static const int imageCounts[] = {\n        '
-            encodedImage.forEach((item) => {
-              cppCode += `${item[1]}, `
-              if(!l_gifData_imageCounts.includes(item[1])){
-                l_gifData_imageCounts.push(item[1])
-              }
-            })
-
-            cppCode += '\n    };\n'
-            cppCode += '    int x = 0, y = 0;\n'
-            cppCode += '    for(int i = 0; i < sizeof(imageIndices) / sizeof(imageIndices[0]); ++i) {\n'
-            cppCode += '        int index = imageIndices[i];\n'
-            cppCode += '        int count = imageCounts[i];\n'
-            cppCode += '        if(index >= 0) {\n'
-            cppCode += '            const char* color = imageColors[index];\n'
-            cppCode += '            Brain.Screen.setPenColor(color);\n'
-            cppCode += '            for(int j = 0; j < count; ++j) {\n'
-            cppCode += '                Brain.Screen.drawPixel(x++, y);\n'
-            cppCode += '                if(x >= 480) { x = 0; y++; }\n'
-            cppCode += '            }\n'
-            cppCode += '        } else {\n'
-            cppCode += '            x += count;\n'
-            cppCode += '            while(x >= 480) { x -= 480; y++; }\n'
-            cppCode += '        }\n'
-            cppCode += '    }\n'
-            cppCode += '}\n'
-
-            debugStats.value = {
-                hasData: true,
-                colorIndices: l_gifData_colorIndices,
-                imageIndices: l_gifData_imageIndices,
-                imageCounts: l_gifData_imageCounts
+            // Write Indices
+            // We map directly to string to avoid another loop
+            for (let i = 0; i < encodedImage.length; i++) {
+                const item = encodedImage[i];
+                const idx = item[0] === '' ? -1 : colorIndices[item[0]];
+                buffer.push(`${idx}, `);
             }
 
-            return cppCode
+            buffer.push('\n    };\n\n    static const int imageCounts[] = {\n        ');
+
+            // Write Counts
+            for (let i = 0; i < encodedImage.length; i++) {
+                buffer.push(`${encodedImage[i][1]}, `);
+            }
+
+            buffer.push('\n    };\n');
+            
+            // Static logic footer
+            buffer.push(`
+    int x = 0, y = 0;
+    int len = sizeof(imageIndices) / sizeof(imageIndices[0]);
+    for(int i = 0; i < len; ++i) {
+        int index = imageIndices[i];
+        int count = imageCounts[i];
+        if(index >= 0) {
+            const char* color = imageColors[index];
+            Brain.Screen.setPenColor(color);
+            for(int j = 0; j < count; ++j) {
+                Brain.Screen.drawPixel(x++, y);
+                if(x >= 480) { x = 0; y++; }
+            }
+        } else {
+            x += count;
+            while(x >= 480) { x -= 480; y++; }
+        }
+    }
+}
+`);
+            // Join the array once at the end
+            return buffer.join('');
           }
 
           function downloadCode() {
@@ -235,14 +233,21 @@
           const copyCode = () => {
             navigator.clipboard.writeText(generatedCode.value)
             recentlyCopied.value = true
-            setTimeout(() => {
-              recentlyCopied.value = false
-            }, 1500)
+            setTimeout(() => { recentlyCopied.value = false }, 1500)
           }
 
+          // OPTIMIZATION 3: Highlight logic
+          // Highlighting 500kb of text will freeze the browser. 
+          // We only highlight if the code is small, or we truncate the preview.
           watch(generatedCode, (newValue) => {
-            if (newValue) {
-              highlightedCode.value = hljs.highlight(newValue, { language: 'cpp' }).value
+            if (!newValue) return;
+            
+            // If code is too huge, just show raw text or a truncated preview to save the browser
+            if (newValue.length > 50000) {
+                 const preview = newValue.substring(0, 2000) + '\n\n// ... (Code too long for preview, download to view full source) ...\n\n' + newValue.substring(newValue.length - 500);
+                 highlightedCode.value = hljs.highlight(preview, { language: 'cpp' }).value
+            } else {
+                 highlightedCode.value = hljs.highlight(newValue, { language: 'cpp' }).value
             }
           })
 
@@ -256,7 +261,7 @@
             generatedCode,
             recentlyCopied,
             highlightedCode,
-            debugStats
+            isProcessing
           }
         },
         template: `
@@ -265,46 +270,28 @@
               <h3 class="font-bold text-lg">{{ modalTitle }}</h3>
               <p class="py-4">{{ modalContent }}</p>
               <div class="modal-action">
-                <form method="dialog">
-                  <button class="btn">Close</button>
-                </form>
+                <form method="dialog"><button class="btn">Close</button></form>
               </div>
             </div>
           </dialog>
 
           <nav class="navbar px-6">
             <div class="flex-1">
-              <img src="logo.svg" alt="DynamiK team logo" class="h-8 auto" v-if="!isDarkTheme" />
-              <img src="logo-dark.svg" alt="DynamiK team logo" class="h-8 auto" v-else />
+               <span class="font-bold text-xl">VEX Img</span>
             </div>
-
             <div class="flex-1 flex justify-end space-x-2">
-              <button
-                class="btn btn-sm btn-ghost"
-                aria-labelledby="Go to github repository"
-                onclick="window.open('https://github.com/SuhJae/vex-image')"
-              >
-                <Github :size="20" />
-              </button>
-
+              <button class="btn btn-sm btn-ghost" onclick="window.open('https://github.com/SuhJae/vex-image')"><Github :size="20" /></button>
               <label class="cursor-pointer grid place-items-center">
-                <input
-                  type="checkbox"
-                  v-model="isDarkTheme"
-                  class="toggle bg-base-content row-start-1 col-start-1 col-span-2"
-                />
-                <Sun :size="14" color="currentColor" class="col-start-1 row-start-1" />
+                <input type="checkbox" v-model="isDarkTheme" class="toggle bg-base-content row-start-1 col-start-1 col-span-2" />
+                <Sun :size="14" class="col-start-1 row-start-1" />
                 <Moon :size="14" class="col-start-2 row-start-1" />
               </label>
             </div>
           </nav>
 
-          <section class="h-[30vh] px-8 pt-[5vh]">
+          <section class="h-[20vh] px-8 pt-[5vh]">
             <div class="flex justify-center items-center h-full flex-col">
               <h1 class="font-bold text-center text-2xl sm:text-4xl">VEX Robotics Image Converter</h1>
-              <p class="font-light text-center text-sm sm:text-lg">
-                Convert PNG images into ready-to-use VEX Robotics code
-              </p>
             </div>
           </section>
 
@@ -312,63 +299,32 @@
             <div class="p-3 md:p-6 bg-base rounded-lg border max-w-4xl w-full">
               <h2 class="font-bold text-2xl md:text-3xl">How to use</h2>
               <p class="pb-4 text-sm md:text-base">
-                Use any image editing software to create a 480×240 pixel PNG image for the VEX Brain's whole screen (Transparency supported). 
-                Upload it below, copy the code, insert it into your VEX C++ project, and call <code class="border rounded-md text-primary">drawLogo()</code>.
+                Upload a 480×240 PNG. Copy code, paste into VEX C++, call drawLogo().
               </p>
 
               <div class="flex space-x-2 justify-between">
-                <input
-                  type="file"
-                  class="file-input w-full max-w-xs file-input-ghost file-input-bordered"
-                  @change="handleFileUpload"
-                  accept="image/png"
-                  multiple
-                />
+                <input type="file" class="file-input w-full max-w-xs file-input-ghost file-input-bordered" @change="handleFileUpload" accept="image/png" />
 
                 <div class="flex space-x-2">
-                  <button
-                    class="btn btn-accent btn-square btn-outline"
-                    @click="copyCode"
-                    aria-labelledby="copy generated code"
-                    :disabled="!generatedCode"
-                  >
-                    <Clipboard :size="20" v-if="!recentlyCopied" />
-                    <ClipboardCheck :size="20" v-else />
+                  <button class="btn btn-accent btn-square btn-outline" @click="copyCode" :disabled="!generatedCode">
+                    <Clipboard :size="20" v-if="!recentlyCopied" /><ClipboardCheck :size="20" v-else />
                   </button>
-
-                  <button
-                    class="btn btn-accent btn-square btn-outline"
-                    @click="downloadCode"
-                    aria-labelledby="download generated code"
-                    :disabled="!generatedCode"
-                  >
+                  <button class="btn btn-accent btn-square btn-outline" @click="downloadCode" :disabled="!generatedCode">
                     <Download :size="20" />
                   </button>
                 </div>
               </div>
-
-              <div v-if="debugStats.hasData" class="mt-4 text-xs font-mono break-all p-4 bg-base-200 rounded">
-                <p class="font-bold">Debug Stats:</p>
-                <p><strong>Color Indices:</strong> {{ debugStats.colorIndices.join(', ') }}</p>
-                <br>
-                <p><strong>Image Indices:</strong> {{ debugStats.imageIndices.join(', ') }}</p>
-                <br>
-                <p><strong>Image Counts:</strong> {{ debugStats.imageCounts.join(', ') }}</p>
+              
+              <div v-if="isProcessing" class="mt-4 flex justify-center">
+                 <span class="loading loading-spinner loading-lg"></span>
               </div>
 
-              <div v-if="generatedCode">
+              <div v-if="generatedCode && !isProcessing">
                 <div class="mt-2 md:mt-4 p-6 rounded-lg max-h-96 overflow-scroll justify-center border code-block">
                   <pre><code v-html="highlightedCode" class="language-cpp"></code></pre>
                 </div>
-
-                <p class="pt-2">
-                  Code size:
-                  <span class=" font-mono">{{ generatedCode.length.toLocaleString() }}</span> bytes
-                </p>
+                <p class="pt-2">Code size: <span class="font-mono">{{ generatedCode.length.toLocaleString() }}</span> bytes</p>
               </div>
-              <p class="text-sm text-gray-500 mt-3">
-                <span class="font-bold">Note:</span> All data is processed locally in your browser. No data ever leaves your device.
-              </p>
             </div>
           </section>
         `

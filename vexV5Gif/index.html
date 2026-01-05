@@ -1,204 +1,159 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VEX Robotics Image Converter</title>
+<script type="module">
+  import { createApp, ref, watch, onMounted, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  import { Sun, Moon, Download, Clipboard, ClipboardCheck, Github } from 'https://esm.sh/lucide-vue-next'
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js'
+  import cpp from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/languages/cpp.min.js'
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;700&display=swap"
-      rel="stylesheet"
-    />
+  hljs.registerLanguage('cpp', cpp);
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-    />
+  const App = {
+    components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Github },
+    setup() {
+      // ========== Theme Management ==========
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      const isDarkTheme = ref(prefersDark)
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-      body {
-        font-family: 'IBM Plex Sans', sans-serif;
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+          isDarkTheme.value = event.matches
+        })
       }
-      [data-theme='light'] .code-block {
-        scrollbar-color: #e5e7eb transparent;
-        scrollbar-width: thin;
+
+      onMounted(() => {
+        watch(isDarkTheme, (newValue) => {
+          document.documentElement.setAttribute('data-theme', newValue ? 'dark' : 'light')
+        }, { immediate: true })
+      })
+
+      // ========== Code Generation ==========
+      const uploadedImage = ref(null)
+      const generatedCode = ref('')
+      const highlightedCode = ref('')
+      const isProcessing = ref(false) // UI Loading state
+      const modalTitle = ref('')
+      const modalContent = ref('')
+      const recentlyCopied = ref(false)
+
+      function handleFileUpload(event) {
+        const file = event.target.files[0]
+        if (file) {
+          const img = new Image()
+          img.onload = function () {
+            if (img.width === 480 && img.height === 240) {
+              uploadedImage.value = img
+              // Use setTimeout to allow the UI to update "isProcessing" before freezing for calculation
+              isProcessing.value = true
+              setTimeout(() => {
+                processImage()
+                isProcessing.value = false
+              }, 50)
+            } else {
+              modalTitle.value = 'Invalid Image Size'
+              modalContent.value = `Image must be PNG format and have a size of 480×240 pixels. Your image is ${img.width}×${img.height} pixels.`
+              document.getElementById('my_modal_1').showModal()
+              event.target.value = ''
+            }
+          }
+          img.src = URL.createObjectURL(file)
+        }
       }
-      [data-theme='dark'] .code-block {
-        scrollbar-color: #1b1f25 transparent;
-        scrollbar-width: thin;
+
+      function processImage() {
+        const canvas = document.createElement('canvas')
+        canvas.width = uploadedImage.value.width
+        canvas.height = uploadedImage.value.height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(uploadedImage.value, 0, 0)
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+
+        const encodedImage = encodeImage(imageData, canvas.width, canvas.height)
+        generatedCode.value = generateCpp(encodedImage)
       }
-      /* Fix for pre/code block scrolling */
-      pre { margin: 0; }
-    </style>
-  </head>
-  <body>
-    <div id="app"></div>
 
-    <script type="module">
-      import { createApp, ref, watch, onMounted, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-      import { Sun, Moon, Download, Clipboard, ClipboardCheck, Github } from 'https://esm.sh/lucide-vue-next'
-      import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js'
-      import cpp from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/languages/cpp.min.js'
+      function encodeImage(imageData, width, height) {
+        // Pre-allocate array estimate to avoid constant resizing (optional but good)
+        let encodedImage = []
+        let currentColor = null
+        let repeatCount = 0
 
-      hljs.registerLanguage('cpp', cpp);
+        // Cache data length for slight speedup
+        const totalPixels = width * height;
 
-      const App = {
-        components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Github },
-        setup() {
-          // ========== Theme Management ==========
-          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-          const isDarkTheme = ref(prefersDark)
+        for (let i = 0; i < totalPixels; i++) {
+          const index = i * 4;
+          const r = imageData[index]
+          const g = imageData[index + 1]
+          const b = imageData[index + 2]
+          const a = imageData[index + 3]
+          let color = '' // Empty string represents transparent/skip
 
-          if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-              isDarkTheme.value = event.matches
-            })
+          if (a !== 0) {
+            // Optimization: Bitwise is faster, but your hex approach is fine. 
+            // Keeping your logic for consistency, just cleaned up.
+            color = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
           }
 
-          onMounted(() => {
-            watch(isDarkTheme, (newValue) => {
-              document.documentElement.setAttribute('data-theme', newValue ? 'dark' : 'light')
-            }, { immediate: true })
-          })
-
-          // ========== Code Generation ==========
-          const uploadedImage = ref(null)
-          const generatedCode = ref('')
-          const highlightedCode = ref('')
-          const isProcessing = ref(false) // UI Loading state
-          const modalTitle = ref('')
-          const modalContent = ref('')
-          const recentlyCopied = ref(false)
-
-          function handleFileUpload(event) {
-            const file = event.target.files[0]
-            if (file) {
-              const img = new Image()
-              img.onload = function () {
-                if (img.width === 480 && img.height === 240) {
-                  uploadedImage.value = img
-                  // Use setTimeout to allow the UI to update "isProcessing" before freezing for calculation
-                  isProcessing.value = true
-                  setTimeout(() => {
-                      processImage()
-                      isProcessing.value = false
-                  }, 50)
-                } else {
-                  modalTitle.value = 'Invalid Image Size'
-                  modalContent.value = `Image must be PNG format and have a size of 480×240 pixels. Your image is ${img.width}×${img.height} pixels.`
-                  document.getElementById('my_modal_1').showModal()
-                  event.target.value = ''
-                }
-              }
-              img.src = URL.createObjectURL(file)
+          if (color === currentColor) {
+            repeatCount++
+          } else {
+            if (currentColor !== null) {
+              encodedImage.push([currentColor, repeatCount])
             }
+            currentColor = color
+            repeatCount = 1
           }
+        }
+        // Push the final run
+        encodedImage.push([currentColor, repeatCount])
+        return encodedImage
+      }
 
-          function processImage() {
-            const canvas = document.createElement('canvas')
-            canvas.width = uploadedImage.value.width
-            canvas.height = uploadedImage.value.height
-            const ctx = canvas.getContext('2d')
-            ctx.drawImage(uploadedImage.value, 0, 0)
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      function generateCpp(encodedImage) {
+        // OPTIMIZATION 1: Use Array.push() instead of String concatenation
+        const buffer = [];
 
-            const encodedImage = encodeImage(imageData, canvas.width, canvas.height)
-            generatedCode.value = generateCpp(encodedImage)
+        buffer.push('#include "vex.h"\n\nusing namespace vex;\n\nvoid drawLogo() {\n');
+        buffer.push('    static const char* imageColors[] = {\n        ');
+
+        // OPTIMIZATION 2: Use Set for O(1) lookups instead of .filter loop
+        const uniqueColorsSet = new Set();
+        const colorIndices = {};
+        let colorIndexCounter = 0;
+
+        encodedImage.forEach(item => {
+          const c = item[0];
+          if (c !== '' && !uniqueColorsSet.has(c)) {
+            uniqueColorsSet.add(c);
+            colorIndices[c] = colorIndexCounter++;
           }
+        });
 
-          function encodeImage(imageData, width, height) {
-            // Pre-allocate array estimate to avoid constant resizing (optional but good)
-            let encodedImage = []
-            let currentColor = null
-            let repeatCount = 0
+        // Write Colors
+        uniqueColorsSet.forEach((color) => {
+          buffer.push(`"${color}", `);
+        })
 
-            // Cache data length for slight speedup
-            const totalPixels = width * height; 
-            
-            for (let i = 0; i < totalPixels; i++) {
-                const index = i * 4;
-                const r = imageData[index]
-                const g = imageData[index + 1]
-                const b = imageData[index + 2]
-                const a = imageData[index + 3]
-                let color = '' // Empty string represents transparent/skip
+        buffer.push('\n    };\n\n    static const int imageIndices[] = {\n        ');
 
-                if (a !== 0) {
-                   // Optimization: Bitwise is faster, but your hex approach is fine. 
-                   // Keeping your logic for consistency, just cleaned up.
-                   color = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
-                }
+        // Write Indices
+        // We map directly to string to avoid another loop
+        for (let i = 0; i < encodedImage.length; i++) {
+          const item = encodedImage[i];
+          const idx = item[0] === '' ? -1 : colorIndices[item[0]];
+          buffer.push(`${idx}, `);
+        }
 
-                if (color === currentColor) {
-                  repeatCount++
-                } else {
-                  if (currentColor !== null) {
-                    encodedImage.push([currentColor, repeatCount])
-                  }
-                  currentColor = color
-                  repeatCount = 1
-                }
-            }
-            // Push the final run
-            encodedImage.push([currentColor, repeatCount])
-            return encodedImage
-          }
+        buffer.push('\n    };\n\n    static const int imageCounts[] = {\n        ');
 
-          function generateCpp(encodedImage) {
-            // OPTIMIZATION 1: Use Array.push() instead of String concatenation
-            const buffer = [];
-            
-            buffer.push('#include "vex.h"\n\nusing namespace vex;\n\nvoid drawLogo() {\n');
-            buffer.push('    static const char* imageColors[] = {\n        ');
+        // Write Counts
+        for (let i = 0; i < encodedImage.length; i++) {
+          buffer.push(`${encodedImage[i][1]}, `);
+        }
 
-            // OPTIMIZATION 2: Use Set for O(1) lookups instead of .filter loop
-            const uniqueColorsSet = new Set();
-            const colorIndices = {};
-            let colorIndexCounter = 0;
+        buffer.push('\n    };\n');
 
-            encodedImage.forEach(item => {
-                const c = item[0];
-                if (c !== '' && !uniqueColorsSet.has(c)) {
-                    uniqueColorsSet.add(c);
-                    colorIndices[c] = colorIndexCounter++;
-                }
-            });
-
-            // Write Colors
-            uniqueColorsSet.forEach((color) => {
-              buffer.push(`"${color}", `);
-            })
-
-            buffer.push('\n    };\n\n    static const int imageIndices[] = {\n        ');
-
-            // Write Indices
-            // We map directly to string to avoid another loop
-            for (let i = 0; i < encodedImage.length; i++) {
-                const item = encodedImage[i];
-                const idx = item[0] === '' ? -1 : colorIndices[item[0]];
-                buffer.push(`${idx}, `);
-            }
-
-            buffer.push('\n    };\n\n    static const int imageCounts[] = {\n        ');
-
-            // Write Counts
-            for (let i = 0; i < encodedImage.length; i++) {
-                buffer.push(`${encodedImage[i][1]}, `);
-            }
-
-            buffer.push('\n    };\n');
-            
-            // Static logic footer
-            buffer.push(`
+        // Static logic footer
+        buffer.push(`
     int x = 0, y = 0;
     int len = sizeof(imageIndices) / sizeof(imageIndices[0]);
     for(int i = 0; i < len; ++i) {
@@ -218,53 +173,53 @@
     }
 }
 `);
-            // Join the array once at the end
-            return buffer.join('');
-          }
+        // Join the array once at the end
+        return buffer.join('');
+      }
 
-          function downloadCode() {
-            const blob = new Blob([generatedCode.value], { type: 'text/plain' })
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = 'imageCode.cpp'
-            link.click()
-          }
+      function downloadCode() {
+        const blob = new Blob([generatedCode.value], { type: 'text/plain' })
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = 'imageCode.cpp'
+        link.click()
+      }
 
-          const copyCode = () => {
-            navigator.clipboard.writeText(generatedCode.value)
-            recentlyCopied.value = true
-            setTimeout(() => { recentlyCopied.value = false }, 1500)
-          }
+      const copyCode = () => {
+        navigator.clipboard.writeText(generatedCode.value)
+        recentlyCopied.value = true
+        setTimeout(() => { recentlyCopied.value = false }, 1500)
+      }
 
-          // OPTIMIZATION 3: Highlight logic
-          // Highlighting 500kb of text will freeze the browser. 
-          // We only highlight if the code is small, or we truncate the preview.
-          watch(generatedCode, (newValue) => {
-            if (!newValue) return;
-            
-            // If code is too huge, just show raw text or a truncated preview to save the browser
-            if (newValue.length > 50000) {
-                 const preview = newValue.substring(0, 2000) + '\n\n// ... (Code too long for preview, download to view full source) ...\n\n' + newValue.substring(newValue.length - 500);
-                 highlightedCode.value = hljs.highlight(preview, { language: 'cpp' }).value
-            } else {
-                 highlightedCode.value = hljs.highlight(newValue, { language: 'cpp' }).value
-            }
-          })
+      // OPTIMIZATION 3: Highlight logic
+      // Highlighting 500kb of text will freeze the browser. 
+      // We only highlight if the code is small, or we truncate the preview.
+      watch(generatedCode, (newValue) => {
+        if (!newValue) return;
 
-          return {
-            isDarkTheme,
-            modalTitle,
-            modalContent,
-            handleFileUpload,
-            copyCode,
-            downloadCode,
-            generatedCode,
-            recentlyCopied,
-            highlightedCode,
-            isProcessing
-          }
-        },
-        template: `
+        // If code is too huge, just show raw text or a truncated preview to save the browser
+        if (newValue.length > 50000) {
+          const preview = newValue.substring(0, 2000) + '\n\n// ... (Code too long for preview, download to view full source) ...\n\n' + newValue.substring(newValue.length - 500);
+          highlightedCode.value = hljs.highlight(preview, { language: 'cpp' }).value
+        } else {
+          highlightedCode.value = hljs.highlight(newValue, { language: 'cpp' }).value
+        }
+      })
+
+      return {
+        isDarkTheme,
+        modalTitle,
+        modalContent,
+        handleFileUpload,
+        copyCode,
+        downloadCode,
+        generatedCode,
+        recentlyCopied,
+        highlightedCode,
+        isProcessing
+      }
+    },
+    template: `
           <dialog id="my_modal_1" class="modal">
             <div class="modal-box">
               <h3 class="font-bold text-lg">{{ modalTitle }}</h3>
@@ -328,9 +283,7 @@
             </div>
           </section>
         `
-      }
+  }
 
-      createApp(App).mount('#app')
-    </script>
-  </body>
-</html>
+  createApp(App).mount('#app')
+</script>

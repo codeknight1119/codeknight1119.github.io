@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VEX Robotics Image Converter (Optimized)</title>
+    <title>VEX Animation Converter (High Performance)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,31 +11,20 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;700&display=swap"
       rel="stylesheet"
     />
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-    />
-
     <link
       href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
       rel="stylesheet"
       type="text/css"
     />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
 
     <style>
-      body {
-        font-family: 'IBM Plex Sans', sans-serif;
-      }
-      [data-theme='light'] .code-block {
-        scrollbar-color: #e5e7eb transparent;
-        scrollbar-width: thin;
-      }
-      [data-theme='dark'] .code-block {
-        scrollbar-color: #1b1f25 transparent;
-        scrollbar-width: thin;
-      }
+      body { font-family: 'IBM Plex Sans', sans-serif; }
       pre { margin: 0; }
     </style>
   </head>
@@ -43,341 +32,304 @@
     <div id="app"></div>
 
     <script type="module">
-      import { createApp, ref, watch, onMounted, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-      import { Sun, Moon, Download, Clipboard, ClipboardCheck, Github } from 'https://esm.sh/lucide-vue-next'
-      import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js'
-      import cpp from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/languages/cpp.min.js'
-
-      hljs.registerLanguage('cpp', cpp);
+      import { createApp, ref, watch, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+      import { Sun, Moon, Download, Clipboard, ClipboardCheck, Layers } from 'https://esm.sh/lucide-vue-next'
 
       const App = {
-        components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Github },
+        components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Layers },
         setup() {
-          // ========== Theme Management ==========
-          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-          const isDarkTheme = ref(prefersDark)
+          // --- Theme & UI State ---
+          const isDark = ref(true)
+          const compressionLevel = ref(15) // Default 15% fuzziness
+          const isProcessing = ref(false)
+          
+          // --- Data ---
+          const frames = ref([]) // Array of processed frame objects
+          const generatedCode = ref('')
+          const previewCode = ref('')
+          const stats = ref({ sizeKB: 0, ramSaved: 0, totalFrames: 0 })
 
-          if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-              isDarkTheme.value = event.matches
+          onMounted(() => {
+            document.documentElement.setAttribute('data-theme', 'dark')
+          })
+
+          const toggleTheme = () => {
+            isDark.value = !isDark.value
+            document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
+          }
+
+          // --- Core Logic ---
+          
+          function handleFileUpload(event) {
+            const files = Array.from(event.target.files)
+            if (!files.length) return
+
+            // Sort files by name to ensure animation order is correct
+            files.sort((a, b) => a.name.localeCompare(b.name))
+
+            isProcessing.value = true
+            frames.value = [] // Reset
+            
+            // Process sequentially
+            let loaded = 0
+            files.forEach(file => {
+                const img = new Image()
+                img.onload = () => {
+                    if (img.width !== 480 || img.height !== 240) {
+                        alert(`Error: ${file.name} is ${img.width}x${img.height}. Must be 480x240.`)
+                    } else {
+                        frames.value.push({ img, name: file.name })
+                    }
+                    loaded++
+                    if(loaded === files.length) processAllFrames()
+                }
+                img.src = URL.createObjectURL(file)
             })
           }
 
-          onMounted(() => {
-            watch(
-              isDarkTheme,
-              (newValue) => {
-                document.documentElement.setAttribute('data-theme', newValue ? 'dark' : 'light')
-              },
-              { immediate: true }
-            )
-          })
-
-          // ========== Code Generation ==========
-          const uploadedImage = ref(null)
-          const generatedCode = ref('')
-          const highlightedPreview = ref('') // Store only a preview for UI
-          const modalTitle = ref('')
-          const modalContent = ref('')
-          const recentlyCopied = ref(false)
-          const isProcessing = ref(false)
-
-          const debugStats = ref({
-            hasData: false,
-            uniqueColors: 0,
-            totalBlocks: 0,
-            uniqueCounts: 0
-          })
-
-          function handleFileUpload(event) {
-            const file = event.target.files[0]
-            if (file) {
-              const img = new Image()
-              img.onload = function () {
-                if (img.width === 480 && img.height === 240) {
-                  uploadedImage.value = img
-                  processImage()
-                } else {
-                  modalTitle.value = 'Invalid Image Size'
-                  modalContent.value = `Image must be PNG format and have a size of 480×240 pixels. Your image is ${img.width}×${img.height} pixels.`
-                  document.getElementById('my_modal_1').showModal()
-                  event.target.value = ''
-                }
-              }
-              img.src = URL.createObjectURL(file)
-            }
+          async function processAllFrames() {
+             // Delay to let UI render "Processing" state
+             setTimeout(() => {
+                 const allFrameData = frames.value.map(f => encodeFrame(f.img))
+                 generatedCode.value = generateCpp(allFrameData)
+                 
+                 // Create preview
+                 const lines = generatedCode.value.split('\n')
+                 previewCode.value = lines.slice(0, 50).join('\n') + `\n\n// ... (${lines.length} lines total) ...`
+                 
+                 isProcessing.value = false
+             }, 100)
           }
 
-          async function processImage() {
-            isProcessing.value = true;
-            // Use setTimeout to allow UI to update to "Processing" state before heavy lifting
-            setTimeout(() => {
-                const canvas = document.createElement('canvas')
-                canvas.width = uploadedImage.value.width
-                canvas.height = uploadedImage.value.height
-                const ctx = canvas.getContext('2d')
-                ctx.drawImage(uploadedImage.value, 0, 0)
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+          function encodeFrame(imageElement) {
+            const canvas = document.createElement('canvas')
+            canvas.width = 480; canvas.height = 240;
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(imageElement, 0, 0)
+            const data = ctx.getImageData(0, 0, 480, 240).data
+            
+            // Quantization Factor (0-255)
+            // Higher compression = divide colors into larger buckets
+            const q = Math.max(1, Math.floor((compressionLevel.value / 100) * 80)) 
 
-                const encodedImage = encodeImage(imageData, canvas.width, canvas.height)
-                generatedCode.value = generateCpp(encodedImage)
-                isProcessing.value = false;
-            }, 50);
-          }
-
-          function encodeImage(imageData, width, height) {
-            let encodedImage = []
+            let encoded = []
             let currentColor = null
-            let repeatCount = 0
+            let count = 0
 
-            // Optimized loop
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
-                const index = (y * width + x) * 4
-                const a = imageData[index + 3]
+            for (let i = 0; i < data.length; i += 4) {
+                // Skip fully transparent pixels (treat as black/background)
+                if (data[i+3] === 0) {
+                    if (currentColor !== null) { encoded.push({c: currentColor, n: count}); }
+                    currentColor = "TRANSPARENT"; count = 1; continue;
+                }
+
+                // Color Quantization: Round to nearest bucket
+                // This forces slightly different pixels to be identical, increasing run-length
+                const r = Math.round(data[i] / q) * q
+                const g = Math.round(data[i+1] / q) * q
+                const b = Math.round(data[i+2] / q) * q
                 
-                let color = ''
-                if (a !== 0) {
-                  // Pre-calc hex strings for speed
-                  const r = imageData[index].toString(16).padStart(2, '0')
-                  const g = imageData[index + 1].toString(16).padStart(2, '0')
-                  const b = imageData[index + 2].toString(16).padStart(2, '0')
-                  color = `#${r}${g}${b}`
-                }
+                // Convert to hex
+                const hex = `#${Math.min(255,r).toString(16).padStart(2,'0')}${Math.min(255,g).toString(16).padStart(2,'0')}${Math.min(255,b).toString(16).padStart(2,'0')}`
 
-                if (color === currentColor) {
-                  repeatCount++
+                if (hex === currentColor) {
+                    count++
                 } else {
-                  if (currentColor !== null) {
-                    encodedImage.push([currentColor, repeatCount])
-                  }
-                  currentColor = color
-                  repeatCount = 1
+                    if (currentColor !== null) encoded.push({c: currentColor, n: count})
+                    currentColor = hex
+                    count = 1
                 }
-              }
             }
-            encodedImage.push([currentColor, repeatCount])
-            return encodedImage
+            encoded.push({c: currentColor, n: count})
+            return encoded
           }
 
-          function generateCpp(encodedImage) {
-            // OPTIMIZATION 1: Use Maps/Sets for O(1) lookups instead of .includes() loop
-            const uniqueColors = [...new Set(encodedImage.map((item) => item[0]).filter((color) => color !== ''))]
-            const colorIndices = new Map(uniqueColors.map((color, index) => [color, index]))
-            
-            // OPTIMIZATION 2: Use Array.join() instead of string concatenation +=
-            // This prevents memory thrashing and huge GC pauses
-            const buffer = []
+          function generateCpp(allFrames) {
+             const buffer = []
+             
+             // 1. Header
+             buffer.push('#include "vex.h"\nusing namespace vex;\n\n')
+             buffer.push('// Optimized Animation Code\n')
+             buffer.push(`// Frames: ${allFrames.length} | Compression: ${compressionLevel.value}%\n\n`)
 
-            buffer.push('#include "vex.h"\n\nusing namespace vex;\n\nvoid drawLogo() {\n')
-            
-            // 1. Colors Array
-            buffer.push('    static const char* imageColors[] = {\n        ')
-            // Map colors to quoted strings
-            buffer.push(uniqueColors.map(c => `"${c}"`).join(', '))
-            buffer.push('\n    };\n\n')
+             // 2. Global Color Table (Deduplicated across ALL frames to save space)
+             const globalColors = new Set()
+             allFrames.forEach(frame => frame.forEach(p => {
+                 if(p.c !== "TRANSPARENT") globalColors.add(p.c)
+             }))
+             const colorArray = Array.from(globalColors)
+             const colorMap = new Map(colorArray.map((c, i) => [c, i]))
 
-            // 2. Indices Array
-            buffer.push('    static const int imageIndices[] = {\n        ')
-            // Map encoded image to indices efficiently
-            const indices = encodedImage.map(item => item[0] === '' ? -1 : colorIndices.get(item[0]))
-            buffer.push(indices.join(', '))
-            buffer.push('\n    };\n\n')
+             buffer.push(`static const char* globalColors[] = { ${colorArray.map(c => `"${c}"`).join(', ')} };\n\n`)
 
-            // 3. Counts Array
-            buffer.push('    static const int imageCounts[] = {\n        ')
-            const counts = encodedImage.map(item => item[1])
-            buffer.push(counts.join(', '))
-            buffer.push('\n    };\n')
+             // 3. Frame Data
+             const framePointers = []
+             
+             allFrames.forEach((frame, index) => {
+                 // Determine smallest safe data type for this frame
+                 const maxColorIndex = colorArray.length
+                 const maxRunLength = Math.max(...frame.map(p => p.n))
+                 
+                 const typeColor = maxColorIndex < 256 ? 'uint8_t' : 'int'
+                 const typeCount = maxRunLength < 256 ? 'uint8_t' : 'int'
 
-            // 4. Logic Boilerplate
-            buffer.push(`
-    int x = 0, y = 0;
-    // Calculate size dynamically
-    int totalOps = sizeof(imageIndices) / sizeof(imageIndices[0]);
+                 buffer.push(`// --- Frame ${index} ---\n`)
+                 
+                 // Indices
+                 buffer.push(`static const ${typeColor} f${index}_ind[] = {`)
+                 buffer.push(frame.map(p => p.c === "TRANSPARENT" ? -1 : colorMap.get(p.c)).join(','))
+                 buffer.push('};\n')
+
+                 // Counts
+                 buffer.push(`static const ${typeCount} f${index}_cnt[] = {`)
+                 buffer.push(frame.map(p => p.n).join(','))
+                 buffer.push('};\n\n')
+                 
+                 framePointers.push(`    { (void*)f${index}_ind, (void*)f${index}_cnt, ${frame.length}, sizeof(${typeColor}), sizeof(${typeCount}) }`)
+             })
+
+             // 4. Frame Registry
+             buffer.push('typedef struct { void* ind; void* cnt; int len; int s_ind; int s_cnt; } FrameData;\n')
+             buffer.push('static const FrameData frames[] = {\n')
+             buffer.push(framePointers.join(',\n'))
+             buffer.push('\n};\n\n')
+
+             // 5. Draw Function (Optimized with drawRectangle)
+             buffer.push(`
+void drawFrame(int frameIndex, int x_offset = 0, int y_offset = 0) {
+    if(frameIndex < 0 || frameIndex >= ${allFrames.length}) return;
     
-    for(int i = 0; i < totalOps; ++i) {
-        int index = imageIndices[i];
-        int count = imageCounts[i];
-        if(index >= 0) {
-            const char* color = imageColors[index];
-            Brain.Screen.setPenColor(color);
-            for(int j = 0; j < count; ++j) {
-                Brain.Screen.drawPixel(x++, y);
+    FrameData f = frames[frameIndex];
+    int x = 0, y = 0;
+    
+    // Pointers for variable byte-width reading
+    uint8_t* ind8 = (uint8_t*)f.ind; int* ind32 = (int*)f.ind;
+    uint8_t* cnt8 = (uint8_t*)f.cnt; int* cnt32 = (int*)f.cnt;
+
+    for(int i = 0; i < f.len; i++) {
+        // Read flexible data types
+        int colorIdx = (f.s_ind == 1) ? (int)ind8[i] : ind32[i];
+        if (f.s_ind == 1 && ind8[i] == 255) colorIdx = -1; // Handle uint8 -1 cast
+
+        int count = (f.s_cnt == 1) ? (int)cnt8[i] : cnt32[i];
+
+        if(colorIdx >= 0) {
+            Brain.Screen.setPenColor(globalColors[colorIdx]);
+            Brain.Screen.setFillColor(globalColors[colorIdx]);
+            
+            // Draw Rectangle logic for speed (handles wrapping)
+            int remaining = count;
+            while(remaining > 0) {
+                int spaceOnLine = 480 - x;
+                int drawW = (remaining < spaceOnLine) ? remaining : spaceOnLine;
+                
+                Brain.Screen.drawRectangle(x + x_offset, y + y_offset, drawW, 1);
+                
+                x += drawW;
+                remaining -= drawW;
                 if(x >= 480) { x = 0; y++; }
             }
         } else {
+            // Skip transparent pixels
             x += count;
             while(x >= 480) { x -= 480; y++; }
         }
     }
-}
-`)
-            
-            // Calculate Debug stats efficiently using Sets
-            const uniqueCountsSet = new Set(counts);
-            debugStats.value = {
-                hasData: true,
-                uniqueColors: uniqueColors.length,
-                totalBlocks: indices.length,
-                uniqueCounts: uniqueCountsSet.size
-            }
-
-            return buffer.join('')
+}`)
+             
+             // Calculate stats
+             stats.value.sizeKB = (buffer.join('').length / 1024).toFixed(1)
+             stats.value.totalFrames = allFrames.length
+             
+             return buffer.join('')
           }
 
-          function downloadCode() {
-            const blob = new Blob([generatedCode.value], { type: 'text/plain' })
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = 'imageCode.cpp'
-            link.click()
+          const download = () => {
+             const blob = new Blob([generatedCode.value], {type: 'text/plain'})
+             const link = document.createElement('a')
+             link.href = URL.createObjectURL(blob); link.download = 'meme_animation.cpp'; link.click()
           }
 
-          const copyCode = () => {
-            navigator.clipboard.writeText(generatedCode.value)
-            recentlyCopied.value = true
-            setTimeout(() => {
-              recentlyCopied.value = false
-            }, 1500)
+          const copy = () => {
+             navigator.clipboard.writeText(generatedCode.value)
+             alert("Copied to clipboard!")
           }
 
-          // OPTIMIZATION 3: Only highlight a preview of the code
-          // Highlighting 5MB of C++ code crashes the browser. We show the first 2000 chars.
-          watch(generatedCode, (newValue) => {
-            if (newValue) {
-              const previewLimit = 2000;
-              const isTruncated = newValue.length > previewLimit;
-              const snippet = newValue.substring(0, previewLimit) + (isTruncated ? '\n\n// ... Code truncated for preview. Download to see full file ...' : '');
-              highlightedPreview.value = hljs.highlight(snippet, { language: 'cpp' }).value
-            }
+          // Watch slider changes to re-process if image exists
+          watch(compressionLevel, () => {
+              if(frames.value.length > 0) processAllFrames()
           })
 
-          return {
-            isDarkTheme,
-            modalTitle,
-            modalContent,
-            handleFileUpload,
-            copyCode,
-            downloadCode,
-            generatedCode,
-            recentlyCopied,
-            highlightedPreview,
-            debugStats,
-            isProcessing
-          }
+          return { isDark, toggleTheme, handleFileUpload, download, copy, previewCode, stats, isProcessing, compressionLevel }
         },
         template: `
-          <dialog id="my_modal_1" class="modal">
-            <div class="modal-box">
-              <h3 class="font-bold text-lg">{{ modalTitle }}</h3>
-              <p class="py-4">{{ modalContent }}</p>
-              <div class="modal-action">
-                <form method="dialog">
-                  <button class="btn">Close</button>
-                </form>
-              </div>
-            </div>
-          </dialog>
-
-          <nav class="navbar px-6 border-b border-base-200">
-             <div class="flex-1 font-bold text-xl">
-               VEX Converter
-            </div>
-
-            <div class="flex-1 flex justify-end space-x-2">
-              <button
-                class="btn btn-sm btn-ghost"
-                onclick="window.open('https://github.com/SuhJae/vex-image')"
-              >
-                <Github :size="20" />
-              </button>
-
-              <label class="cursor-pointer grid place-items-center">
-                <input
-                  type="checkbox"
-                  v-model="isDarkTheme"
-                  class="toggle bg-base-content row-start-1 col-start-1 col-span-2"
-                />
-                <Sun :size="14" color="currentColor" class="col-start-1 row-start-1" />
-                <Moon :size="14" class="col-start-2 row-start-1" />
-              </label>
-            </div>
-          </nav>
-
-          <section class="h-[25vh] px-8 flex justify-center items-center flex-col">
-              <h1 class="font-bold text-center text-3xl sm:text-4xl mb-2">VEX Robotics Image Converter</h1>
-              <p class="font-light text-center text-lg opacity-80">
-                Optimized high-performance PNG to C++ converter
-              </p>
-          </section>
-
-          <section class="flex justify-center items-center p-4">
-            <div class="p-3 md:p-6 bg-base-100 rounded-lg border border-base-300 max-w-4xl w-full shadow-sm">
-              <h2 class="font-bold text-2xl mb-4">Upload Image</h2>
-              
-              <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-                <input
-                  type="file"
-                  class="file-input w-full max-w-xs file-input-bordered file-input-primary"
-                  @change="handleFileUpload"
-                  accept="image/png"
-                />
-
-                <div class="flex space-x-2">
-                  <button
-                    class="btn btn-primary"
-                    @click="copyCode"
-                    :disabled="!generatedCode"
-                  >
-                    <Clipboard :size="20" v-if="!recentlyCopied" />
-                    <ClipboardCheck :size="20" v-else />
-                    Copy
-                  </button>
-
-                  <button
-                    class="btn btn-secondary"
-                    @click="downloadCode"
-                    :disabled="!generatedCode"
-                  >
-                    <Download :size="20" />
-                    Download
-                  </button>
+          <div class="min-h-screen bg-base-100 text-base-content p-4 md:p-8">
+            <nav class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-2 font-bold text-2xl">
+                    <Layers class="text-primary" /> VEX Animator
                 </div>
-              </div>
+                <button @click="toggleTheme" class="btn btn-circle btn-ghost">
+                    <Sun v-if="!isDark" /><Moon v-else />
+                </button>
+            </nav>
 
-              <div v-if="isProcessing" class="mt-4 flex items-center justify-center p-4 text-warning">
-                <span class="loading loading-spinner loading-md mr-2"></span> Processing heavy image data...
-              </div>
+            <main class="max-w-4xl mx-auto space-y-6">
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title">1. Upload Frames</h2>
+                        <p class="text-sm opacity-75">Select all PNG images (480x240) for your meme/animation at once.</p>
+                        <input type="file" multiple accept="image/png" @change="handleFileUpload" class="file-input file-input-bordered file-input-primary w-full" />
+                        
+                        <div class="divider"></div>
+                        
+                        <h2 class="card-title flex justify-between">
+                            2. Compression Level 
+                            <span class="text-primary">{{ compressionLevel }}%</span>
+                        </h2>
+                        <input type="range" min="0" max="60" v-model="compressionLevel" class="range range-primary" />
+                        <p class="text-xs mt-2">
+                           0% = Perfect Quality (Huge Size). 
+                           20% = Good for Memes (Small Size). 
+                           <span class="text-warning">Increase this if your code crashes the robot!</span>
+                        </p>
+                    </div>
+                </div>
 
-              <div v-if="debugStats.hasData && !isProcessing" class="mt-6 grid grid-cols-3 gap-4 text-center">
-                <div class="stat bg-base-200 rounded-lg p-2">
-                   <div class="stat-title text-xs">Colors</div>
-                   <div class="stat-value text-lg">{{ debugStats.uniqueColors }}</div>
+                <div v-if="isProcessing" class="alert alert-info">
+                    <span class="loading loading-spinner"></span> Processing Animation...
                 </div>
-                <div class="stat bg-base-200 rounded-lg p-2">
-                   <div class="stat-title text-xs">Blocks</div>
-                   <div class="stat-value text-lg">{{ debugStats.totalBlocks.toLocaleString() }}</div>
-                </div>
-                <div class="stat bg-base-200 rounded-lg p-2">
-                   <div class="stat-title text-xs">Run Lengths</div>
-                   <div class="stat-value text-lg">{{ debugStats.uniqueCounts }}</div>
-                </div>
-              </div>
 
-              <div v-if="generatedCode && !isProcessing" class="mt-6">
-                <div class="mockup-code bg-[#282c34] text-white">
-                    <pre><code v-html="highlightedPreview"></code></pre>
+                <div v-if="previewCode && !isProcessing" class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h2 class="card-title">Generated C++</h2>
+                                <div class="badge badge-success gap-2 mt-1">
+                                    {{ stats.totalFrames }} Frames
+                                </div>
+                                <div class="badge badge-outline gap-2 mt-1">
+                                    ~{{ stats.sizeKB }} KB Source
+                                </div>
+                            </div>
+                            <div class="join">
+                                <button @click="copy" class="btn btn-primary join-item"><Clipboard /> Copy</button>
+                                <button @click="download" class="btn btn-secondary join-item"><Download /> Download</button>
+                            </div>
+                        </div>
+
+                        <div class="mockup-code mt-4 max-h-96 overflow-y-auto">
+                            <pre><code v-text="previewCode"></code></pre>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-4 text-sm">
+                            <span><strong>How to use:</strong> Paste into your project. Call <code>drawFrame(0)</code> in a loop with a <code>wait(100, msec)</code> delay.</span>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-xs text-center mt-2 opacity-60">
-                   Preview mode. Total size: {{ (generatedCode.length / 1024).toFixed(1) }} KB
-                </p>
-              </div>
-            </div>
-          </section>
+            </main>
+          </div>
         `
       }
-
       createApp(App).mount('#app')
     </script>
   </body>

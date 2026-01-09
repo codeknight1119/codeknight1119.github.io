@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>HØLLØW COMMS</title>
+  <title>HØLLØW COMMS - TEST</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,6 +71,8 @@
       startAfter,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const urlParams = new URLSearchParams(window.location.search);
 
     // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
     let firebaseConfig;
@@ -620,7 +622,9 @@
               unreadCount++;
               changeFavicon('resources/notifC.png');
               document.title = `(${unreadCount}) ${originalTitle}`;
+              if(urlParams.get('notifs') === true){
               notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
+              }
             }
           }
 

@@ -1,91 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat4Friends - Sign In</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>HØLLØW COMMS - Access</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="resources/forestStyle.css">
+    <link id="favicon" rel="icon" type="image/png" href="resources/normalC.png">
+
     <style>
+       /* Most styles have been moved to forestStyle.css to ensure 
+          consistency and clean separation.
+       */
        body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-.login-container {
-    padding: 30px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    border-radius: 8px;
-    box-sizing: border-box;
-}
-
-.input-group {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.input-group i {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-input {
-    width: 100%;
-    padding: 10px 10px 10px 40px;
-    border-radius: 5px;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-
-button {
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 10px 5px;
-}
-
-@media (max-width: 600px) {
-    .login-container {
-        padding: 20px;
-        margin: 10px;
-    }
-
-    h2 {
-        font-size: 24px;
-    }
-}
+           /* Ensures the flex centering works if CSS fails to load */
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           min-height: 100vh;
+           margin: 0;
+       }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>Chat4Friends</h2>
-        <p class="tagline">Connect with Friends</p>
+        <h2>HØLLØW COMMS</h2>
+        <p class="tagline">Secure Channel Access v5.3</p>
         <form id="authForm">
             <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" placeholder="example@something.com" id="email">
+                <i class="fas fa-user-astronaut"></i>
+                <input type="text" placeholder="Identity (Email)" id="email" autocomplete="off">
             </div>
             <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" placeholder="Password" id="password">
+                <i class="fas fa-key"></i>
+                <input type="password" placeholder="Access Key (Password)" id="password">
             </div>
-            <button id="logInBttn">Log In</button>
-            <button id="registerBttn">Sign Up</button>
+            <button id="logInBttn">Initialize</button>
+            <button id="registerBttn">New Uplink</button>
         </form>
-        <footer>Powered by Chat4Friends</footer>
+        <footer>SYSTEM STATUS: ONLINE</footer>
     </div>
 
     <script type="module">
-        console.log("login v.9");
+        console.log("HØLLØW COMMS Access v.9");
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import {
@@ -120,17 +79,18 @@ button {
         document.getElementById('registerBttn').addEventListener("click", async (e) => {
             e.preventDefault();
             regestring = true;
-            const username = prompt("Username\nThis can be changed later");
+            const username = prompt("Enter User Alias:\n(This can be changed later)");
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                console.log("Registered:", user);
+                console.log("Uplink Established:", user);
                 await setUpUserData(user.uid, username);
             } catch (error) {
                 console.error("Registration error:", error.message);
+                alert("Uplink Failed: " + error.message);
             }
         });
 
@@ -142,20 +102,21 @@ button {
 
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    console.log("Logged in:", userCredential.user);
+                    console.log("Access Granted:", userCredential.user);
                 })
                 .catch((error) => {
                     console.error(error.message);
+                    alert("Access Denied: " + error.message);
                 });
         });
 
         // Auth state observer
         onAuthStateChanged(auth, (user) => {
             if (user && !regestring) {
-                console.log("User is logged in:", user.email);
+                console.log("User verified:", user.email);
                 window.location.href = "mainchat.html";
             } else {
-                console.log("No user logged in");
+                console.log("Waiting for credentials...");
             }
         });
 
@@ -165,10 +126,10 @@ button {
                     username: username,
                     conversations: []
                 });
-                console.log("User document created");
+                console.log("User profile initialized");
                 window.location.href = "mainchat.html";
             } catch (error) {
-                console.error("Error setting up user data:", error);
+                console.error("Error setting up data:", error);
             }
         }
     </script>

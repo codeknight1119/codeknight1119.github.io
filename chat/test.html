@@ -22,9 +22,6 @@
     <span class="version" aria-hidden="true">V5.3</span>
   </header>
 
-  <div id="timedText" role="status" aria-live="polite">Gabe will be in his math class until 12:30 and will not be able
-    to chat until then.</div>
-
   <section>
     <div class="container">
       <div id="chatsSelect" aria-label="Conversations list"></div>
@@ -358,25 +355,7 @@
       }
     });
 
-    // Timed message visibility (example)
-    function checkTime() {
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const start = 10 * 60 + 30;
-      const end = 12 * 60 + 30;
-      const textElement = document.getElementById("timedText");
 
-      if (textElement) {
-        if (currentMinutes >= start && currentMinutes <= end) {
-          textElement.style.display = "block";
-        } else {
-          textElement.style.display = "none";
-        }
-      }
-    }
-
-    checkTime();
-    setInterval(checkTime, 60000);
 
     function changeFavicon(src) {
       let link = document.querySelector("link[rel~='icon']");

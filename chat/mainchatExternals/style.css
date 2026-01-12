@@ -9,6 +9,7 @@ body {
       padding-bottom: 80px;
       display: flex;
       flex-direction: column;
+      overflow-y: hidden;
     }
 
     body::after {

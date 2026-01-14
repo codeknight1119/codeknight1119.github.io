@@ -95,27 +95,6 @@
                         // Create preview
                         const lines = generatedCode.value.split('\n')
                         previewCode.value = lines.slice(0, 50).join('\n') + `\n\n// ... (${lines.length} lines total) ...`
-                        generatedCode += `
-                 int frame = 0;
-
-    void drawNextFrame(){
-frame +=1;
-if(frame > 8){
-frame = 0;  
-}
-drawFrame(frame);
- Brain.Timer.event(drawNextFrame, 100);
-}
-
-int main(){
-  Brain.Timer.event(drawNextFrame, 100);
-
-  while(true) {
-    // Sleep to prevent wasting CPU resources
-    wait(20, msec);
-  }
-}
-                 `
 
                         isProcessing.value = false
                     }, 100)
@@ -255,6 +234,26 @@ void drawFrame(int frameIndex, int x_offset = 0, int y_offset = 0) {
             while(x >= 480) { x -= 480; y++; }
         }
     }
+}`)
+
+                    buffer.push(`int frame = 0;
+
+void drawNextFrame(){
+frame +=1;
+if(frame > 8){
+frame = 0;  
+}
+drawFrame(frame);
+ Brain.Timer.event(drawNextFrame, 100);
+}
+
+int main(){
+  Brain.Timer.event(drawNextFrame, 100);
+
+  while(true) {
+    // Sleep to prevent wasting CPU resources
+    wait(20, msec);
+  }
 }`)
 
                     // Calculate stats

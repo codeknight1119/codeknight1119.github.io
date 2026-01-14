@@ -1,201 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VEX Animation Converter (High Performance)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-      rel="stylesheet"
-      type="text/css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-    />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
 
     <style>
-      body { font-family: 'IBM Plex Sans', sans-serif; }
-      pre { margin: 0; }
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        pre {
+            margin: 0;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div id="app"></div>
 
     <script type="module">
-      import { createApp, ref, watch, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-      import { Sun, Moon, Download, Clipboard, ClipboardCheck, Layers } from 'https://esm.sh/lucide-vue-next'
+        import { createApp, ref, watch, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+        import { Sun, Moon, Download, Clipboard, ClipboardCheck, Layers } from 'https://esm.sh/lucide-vue-next'
 
-      const App = {
-        components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Layers },
-        setup() {
-          // --- Theme & UI State ---
-          const isDark = ref(true)
-          const compressionLevel = ref(15) // Default 15% fuzziness
-          const isProcessing = ref(false)
-          
-          // --- Data ---
-          const frames = ref([]) // Array of processed frame objects
-          const generatedCode = ref('')
-          const previewCode = ref('')
-          const stats = ref({ sizeKB: 0, ramSaved: 0, totalFrames: 0 })
+        const App = {
+            components: { Sun, Moon, Download, Clipboard, ClipboardCheck, Layers },
+            setup() {
+                // --- Theme & UI State ---
+                const isDark = ref(true)
+                const compressionLevel = ref(15) // Default 15% fuzziness
+                const isProcessing = ref(false)
 
-          onMounted(() => {
-            document.documentElement.setAttribute('data-theme', 'dark')
-          })
+                // --- Data ---
+                const frames = ref([]) // Array of processed frame objects
+                const generatedCode = ref('')
+                const previewCode = ref('')
+                const stats = ref({ sizeKB: 0, ramSaved: 0, totalFrames: 0 })
 
-          const toggleTheme = () => {
-            isDark.value = !isDark.value
-            document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
-          }
+                onMounted(() => {
+                    document.documentElement.setAttribute('data-theme', 'dark')
+                })
 
-          // --- Core Logic ---
-          
-          function handleFileUpload(event) {
-            const files = Array.from(event.target.files)
-            if (!files.length) return
+                const toggleTheme = () => {
+                    isDark.value = !isDark.value
+                    document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
+                }
 
-            // Sort files by name to ensure animation order is correct
-            files.sort((a, b) => a.name.localeCompare(b.name))
+                // --- Core Logic ---
 
-            isProcessing.value = true
-            frames.value = [] // Reset
-            
-            // Process sequentially
-            let loaded = 0
-            files.forEach(file => {
-                const img = new Image()
-                img.onload = () => {
-                    if (img.width !== 480 || img.height !== 240) {
-                        alert(`Error: ${file.name} is ${img.width}x${img.height}. Must be 480x240.`)
-                    } else {
-                        frames.value.push({ img, name: file.name })
+                function handleFileUpload(event) {
+                    const files = Array.from(event.target.files)
+                    if (!files.length) return
+
+                    // Sort files by name to ensure animation order is correct
+                    files.sort((a, b) => a.name.localeCompare(b.name))
+
+                    isProcessing.value = true
+                    frames.value = [] // Reset
+
+                    // Process sequentially
+                    let loaded = 0
+                    files.forEach(file => {
+                        const img = new Image()
+                        img.onload = () => {
+                            if (img.width !== 480 || img.height !== 240) {
+                                alert(`Error: ${file.name} is ${img.width}x${img.height}. Must be 480x240.`)
+                            } else {
+                                frames.value.push({ img, name: file.name })
+                            }
+                            loaded++
+                            if (loaded === files.length) processAllFrames()
+                        }
+                        img.src = URL.createObjectURL(file)
+                    })
+                }
+
+                async function processAllFrames() {
+                    // Delay to let UI render "Processing" state
+                    setTimeout(() => {
+                        const allFrameData = frames.value.map(f => encodeFrame(f.img))
+                        generatedCode.value = generateCpp(allFrameData)
+
+                        // Create preview
+                        const lines = generatedCode.value.split('\n')
+                        previewCode.value = lines.slice(0, 50).join('\n') + `\n\n// ... (${lines.length} lines total) ...`
+                        generatedCode += `
+                 int frame = 0;
+
+    void drawNextFrame(){
+frame +=1;
+if(frame > 8){
+frame = 0;  
+}
+drawFrame(frame);
+ Brain.Timer.event(drawNextFrame, 100);
+}
+
+int main(){
+  Brain.Timer.event(drawNextFrame, 100);
+
+  while(true) {
+    // Sleep to prevent wasting CPU resources
+    wait(20, msec);
+  }
+}
+                 `
+
+                        isProcessing.value = false
+                    }, 100)
+                }
+
+                function encodeFrame(imageElement) {
+                    const canvas = document.createElement('canvas')
+                    canvas.width = 480; canvas.height = 240;
+                    const ctx = canvas.getContext('2d')
+                    ctx.drawImage(imageElement, 0, 0)
+                    const data = ctx.getImageData(0, 0, 480, 240).data
+
+                    // Quantization Factor (0-255)
+                    // Higher compression = divide colors into larger buckets
+                    const q = Math.max(1, Math.floor((compressionLevel.value / 100) * 80))
+
+                    let encoded = []
+                    let currentColor = null
+                    let count = 0
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Skip fully transparent pixels (treat as black/background)
+                        if (data[i + 3] === 0) {
+                            if (currentColor !== null) { encoded.push({ c: currentColor, n: count }); }
+                            currentColor = "TRANSPARENT"; count = 1; continue;
+                        }
+
+                        // Color Quantization: Round to nearest bucket
+                        // This forces slightly different pixels to be identical, increasing run-length
+                        const r = Math.round(data[i] / q) * q
+                        const g = Math.round(data[i + 1] / q) * q
+                        const b = Math.round(data[i + 2] / q) * q
+
+                        // Convert to hex
+                        const hex = `#${Math.min(255, r).toString(16).padStart(2, '0')}${Math.min(255, g).toString(16).padStart(2, '0')}${Math.min(255, b).toString(16).padStart(2, '0')}`
+
+                        if (hex === currentColor) {
+                            count++
+                        } else {
+                            if (currentColor !== null) encoded.push({ c: currentColor, n: count })
+                            currentColor = hex
+                            count = 1
+                        }
                     }
-                    loaded++
-                    if(loaded === files.length) processAllFrames()
-                }
-                img.src = URL.createObjectURL(file)
-            })
-          }
-
-          async function processAllFrames() {
-             // Delay to let UI render "Processing" state
-             setTimeout(() => {
-                 const allFrameData = frames.value.map(f => encodeFrame(f.img))
-                 generatedCode.value = generateCpp(allFrameData)
-                 
-                 // Create preview
-                 const lines = generatedCode.value.split('\n')
-                 previewCode.value = lines.slice(0, 50).join('\n') + `\n\n// ... (${lines.length} lines total) ...`
-                 
-                 isProcessing.value = false
-             }, 100)
-          }
-
-          function encodeFrame(imageElement) {
-            const canvas = document.createElement('canvas')
-            canvas.width = 480; canvas.height = 240;
-            const ctx = canvas.getContext('2d')
-            ctx.drawImage(imageElement, 0, 0)
-            const data = ctx.getImageData(0, 0, 480, 240).data
-            
-            // Quantization Factor (0-255)
-            // Higher compression = divide colors into larger buckets
-            const q = Math.max(1, Math.floor((compressionLevel.value / 100) * 80)) 
-
-            let encoded = []
-            let currentColor = null
-            let count = 0
-
-            for (let i = 0; i < data.length; i += 4) {
-                // Skip fully transparent pixels (treat as black/background)
-                if (data[i+3] === 0) {
-                    if (currentColor !== null) { encoded.push({c: currentColor, n: count}); }
-                    currentColor = "TRANSPARENT"; count = 1; continue;
+                    encoded.push({ c: currentColor, n: count })
+                    return encoded
                 }
 
-                // Color Quantization: Round to nearest bucket
-                // This forces slightly different pixels to be identical, increasing run-length
-                const r = Math.round(data[i] / q) * q
-                const g = Math.round(data[i+1] / q) * q
-                const b = Math.round(data[i+2] / q) * q
-                
-                // Convert to hex
-                const hex = `#${Math.min(255,r).toString(16).padStart(2,'0')}${Math.min(255,g).toString(16).padStart(2,'0')}${Math.min(255,b).toString(16).padStart(2,'0')}`
+                function generateCpp(allFrames) {
+                    const buffer = []
 
-                if (hex === currentColor) {
-                    count++
-                } else {
-                    if (currentColor !== null) encoded.push({c: currentColor, n: count})
-                    currentColor = hex
-                    count = 1
-                }
-            }
-            encoded.push({c: currentColor, n: count})
-            return encoded
-          }
+                    // 1. Header
+                    buffer.push('#include "vex.h"\nusing namespace vex;\n\n')
+                    buffer.push('// Optimized Animation Code\n')
+                    buffer.push(`// Frames: ${allFrames.length} | Compression: ${compressionLevel.value}%\n\n`)
 
-          function generateCpp(allFrames) {
-             const buffer = []
-             
-             // 1. Header
-             buffer.push('#include "vex.h"\nusing namespace vex;\n\n')
-             buffer.push('// Optimized Animation Code\n')
-             buffer.push(`// Frames: ${allFrames.length} | Compression: ${compressionLevel.value}%\n\n`)
+                    // 2. Global Color Table (Deduplicated across ALL frames to save space)
+                    const globalColors = new Set()
+                    allFrames.forEach(frame => frame.forEach(p => {
+                        if (p.c !== "TRANSPARENT") globalColors.add(p.c)
+                    }))
+                    const colorArray = Array.from(globalColors)
+                    const colorMap = new Map(colorArray.map((c, i) => [c, i]))
 
-             // 2. Global Color Table (Deduplicated across ALL frames to save space)
-             const globalColors = new Set()
-             allFrames.forEach(frame => frame.forEach(p => {
-                 if(p.c !== "TRANSPARENT") globalColors.add(p.c)
-             }))
-             const colorArray = Array.from(globalColors)
-             const colorMap = new Map(colorArray.map((c, i) => [c, i]))
+                    buffer.push(`static const char* globalColors[] = { ${colorArray.map(c => `"${c}"`).join(', ')} };\n\n`)
 
-             buffer.push(`static const char* globalColors[] = { ${colorArray.map(c => `"${c}"`).join(', ')} };\n\n`)
+                    // 3. Frame Data
+                    const framePointers = []
 
-             // 3. Frame Data
-             const framePointers = []
-             
-             allFrames.forEach((frame, index) => {
-                 // Determine smallest safe data type for this frame
-                 const maxColorIndex = colorArray.length
-                 const maxRunLength = Math.max(...frame.map(p => p.n))
-                 
-                 const typeColor = maxColorIndex < 256 ? 'uint8_t' : 'int'
-                 const typeCount = maxRunLength < 256 ? 'uint8_t' : 'int'
+                    allFrames.forEach((frame, index) => {
+                        // Determine smallest safe data type for this frame
+                        const maxColorIndex = colorArray.length
+                        const maxRunLength = Math.max(...frame.map(p => p.n))
 
-                 buffer.push(`// --- Frame ${index} ---\n`)
-                 
-                 // Indices
-                 buffer.push(`static const ${typeColor} f${index}_ind[] = {`)
-                 buffer.push(frame.map(p => p.c === "TRANSPARENT" ? -1 : colorMap.get(p.c)).join(','))
-                 buffer.push('};\n')
+                        const typeColor = maxColorIndex < 256 ? 'uint8_t' : 'int'
+                        const typeCount = maxRunLength < 256 ? 'uint8_t' : 'int'
 
-                 // Counts
-                 buffer.push(`static const ${typeCount} f${index}_cnt[] = {`)
-                 buffer.push(frame.map(p => p.n).join(','))
-                 buffer.push('};\n\n')
-                 
-                 framePointers.push(`    { (void*)f${index}_ind, (void*)f${index}_cnt, ${frame.length}, sizeof(${typeColor}), sizeof(${typeCount}) }`)
-             })
+                        buffer.push(`// --- Frame ${index} ---\n`)
 
-             // 4. Frame Registry
-             buffer.push('typedef struct { void* ind; void* cnt; int len; int s_ind; int s_cnt; } FrameData;\n')
-             buffer.push('static const FrameData frames[] = {\n')
-             buffer.push(framePointers.join(',\n'))
-             buffer.push('\n};\n\n')
+                        // Indices
+                        buffer.push(`static const ${typeColor} f${index}_ind[] = {`)
+                        buffer.push(frame.map(p => p.c === "TRANSPARENT" ? -1 : colorMap.get(p.c)).join(','))
+                        buffer.push('};\n')
 
-             // 5. Draw Function (Optimized with drawRectangle)
-             buffer.push(`
+                        // Counts
+                        buffer.push(`static const ${typeCount} f${index}_cnt[] = {`)
+                        buffer.push(frame.map(p => p.n).join(','))
+                        buffer.push('};\n\n')
+
+                        framePointers.push(`    { (void*)f${index}_ind, (void*)f${index}_cnt, ${frame.length}, sizeof(${typeColor}), sizeof(${typeCount}) }`)
+                    })
+
+                    // 4. Frame Registry
+                    buffer.push('typedef struct { void* ind; void* cnt; int len; int s_ind; int s_cnt; } FrameData;\n')
+                    buffer.push('static const FrameData frames[] = {\n')
+                    buffer.push(framePointers.join(',\n'))
+                    buffer.push('\n};\n\n')
+
+                    // 5. Draw Function (Optimized with drawRectangle)
+                    buffer.push(`
 void drawFrame(int frameIndex, int x_offset = 0, int y_offset = 0) {
     if(frameIndex < 0 || frameIndex >= ${allFrames.length}) return;
     
@@ -236,33 +256,33 @@ void drawFrame(int frameIndex, int x_offset = 0, int y_offset = 0) {
         }
     }
 }`)
-             
-             // Calculate stats
-             stats.value.sizeKB = (buffer.join('').length / 1024).toFixed(1)
-             stats.value.totalFrames = allFrames.length
-             
-             return buffer.join('')
-          }
 
-          const download = () => {
-             const blob = new Blob([generatedCode.value], {type: 'text/plain'})
-             const link = document.createElement('a')
-             link.href = URL.createObjectURL(blob); link.download = 'meme_animation.cpp'; link.click()
-          }
+                    // Calculate stats
+                    stats.value.sizeKB = (buffer.join('').length / 1024).toFixed(1)
+                    stats.value.totalFrames = allFrames.length
 
-          const copy = () => {
-             navigator.clipboard.writeText(generatedCode.value)
-             alert("Copied to clipboard!")
-          }
+                    return buffer.join('')
+                }
 
-          // Watch slider changes to re-process if image exists
-          watch(compressionLevel, () => {
-              if(frames.value.length > 0) processAllFrames()
-          })
+                const download = () => {
+                    const blob = new Blob([generatedCode.value], { type: 'text/plain' })
+                    const link = document.createElement('a')
+                    link.href = URL.createObjectURL(blob); link.download = 'meme_animation.cpp'; link.click()
+                }
 
-          return { isDark, toggleTheme, handleFileUpload, download, copy, previewCode, stats, isProcessing, compressionLevel }
-        },
-        template: `
+                const copy = () => {
+                    navigator.clipboard.writeText(generatedCode.value)
+                    alert("Copied to clipboard!")
+                }
+
+                // Watch slider changes to re-process if image exists
+                watch(compressionLevel, () => {
+                    if (frames.value.length > 0) processAllFrames()
+                })
+
+                return { isDark, toggleTheme, handleFileUpload, download, copy, previewCode, stats, isProcessing, compressionLevel }
+            },
+            template: `
           <div class="min-h-screen bg-base-100 text-base-content p-4 md:p-8">
             <nav class="flex justify-between items-center mb-8">
                 <div class="flex items-center gap-2 font-bold text-2xl">
@@ -329,8 +349,9 @@ void drawFrame(int frameIndex, int x_offset = 0, int y_offset = 0) {
             </main>
           </div>
         `
-      }
-      createApp(App).mount('#app')
+        }
+        createApp(App).mount('#app')
     </script>
-  </body>
+</body>
+
 </html>

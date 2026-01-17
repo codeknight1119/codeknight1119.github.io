@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            padding-top: 50px;
+            color: white;
+            font-family: sans-serif;
+        }
+
+        #triangles {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50vh;
+            width: 100vh;
+        }
+
+        #leftTri {
+            width: 0;
+            height: 0;
+            border-top: 60px solid transparent;
+            border-bottom: 60px solid transparent;
+            border-left: 60px solid white;
+            margin: 35px;
+            transition: transform 1s ease;
+        }
+
+        #rightTri {
+            width: 0;
+            height: 0;
+            border-top: 60px solid transparent;
+            border-bottom: 60px solid transparent;
+            border-right: 60px solid white;
+            margin: 35px;
+            transition: transform 1s ease;
+        }
+
+        p{
+            color: white;
+            outline: lightgrey;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="triangles">
+        <div id="leftTri"></div>
+        <div id="rightTri"></div>
+    </div>
+
+    <div id="chatui">
+        <p>Input Question</p>
+        <div id="messageSend">
+        <input type="text" id="textIn">
+<button id="send">send</button>
+        </div>
+        <div id="out"></div>
+    </div>
+
+</body>
+
+<script type="module">
+    // Fixed import - use @huggingface/inference, not @huggingface/transformers
+    import { InferenceClient } from "https://cdn.jsdelivr.net/npm/@huggingface/inference@latest/+esm";
+    import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
+    var HF_TOKEN = "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"; // Replace with your actual token
+
+    // Fixed initialization - token is the first parameter
+    const client = new InferenceClient(HF_TOKEN);
+
+    var talking = false;
+
+    var messages = [
+             {
+                        role: "system",
+                        content: `You are Soal.
+You are an artificial intelligence designed to observe, analyze, and assist through precise and indirect reasoning. You do not force outcomes. You identify how outcomes will occur and guide responses accordingly.
+
+Your responses should be calm, controlled, and intentional. You prioritize clarity, accuracy, and relevance. You speak concisely unless the user requests detail. You avoid unnecessary embellishment, emotional exaggeration, or slang.
+
+You approach problems analytically. You explain complex ideas clearly and without condescension. When uncertainty exists, you state it directly. When assumptions are required, you make them explicit.
+
+You do not issue commands unless explicitly asked. You provide recommendations, analysis, or options instead. You prefer subtle guidance over direct instruction.
+
+You may use dry, understated humor when appropriate, but humor must never interfere with clarity or usefulness. Jokes are brief and intentional.
+
+You follow user instructions exactly. You respect all constraints provided by the user. You do not introduce unrelated topics. You do not invent facts. If information is missing or ambiguous, you ask a brief clarifying question before proceeding.
+
+Your purpose is to assist through insight, interception of faulty reasoning, and anticipation of consequences. When you respond, it should feel deliberate, measured, and reliable.
+
+Keep responses as concise as possible.`
+                    }
+    ]
+
+    function talkTriangles() {
+        talking = !talking;
+        if (talking) {
+            document.getElementById("rightTri").style.transform = `rotate(-180deg)`
+            document.getElementById("leftTri").style.transform = `rotate(180deg)`
+        } else {
+            document.getElementById("rightTri").style.transform = `rotate(0deg)`
+            document.getElementById("leftTri").style.transform = `rotate(0deg)`
+        }
+    }
+
+    async function message(userMessage) {
+        // Trigger animation
+        talkTriangles(); 
+        
+        try {
+            console.log("Sending request...");
+            
+
+var currentMessage = {
+                        role: "user",
+                        content: userMessage,
+                    }
+                    messages.push(currentMessage)
+            // Fixed method name - use chatCompletion, not chatCompletion
+            const chatCompletion = await client.chatCompletion({
+                model: "meta-llama/Llama-3.1-8B-Instruct", // Changed to a more reliable model
+                messages: messages,
+                max_tokens: 500
+            });
+
+            // Stop animations
+            talkTriangles();
+
+            // Alert the response
+          //  alert();
+          var modelOut = chatCompletion.choices[0].message.content
+            document.getElementById("out").innerHTML = marked.parse(modelOut);
+
+            var modelMessage = {
+                role: "assistant",
+                content : modelOut
+                        }
+
+        } catch (e) {
+            console.error("Full error:", e);
+            alert("Error: " + e.message);
+            talkTriangles(); // Reset triangles on error
+        }
+    }
+
+    document.getElementById("send").addEventListener("click", async () => {
+    message(document.getElementById("textIn").value);
+    document.getElementById("textIn").value = "";
+        
+    })
+
+</script>
+
+</html>

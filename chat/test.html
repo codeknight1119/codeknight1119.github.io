@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>HØLLØW COMMS - TEST</title>
+  <title>HØLLØW COMMS - test</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,8 @@
     <h2>HØLLØW COMMS</h2>
     <span class="version" aria-hidden="true">V5.3</span>
   </header>
+
+
 
   <section>
     <div class="container">
@@ -52,8 +54,6 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
     import {
       getFirestore,
-      enableIndexedDbPersistence,
-      CACHE_SIZE_UNLIMITED,
       collection,
       getDoc,
       getDocs,
@@ -106,16 +106,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    enableIndexedDbPersistence(db)
-      .catch((err) => {
-        if (err.code == 'failed-precondition') {
-          alert("Persistence failed: Multiple tabs open.");
-        } else if (err.code == 'unimplemented') {
-          alert("Persistence not supported by browser.");
-        }
-      });
-
-
     let myName = "";
     let currentConvId = null;
     let currentConvUnsubscribe = null;
@@ -131,8 +121,6 @@
     let newestLoadedTimestamp = null; // timestamp of newest message currently shown
 
     let myColor;
-
-    let userProfileCache = new Map();
 
     // Initially hide UI until authenticated
     document.getElementById("messageSend").style.display = "none";
@@ -151,6 +139,7 @@
       if (user) {
         document.getElementById("messageSend").style.display = "flex";
         document.getElementById("messages").style.display = "flex";
+        myName = (await getUsername(user.uid)) || "Anonymous";
         document.getElementById("name").value = myName;
 
         // Listen for conversations that include the current user
@@ -163,8 +152,6 @@
 
         if (userDocSnap.exists()) {
           const data = userDocSnap.data();
-          myName = data.username || "Anonymous";
-
           if (data.color) {
             myColor = data.color;
             document.getElementById("messageSend").style.color = myColor;
@@ -173,7 +160,6 @@
             myColor = randomNeonColor();
             await setDoc(userDocRef, { color: myColor }, { merge: true }); // Use setDoc with merge to update color
           }
-          userProfileCache.set(user.uid, data);
         }
 
         // Show conversations and keep listener active
@@ -249,7 +235,7 @@
     async function sendMessage() {
       const name = document.getElementById("name").value || "Anonymous";
       let text = document.getElementById("messageInput").value;
-      // myName = name;
+      myName = name;
 
       if (!currentConvId) {
         // Use a modal or in-page message instead of alert
@@ -454,33 +440,16 @@
           div.className = "messageOther";
           baseMessageText = `${msg.name || "Unknown"}: ${baseMessageText}`;
 
-          if (userProfileCache.has(msg.uid)) {
-            const cachedUser = userProfileCache.get(msg.uid);
-            // This now correctly expects an object
-            msgColor = cachedUser.color || "#CCCCCC";
+          // Get other user's color
+          const userDocRef = doc(db, "users", msg.uid);
+          const userDocSnap = await getDoc(userDocRef);
 
+          if (userDocSnap.exists()) {
+            msgColor = userDocSnap.data().color || msgColor;
           } else {
-            try {
-              // Get other user's color
-              const userDocRef = doc(db, "users", msg.uid);
-              const userDocSnap = await getDoc(userDocRef);
-
-              if (userDocSnap.exists()) {
-                msgColor = userDocSnap.data().color || msgColor;
-               userProfileCache.set(msg.uid, { color: msgColor });
-
-              } else {
-                console.log(`color fail: User document not found for UID: ${msg.uid}`);
-                userProfileCache.set(msg.uid, { color: "#CCCCCC" });
-              }
-
-            } catch (e) {
-              console.log( "fetch profile error" , e)
-            }
+            console.log(`color fail: User document not found for UID: ${msg.uid}`);
           }
         }
-
-
 
         // Check for image format: IMG:{mimeType}:{base85String}
         if (displayText.startsWith("IMG:")) {
@@ -634,8 +603,8 @@
               unreadCount++;
               changeFavicon('resources/notifC.png');
               document.title = `(${unreadCount}) ${originalTitle}`;
-              if (urlParams.get('notifs') === true) {
-                notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
+              if(urlParams.get('notifs') === true){
+              notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
               }
             }
           }

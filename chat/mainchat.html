@@ -781,7 +781,7 @@
       const notifTitle = `${sender} in ${conversationName || 'a conversation'}`;
       const notifBody = preview;
 
-      if (Notification.permission === "default") {
+      if (Notification.permission === "default" || Notification.permission === "denied") {
         Notification.requestPermission();
       }
       if (Notification.permission === "granted") {

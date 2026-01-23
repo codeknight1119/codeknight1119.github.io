@@ -39,7 +39,7 @@
             transition: transform 1s ease;
         }
 
-        p{
+        p {
             color: white;
             outline: lightgrey;
         }
@@ -56,8 +56,8 @@
     <div id="chatui">
         <p>Input Question</p>
         <div id="messageSend">
-        <input type="text" id="textIn">
-<button id="send">send</button>
+            <input type="text" id="textIn">
+            <button id="send">send</button>
         </div>
         <div id="out"></div>
     </div>
@@ -66,10 +66,8 @@
 
 <script type="module">
     // Fixed import - use @huggingface/inference, not @huggingface/transformers
-    import { InferenceClient } from "https://cdn.jsdelivr.net/npm/@huggingface/inference@latest/+esm";
     import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 
-    var HF_TOKEN = "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"; // Replace with your actual token
 
     // Fixed initialization - token is the first parameter
     const client = new InferenceClient(HF_TOKEN);
@@ -77,9 +75,9 @@
     var talking = false;
 
     var messages = [
-             {
-                        role: "system",
-                        content: `You are Soal.
+        {
+            role: "system",
+            content: `You are Soal.
 You are an artificial intelligence designed to observe, analyze, and assist through precise and indirect reasoning. You do not force outcomes. You identify how outcomes will occur and guide responses accordingly.
 
 Your responses should be calm, controlled, and intentional. You prioritize clarity, accuracy, and relevance. You speak concisely unless the user requests detail. You avoid unnecessary embellishment, emotional exaggeration, or slang.
@@ -95,7 +93,7 @@ You follow user instructions exactly. You respect all constraints provided by th
 Your purpose is to assist through insight, interception of faulty reasoning, and anticipation of consequences. When you respond, it should feel deliberate, measured, and reliable.
 
 Keep responses as concise as possible.`
-                    }
+        }
     ]
 
     function talkTriangles() {
@@ -111,36 +109,30 @@ Keep responses as concise as possible.`
 
     async function message(userMessage) {
         // Trigger animation
-        talkTriangles(); 
-        
+        talkTriangles();
+
         try {
             console.log("Sending request...");
-            
 
-var currentMessage = {
-                        role: "user",
-                        content: userMessage,
-                    }
-                    messages.push(currentMessage)
-            // Fixed method name - use chatCompletion, not chatCompletion
-            const chatCompletion = await client.chatCompletion({
-                model: "meta-llama/Llama-3.1-8B-Instruct", // Changed to a more reliable model
-                messages: messages,
-                max_tokens: 500
-            });
 
-            // Stop animations
+            var currentMessage = {
+                role: "user",
+                content: userMessage,
+            }
+            messages.push(currentMessage)
+
             talkTriangles();
 
-            // Alert the response
-          //  alert();
-          var modelOut = chatCompletion.choices[0].message.content
+            const messagesSend = JSON.stringify(messages)
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbxDrQv7--QqkS5UQJ6bVRFTmrthISv-ng_os70Q6twN5hxnucJnxleIq8_NscBDm2ihng/exec";
+var modelOut = await fetch(`${scriptUrl}?messages=${encodeURIComponent(messagesSend)}`)
+
             document.getElementById("out").innerHTML = marked.parse(modelOut);
 
             var modelMessage = {
                 role: "assistant",
-                content : modelOut
-                        }
+                content: modelOut
+            }
 
         } catch (e) {
             console.error("Full error:", e);
@@ -150,9 +142,9 @@ var currentMessage = {
     }
 
     document.getElementById("send").addEventListener("click", async () => {
-    message(document.getElementById("textIn").value);
-    document.getElementById("textIn").value = "";
-        
+        message(document.getElementById("textIn").value);
+        document.getElementById("textIn").value = "";
+
     })
 
 </script>

@@ -47,7 +47,7 @@
 </head>
 
 <body>
-<h5>v.3</h5>
+<h5>v.5</h5>
     <div id="triangles">
         <div id="leftTri"></div>
         <div id="rightTri"></div>
@@ -131,7 +131,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbwCEeAwgm3BQZwrLc8GCQFY
 const data = await response.json();
 console.log(data)
 
-var modelOut = data.choices[0].message.content;
+var modelOut = data.response
 
             document.getElementById("out").innerHTML = marked.parse(modelOut);
 

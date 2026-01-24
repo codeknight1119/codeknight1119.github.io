@@ -47,7 +47,7 @@
 </head>
 
 <body>
-
+<h5>v.3</h5>
     <div id="triangles">
         <div id="leftTri"></div>
         <div id="rightTri"></div>
@@ -67,10 +67,6 @@
 <script type="module">
     // Fixed import - use @huggingface/inference, not @huggingface/transformers
     import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-
-
-    // Fixed initialization - token is the first parameter
-    const client = new InferenceClient(HF_TOKEN);
 
     var talking = false;
 
@@ -126,12 +122,10 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbwCEeAwgm3BQZwrLc8GCQFY
             talkTriangles();
 
             const messagesSend = JSON.stringify(messages)
-            const scriptUrl = "https://script.google.com/macros/s/AKfycbxDrQv7--QqkS5UQJ6bVRFTmrthISv-ng_os70Q6twN5hxnucJnxleIq8_NscBDm2ihng/exec";
-
 
     var response = await fetch(GAS_URL, {
         method: "POST",
-        body: JSON.stringify({ prompt: chatHistory })
+        body: JSON.stringify({ prompt: messagesSend })
     })
 
 const data = await response.json();

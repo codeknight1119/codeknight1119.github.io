@@ -107,6 +107,8 @@ Keep responses as concise as possible.`
         }
     }
 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwCEeAwgm3BQZwrLc8GCQFYIlwNAD42GzXfUNAvLA65vA0cF-bhoIKrzi08U_0KrJCY/exec"
+
     async function message(userMessage) {
         // Trigger animation
         talkTriangles();
@@ -125,7 +127,16 @@ Keep responses as concise as possible.`
 
             const messagesSend = JSON.stringify(messages)
             const scriptUrl = "https://script.google.com/macros/s/AKfycbxDrQv7--QqkS5UQJ6bVRFTmrthISv-ng_os70Q6twN5hxnucJnxleIq8_NscBDm2ihng/exec";
-var modelOut = await fetch(`${scriptUrl}?messages=${encodeURIComponent(messagesSend)}`)
+
+
+    var response = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ prompt: chatHistory })
+    })
+
+const data = await response.json();
+
+var modelOut = data.choices[0].message.content;
 
             document.getElementById("out").innerHTML = marked.parse(modelOut);
 

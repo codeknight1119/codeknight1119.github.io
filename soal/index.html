@@ -47,7 +47,7 @@
 </head>
 
 <body>
-<h5>v.6</h5>
+<h5>v.7</h5>
     <div id="triangles">
         <div id="leftTri"></div>
         <div id="rightTri"></div>
@@ -121,11 +121,11 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbwCEeAwgm3BQZwrLc8GCQFY
 
             talkTriangles();
 
-            const messagesSend = JSON.stringify(messages)
+    
 
     var response = await fetch(GAS_URL, {
         method: "POST",
-        body: JSON.stringify({ prompt: messagesSend })
+        body: JSON.stringify({ prompt: messages })
     })
 
 const data = await response.json();

@@ -129,6 +129,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbwCEeAwgm3BQZwrLc8GCQFY
     })
 
 const data = await response.json();
+console.log(data)
 
 var modelOut = data.choices[0].message.content;
 

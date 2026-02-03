@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core-Link // Item Editor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        :root {
+            --primary: #00f2ff; /* Cyber Cyan */
+            --accent: #bc00ff;  /* Neon Purple */
+        }
+        body { background-color: #0b0e14; border-top: 4px solid var(--primary); }
+        h1, h2, h3 { color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+        .cyber-card { border: 1px solid #1a212c; background: #11151c; box-shadow: 0 0 15px rgba(0, 242, 255, 0.05); }
+        .hidden { display: none !important; }
+        .status-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <section id="auth-page">
+            <hgroup>
+                <h1>Core-Link Terminal</h1>
+                <h2>Authorized Personnel Only</h2>
+            </hgroup>
+            
+            <div class="grid">
+                <article class="cyber-card">
+                    <header><strong>Access Terminal</strong></header>
+                    <form id="login-form">
+                        <label>Neural Email</label>
+                        <input type="email" id="email" placeholder="user@core.link" required>
+                        <label>Security Key</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        
+                        <div class="grid">
+                            <button type="submit" id="btn-login">Login</button>
+                            <button type="button" class="outline" id="btn-signup">Register</button>
+                        </div>
+                    </form>
+                    <footer>
+                        <small>
+                            <strong>New User?</strong> Enter details and click Register.<br>
+                            <strong>Returning?</strong> Enter details and click Login.
+                        </small>
+                    </footer>
+                </article>
+
+                <div>
+                    <h3>System Status</h3>
+                    <ul>
+                        <li><span class="status-badge">ONLINE</span> PlayCanvas Bridge</li>
+                        <li><span class="status-badge">ONLINE</span> Firebase Data Hive</li>
+                        <li><span class="status-badge" style="background:gray">WAITING</span> User Authentication</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="denied-page" class="hidden">
+            <article style="border-color: red; text-align: center;">
+                <h1 style="color: red;">[ ACCESS DENIED ]</h1>
+                <p>Your account UID is not flagged with <code>editor_clearance: true</code>.</p>
+                <p>Contact the System Admin to whitelist your neural link.</p>
+                <button onclick="logout()">Back to Login</button>
+            </article>
+        </section>
+
+        <section id="editor-page" class="hidden">
+            <nav>
+                <ul><li><strong>ITEM_EDITOR_V1.2</strong></li></ul>
+                <ul>
+                    <li><a href="#" onclick="showTab('tab-items')">Items</a></li>
+                    <li><a href="#" onclick="showTab('tab-crafting')">Crafting</a></li>
+                    <li><button class="secondary" onclick="logout()">Disconnect</button></li>
+                </ul>
+            </nav>
+
+            <div id="tab-items">
+                <h2>Modular Item Registry</h2>
+                <div class="grid">
+                    <aside>
+                        <ul id="item-list">
+                            <li><a href="#">noble_sword</a></li>
+                            <li><a href="#">iron_scrap</a></li>
+                        </ul>
+                        <button class="outline">+ New Item</button>
+                    </aside>
+
+                    <article class="cyber-card">
+                        <form id="item-form">
+                            <div class="grid">
+                                <label>Internal ID <input type="text" placeholder="e.g. laser_axe"></label>
+                                <label>Display Name <input type="text" placeholder="Laser Axe"></label>
+                            </div>
+                            
+                            <div class="grid">
+                                <label>Type
+                                    <select>
+                                        <option>weapon</option>
+                                        <option>material</option>
+                                        <option>consumeable</option>
+                                    </select>
+                                </label>
+                                <label>Weapon Damage <input type="number"></label>
+                            </div>
+
+                            <label>Model Texture Path</label>
+                            <input type="text" placeholder="texture_name_01">
+
+                            <div class="grid">
+                                <label><input type="checkbox" role="switch"> Stackable</label>
+                                <label><input type="checkbox" role="switch"> Complex System</label>
+                            </div>
+
+                            <button type="submit">Sync to Hive</button>
+                        </form>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Guidance Logic:
+        // Use Firebase onAuthStateChanged to check if user is logged in.
+        // If logged in:
+        //    Fetch user's document from Firestore.
+        //    If (doc.editor_clearance == true) { 
+        //       showSection('editor-page'); 
+        //    } else { 
+        //       showSection('denied-page'); 
+        //    }
+        // Else: showSection('auth-page');
+
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

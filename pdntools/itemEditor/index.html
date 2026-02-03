@@ -77,14 +77,6 @@
                     </footer>
                 </article>
 
-                <div>
-                    <h3>System Status</h3>
-                    <ul>
-                        <li><span class="status-badge">ONLINE</span> PlayCanvas Bridge</li>
-                        <li><span class="status-badge">ONLINE</span> Firebase Data Hive</li>
-                        <li><span class="status-badge" style="background:gray">WAITING</span> User Authentication</li>
-                    </ul>
-                </div>
             </div>
         </section>
 
@@ -123,6 +115,21 @@
                             <div class="grid">
                                 <label>Internal ID <input type="text" placeholder="e.g. laser_axe"></label>
                                 <label>Display Name <input type="text" placeholder="Laser Axe"></label>
+                                <label>Texture File <input type="file"></label>
+                                <label>Model File <input type="file"></label>
+                                <label>Model Texture File <input type="file"></label>
+                                <button type="button" id="typeDropdown">Item Type: None</button>
+                                <div id="typeDropdownContent" style="display:none;">
+                                    <button value="none">None</button>
+                                    <button value="weapon">Weapon</button>
+                                </div>
+                                <div class="typeSpecificSettings" id="typeSpecificSettings:none" style="display:none;">
+                                    <p>No additional settings for this type.</p>
+                                    </div>
+                                <div class="typeSpecificSettings" id="typeSpecificSettings:weapon" style="display:none;">
+                                    <label>Damage <input type="number" placeholder="1"></label>
+                                    <label>Weapon Type <input type="text" placeholder="e.g. melee, ranged, spear"></label>
+                                </div>
                             </div>
 
                             <div class="grid">
@@ -137,14 +144,13 @@
                             </div>
 
                             <label>Model Texture Path</label>
-                            <input type="text" placeholder="texture_name_01">
+
 
                             <div class="grid">
-                                <label><input type="checkbox" role="switch"> Stackable</label>
-                                <label><input type="checkbox" role="switch"> Complex System</label>
+
                             </div>
 
-                            <button type="submit">Sync to Hive</button>
+                            <button type="submit">Sync to Game</button>
                         </form>
                     </article>
                 </div>
@@ -152,107 +158,122 @@
         </section>
     </main>
 
-<script type="module">
-    console.log("Version 1.0.9 - Firestore Edition");
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    // Changed: Import Firestore methods
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script type="module">
+        console.log("Version 1.1.0");
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Changed: Import Firestore methods
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
-        authDomain: "planet-data-null-data.firebaseapp.com",
-        projectId: "planet-data-null-data",
-        storageBucket: "planet-data-null-data.firebasestorage.app",
-        messagingSenderId: "571251625083",
-        appId: "1:571251625083:web:8ca0b3db09e84767bce6de",
-        measurementId: "G-NXGCBBHLS5"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
+            authDomain: "planet-data-null-data.firebaseapp.com",
+            projectId: "planet-data-null-data",
+            storageBucket: "planet-data-null-data.firebasestorage.app",
+            messagingSenderId: "571251625083",
+            appId: "1:571251625083:web:8ca0b3db09e84767bce6de",
+            measurementId: "G-NXGCBBHLS5"
+        };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    // Changed: Initialize Firestore
-    const db = getFirestore(app);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        // Changed: Initialize Firestore
+        const db = getFirestore(app);
 
-    // --- Sign Up Logic ---
-    document.getElementById("btn-signup").addEventListener("click", async () => {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        // --- Sign Up Logic ---
+        document.getElementById("btn-signup").addEventListener("click", async () => {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            const name = prompt("Enter your username.");
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const name = prompt("Enter your username.");
 
-            await setDoc(doc(db, "users", user.uid), {
-                editor_clearance: false,
-                username: name,
-                createdAt: new Date()
-            });
+                await setDoc(doc(db, "users", user.uid), {
+                    editor_clearance: false,
+                    username: name,
+                    createdAt: new Date()
+                });
 
-            alert("Registration successful! You can now log in.");
-        } catch (error) {
-            alert("Error: " + error.message);
-        }
-    });
+                alert("Registration successful! You can now log in.");
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        });
 
-    // --- Login Logic ---
-    document.getElementById("btn-login").addEventListener("click", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        // --- Login Logic ---
+        document.getElementById("btn-login").addEventListener("click", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            alert("Error: " + error.message);
-        }
-    });
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        });
 
-    // --- Auth Observer ---
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("Logged in as:", user.email);
-            checkUserPermissions(user);
-        } else {
-            showSection('auth-page');
-        }
-    });
+        // --- Auth Observer ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Logged in as:", user.email);
+                checkUserPermissions(user);
+            } else {
+                showSection('auth-page');
+            }
+        });
 
-    // --- Permissions Check ---
-    async function checkUserPermissions(user) {
-        try {
-            // Changed: Use getDoc for Firestore
-            const userDocRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userDocRef);
+        // --- Permissions Check ---
+        async function checkUserPermissions(user) {
+            try {
+                // Changed: Use getDoc for Firestore
+                const userDocRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userDocRef);
 
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                if (userData.editor_clearance === true) {
-                    showSection('editor-page');
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    if (userData.editor_clearance === true) {
+                        showSection('editor-page');
+                    } else {
+                        showSection('denied-page');
+                    }
                 } else {
+                    console.error("No user record found in Firestore.");
                     showSection('denied-page');
                 }
-            } else {
-                console.error("No user record found in Firestore.");
-                showSection('denied-page');
+            } catch (error) {
+                console.error("Permission check failed:", error);
             }
-        } catch (error) {
-            console.error("Permission check failed:", error);
         }
-    }
 
-    // --- UI Helpers ---
-    function showSection(id) {
-        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
+        // --- UI Helpers ---
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
 
-    window.logout = function() {
-        signOut(auth);
-    };
-</script>
+        window.logout = function () {
+            signOut(auth);
+        };
+
+        document.getElementById("typeDropdown").addEventListener("click", () => {
+            const content = document.getElementById("typeDropdownContent");
+            content.style.display = content.style.display === "none" ? "block" : "none";
+        });
+        document.getElementsByClassName("typeDropdownContent").forEach((val) => {
+            val.addEventListener("click", (e) => {
+                document.getElementById("typeDropdown").innerText = "Item Type: " + e.target.value;
+                document.getElementsByClassName("typeSpecificSettings").forEach((el) => {
+                    el.style.display = "none";
+                });
+                document.getElementById("typeSpecificSettings:" + e.target.value).style.display = "block";
+
+            });
+        })
+    </script>
 </body>
 
 </html>

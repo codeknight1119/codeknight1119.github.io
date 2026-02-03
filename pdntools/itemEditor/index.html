@@ -154,94 +154,108 @@
         </section>
     </main>
 
-    <script type="module">
-        console.log("Version 1.0.8")
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<script type="module">
+    console.log("Version 1.0.8 - Firestore Edition");
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    // Changed: Import Firestore methods
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    const firebaseConfig = {
+        apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
+        authDomain: "planet-data-null-data.firebaseapp.com",
+        projectId: "planet-data-null-data",
+        storageBucket: "planet-data-null-data.firebasestorage.app",
+        messagingSenderId: "571251625083",
+        appId: "1:571251625083:web:8ca0b3db09e84767bce6de",
+        measurementId: "G-NXGCBBHLS5"
+    };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
-            authDomain: "planet-data-null-data.firebaseapp.com",
-            databaseURL: "https://console.firebase.google.com/u/0/project/planet-data-null-data/firestore/databases/-default-/data",
-            projectId: "planet-data-null-data",
-            storageBucket: "planet-data-null-data.firebasestorage.app",
-            messagingSenderId: "571251625083",
-            appId: "1:571251625083:web:8ca0b3db09e84767bce6de",
-            measurementId: "G-NXGCBBHLS5"
-        };
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    // Changed: Initialize Firestore
+    const db = getFirestore(app);
 
- 
-        //init firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+    // --- Sign Up Logic ---
+    document.getElementById("btn-signup").addEventListener("click", async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            const name = prompt("Enter your username.");
 
+            // Changed: Use setDoc for Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                editor_clearance: false,
+                username: name,
+                createdAt: new Date()
+            });
 
-        document.getElementById("btn-signup").addEventListener("click", async () => {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+            alert("Registration successful! You can now log in.");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    });
 
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                const dbRef = ref(db);
-                var name = prompt("Enter your username.")
-                await set(child(dbRef, `users/${auth.currentUser.uid}`), {
-                    editor_clearance: false,
-                    username: name
-                });
+    // --- Login Logic ---
+    document.getElementById("btn-login").addEventListener("click", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-                    alert("Registration successful! You can now log in.");
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        });
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    });
 
-        document.getElementById("btn-login").addEventListener("click", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
+    // --- Auth Observer ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("Logged in as:", user.email);
+            checkUserPermissions(user);
+        } else {
+            showSection('auth-page');
+        }
+    });
 
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        });
+    // --- Permissions Check ---
+    async function checkUserPermissions(user) {
+        try {
+            // Changed: Use getDoc for Firestore
+            const userDocRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userDocRef);
 
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Logged in as:", user.email);
-                checkUserPermissions(user);
-            } else {
-                showSection('auth-page');
-            }
-        });
-
-
-        function checkUserPermissions(user) {
-            const dbRef = ref(db);
-            get(child(dbRef, `users/${user.uid}/editor_clearance`)).then((snapshot) => {
-                if (snapshot.exists() && snapshot.val() === true) {
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                if (userData.editor_clearance === true) {
                     showSection('editor-page');
                 } else {
                     showSection('denied-page');
                 }
-            }).catch((error) => {
-                console.error(error);
-            });
+            } else {
+                console.error("No user record found in Firestore.");
+                showSection('denied-page');
+            }
+        } catch (error) {
+            console.error("Permission check failed:", error);
         }
+    }
 
+    // --- UI Helpers ---
+    function showSection(id) {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
 
-        function showSection(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-    </script>
+    window.logout = function() {
+        signOut(auth);
+    };
+</script>
 </body>
 
 </html>

@@ -172,6 +172,13 @@
         };
 
 
+        //init firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+
+
         document.getElementById("btn-signup").addEventListener("click", async () => {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
@@ -203,12 +210,6 @@
                 alert("Error: " + error.message);
             }
         });
-
-
-        //init firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
 
 
         onAuthStateChanged(auth, (user) => {

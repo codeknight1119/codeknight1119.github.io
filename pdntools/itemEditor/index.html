@@ -114,8 +114,6 @@
                 <div class="grid">
                     <aside>
                         <ul id="item-list">
-                            <li><a href="#">noble_sword</a></li>
-                            <li><a href="#">iron_scrap</a></li>
                         </ul>
                         <button class="outline">+ New Item</button>
                     </aside>
@@ -187,7 +185,6 @@
             const user = userCredential.user;
             const name = prompt("Enter your username.");
 
-            // Changed: Use setDoc for Firestore
             await setDoc(doc(db, "users", user.uid), {
                 editor_clearance: false,
                 username: name,

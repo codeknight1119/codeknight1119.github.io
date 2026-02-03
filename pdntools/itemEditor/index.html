@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,44 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <style>
         :root {
-            --primary: #00f2ff; /* Cyber Cyan */
-            --accent: #bc00ff;  /* Neon Purple */
+            --primary: #00f2ff;
+            /* Cyber Cyan */
+            --accent: #bc00ff;
+            /* Neon Purple */
         }
-        body { background-color: #0b0e14; border-top: 4px solid var(--primary); }
-        h1, h2, h3 { color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
-        .cyber-card { border: 1px solid #1a212c; background: #11151c; box-shadow: 0 0 15px rgba(0, 242, 255, 0.05); }
-        .hidden { display: none !important; }
-        .status-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: var(--accent); }
+
+        body {
+            background-color: #0b0e14;
+            border-top: 4px solid var(--primary);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cyber-card {
+            border: 1px solid #1a212c;
+            background: #11151c;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.05);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--accent);
+        }
     </style>
 </head>
+
 <body>
 
     <main class="container">
@@ -25,16 +54,16 @@
                 <h1>Core-Link Terminal</h1>
                 <h2>Authorized Personnel Only</h2>
             </hgroup>
-            
+
             <div class="grid">
                 <article class="cyber-card">
                     <header><strong>Access Terminal</strong></header>
                     <form id="login-form">
-                        <label>Neural Email</label>
+                        <label>Email</label>
                         <input type="email" id="email" placeholder="user@core.link" required>
-                        <label>Security Key</label>
+                        <label>Password</label>
                         <input type="password" id="password" placeholder="••••••••" required>
-                        
+
                         <div class="grid">
                             <button type="submit" id="btn-login">Login</button>
                             <button type="button" class="outline" id="btn-signup">Register</button>
@@ -70,7 +99,9 @@
 
         <section id="editor-page" class="hidden">
             <nav>
-                <ul><li><strong>ITEM_EDITOR_V1.2</strong></li></ul>
+                <ul>
+                    <li><strong>ITEM_EDITOR_V1.2</strong></li>
+                </ul>
                 <ul>
                     <li><a href="#" onclick="showTab('tab-items')">Items</a></li>
                     <li><a href="#" onclick="showTab('tab-crafting')">Crafting</a></li>
@@ -95,7 +126,7 @@
                                 <label>Internal ID <input type="text" placeholder="e.g. laser_axe"></label>
                                 <label>Display Name <input type="text" placeholder="Laser Axe"></label>
                             </div>
-                            
+
                             <div class="grid">
                                 <label>Type
                                     <select>
@@ -123,17 +154,38 @@
         </section>
     </main>
 
-    <script>
-        // Guidance Logic:
-        // Use Firebase onAuthStateChanged to check if user is logged in.
-        // If logged in:
-        //    Fetch user's document from Firestore.
-        //    If (doc.editor_clearance == true) { 
-        //       showSection('editor-page'); 
-        //    } else { 
-        //       showSection('denied-page'); 
-        //    }
-        // Else: showSection('auth-page');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
+            authDomain: "planet-data-null-data.firebaseapp.com",
+            projectId: "planet-data-null-data",
+            storageBucket: "planet-data-null-data.firebasestorage.app",
+            messagingSenderId: "571251625083",
+            appId: "1:571251625083:web:8ca0b3db09e84767bce6de",
+            measurementId: "G-NXGCBBHLS5"
+        };
+
+
+        //init firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Logged in as:", user.email);
+                checkUserPermissions(user);
+            } else {
+                showSection('auth-page');
+            }
+        });
+
 
         function showSection(id) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
@@ -141,4 +193,5 @@
         }
     </script>
 </body>
+
 </html>

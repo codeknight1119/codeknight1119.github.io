@@ -164,6 +164,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
             authDomain: "planet-data-null-data.firebaseapp.com",
+            databaseURL: "https://planet-data-null-data-default-rtdb.firebaseio.com",
             projectId: "planet-data-null-data",
             storageBucket: "planet-data-null-data.firebasestorage.app",
             messagingSenderId: "571251625083",
@@ -171,7 +172,7 @@
             measurementId: "G-NXGCBBHLS5"
         };
 
-
+ 
         //init firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);

@@ -43,6 +43,11 @@
             border-radius: 4px;
             background: var(--accent);
         }
+
+        .vec3 {
+            overflow: hidden;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -112,35 +117,29 @@
 
                     <article class="cyber-card">
                         <form id="item-form">
-                            <div class="grid">
+                            <div>
                                 <label>Internal ID <input type="text" placeholder="e.g. laser_axe"></label>
                                 <label>Display Name <input type="text" placeholder="Laser Axe"></label>
                                 <label>Texture File <input type="file"></label>
                                 <label>Model File <input type="file"></label>
                                 <label>Model Texture File <input type="file"></label>
                                 <button type="button" id="typeDropdown">Item Type: None</button>
+                                <label>Collision Size <div class="vec3"> <input type="number" placeholder="x"> <input
+                                            type="number" placeholder="y"> <input type="number" placeholder="z"></div>
+                                    </label>
                                 <div id="typeDropdownContent" style="display:none;">
                                     <button value="none">None</button>
                                     <button value="weapon">Weapon</button>
                                 </div>
                                 <div class="typeSpecificSettings" id="typeSpecificSettings:none" style="display:none;">
                                     <p>No additional settings for this type.</p>
-                                    </div>
-                                <div class="typeSpecificSettings" id="typeSpecificSettings:weapon" style="display:none;">
-                                    <label>Damage <input type="number" placeholder="1"></label>
-                                    <label>Weapon Type <input type="text" placeholder="e.g. melee, ranged, spear"></label>
                                 </div>
-                            </div>
-
-                            <div class="grid">
-                                <label>Type
-                                    <select>
-                                        <option>weapon</option>
-                                        <option>material</option>
-                                        <option>consumeable</option>
-                                    </select>
-                                </label>
-                                <label>Weapon Damage <input type="number"></label>
+                                <div class="typeSpecificSettings" id="typeSpecificSettings:weapon"
+                                    style="display:none;">
+                                    <label>Damage <input type="number" placeholder="1"></label>
+                                    <label>Weapon Type <input type="text"
+                                            placeholder="e.g. melee, ranged, spear"></label>
+                                </div>
                             </div>
 
                             <label>Model Texture Path</label>
@@ -159,7 +158,7 @@
     </main>
 
     <script type="module">
-        console.log("Version 1.1.0");
+        console.log("Version 1.1.1");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods

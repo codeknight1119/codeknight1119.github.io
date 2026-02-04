@@ -192,7 +192,7 @@
     </main>
 
     <script type="module">
-        console.log("Version 1.1.6");
+        console.log("Version 1.1.7");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods
@@ -292,7 +292,7 @@
             signOut(auth);
         };
 
-        document.getElementById("typeDropdown").addEventListener("click", () => {
+        document.querySelectorAll("typeDropdown").addEventListener("click", () => {
             const content = document.getElementById("typeDropdownContent");
             content.style.display = content.style.display === "none" ? "block" : "none";
         });

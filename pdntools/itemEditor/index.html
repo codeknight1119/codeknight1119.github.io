@@ -148,6 +148,8 @@
                             <div>
                                 <label>Internal ID <input type="text" placeholder="e.g. laser_axe"></label>
                                 <label>Display Name <input type="text" placeholder="Laser Axe"></label>
+                                <label>Stackable <input type="checkbox"></label>
+
                                 <label>Texture File <input type="file"></label>
                                 <label>Model File <input type="file"></label>
                                 <label>Model Texture File <input type="file"></label>
@@ -164,15 +166,27 @@
                                 <div id="typeDropdownContent" style="display:none;">
                                     <button type="button" value="none">None</button>
                                     <button type="button" value="weapon">Weapon</button>
+                                    <button type="button" value="material">Material</button>
                                 </div>
                                 <div class="typeSpecificSettings" id="typeSpecificSettings:none" style="display:none;">
                                     <p>No additional settings for this type.</p>
                                 </div>
+
                                 <div class="typeSpecificSettings" id="typeSpecificSettings:weapon"
                                     style="display:none;">
                                     <label>Damage <input type="number" placeholder="1"></label>
                                     <label>Weapon Type <input type="text"
                                             placeholder="e.g. melee, ranged, spear"></label>
+                                </div>
+
+                                <div class="typeSpecificSettings" id="typeSpecificSettings:material"
+                                    style="display:none;">
+                                    <label>Damage Modifier<input type="number" placeholder="1"></label>
+                                    <label>Material Category<input type="text" placeholder="eg. Ore"></label>
+                                    <label>Material Subset<input type="text" placeholder="eg. Refined"></label>
+                                    <label>Texture Color<input type="color"></label>
+
+
                                 </div>
                             </div>
 
@@ -288,9 +302,6 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        window.logout = function () {
-            signOut(auth);
-        };
 
         document.getElementById("typeDropdown").addEventListener("click", (e) => {
             // Prevent this button from submitting the form too

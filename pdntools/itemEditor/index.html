@@ -55,7 +55,7 @@
         }
 
         #typeDropdownContent {
-           /* position: absolute;*/
+            /* position: absolute;*/
             /*right: 10px;*/
             /* Moves it slightly to the right */
             top: 100%;
@@ -65,7 +65,7 @@
             padding: 0.5rem;
             background: #1a212c;
             border: 1px solid var(--primary);
-           /* box-shadow: 5px 5px 0px var(--accent);*/
+            /* box-shadow: 5px 5px 0px var(--accent);*/
             /* Cyberpunk shadow */
         }
 
@@ -162,8 +162,8 @@
 
                                 <button type="button" id="typeDropdown">Item Type: None</button>
                                 <div id="typeDropdownContent" style="display:none;">
-                                    <button value="none">None</button>
-                                    <button value="weapon">Weapon</button>
+                                    <button type="button" value="none">None</button>
+                                    <button type="button" value="weapon">Weapon</button>
                                 </div>
                                 <div class="typeSpecificSettings" id="typeSpecificSettings:none" style="display:none;">
                                     <p>No additional settings for this type.</p>
@@ -292,20 +292,32 @@
             signOut(auth);
         };
 
-        document.querySelectorAll("typeDropdown").addEventListener("click", () => {
+        document.getElementById("typeDropdown").addEventListener("click", (e) => {
+            // Prevent this button from submitting the form too
+            e.preventDefault();
             const content = document.getElementById("typeDropdownContent");
             content.style.display = content.style.display === "none" ? "block" : "none";
         });
-        document.getElementsByClassName("typeDropdownContent").forEach((val) => {
-            val.addEventListener("click", (e) => {
+
+        // 2. Select the BUTTONS inside the content div using querySelectorAll
+        document.querySelectorAll("#typeDropdownContent button").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                // Update the main button text
                 document.getElementById("typeDropdown").innerText = "Item Type: " + e.target.value;
-                document.getElementsByClassName("typeSpecificSettings").forEach((el) => {
+
+                // Hide the menu
+                document.getElementById("typeDropdownContent").style.display = "none";
+
+                // Hide all setting groups
+                document.querySelectorAll(".typeSpecificSettings").forEach((el) => {
                     el.style.display = "none";
                 });
-                document.getElementById("typeSpecificSettings:" + e.target.value).style.display = "block";
 
+                // Show the specific one (Safety check to ensure element exists)
+                const specificSettings = document.getElementById("typeSpecificSettings:" + e.target.value);
+                if (specificSettings) specificSettings.style.display = "block";
             });
-        })
+        });
     </script>
 </body>
 

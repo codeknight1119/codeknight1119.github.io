@@ -197,7 +197,7 @@
 
                             </div>
 
-                            <button type="submit">Sync to Game</button>
+                            <button id="sendItem">Sync to Game</button>
                         </form>
                     </article>
                 </div>
@@ -210,7 +210,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
@@ -308,6 +308,51 @@
             e.preventDefault();
             const content = document.getElementById("typeDropdownContent");
             content.style.display = content.style.display === "none" ? "block" : "none";
+        });
+
+        document.getElementById("sendItem").addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            document.getElementById("sendItem").addEventListener("click", async (e) => {
+                e.preventDefault(); // Stop page refresh
+
+                const form = document.getElementById("item-form");
+                const formData = new FormData(form);
+                const itemData = {};
+
+                // 1. Automatically grab all named inputs
+                formData.forEach((value, key) => {
+                    const input = form.querySelector(`[name="${key}"]`);
+
+                    // Handle Checkboxes
+                    if (input.type === "checkbox") {
+                        itemData[key] = input.checked;
+                    }
+                    // Handle Numbers
+                    else if (input.type === "number") {
+                        itemData[key] = parseFloat(value) || 0;
+                    }
+                    // Handle everything else (strings, colors, etc)
+                    else {
+                        if (value !== "") itemData[key] = value;
+                    }
+                });
+
+                // 2. Add metadata
+                itemData.updatedAt = new Date();
+                itemData.itemType = document.getElementById("typeDropdown").innerText.replace("Item Type: ", "").toLowerCase();
+
+                // 3. Save to Firestore
+                try {
+                    const docRef = await addDoc(collection(db, "items"), itemData);
+                    alert("System Sync Complete. Item ID: " + docRef.id);
+                    form.reset(); // Clear form for next item
+                } catch (error) {
+                    console.error("Sync failed:", error);
+                    alert("Upload Interrupted: " + error.message);
+                }
+            });
+
         });
 
         // 2. Select the BUTTONS inside the content div using querySelectorAll

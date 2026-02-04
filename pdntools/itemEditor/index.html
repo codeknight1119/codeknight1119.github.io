@@ -48,6 +48,34 @@
             overflow: hidden;
             white-space: nowrap;
         }
+
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        #typeDropdownContent {
+            position: absolute;
+            right: -10px;
+            /* Moves it slightly to the right */
+            top: 100%;
+            z-index: 10;
+            width: 150px;
+            /* Makes the result box smaller */
+            padding: 0.5rem;
+            background: #1a212c;
+            border: 1px solid var(--primary);
+            box-shadow: 5px 5px 0px var(--accent);
+            /* Cyberpunk shadow */
+        }
+
+        #typeDropdownContent button {
+            font-size: 0.8rem;
+            /* Smaller text */
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            width: 100%;
+        }
     </style>
 </head>
 

@@ -207,7 +207,7 @@
     </main>
 
     <script type="module">
-        console.log("Version 1.2.2");
+        console.log("Version 1.2.3");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods
@@ -332,7 +332,7 @@
             var b64;
             if (inputFileElement.files.length > 0) {
                 var fileToParse = inputFileElement.files[0]
-                b64 = to64(fileToParse)
+                b64 = await to64(fileToParse)
             } else {
                 alert("upload a file")
                 return

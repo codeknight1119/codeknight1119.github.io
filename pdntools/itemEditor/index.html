@@ -146,11 +146,12 @@
                     <article class="cyber-card">
                         <form id="item-form">
                             <div>
-                                <label>Internal ID <input type="text" placeholder="e.g. laser_axe"></label>
+                                <label>Internal ID <input id="id_input" type="text"
+                                        placeholder="e.g. laser_axe"></label>
                                 <label>Display Name <input type="text" placeholder="Laser Axe"></label>
                                 <label>Stackable <input type="checkbox"></label>
 
-                                <label>Texture File <input type="file"></label>
+                                <label>Texture File <input id="texture_file_input" type="file"></label>
                                 <label>Model File <input type="file"></label>
                                 <label>Model Texture File <input type="file"></label>
 
@@ -206,7 +207,7 @@
     </main>
 
     <script type="module">
-        console.log("Version 1.2.1");
+        console.log("Version 1.2.2");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods
@@ -227,6 +228,8 @@
         const auth = getAuth(app);
         // Changed: Initialize Firestore
         const db = getFirestore(app);
+
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyMeCSwAlGP8hRs_Qn7oEulPP1MjfleTjuykquFiV1tCIKelUEd15kbzjtz03gWV19s/exec";
 
         // --- Sign Up Logic ---
         document.getElementById("btn-signup").addEventListener("click", async () => {
@@ -311,45 +314,101 @@
         });
 
 
-            document.getElementById("sendItem").addEventListener("click", async (e) => {
-                e.preventDefault(); // Stop page refresh
-
-                const form = document.getElementById("item-form");
-                const formData = new FormData(form);
-                const itemData = {};
-
-                // 1. Automatically grab all named inputs
-                formData.forEach((value, key) => {
-                    const input = form.querySelector(`[name="${key}"]`);
-
-                    // Handle Checkboxes
-                    if (input.type === "checkbox") {
-                        itemData[key] = input.checked;
-                    }
-                    // Handle Numbers
-                    else if (input.type === "number") {
-                        itemData[key] = parseFloat(value) || 0;
-                    }
-                    // Handle everything else (strings, colors, etc)
-                    else {
-                        if (value !== "") itemData[key] = value;
-                    }
-                });
-
-                // 2. Add metadata
-                itemData.updatedAt = new Date();
-                itemData.itemType = document.getElementById("typeDropdown").innerText.replace("Item Type: ", "").toLowerCase();
-
-                // 3. Save to Firestore
-                try {
-                    const docRef = await addDoc(collection(db, "items"), itemData);
-                    alert("System Sync Complete. Item ID: " + docRef.id);
-                    form.reset(); // Clear form for next item
-                } catch (error) {
-                    console.error("Sync failed:", error);
-                    alert("Upload Interrupted: " + error.message);
-                }
+        function to64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
             });
+        }
+
+        document.getElementById("sendItem").addEventListener("click", async (e) => {
+            e.preventDefault(); // Stop page refresh
+
+            var itemName = document.getElementById("id_input").value;
+
+            var inputFileElement = document.getElementById("texture_file_input")
+            var b64;
+            if (inputFileElement.files.length > 0) {
+                var fileToParse = inputFileElement.files[0]
+                b64 = to64(fileToParse)
+            } else {
+                alert("upload a file")
+                return
+            }
+
+            // 1. Setup the folder
+            var bodyFolder = {
+                postType: "folderSetup",
+                fileName: `${itemName}`
+            };
+
+            var result = await fetch(GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(bodyFolder)
+            });
+
+            var data = await result.json();
+            console.log(data)
+            var parentId = data.data.id;
+            console.log(parentId)
+ 
+
+            var body2 = {
+                postType: "fileUpload",
+                fileName: `${itemName}_texture.png`,
+                parentId: parentId,
+                base64: b64
+            }
+
+
+            var result2 = await fetch(GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(body2)
+            });
+            var data2 = await result2.json();
+            console.log(data2)
+
+            /*
+              const form = document.getElementById("item-form");
+              const formData = new FormData(form);
+              const itemData = {};
+
+              // 1. Automatically grab all named inputs
+formData.forEach((value, key) => {
+                  const input = form.querySelector(`[name="${key}"]`);
+
+                  // Handle Checkboxes
+                  if (input.type === "checkbox") {
+                      itemData[key] = input.checked;
+                  }
+                  // Handle Numbers
+                  else if (input.type === "number") {
+                      itemData[key] = parseFloat(value) || 0;
+                  }
+                  // Handle everything else (strings, colors, etc)
+                  else {
+                      if (value !== "") itemData[key] = value;
+                  }
+              });
+
+              // 2. Add metadata
+              itemData.updatedAt = new Date();
+              itemData.itemType = document.getElementById("typeDropdown").innerText.replace("Item Type: ", "").toLowerCase();
+
+              // 3. Save to Firestore
+              try {
+                  const docRef = await addDoc(collection(db, "items"), itemData);
+                  alert("System Sync Complete. Item ID: " + docRef.id);
+                  form.reset(); // Clear form for next item
+              } catch (error) {
+                  console.error("Sync failed:", error);
+                  alert("Upload Interrupted: " + error.message);
+              }*/
+        });
 
         // 2. Select the BUTTONS inside the content div using querySelectorAll
         document.querySelectorAll("#typeDropdownContent button").forEach((btn) => {

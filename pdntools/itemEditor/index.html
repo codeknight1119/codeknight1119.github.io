@@ -194,7 +194,7 @@
                             <label>Model Texture Path</label>
 
 
-                            <div class="grid">
+                            <div class="grid" id="threeVeiwer">
 
                             </div>
 
@@ -207,7 +207,7 @@
     </main>
 
     <script type="module">
-        console.log("Version 1.2.3");
+        console.log("Version 1.2.4");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods
@@ -233,6 +233,23 @@
 
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2'
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader'
+
+        //setup threejs veiwer
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(500, 500);
+        document.getElementById("threeVeiwer").appendChild(renderer.domElement)
+
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        camera.position.z = 5;
+
 
         // --- Sign Up Logic ---
         document.getElementById("btn-signup").addEventListener("click", async () => {
@@ -357,7 +374,7 @@
             console.log(data)
             var parentId = data.data.id;
             console.log(parentId)
- 
+
 
             var body2 = {
                 postType: "fileUpload",

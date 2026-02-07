@@ -231,6 +231,9 @@
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyMeCSwAlGP8hRs_Qn7oEulPP1MjfleTjuykquFiV1tCIKelUEd15kbzjtz03gWV19s/exec";
 
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2'
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader'
+
         // --- Sign Up Logic ---
         document.getElementById("btn-signup").addEventListener("click", async () => {
             const email = document.getElementById("email").value;

@@ -233,6 +233,7 @@
 
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2'
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader'
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         //setup threejs veiwer
 
@@ -243,14 +244,18 @@
         renderer.setSize(500, 500);
         document.getElementById("threeVeiwer").appendChild(renderer.domElement)
 
+        const controls = new OrbitControls( camera, renderer.domElement );
+
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         const cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
 
         camera.position.z = 5;
+        controls.update();
 
         function animate() {
+            controls.update();
             renderer.render(scene, camera);
         }
         renderer.setAnimationLoop(animate);

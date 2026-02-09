@@ -98,7 +98,7 @@
                         <input type="password" id="password" placeholder="••••••••" required>
 
                         <div class="grid">
-                            <button type="submit" id="btn-login">Login</button>
+                            <button type="button" id="btn-login">Login</button>
                             <button type="button" class="outline" id="btn-signup">Register</button>
                         </div>
                     </form>
@@ -198,7 +198,7 @@
 
                             </div>
 
-                            <button id="sendItem">Sync to Game</button>
+                            <button type="button" id="sendItem">Sync to Game</button>
                         </form>
                     </article>
                 </div>
@@ -207,22 +207,17 @@
     </main>
     <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-    <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net",
-      "three/addons/": "https://cdn.jsdelivr.net"
-    }
-  }
-</script>
-
-
     <script type="module">
-        console.log("Version 1.2.5");
+        console.log("Version 1.2.5 - Fixed");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Changed: Import Firestore methods
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        // Import Three.js
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+        import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyA67p_uOaoxr4GDhsXpo0tkMAorlLYtTfY",
@@ -242,32 +237,30 @@
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyMeCSwAlGP8hRs_Qn7oEulPP1MjfleTjuykquFiV1tCIKelUEd15kbzjtz03gWV19s/exec";
 
-        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2'
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-        //setup threejs veiwer
-
+        //setup threejs viewer
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(500, 500);
-        document.getElementById("threeVeiwer").appendChild(renderer.domElement)
+        renderer.setClearColor(0x11151c);
+        document.getElementById("threeVeiwer").appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
+        controls.autoRotate = false;
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         const cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
 
-
         camera.position.z = 5;
         controls.update();
 
         const loader = new GLTFLoader();
 
+        // Store the currently loaded model so we can remove it
+        let currentModel = null;
 
         function animate() {
             controls.update();
@@ -277,29 +270,50 @@
 
         const modelImport = document.getElementById("model_file_input");
         modelImport.addEventListener("change", () => {
-            if (modelImport.files > 0) {
-                loader.load(modelImport.files[0], function (gltf) {
-
+            // Fixed: Check .length instead of comparing FileList to number
+            if (modelImport.files.length > 0) {
+                const file = modelImport.files[0];
+                const url = URL.createObjectURL(file);
+                
+                loader.load(url, function (gltf) {
+                    // Remove previous model if it exists
+                    if (currentModel) {
+                        scene.remove(currentModel);
+                    }
+                    
+                    currentModel = gltf.scene;
                     scene.add(gltf.scene);
+                    
+                    // Clean up the object URL
+                    URL.revokeObjectURL(url);
+                    console.log("Model loaded successfully");
 
                 }, undefined, function (error) {
-
-                    console.error(error);
-
+                    console.error("Error loading model:", error);
+                    alert("Failed to load model: " + error.message);
                 });
             }
-        })
-
+        });
 
         // --- Sign Up Logic ---
         document.getElementById("btn-signup").addEventListener("click", async () => {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
+            if (!email || !password) {
+                alert("Please enter both email and password");
+                return;
+            }
+
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const name = prompt("Enter your username.");
+
+                if (!name) {
+                    alert("Username is required");
+                    return;
+                }
 
                 await setDoc(doc(db, "users", user.uid), {
                     editor_clearance: false,
@@ -308,7 +322,11 @@
                 });
 
                 alert("Registration successful! You can now log in.");
+                // Clear form
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
             } catch (error) {
+                console.error("Registration error:", error);
                 alert("Error: " + error.message);
             }
         });
@@ -319,9 +337,16 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
+            if (!email || !password) {
+                alert("Please enter both email and password");
+                return;
+            }
+
             try {
                 await signInWithEmailAndPassword(auth, email, password);
+                console.log("Login attempt in progress...");
             } catch (error) {
+                console.error("Login error:", error);
                 alert("Error: " + error.message);
             }
         });
@@ -345,6 +370,7 @@
 
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
+                    console.log("User data:", userData);
                     if (userData.editor_clearance === true) {
                         showSection('editor-page');
                     } else {
@@ -356,23 +382,46 @@
                 }
             } catch (error) {
                 console.error("Permission check failed:", error);
+                alert("Error checking permissions: " + error.message);
             }
         }
 
+        // --- Logout Logic ---
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                console.log("Logged out successfully");
+                showSection('auth-page');
+            } catch (error) {
+                console.error("Logout error:", error);
+                alert("Error logging out: " + error.message);
+            }
+        };
+
         // --- UI Helpers ---
-        function showSection(id) {
+        window.showSection = function(id) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-        }
+        };
 
+        window.showTab = function(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            // Show selected tab
+            const tab = document.getElementById(tabId);
+            if (tab) {
+                tab.style.display = 'block';
+            }
+        };
 
         document.getElementById("typeDropdown").addEventListener("click", (e) => {
-            // Prevent this button from submitting the form too
+            // Prevent this button from submitting the form
             e.preventDefault();
             const content = document.getElementById("typeDropdownContent");
             content.style.display = content.style.display === "none" ? "block" : "none";
         });
-
 
         function to64(file) {
             return new Promise((resolve, reject) => {
@@ -387,6 +436,11 @@
             e.preventDefault(); // Stop page refresh
 
             var itemName = document.getElementById("id_input").value;
+
+            if (!itemName) {
+                alert("Please enter an item ID");
+                return;
+            }
 
             var inputFileElement = document.getElementById("texture_file_input")
             var b64;
@@ -414,7 +468,6 @@
             console.log(data)
             var parentId = data.data.id;
             console.log(parentId)
-
 
             var body2 = {
                 postType: "fileUpload",
@@ -473,6 +526,7 @@ formData.forEach((value, key) => {
         // 2. Select the BUTTONS inside the content div using querySelectorAll
         document.querySelectorAll("#typeDropdownContent button").forEach((btn) => {
             btn.addEventListener("click", (e) => {
+                e.preventDefault();
                 // Update the main button text
                 document.getElementById("typeDropdown").innerText = "Item Type: " + e.target.value;
 

@@ -152,7 +152,7 @@
                                 <label>Stackable <input type="checkbox"></label>
 
                                 <label>Texture File <input id="texture_file_input" type="file"></label>
-                                <label>Model File <input type="file"></label>
+                                <label>Model File <input id="model_file_input" type="file"></label>
                                 <label>Model Texture File <input type="file"></label>
 
                                 <label>Collision Size (X, Y, Z)</label>
@@ -205,6 +205,17 @@
             </div>
         </section>
     </main>
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net",
+      "three/addons/": "https://cdn.jsdelivr.net"
+    }
+  }
+</script>
+
 
     <script type="module">
         console.log("Version 1.2.5");
@@ -232,8 +243,8 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyMeCSwAlGP8hRs_Qn7oEulPP1MjfleTjuykquFiV1tCIKelUEd15kbzjtz03gWV19s/exec";
 
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2'
-        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader'
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
         //setup threejs veiwer
 
@@ -244,21 +255,40 @@
         renderer.setSize(500, 500);
         document.getElementById("threeVeiwer").appendChild(renderer.domElement)
 
-        const controls = new OrbitControls( camera, renderer.domElement );
+        const controls = new OrbitControls(camera, renderer.domElement);
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         const cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
 
+
         camera.position.z = 5;
         controls.update();
+
+        const loader = new GLTFLoader();
+
 
         function animate() {
             controls.update();
             renderer.render(scene, camera);
         }
         renderer.setAnimationLoop(animate);
+
+        const modelImport = document.getElementById("model_file_input");
+        modelImport.addEventListener("change", () => {
+            if (modelImport.files > 0) {
+                loader.load(modelImport.files[0], function (gltf) {
+
+                    scene.add(gltf.scene);
+
+                }, undefined, function (error) {
+
+                    console.error(error);
+
+                });
+            }
+        })
 
 
         // --- Sign Up Logic ---

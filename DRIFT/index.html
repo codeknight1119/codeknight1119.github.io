@@ -9,7 +9,7 @@
 
 <body>
     <h1>DRIFT</h1>
-    <h3>v1.4<h3>
+    <h3>v1.5<h3>
             <button id="pairBttn">Pair</button>
             <p id="out">out</p>
 </body>
@@ -18,7 +18,28 @@
     document.getElementById("pairBttn").addEventListener("click", async () => {
 
 
-navigator.bluetooth.requestDevice(options)
+        navigator.bluetooth.getAvailability().then((available) => {
+            if (available) {
+            
+                                let options = {
+                                    filters: [
+                                        //  { services: ["heart_rate"] },
+                                        //  { services: [0x1802, 0x1803] },
+                                         // { services: ["12345"] },
+                                     //     { name: "raspberrypi" },
+                                          { name: "DRIFT-P"},
+                                        // { namePrefix: "Prefix" },
+                                       
+                                    ],
+                                    optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
+                                    // optionalServices: ["battery_service"],
+                                };
+             /*   let options = {
+                    acceptAllDevices: true,
+                    optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
+                };*/
+
+               navigator.bluetooth.requestDevice(options)
     .then((device) => {
         out.innerText = "Connecting to GATT Server...";
         console.log("Device Name:", device.name);
@@ -53,6 +74,13 @@ navigator.bluetooth.requestDevice(options)
         console.error("Connection failed:", error); 
     });
 
+
+
+            } else {
+                out.innerText = "Bluetooth denied"
+                return
+            }
+        });
         /*
         
                 try {

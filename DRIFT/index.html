@@ -9,7 +9,7 @@
 
 <body>
     <h1>DRIFT</h1>
-    <h3>v1.5<h3>
+    <h3>v1.6<h3>
             <button id="pairBttn">Pair</button>
             <p id="out">out</p>
 </body>
@@ -20,59 +20,69 @@
 
         navigator.bluetooth.getAvailability().then((available) => {
             if (available) {
-            
-                                let options = {
-                                    filters: [
-                                        //  { services: ["heart_rate"] },
-                                        //  { services: [0x1802, 0x1803] },
-                                         // { services: ["12345"] },
-                                     //     { name: "raspberrypi" },
-                                          { name: "DRIFT-P"},
-                                        // { namePrefix: "Prefix" },
-                                       
-                                    ],
-                                    optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
-                                    // optionalServices: ["battery_service"],
-                                };
-             /*   let options = {
-                    acceptAllDevices: true,
-                    optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
-                };*/
 
-               navigator.bluetooth.requestDevice(options)
-    .then((device) => {
-        out.innerText = "Connecting to GATT Server...";
-        console.log("Device Name:", device.name);
-        return device.gatt.connect(); // Connect to the server
-    })
-    .then((server) => {
-        out.innerText = "Getting Service...";
-        // Ask for the specific Service UUID defined in your Python script
-        return server.getPrimaryService("12345678-1234-5678-1234-5678abcdef00");
-    })
-    .then((service) => {
-        out.innerText = "Getting Characteristic...";
-        // Ask for the specific Characteristic UUID defined in your Python script
-        return service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
-    })
-    .then((characteristic) => {
-        out.innerText = "Reading Value...";
-        // Trigger the ReadValue method on your Raspberry Pi
-        return characteristic.readValue();
-    })
-    .then((value) => {
-        // The Pi sends raw bytes. We use TextDecoder to turn them back into a string.
-        const decoder = new TextDecoder('utf-8');
-        const text = decoder.decode(value);
-        
-        // Display the result on the webpage!
-        out.innerText = `Success! The Pi says: "${text}"`;
-        console.log("Data received:", text);
-    })
-    .catch((error) => { 
-        out.innerText = "Error (Check Console)";
-        console.error("Connection failed:", error); 
-    });
+                let options = {
+                    filters: [
+                        //  { services: ["heart_rate"] },
+                        //  { services: [0x1802, 0x1803] },
+                        // { services: ["12345"] },
+                        //     { name: "raspberrypi" },
+                        { name: "DRIFT-P" },
+                        // { namePrefix: "Prefix" },
+
+                    ],
+                    optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
+                    // optionalServices: ["battery_service"],
+                };
+                /*   let options = {
+                       acceptAllDevices: true,
+                       optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
+                   };*/
+
+                navigator.bluetooth.requestDevice(options)
+                    .then((device) => {
+                        out.innerText = "Connecting to GATT Server...";
+                        console.log("Device Name:", device.name);
+                        return device.gatt.connect(); // Connect to the server
+                    })
+                    .then((server) => {
+                        out.innerText = "Getting Service...";
+                        // Ask for the specific Service UUID defined in your Python script
+                        return server.getPrimaryService("12345678-1234-5678-1234-5678abcdef00");
+                    })
+                    .then((service) => {
+                        out.innerText = "Getting Characteristic...";
+                        // Ask for the specific Characteristic UUID defined in your Python script
+                        return service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
+                    })
+                    .then(async (characteristic) => {
+                        out.innerText = "Waiting for RSSI"
+                        await characteristic.startNotifications()
+                        // 2. Set up the listener
+                        characteristic.addEventListener('characteristicvaluechanged', (event) => {
+                            const value = event.target.value;
+                            const decoder = new TextDecoder('utf-8');
+                            const text = decoder.decode(value);
+
+                            out.innerText = `Live Sensor Data: ${text}`;
+                            console.log("Update received:", text);
+                        });
+
+                        console.log("Subscription active.");
+                    })
+                    .then((value) => {
+                        // The Pi sends raw bytes. We use TextDecoder to turn them back into a string.
+                        const decoder = new TextDecoder('utf-8');
+                        const text = decoder.decode(value);
+
+                        // Display the result on the webpage!
+                        out.innerText = `Success! The Pi says: "${text}"`;
+                        console.log("Data received:", text);
+                    })
+                    .catch((error) => {
+                        out.innerText = "Error (Check Console)";
+                        console.error("Connection failed:", error);
+                    });
 
 
 

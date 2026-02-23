@@ -2,48 +2,49 @@
 <html lang="en">
 
 <head>
-<meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DRIFT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <style>
-    #deviceInOut {
-        visibility : visible;
-    }
+        #deviceInOut {
+            visibility: visible;
+        }
     </style>
 </head>
 <main class="container">
-<body>
-    <h1>DRIFT</h1>
-    <h3>v1.6</h3>
-            <button id="pairBttn">Pair Device</button>
-            
-            <section>
+
+    <body>
+        <h1>DRIFT</h1>
+        <h3>v1.6</h3>
+        <button id="pairBttn">Pair Device</button>
+
+        <section>
             <h6>RSSI Output</h6>
             <p id="out">0.0</p>
             <br>
             <h6>Strongest signal direction</h6>
             <p id="direction">0.0</p>
             <br>
-            </section>
+        </section>
 
-                <fieldset>
-                    <label>
-                        Target Frequency:
-                        <input type="number" name="targetFreq" placeholder=93.9>
-                    </label>
-                    <label>
-                        Device functions: <br>
-                        <button id="restartDevice">Restart Device</button>
-                        <button id="shutdownDevice">Shutdown Device</button>
-                    </label>
-                </fieldset>
-</body>
+        <fieldset>
+            <label>
+                Target Frequency:
+                <input type="number" name="targetFreq" placeholder=93.9>
+            </label>
+            <label>
+                Device functions: <br>
+                <button id="restartDevice">Restart Device</button>
+                <button id="shutdownDevice">Shutdown Device</button>
+            </label>
+        </fieldset>
+    </body>
 </main>
 <script>
     const deviceInOut = document.getElementById("deviceInOut")
     const rssiOut = document.getElementById("rssiOUt")
-    
+
     let writeCharacteristic;
     document.getElementById("pairBttn").addEventListener("click", async () => {
         navigator.bluetooth.getAvailability().then((available) => {
@@ -66,7 +67,7 @@
                     })
                     .then(async (service) => {
                         out.innerText = "Getting Characteristic...";
-                    
+
                         const notifCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
                         await notifCharacteristic.startNotifications()
                         notifCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
@@ -77,7 +78,7 @@
                             out.innerText = `Live Sensor Data: ${text}`;
                             console.log("Update received:", text);
                         });
-                        
+
                         writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
                     })
                     .catch((error) => {
@@ -92,7 +93,7 @@
     })
 
     async function sendDataToPI(command) {
-        if(!writeCharacteristic){
+        if (!writeCharacteristic) {
             console.error("Pi is not connected or write characteristic is not found")
         }
         try {
@@ -100,8 +101,21 @@
             const data = encoder.encode(command);
             await writeCharacteristic.writeValue(data)
             console.log(dataSent)
+        } catch (err) {
+            console.error(err)
+
         }
     }
+
+    document.getElementById("targetFreq").addEventListener("change", async (event) => {
+        sendDataToPI("FREQ:" + event.target.value)
+    })
+    document.getElementById("restartDevice").addEventListener("click", async () => {
+        sendDataToPI("REBOOT")
+    })
+    document.getElementById("shutdownDevice").addEventListener("click", async () => {
+        sendDataToPI("SHUTDOWN")
+    })
 
 </script>
 

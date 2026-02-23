@@ -2,43 +2,58 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DRIFT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+    #deviceInOut {
+        visibility : visible;
+    }
+    </style>
 </head>
-
+<main class="container">
 <body>
     <h1>DRIFT</h1>
-    <h3>v1.6<h3>
-            <button id="pairBttn">Pair</button>
-            <p id="out">out</p>
+    <h3>v1.6</h3>
+            <button id="pairBttn">Pair Device</button>
+            
+            <section>
+            <h6>RSSI Output</h6>
+            <p id="out">0.0</p>
+            <br>
+            <h6>Strongest signal direction</h6>
+            <p id="direction">0.0</p>
+            <br>
+            </section>
+
+                <fieldset>
+                    <label>
+                        Target Frequency:
+                        <input type="number" name="targetFreq" placeholder=93.9>
+                    </label>
+                    <label>
+                        Device functions: <br>
+                        <button id="restartDevice">Restart Device</button>
+                        <button id="shutdownDevice">Shutdown Device</button>
+                    </label>
+                </fieldset>
 </body>
+</main>
 <script>
-    const out = document.getElementById("out")
+    const deviceInOut = document.getElementById("deviceInOut")
+    const rssiOut = document.getElementById("rssiOUt")
+    
+    let writeCharacteristic;
     document.getElementById("pairBttn").addEventListener("click", async () => {
-
-
         navigator.bluetooth.getAvailability().then((available) => {
             if (available) {
-
                 let options = {
                     filters: [
-                        //  { services: ["heart_rate"] },
-                        //  { services: [0x1802, 0x1803] },
-                        // { services: ["12345"] },
-                        //     { name: "raspberrypi" },
                         { name: "DRIFT-P" },
-                        // { namePrefix: "Prefix" },
-
                     ],
                     optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
-                    // optionalServices: ["battery_service"],
                 };
-                /*   let options = {
-                       acceptAllDevices: true,
-                       optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
-                   };*/
-
                 navigator.bluetooth.requestDevice(options)
                     .then((device) => {
                         out.innerText = "Connecting to GATT Server...";
@@ -47,19 +62,14 @@
                     })
                     .then((server) => {
                         out.innerText = "Getting Service...";
-                        // Ask for the specific Service UUID defined in your Python script
                         return server.getPrimaryService("12345678-1234-5678-1234-5678abcdef00");
                     })
-                    .then((service) => {
+                    .then(async (service) => {
                         out.innerText = "Getting Characteristic...";
-                        // Ask for the specific Characteristic UUID defined in your Python script
-                        return service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
-                    })
-                    .then(async (characteristic) => {
-                        out.innerText = "Waiting for RSSI"
-                        await characteristic.startNotifications()
-                        // 2. Set up the listener
-                        characteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    
+                        const notifCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
+                        await notifCharacteristic.startNotifications()
+                        notifCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
                             const value = event.target.value;
                             const decoder = new TextDecoder('utf-8');
                             const text = decoder.decode(value);
@@ -67,51 +77,31 @@
                             out.innerText = `Live Sensor Data: ${text}`;
                             console.log("Update received:", text);
                         });
-
-                        console.log("Subscription active.");
-                    })
-                    .then((value) => {
-                        // The Pi sends raw bytes. We use TextDecoder to turn them back into a string.
-                        const decoder = new TextDecoder('utf-8');
-                        const text = decoder.decode(value);
-
-                        // Display the result on the webpage!
-                        out.innerText = `Success! The Pi says: "${text}"`;
-                        console.log("Data received:", text);
+                        
+                        writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
                     })
                     .catch((error) => {
                         out.innerText = "Error (Check Console)";
                         console.error("Connection failed:", error);
                     });
-
-
-
             } else {
                 out.innerText = "Bluetooth denied"
                 return
             }
         });
-        /*
-        
-                try {
-                    console.log('Requesting Bluetooth Device...');
-                    const device = await navigator.bluetooth.requestDevice({
-                        // Filter by name or alias
-                        filters: [{ name: 'raspberrypi' }],
-                        // Or use acceptAllDevices: true if you don't have a specific UUID
-                        optionalServices: ['battery_service'] // Required to access services later
-                    });
-        
-                    console.log('Device Name:', device.name);
-                    const server = await device.gatt.connect();
-                    console.log('Connected to GATT Server');
-        
-                } catch (error) {
-                    console.error('Connection failed!', error);
-                }
-        
-        */
     })
+
+    async function sendDataToPI(command) {
+        if(!writeCharacteristic){
+            console.error("Pi is not connected or write characteristic is not found")
+        }
+        try {
+            const encoder = new TextEncoder("utf-8");
+            const data = encoder.encode(command);
+            await writeCharacteristic.writeValue(data)
+            console.log(dataSent)
+        }
+    }
 
 </script>
 

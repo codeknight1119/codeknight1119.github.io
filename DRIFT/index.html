@@ -2,72 +2,147 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DRIFT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <style>
-        #deviceInOut {
-            visibility: visible;
+        .data-readout {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--pico-primary);
+            margin-bottom: 0.5rem;
+        }
+        .distance-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
         }
     </style>
 </head>
+<body>
 <main class="container">
-
-    <body>
-        <h1>DRIFT</h1>
-        <h3>v1.7</h3>
-        <button id="pairBttn">Pair Device</button>
-
-        <section>
-            <h6>RSSI Output</h6>
-            <p id="out">0.0</p>
-            <br>
+    <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
+    <h1>DRIFT</h1>
+    <h3>v1.6</h3>
+    <button id="pairBttn" style="color: white">Pair Device</button>
+    </hgroup>
+<hr>
+<article style="text-align: center;">
+    <p id="out"><b>Waiting to connect</b></p>
+    </article>
+            
+            <section>
+                <article>
+                    <h3 style="text-align: center;"><strong>Device Data</strong></h3>
+                    <hr>
+            <h6>Strongest RSSI</h6>
+            <p id="strongestRSSI">0.0</p>
+            <hr>
             <h6>Strongest signal direction</h6>
             <p id="direction">0.0</p>
-            <br>
-        </section>
+            <hr>
+            <h6 >Estimated Distance</h6>
+            <div class="distance-wrapper">
+            <p id="distance">0</p> <span>feet</span>
+            </div>
+            <hr>
+            </section>
+            </article>
+            
+            
+            <article>
+                        <h3 style="text-align: center;"><strong>Settings</strong></h3>
+                    <hr>
+                <fieldset>
+                    <label>
+                        Target Frequency (MHz)
+                        <input type="number" name="targetFreq" placeholder=93.9>
+                    </label>
+                    <hr>
+                    <label for="n_selector">Select terrain density</label>
+                    <select id="n_selector">
+                        <option value=2.0>Open Feild</option>
+                        <option value=3.0>Light Brush</option>
+                        <option value=3.5 selected>Urban/City</option>
+                        <option value=4.5>Dense Forest</option>
+                        <option value ="custom"> Custom</option>
+                    </select>
+                    
+                    <div id="custom_n_selector" style="display: none;">
+                        <input type="number" id="custom-input" placeholder="Type your custom value" min="0"/>
+                    </div>
+                    </article>
+                    <article>
+                    <label>
+                         <h3 style="text-align: center;"><strong>Device Functions</strong></h3>
+                         <div class="grid">
+                        <button id="restartDevice">Restart Device</button>
+                        <button id="shutdownDevice">Shutdown Device</button>
+                        </div>
+                    </label>
+                    </article>
+                </fieldset>
 
-        <fieldset>
-            <label>
-                Target Frequency:
-                <input type="number" name="targetFreq" placeholder=93.9>
-            </label>
-            <label>
-                Device functions: <br>
-                <button id="restartDevice">Restart Device</button>
-                <button id="shutdownDevice">Shutdown Device</button>
-            </label>
-        </fieldset>
-    </body>
 </main>
+</body>
 <script>
-    const deviceInOut = document.getElementById("deviceInOut")
-    const rssiOut = document.getElementById("rssiOUt")
+  const select_n = document.getElementById('n_selector');
+const customContainer = document.getElementById('custom_n_selector');
+const customInputField = document.getElementById('custom-input');
+const custom_n_output = document.getElementById("custom_n_output");
 
+// 1. Handle the Dropdown Change
+select_n.addEventListener('change', (event) => {
+    const value = event.target.value;
+
+    if (value === 'custom') {
+        customContainer.style.display = 'block';
+        customInputField.focus();
+    } else {
+        customContainer.style.display = 'none';
+        // Optional: clear the custom field if they switch back
+        custom_n_output.textContent = "Selected: " + value;
+    }
+});
+
+// 2. Handle the Custom Input separately
+customInputField.addEventListener('input', () => {
+    custom_n_output.textContent = "Custom Value: " + customInputField.value;
+});
+
+
+    const deviceInOut = document.getElementById("deviceInOut")
+    const rssiOut = document.getElementById("rssiOut")
+    
     let writeCharacteristic;
     document.getElementById("pairBttn").addEventListener("click", async () => {
+
+
         navigator.bluetooth.getAvailability().then((available) => {
             if (available) {
+
                 let options = {
                     filters: [
                         { name: "DRIFT-P" },
+
                     ],
                     optionalServices: ["12345678-1234-5678-1234-5678abcdef00"]
                 };
+
                 navigator.bluetooth.requestDevice(options)
                     .then((device) => {
-                        out.innerText = "Connecting to GATT Server...";
+                        out.innerHTML = "<b>Connecting to GATT Server...</b>";
                         console.log("Device Name:", device.name);
                         return device.gatt.connect(); // Connect to the server
                     })
                     .then((server) => {
-                        out.innerText = "Getting Service...";
+                        out.innerHTML = "<b>Getting Service...</b>";
                         return server.getPrimaryService("12345678-1234-5678-1234-5678abcdef00");
                     })
                     .then(async (service) => {
-                        out.innerText = "Getting Characteristic...";
-
+                        out.innerHTML = "<b>Getting Characteristic...</b>";
+                    
                         const notifCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
                         await notifCharacteristic.startNotifications()
                         notifCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
@@ -75,48 +150,37 @@
                             const decoder = new TextDecoder('utf-8');
                             const text = decoder.decode(value);
 
-                            out.innerText = `Live Sensor Data: ${text}`;
+                            strongestRSSI.innerText = text};
                             console.log("Update received:", text);
                         });
-
+                        
+                        await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
+                    })
+                    .then(async (characteristic) => {
+                        deviceInOut.style.visibility = "visible"
+                        out.innerHTML = "<b>Device connected</b>"
+                        
+                        await characteristic.startNotifications()
+                        // 2. Set up the listener
+                        
+                        
                         writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
+
+                        console.log("Subscription active.");
                     })
                     .catch((error) => {
-                        out.innerText = "Error (Check Console)";
+                        out.innerHTML = `<b>Error: ${error}</b>`;
                         console.error("Connection failed:", error);
                     });
+
+
+
             } else {
-                out.innerText = "Bluetooth denied"
+                out.innerHTML = "<b>Bluetooth denied</b>"
                 return
             }
         });
     })
-
-    async function sendDataToPI(command) {
-        if (!writeCharacteristic) {
-            console.error("Pi is not connected or write characteristic is not found")
-        }
-        try {
-            const encoder = new TextEncoder("utf-8");
-            const data = encoder.encode(command);
-            await writeCharacteristic.writeValue(data)
-            console.log(dataSent)
-        } catch (err) {
-            console.error(err)
-
-        }
-    }
-
-    document.getElementById("targetFreq").addEventListener("change", async (event) => {
-        sendDataToPI("FREQ:" + event.target.value)
-    })
-    document.getElementById("restartDevice").addEventListener("click", async () => {
-        sendDataToPI("REBOOT")
-    })
-    document.getElementById("shutdownDevice").addEventListener("click", async () => {
-        sendDataToPI("SHUTDOWN")
-    })
-
 </script>
 
 </html>

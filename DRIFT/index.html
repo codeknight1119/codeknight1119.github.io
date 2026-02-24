@@ -28,6 +28,7 @@
     <button id="pairBttn" style="color: white">Pair Device</button>
     </hgroup>
 <hr>
+  <div id="mainContent">
 <article style="text-align: center;">
     <p id="out"><b>Waiting to connect</b></p>
     </article>
@@ -83,7 +84,7 @@
                     </label>
                     </article>
                 </fieldset>
-
+  </div>
 </main>
 </body>
 <script>
@@ -112,7 +113,7 @@ customInputField.addEventListener('input', () => {
 });
 
 
-    const deviceInOut = document.getElementById("deviceInOut")
+    const deviceInOut = document.getElementById("mainContent")
     const rssiOut = document.getElementById("rssiOut")
     
     let writeCharacteristic;

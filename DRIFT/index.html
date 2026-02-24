@@ -18,19 +18,36 @@
             align-items: baseline;
             gap: 0.5rem;
         }
+
+main.container {
+    max-width: 700px;
+}
+
+article {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    backdrop-filter: blur(6px);
+}
+
+h1 {
+    letter-spacing: 0.1em;
+}
     </style>
 </head>
 <body>
 <main class="container">
     <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
     <h1>DRIFT</h1>
-    <h3>v1.9</h3>
+    <h3>v2.0</h3>
+    <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
+    <br>
     <button id="pairBttn" style="color: white">Pair Device</button>
     </hgroup>
 <hr>
-  <div id="mainContent">
 <article style="text-align: center;">
     <p id="out"><b>Waiting to connect</b></p>
+    <div id="mainContent">
     </article>
             
             <section>
@@ -38,7 +55,7 @@
                     <h3 style="text-align: center;"><strong>Device Data</strong></h3>
                     <hr>
             <h6>Strongest RSSI</h6>
-            <p id="strongestRSSI">0.0</p>
+            <p id="strongestRSSI">0.0</p> <span>dB</span>
             <hr>
             <h6>Strongest signal direction</h6>
             <p id="direction">0.0</p>
@@ -48,8 +65,9 @@
             <p id="distance">0</p> <span>feet</span>
             </div>
             <hr>
+                </article>
             </section>
-            </article>
+            
             
             
             <article>
@@ -69,11 +87,12 @@
                         <option value=4.5>Dense Forest</option>
                         <option value ="custom"> Custom</option>
                     </select>
-                    
                     <div id="custom_n_selector" style="display: none;">
                         <input type="number" id="custom-input" placeholder="Type your custom value" min="0"/>
                     </div>
+                    </fieldset>
                     </article>
+                    
                     <article>
                     <label>
                          <h3 style="text-align: center;"><strong>Device Functions</strong></h3>
@@ -83,15 +102,15 @@
                         </div>
                     </label>
                     </article>
-                </fieldset>
-  </div>
+                
+</div>
 </main>
 </body>
 <script>
   const select_n = document.getElementById('n_selector');
 const customContainer = document.getElementById('custom_n_selector');
 const customInputField = document.getElementById('custom-input');
-const custom_n_output = document.getElementById("custom_n_output");
+const out = document.getElementById("out")
 
 // 1. Handle the Dropdown Change
 select_n.addEventListener('change', (event) => {
@@ -102,23 +121,18 @@ select_n.addEventListener('change', (event) => {
         customInputField.focus();
     } else {
         customContainer.style.display = 'none';
-        // Optional: clear the custom field if they switch back
-        custom_n_output.textContent = "Selected: " + value;
     }
 });
 
-// 2. Handle the Custom Input separately
-customInputField.addEventListener('input', () => {
-    custom_n_output.textContent = "Custom Value: " + customInputField.value;
-});
+
 
 
     const deviceInOut = document.getElementById("mainContent")
     const rssiOut = document.getElementById("rssiOut")
-    
+    const pairBttn = document.getElementById("pairBttn")
     let writeCharacteristic;
-    document.getElementById("pairBttn").addEventListener("click", async () => {
-
+    pairBttn.addEventListener("click", async () => {
+pairBttn.innerText ="Connecting..."
 
         navigator.bluetooth.getAvailability().then((available) => {
             if (available) {
@@ -151,23 +165,12 @@ customInputField.addEventListener('input', () => {
                             const decoder = new TextDecoder('utf-8');
                             const text = decoder.decode(value);
 
-                            strongestRSSI.innerText = text;
+                            strongestRSSI.innerText = text
                             console.log("Update received:", text);
                         });
                         
-                        await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
-                    })
-                    .then(async (characteristic) => {
-                        deviceInOut.style.visibility = "visible"
-                        out.innerHTML = "<b>Device connected</b>"
-                        
-                        await characteristic.startNotifications()
-                        // 2. Set up the listener
-                        
-                        
                         writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
-
-                        console.log("Subscription active.");
+                        out.innerHTML = "<b>Device connected</b>"
                     })
                     .catch((error) => {
                         out.innerHTML = `<b>Error: ${error}</b>`;

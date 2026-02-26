@@ -33,13 +33,19 @@ article {
 h1 {
     letter-spacing: 0.1em;
 }
+.small_input {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid black;
+    box-sizing: border-box; /* Ensures padding/border are included in the 300px width */
+  }
     </style>
 </head>
 <body>
 <main class="container">
     <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
     <h1>DRIFT</h1>
-    <h3>v2.1</h3>
+    <h3>v2.2</h3>
     <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
     <br>
     <button id="pairBttn" style="color: white">Pair Device</button>
@@ -67,6 +73,11 @@ h1 {
             <p id="distance">0</p> <span>feet</span>
             </div>
             <hr>
+            <h6>Last Recorded RSSI</h6>
+            <div class = "distance-wrapper">
+                <p id="rssiOut">0</p> <span>dB</span>
+            </div>
+            <hr>
                 </article>
             </section>
             
@@ -78,8 +89,26 @@ h1 {
                 <fieldset>
                     <label>
                         Target Frequency (MHz)
-                        <input type="number" name="targetFreq" placeholder=93.9>
+                        <input type="number" name="targetFreq" placeholder=93.9 id="targetFrequency">
                     </label>
+                    <hr>
+                    <label>
+                    Test Signal (dB)
+                    <input type="number" name="testSignal" id="signalTestInput"></input>
+                    <select id="customTestSignals">
+                        <option value="createNew">Create New</option>
+                    </select>
+                    </label>
+                    <div id="createNewTestSignal">
+                        <hr>
+                        <p>To accurately detect distances, you need to get a refrence RSSI.</p>
+                        <p>Enter the transmitter's signal,then point the open slit towards the transmitter and hit the <b>Start signal test</b> button and wait for the test to finish.</p>
+                        <p>This will record the refrence RSSI and save it to your browser.</p>
+                        <p id="scanFeedback"><b>Will scan for: 93.9 Mhz</b></p>
+                        <div class="distance-wrapper">
+                        <button id="startTest">Start signal test</button>
+                        </div>
+                    </div>
                     <hr>
                     <label for="n_selector">Select terrain density</label>
                     <select id="n_selector">
@@ -94,7 +123,6 @@ h1 {
                     </div>
                     </fieldset>
                     </article>
-                    
                     <article>
                     <label>
                          <h3 style="text-align: center;"><strong>Device Functions</strong></h3>
@@ -109,10 +137,67 @@ h1 {
 </main>
 </body>
 <script>
+
+//localStorage.setItem("testSignals", null)
   const select_n = document.getElementById('n_selector');
 const customContainer = document.getElementById('custom_n_selector');
 const customInputField = document.getElementById('custom-input');
 const out = document.getElementById("out")
+
+var strongestRSSIVal = -200;
+var latestRSSI = -200;
+var highestDirection = 0;
+
+var currentFrequency = 93.9
+
+var do_test_signal_test = false;
+var signal_test_signals = [];
+var savedSignals = localStorage.getItem("testSignals")
+if(savedSignals !== "null" && savedSignals){
+   var data = JSON.parse(localStorage.getItem("testSignals"))
+  // var data = {'test':'test'}
+    var keys = Object.keys(data)
+
+    keys.forEach((val)=>{
+        var newElement = document.createElement("option")
+        newElement.textContent = val;
+        newElement.value = data[val]
+        document.getElementById("customTestSignals").appendChild(newElement)
+    })
+}
+
+
+document.getElementById("startTest").addEventListener("click",()=>{
+        do_test_signal_test = true;
+        document.getElementById("scanFeedback").innerHTML = `<b>Currently scanning for ${currentFrequency}</b>`
+        setTimeout(()=>{
+            do_test_signal_test = false;
+            var num = 0;
+            signal_test_signals.forEach((val)=>{
+                num += Number(val);
+            })
+            num = num/ signal_test_signals.length;
+            signal_test_signals = [];
+            
+            let existingData = {};
+            if (localStorage.getItem("testSignals") && localStorage.getItem("testSignals") !== "null") {
+                try {
+                    existingData = JSON.parse(localStorage.getItem("testSignals"));
+                } catch (e) {
+                    existingData = {};
+                }
+            }
+            
+            existingData[String(currentFrequency)] = num;
+            localStorage.setItem("testSignals", JSON.stringify(existingData));
+            
+            var newElement = document.createElement("option")
+        newElement.textContent = currentFrequency
+        newElement.value = num
+        document.getElementById("customTestSignals").appendChild(newElement)
+             document.getElementById("scanFeedback").innerHTML = `<b>Done scanning for ${currentFrequency}</b>`
+        },10000)
+})
 
 // 1. Handle the Dropdown Change
 select_n.addEventListener('change', (event) => {
@@ -126,7 +211,14 @@ select_n.addEventListener('change', (event) => {
     }
 });
 
-
+document.getElementById("customTestSignals").addEventListener("change", (event)=>{
+    if(event.value !== "createNew"){
+        document.getElementById("createNewTestSignal").style.visibility = "visible" 
+    }else{
+        document.getElementById("createNewTestSignal").style.visibility = "hidden" 
+        document.getElementById("signalTestInput").value = event.value
+    }
+})
 
 
     const deviceInOut = document.getElementById("mainContent")
@@ -166,9 +258,23 @@ pairBttn.innerText ="Connecting..."
                             const value = event.target.value;
                             const decoder = new TextDecoder('utf-8');
                             const text = decoder.decode(value);
+    
+                            // Split the comma string
+                            const parts = text.split(',');
+                            if (parts.length < 3) return;
 
-                            strongestRSSI.innerText = text
-                            console.log("Update received:", text);
+                            latestRSSI = parts[0];
+                            strongestRSSIVal = parts[1];
+                            highestDirection = (Number(parts[2]) * 7.2).toFixed(1); // Calculate degrees
+                        
+                            // Update UI
+                            document.getElementById("rssiOut").innerText = latestRSSI;
+                            document.getElementById("strongestRSSI").innerText = strongestRSSIVal;
+                            document.getElementById("direction").innerText = highestDirection;
+                        
+                            if(do_test_signal_test){
+                                signal_test_signals.push(Number(latestRSSI));
+                            }
                         });
                         
                         writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
@@ -187,6 +293,65 @@ pairBttn.innerText ="Connecting..."
             }
         });
     })
+    
+    function calculateDist(RSSI){
+        
+    }
+    
+    // Restart Device
+document.getElementById("restartDevice").addEventListener("click", async () => {
+    if (!writeCharacteristic) {
+        alert("Please connect a device before trying to restart it.");
+        return; // Stops the function here
+    }
+    
+    try {
+        const command = new TextEncoder().encode("REBOOT");
+        await writeCharacteristic.writeValueWithoutResponse(command);
+        console.log("Restart command sent.");
+    } catch (error) {
+        console.error("Restart failed:", error);
+    }
+});
+
+// Shutdown Device
+document.getElementById("shutdownDevice").addEventListener("click", async () => {
+    if (!writeCharacteristic) {
+        alert("Please connect a device before trying to turn it off.");
+        return; 
+    }
+    
+    try {
+        const command = new TextEncoder().encode("SHUTDOWN");
+        await writeCharacteristic.writeValueWithoutResponse(command);
+        console.log("Shutdown command sent.");
+    } catch (error) {
+        console.error("Shutdown failed:", error);
+    }
+});
+
+// Update Target Frequency
+document.getElementById("targetFrequency").addEventListener("change", async (event) => {
+    if (!writeCharacteristic) {
+        alert("Please connect a device before changing the frequency.");
+        return;
+    }
+    
+    const newFrequency = event.target.value;
+    
+    // Prevent sending an empty string if the user clears the input
+    if (!newFrequency) return; 
+    
+    try {
+        const commandString = `FREQ:${newFrequency}`;
+        const command = new TextEncoder().encode(commandString);
+        await writeCharacteristic.writeValueWithoutResponse(command);
+        console.log(`Sent new frequency: ${commandString}`);
+    } catch (error) {
+        console.error("Failed to send frequency update:", error);
+    }
+});
+    
 </script>
 
 </html>

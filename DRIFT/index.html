@@ -61,11 +61,12 @@
 
         /* Styling the canvas to match Pico's theme */
         canvas.vis {
-            border: 1px solid var(--pico-muted-border-color);
-            border-radius: var(--pico-border-radius);
-            background-color: var(--pico-card-sectioning-background-color);
-            box-shadow: var(--pico-card-box-shadow);
-            /* Make it responsive on mobile */
+            border: none;
+            /* No borders */
+            background: transparent;
+            /* Makes it see-through */
+            max-width: 100%;
+            height: auto;
             max-width: 100%;
             height: auto;
         }
@@ -76,7 +77,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.0</h3>
+            <h3>v3.1</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -402,23 +403,58 @@
         }
     });
 
-    //Setup the canvas for visulizations
-    const canvas = document.getElementById("vizCtx")
+    const canvas = document.getElementById("vizCtx");
     const ctx = canvas.getContext("2d");
-    const style = getComputedStyle(document.body);
-    const primaryColor = style.getPropertyValue('--pico-primary');
-    const mutedColor = style.getPropertyValue('--pico-muted-color');
-    const ratio = (Math.PI / 180);
-    const radius = 135
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    for (let i = 0; i < 360; i++) {
-        const px = Math.cos(i * ratio) * radius
-        const py = Math.sin(i * ratio) * radius
-        ctx.fillStyle = i % 90 === 0 ? primaryColor : mutedColor;
-        ctx.fillRect(centerX + px, centerY + py, 2, 2);
+
+    // --- 1. THE RETINA/HIGH-DPI CRISPNESS FIX ---
+    const targetSize = 300; // Your desired CSS display size
+    const scaleFactor = window.devicePixelRatio || 1;
+
+    // Upscale the internal canvas resolution
+    canvas.width = targetSize * scaleFactor;
+    canvas.height = targetSize * scaleFactor;
+
+    // Scale the canvas context so all your drawing commands scale automatically!
+    ctx.scale(scaleFactor, scaleFactor);
+
+    // --- 2. STYLING CONFIGURATION ---
+    // These values are based on the standard 300px space
+    let circleFillColor = "rgba(32, 201, 151, 0.3)";
+    let circleStrokeColor = "rgb(32, 201, 151)";
+    let dotSize = 3;
+    let radarRadius = 120;
+
+    // Notice we use the standard 300 size here, NOT the upscaled canvas.width
+    const centerX = 150;
+    const centerY = 150;
+
+    let signalData = new Array(360).fill(0);
+
+    function drawVisualization() {
+        ctx.clearRect(0, 0, targetSize, targetSize);
+
+        for (let degree = 0; degree < 360; degree++) {
+            const radians = degree * (Math.PI / 180);
+
+            const currentDistance = radarRadius + (signalData[degree] || 0);
+
+            const px = centerX + Math.cos(radians) * currentDistance;
+            const py = centerY + Math.sin(radians) * currentDistance;
+
+            ctx.beginPath();
+            ctx.arc(px, py, dotSize, 0, 2 * Math.PI);
+
+            ctx.fillStyle = circleFillColor;
+            ctx.fill();
+
+            ctx.strokeStyle = circleStrokeColor;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
     }
 
+    // Initial draw
+    drawVisualization();
 </script>
 
 </html>

@@ -71,6 +71,10 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
+      import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js";
+
+const messaging = getMessaging(app);
+
     const urlParams = new URLSearchParams(window.location.search);
 
     // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
@@ -603,8 +607,8 @@
               unreadCount++;
               changeFavicon('resources/notifC.png');
               document.title = `(${unreadCount}) ${originalTitle}`;
-              if(urlParams.get('notifs') === true){
-              notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
+              if (urlParams.get('notifs') === true) {
+                notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
               }
             }
           }
@@ -781,34 +785,55 @@
       const notifTitle = `${sender} in ${conversationName || 'a conversation'}`;
       const notifBody = preview;
 
-      if (Notification.permission === "default" || Notification.permission === "denied") {
-        Notification.requestPermission();
-      }
-      if (Notification.permission === "granted") {
-        const options = {
-          body: notifBody,
-          icon: 'resources/notifC.png',
-          tag: notifTag,          // Tag so notifications for this convo replace each other
-          renotify: true,         // Trigger if already open
-          silent: false           // User will get sound/vibration (if their device does)
-        };
+      const options = {
+        body: notifBody,
+        icon: 'resources/notifC.png',
+        tag: notifTag,          // Tag so notifications for this convo replace each other
+        renotify: true,         // Trigger if already open
+        silent: false           // User will get sound/vibration (if their device does)
+      };
 
-        const notification = new Notification(notifTitle, options);
-        notification.onclick = function () {
-          window.focus();
-          // Load conversation (optional: add more if needed to select/highlight UI)
-          if (typeof loadConversation === 'function' && conversationId && conversationName) {
-            loadConversation(conversationId, { name: conversationName });
+      if (Notification.permission === "default" || Notification.permission === "denied") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            const notification = new Notification(notifTitle, options);
+            notification.onclick = function () {
+              window.focus();
+              // Load conversation (optional: add more if needed to select/highlight UI)
+              if (typeof loadConversation === 'function' && conversationId && conversationName) {
+                loadConversation(conversationId, { name: conversationName });
+              }
+              notification.close();
+            };
+            // Clean up (optionally after some time)
+            setTimeout(() => {
+              try { notification.close(); } catch (e) { }
+              notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
+            }, 10000); // Auto-close after 10 seconds, can change
           }
-          notification.close();
-        };
-        // Clean up (optionally after some time)
-        setTimeout(() => {
-          try { notification.close(); } catch (e) { }
-          notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
-        }, 10000); // Auto-close after 10 seconds, can change
-      }
+        }
+        )
+      };
+    if (Notification.permission === "granted") {
+
+      const notification = new Notification(notifTitle, options);
+      notification.onclick = function () {
+        window.focus();
+        // Load conversation (optional: add more if needed to select/highlight UI)
+        if (typeof loadConversation === 'function' && conversationId && conversationName) {
+          loadConversation(conversationId, { name: conversationName });
+        }
+        notification.close();
+      };
+      // Clean up (optionally after some time)
+      setTimeout(() => {
+        try { notification.close(); } catch (e) { }
+        notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
+      }, 10000); // Auto-close after 10 seconds, can change
     }
+  }
+  
+
 
 
 

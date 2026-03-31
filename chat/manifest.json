@@ -1,0 +1,12 @@
+{
+  "name": "Hollow Comms",
+  "short_name": "HC",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "/resources/normalC.png", "type": "image/png", "sizes": "500x500" },
+    { "src": "/resources/notifC.png", "type": "image/png", "sizes": "500x500" }
+  ]
+}

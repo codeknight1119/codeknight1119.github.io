@@ -49,40 +49,42 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v2.3</h3>
+            <h3>v2.4</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
         </hgroup>
         <hr>
+
         <article style="text-align: center;">
             <p id="out"><b>Waiting to connect</b></p>
-            <div id="mainContent">
         </article>
 
         <section>
             <details open>
-               <summary> <h3 style="text-align: center;"><strong>Device Data</strong></h3> </summary>
-               <fieldset>
-                <hr>
-                <h6>Strongest RSSI</h6>
-                <div class="distance-wrapper">
-                    <p id="strongestRSSI">0.0</p> <span>dB</span>
-                </div>
-                <hr>
-                <h6>Strongest signal direction</h6>
-                <p id="direction">0.0</p>
-                <hr>
-                <h6>Estimated Distance</h6>
-                <div class="distance-wrapper">
-                    <p id="distance">0</p> <span>feet</span>
-                </div>
-                <hr>
-                <h6>Last Recorded RSSI</h6>
-                <div class="distance-wrapper">
-                    <p id="rssiOut">0</p> <span>dB</span>
-                </div>
-                <hr>
+                <summary>
+                    <h3 style="text-align: center;"><strong>Device Data</strong></h3>
+                </summary>
+                <fieldset>
+                    <hr>
+                    <h6>Strongest RSSI</h6>
+                    <div class="distance-wrapper">
+                        <p id="strongestRSSI">0.0</p> <span>dB</span>
+                    </div>
+                    <hr>
+                    <h6>Strongest signal direction</h6>
+                    <p id="direction">0.0</p>
+                    <hr>
+                    <h6>Estimated Distance</h6>
+                    <div class="distance-wrapper">
+                        <p id="distance">0</p> <span>feet</span>
+                    </div>
+                    <hr>
+                    <h6>Last Recorded RSSI</h6>
+                    <div class="distance-wrapper">
+                        <p id="rssiOut">0</p> <span>dB</span>
+                    </div>
+                    <hr>
                 </fieldset>
             </details>
         </section>
@@ -109,7 +111,8 @@
                     <hr>
                     <p>To accurately detect distances, you need to get a refrence RSSI.</p>
                     <p>Enter the transmitter's signal,then point the open slit towards the transmitter and hit the
-                        <b>Start signal test</b> button and wait for the test to finish.</p>
+                        <b>Start signal test</b> button and wait for the test to finish.
+                    </p>
                     <p>This will record the refrence RSSI and save it to your browser.</p>
                     <p id="scanFeedback"><b>Will scan for: 93.9 Mhz</b></p>
                     <div class="distance-wrapper">
@@ -132,17 +135,15 @@
         </details>
         <details open>
             <fieldset>
-            <label>
-                <h3 style="text-align: center;"><strong>Device Functions</strong></h3>
-                <div class="grid">
-                    <button id="restartDevice">Restart Device</button>
-                    <button id="shutdownDevice">Shutdown Device</button>
-                </div>
-            </label>
+                <label>
+                    <h3 style="text-align: center;"><strong>Device Functions</strong></h3>
+                    <div class="grid">
+                        <button id="restartDevice">Restart Device</button>
+                        <button id="shutdownDevice">Shutdown Device</button>
+                    </div>
+                </label>
             </fieldset>
         </details>
-
-        </div>
     </main>
 </body>
 <script>
@@ -153,15 +154,15 @@
     const customInputField = document.getElementById('custom-input');
     const out = document.getElementById("out")
 
-    var strongestRSSIVal = -200;
-    var latestRSSI = -200;
-    var highestDirection = 0;
+    let strongestRSSIVal = -200;
+    let latestRSSI = -200;
+    let highestDirection = 0;
 
-    var currentFrequency = 93.9
+    let currentFrequency = 93.9
 
-    var do_test_signal_test = false;
-    var signal_test_signals = [];
-    var savedSignals = localStorage.getItem("testSignals")
+    let do_test_signal_test = false;
+    let signal_test_signals = [];
+    let savedSignals = localStorage.getItem("testSignals")
     if (savedSignals !== "null" && savedSignals) {
         var data = JSON.parse(localStorage.getItem("testSignals"))
         // var data = {'test':'test'}
@@ -221,7 +222,7 @@
     });
 
     document.getElementById("customTestSignals").addEventListener("change", (event) => {
-        if (event.value !== "createNew") {
+        if (event.target.value !== "createNew") {
             document.getElementById("createNewTestSignal").style.visibility = "visible"
         } else {
             document.getElementById("createNewTestSignal").style.visibility = "hidden"
@@ -229,8 +230,6 @@
         }
     })
 
-
-    const deviceInOut = document.getElementById("mainContent")
     const rssiOut = document.getElementById("rssiOut")
     const pairBttn = document.getElementById("pairBttn")
     let writeCharacteristic;

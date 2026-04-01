@@ -434,7 +434,7 @@
         ctx.clearRect(0, 0, targetSize, targetSize);
 
         for (let degree = 0; degree < 360; degree++) {
-            const radians = degree * (Math.PI / 180);
+            const radians = (degree - 90) * (Math.PI / 180);
 
             const currentDistance = radarRadius + (signalData[degree] || 0);
 
@@ -457,12 +457,12 @@
     drawVisualization();
 
     function updateCircle(val, color) {
-        const radians = val * (Math.PI / 180);
+        const radians = (val - 90) * (Math.PI / 180);
 
         const currentDistance = radarRadius + (signalData[val] || 0);
 
-        const px = centerX + Math.cos(val + 180) * currentDistance;
-        const py = centerY + Math.sin(val + 180) * currentDistance;
+        const px = centerX + Math.cos(radians) * currentDistance;
+        const py = centerY + Math.sin(radians) * currentDistance;
 
         ctx.beginPath();
         ctx.arc(px, py, dotSize, 0, 2 * Math.PI);

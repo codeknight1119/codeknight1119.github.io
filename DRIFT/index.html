@@ -417,10 +417,19 @@
     // Scale the canvas context so all your drawing commands scale automatically!
     ctx.scale(scaleFactor, scaleFactor);
 
+    // 1. Target the root element (usually where Pico variables live)
+    const root = document.documentElement;
+
+    // 2. Get the computed style of the element
+    const styles = window.getComputedStyle(root);
+
+    // 3. Extract the primary (accent) color
+    const accentColor = styles.getPropertyValue('--pico-primary').trim();
+
     // --- 2. STYLING CONFIGURATION ---
     // These values are based on the standard 300px space
-    let circleFillColor = "rgba(32, 201, 151, 0.3)";
-    let circleStrokeColor = "rgb(32, 201, 151)";
+    let circleFillColor = "rgba(255, 255, 255, 0.3)";
+    let circleStrokeColor = accentColor;
     let dotSize = 1.1;
     let radarRadius = 138;
 

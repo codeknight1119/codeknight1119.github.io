@@ -470,7 +470,18 @@
         ctx.fillStyle = `rgb${color}`;
         ctx.fill();
     }
-    updateCircle(0, "(255,255,0)");
+    let f = 1;
+    setTimeout(() => {
+        updateCircle(f, "(128, 128, 128)")
+        f++
+        updateCircle(f, "(255,255,0)")
+        setTimeout(() => {
+            updateCircle(f, "(128, 128, 128)")
+            f++
+            updateCircle(f, "(255,255,0)")
+        }, 100)
+    }, 100)
+
 </script>
 
 </html>

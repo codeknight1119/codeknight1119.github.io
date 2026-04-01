@@ -472,8 +472,8 @@
     }
     let f = 1;
     setInterval(() => {
-        updateCircle(f, "(128, 128, 128)")
-        f++
+        drawVisualization()
+         f =(f + 1) % 360;
         updateCircle(f, "(255,255,0)")
     }, 10);
 

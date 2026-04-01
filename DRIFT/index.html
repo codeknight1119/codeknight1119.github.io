@@ -461,8 +461,8 @@
 
         const currentDistance = radarRadius + (signalData[val] || 0);
 
-        const px = centerX + Math.cos(val + 90) * currentDistance;
-        const py = centerY + Math.sin(val + 90) * currentDistance;
+        const px = centerX + Math.cos(val + 180) * currentDistance;
+        const py = centerY + Math.sin(val + 180) * currentDistance;
 
         ctx.beginPath();
         ctx.arc(px, py, dotSize, 0, 2 * Math.PI);

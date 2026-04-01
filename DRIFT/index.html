@@ -461,8 +461,8 @@
 
         const currentDistance = radarRadius + (signalData[val] || 0);
 
-        const px = centerX + Math.cos(val) * currentDistance;
-        const py = centerY + Math.sin(val) * currentDistance;
+        const px = centerX + Math.cos(val + 90) * currentDistance;
+        const py = centerY + Math.sin(val + 90) * currentDistance;
 
         ctx.beginPath();
         ctx.arc(px, py, dotSize, 0, 2 * Math.PI);
@@ -470,7 +470,7 @@
         ctx.fillStyle = `rgb${color}`;
         ctx.fill();
     }
-    updateCircle(1, "(255,255,255)");
+    updateCircle(1, "(255,255,0)");
 </script>
 
 </html>

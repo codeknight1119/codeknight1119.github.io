@@ -467,12 +467,8 @@
         ctx.beginPath();
         ctx.arc(px, py, dotSize, 0, 2 * Math.PI);
 
-        ctx.fillStyle = `rgb(${color})`;
+        ctx.fillStyle = `rgb${color}`;
         ctx.fill();
-/*
-        ctx.strokeStyle = circleStrokeColor;
-        ctx.lineWidth = 1;
-        ctx.stroke();*/
     }
     updateCircle(1, "(255,255,255)");
 </script>

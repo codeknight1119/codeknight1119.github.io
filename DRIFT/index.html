@@ -50,25 +50,24 @@
             /* Ensures padding/border are included in the 300px width */
         }
 
-        /* Container to center the canvas */
-        .canvas-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 0;
-            width: 100%;
+        #radar-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background: #1a1a1a;
+            border-radius: 50%;
         }
 
-        /* Styling the canvas to match Pico's theme */
-        canvas.vis {
-            border: none;
-            /* No borders */
-            background: transparent;
-            /* Makes it see-through */
-            max-width: 100%;
-            height: auto;
-            max-width: 100%;
-            height: auto;
+        .dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            background-color: rgb(128, 128, 128);
+            transform:
+                translate(-50%, -50%) rotate(calc(var(--deg) * 1deg)) translateY(calc(var(--radius) * -1px));
         }
     </style>
 </head>
@@ -122,9 +121,7 @@
             </summary>
             <hr>
             <fieldset>
-                <div class="canvas-container">
-                    <canvas id="vizCtx" width="300" height="300" style="border: 1px solid black;" class="vis"></canvas>
-                </div>
+                <div class="radar-container"> </div>
             </fieldset>
         </details>
 
@@ -402,80 +399,36 @@
             console.error("Failed to send frequency update:", error);
         }
     });
+    const container = document.getElementById("radar-container");
+const dots = []; // Array to store our DOM elements
+const radarRadius = 138;
 
-    const canvas = document.getElementById("vizCtx");
-    const ctx = canvas.getContext("2d");
+// --- 1. INITIAL GENERATION ---
+for (let i = 0; i < 360; i++) {
+    const dot = document.createElement("div");
+    dot.classList.add("dot");
+    
+    // Set the CSS variables for this specific dot
+    dot.style.setProperty('--deg', i);
+    dot.style.setProperty('--radius', radarRadius);
+    
+    container.appendChild(dot);
+    dots.push(dot); // Store reference for fast updates
+}
 
-    // --- 1. THE RETINA/HIGH-DPI CRISPNESS FIX ---
-    const targetSize = 300; // Your desired CSS display size
-    const scaleFactor = window.devicePixelRatio || 1;
-
-    // Upscale the internal canvas resolution
-    canvas.width = targetSize * scaleFactor;
-    canvas.height = targetSize * scaleFactor;
-
-    // Scale the canvas context so all your drawing commands scale automatically!
-    ctx.scale(scaleFactor, scaleFactor);
-
-    // --- 2. STYLING CONFIGURATION ---
-    // These values are based on the standard 300px space
-    let circleFillColor = "rgb(128, 128, 128)";
-    let circleStrokeColor = "rgba(0,0,0,0)";
-    let dotSize = 1.1;
-    let radarRadius = 138;
-
-    // Notice we use the standard 300 size here, NOT the upscaled canvas.width
-    const centerX = 150;
-    const centerY = 150;
-
-    let signalData = new Array(360).fill(0);
-
-    function drawVisualization() {
-        ctx.clearRect(0, 0, targetSize, targetSize);
-
-        for (let degree = 0; degree < 360; degree++) {
-            const radians = (degree - 90) * (Math.PI / 180);
-
-            const currentDistance = radarRadius + (signalData[degree] || 0);
-
-            const px = centerX + Math.cos(radians) * currentDistance;
-            const py = centerY + Math.sin(radians) * currentDistance;
-
-            ctx.beginPath();
-            ctx.arc(px, py, dotSize, 0, 2 * Math.PI);
-
-            ctx.fillStyle = circleFillColor;
-            ctx.fill();
-
-            ctx.strokeStyle = circleStrokeColor;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        }
+// --- 2. UPDATE FUNCTION ---
+// Pass in your array of 360 color strings or values
+function updateRadar(colorArray) {
+    // colorArray should look like: ["rgb(255,0,0)", "rgb(128,128,128)", ...]
+    for (let i = 0; i < 360; i++) {
+        dots[i].style.backgroundColor = colorArray[i];
     }
+}
 
-    // Initial draw
-    drawVisualization();
-
-    function updateCircle(val, color) {
-        const radians = (val - 90) * (Math.PI / 180);
-
-        const currentDistance = radarRadius + (signalData[val] || 0);
-
-        const px = centerX + Math.cos(radians) * currentDistance;
-        const py = centerY + Math.sin(radians) * currentDistance;
-
-        ctx.beginPath();
-        ctx.arc(px, py, dotSize, 0, 2 * Math.PI);
-
-        ctx.fillStyle = `rgb${color}`;
-        ctx.fill();
-    }
-    let f = 1;
-    setInterval(() => {
-        drawVisualization()
-         f =(f + 1) % 360;
-        updateCircle(f, "(255,255,0)")
-    }, 10);
+// Example usage: Update degree 90 to Red
+function updateSingleDot(degree, rgbString) {
+    dots[degree].style.backgroundColor = `rgb${rgbString}`;
+}
 
 </script>
 

@@ -121,7 +121,7 @@
             </summary>
             <hr>
             <fieldset>
-                <div class="radar-container"> </div>
+                <div class="radar-container" id="radar"> </div>
             </fieldset>
         </details>
 
@@ -399,36 +399,32 @@
             console.error("Failed to send frequency update:", error);
         }
     });
-    const container = document.getElementById("radar-container");
-const dots = []; // Array to store our DOM elements
-const radarRadius = 138;
 
-// --- 1. INITIAL GENERATION ---
-for (let i = 0; i < 360; i++) {
-    const dot = document.createElement("div");
-    dot.classList.add("dot");
-    
-    // Set the CSS variables for this specific dot
-    dot.style.setProperty('--deg', i);
-    dot.style.setProperty('--radius', radarRadius);
-    
-    container.appendChild(dot);
-    dots.push(dot); // Store reference for fast updates
-}
 
-// --- 2. UPDATE FUNCTION ---
-// Pass in your array of 360 color strings or values
-function updateRadar(colorArray) {
-    // colorArray should look like: ["rgb(255,0,0)", "rgb(128,128,128)", ...]
-    for (let i = 0; i < 360; i++) {
-        dots[i].style.backgroundColor = colorArray[i];
+    const container = document.querySelector(".radar-container");
+    const dots = []; // We keep this array to update colors later
+
+    // 1. Generate the 360 dots
+    function createRadarDots() {
+        for (let i = 0; i < 360; i++) {
+            const dot = document.createElement("div");
+
+            // Add the class for styling
+            dot.classList.add("dot");
+
+            // Set the custom CSS variable --deg so the CSS knows where to rotate it
+            dot.style.setProperty('--deg', i);
+
+            // Append it to the container
+            container.appendChild(dot);
+
+            // Store the reference in our array for easy color updates later
+            dots.push(dot);
+        }
     }
-}
 
-// Example usage: Update degree 90 to Red
-function updateSingleDot(degree, rgbString) {
-    dots[degree].style.backgroundColor = `rgb${rgbString}`;
-}
+    // 2. Call the function to build the radar
+    createRadarDots();
 
 </script>
 

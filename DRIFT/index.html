@@ -76,7 +76,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.4</h3>
+            <h3>v3.5</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -257,10 +257,33 @@
         }, 10000)
     })
 
-const input = document.querySelector('input');
-input.addEventListener('keyup', (event) => {
-    console.log(`Key released: ${event.key}`);
-});
+    const input = document.querySelector('input');
+    let hasListYet = false;
+    const GAS_LINK = ''
+    input.addEventListener('keyup', async (event) => {
+        const fullstring = event.target.value;
+        if (fullstring.length > 2) {
+            if (!hasListYet) {
+                const data = { job: search, params: { searchString: fullstring } }
+                const options = {
+                    medthod: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                }
+                fetch(GAS_LINK, options)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        console.log(response.json());
+                    })
+            }
+        } else {
+            hasListYet = false;
+        }
+    });
 
 
     // Handle the Dropdown Change
@@ -271,10 +294,10 @@ input.addEventListener('keyup', (event) => {
             browseContainer.style.display = 'none';
             customContainer.style.display = 'block';
             customInputField.focus();
-        }else if(value === 'browse'){
+        } else if (value === 'browse') {
             browseContainer.style.display = 'block';
             customContainer.style.display = 'none';
-        }else {
+        } else {
             customContainer.style.display = 'none';
             browseContainer.style.display = 'none';
         }

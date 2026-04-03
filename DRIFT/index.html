@@ -158,7 +158,7 @@
                         <button id="startTest">Start signal test</button>
                     </div>
                 </div>
-                <div id="browse_container" style="display:none">
+                <div id="browse_container" style="display:hidden">
                     <p>Browse community and offical base freqencies for distance aproximation.</p>
                     <input id="browse_search_bar" type="search" placeholder="Type 2 characters to begin"><input>
                 </div>
@@ -171,7 +171,7 @@
                     <option value=4.5>Dense Forest</option>
                     <option value="custom"> Custom</option>
                 </select>
-                <div id="custom_n_selector" style="display: none;">
+                <div id="custom_n_selector" style="display: hidden;">
                     <input type="number" id="custom-input" placeholder="Type your custom value" min="0" />
                 </div>
             </fieldset>
@@ -291,15 +291,15 @@
         const value = event.target.value;
 
         if (value === 'custom') {
-            browseContainer.style.display = 'none';
+            browseContainer.style.display = 'hidden';
             customContainer.style.display = 'block';
             customInputField.focus();
         } else if (value === 'browse') {
             browseContainer.style.display = 'block';
-            customContainer.style.display = 'none';
+            customContainer.style.display = 'hidden';
         } else {
-            customContainer.style.display = 'none';
-            browseContainer.style.display = 'none';
+            customContainer.style.display = 'hidden';
+            browseContainer.style.display = 'hidden';
         }
     });
 

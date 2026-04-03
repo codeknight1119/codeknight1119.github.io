@@ -160,7 +160,7 @@
                 </div>
                 <div id="browse_container" style="display:none">
                     <p>Browse community and offical base freqencies for distance aproximation.</p>
-                    <input id="browse_search_bar" type="search" placeholder="Type 2 characters to begin" onkeyup="frequencySearch()"><input>
+                    <input id="browse_search_bar" type="search" placeholder="Type 2 characters to begin"><input>
                 </div>
                 <hr>
                 <label for="n_selector">Select terrain density</label>
@@ -257,18 +257,26 @@
         }, 10000)
     })
 
-    //search function  async function frequencySearch(){}
+const input = document.querySelector('input');
+input.addEventListener('keyup', (event) => {
+    console.log(`Key released: ${event.key}`);
+});
+
+
     // Handle the Dropdown Change
     select_n.addEventListener('change', (event) => {
         const value = event.target.value;
 
         if (value === 'custom') {
+            browseContainer.style.display = 'none';
             customContainer.style.display = 'block';
             customInputField.focus();
         }else if(value === 'browse'){
             browseContainer.style.display = 'block';
+            customContainer.style.display = 'none';
         }else {
             customContainer.style.display = 'none';
+            browseContainer.style.display = 'none';
         }
     });
 

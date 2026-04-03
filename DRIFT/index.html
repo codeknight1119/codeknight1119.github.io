@@ -142,8 +142,8 @@
                     Test Signal (dB)
                     <input type="number" name="testSignal" id="signalTestInput"></input>
                     <select id="customTestSignals">
-                        <option value="browse">Browse </option>
                         <option value="createNew">Create New</option>
+                        <option value="browse">Browse </option>
                     </select>
                 </label>
                 <div id="createNewTestSignal">
@@ -160,7 +160,7 @@
                 </div>
                 <div id="browse_container" style="display:none">
                     <p>Browse community and offical base freqencies for distance aproximation.</p>
-                    <input id="browse_search_bar" type="search" placeholder="Type 2 characters to begin"><input>
+                    <input id="browse_search_bar" type="search" placeholder="Type 2 characters to begin" onkeyup="frequencySearch()"><input>
                 </div>
                 <hr>
                 <label for="n_selector">Select terrain density</label>
@@ -257,7 +257,8 @@
         }, 10000)
     })
 
-    // 1. Handle the Dropdown Change
+    //search function  async function frequencySearch(){}
+    // Handle the Dropdown Change
     select_n.addEventListener('change', (event) => {
         const value = event.target.value;
 

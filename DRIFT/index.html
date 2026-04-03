@@ -76,7 +76,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.3</h3>
+            <h3>v3.4</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -129,6 +129,7 @@
         <details open>
             <summary>
                 <h3 style="text-align: center;"><strong>Settings</strong></h3>
+
             </summary>
             <hr>
             <fieldset>
@@ -141,6 +142,7 @@
                     Test Signal (dB)
                     <input type="number" name="testSignal" id="signalTestInput"></input>
                     <select id="customTestSignals">
+                        <option value="browse">Browse </option>
                         <option value="createNew">Create New</option>
                     </select>
                 </label>
@@ -155,6 +157,10 @@
                     <div class="distance-wrapper">
                         <button id="startTest">Start signal test</button>
                     </div>
+                </div>
+                <div id="browse_container" style="display:none">
+                    <p>Browse community and offical base freqencies for distance aproximation.</p>
+                    <input id="browse_search_bar" type="search" placeholder="Type 2 characters to begin"><input>
                 </div>
                 <hr>
                 <label for="n_selector">Select terrain density</label>
@@ -192,6 +198,8 @@
     const select_n = document.getElementById('n_selector');
     const customContainer = document.getElementById('custom_n_selector');
     const customInputField = document.getElementById('custom-input');
+    const browseContainer = document.getElementById('browse_container')
+    const browseSearchBar = document.getElementById('browse_search_bar')
     const out = document.getElementById("out")
 
     let strongestRSSIVal = -200;
@@ -256,7 +264,9 @@
         if (value === 'custom') {
             customContainer.style.display = 'block';
             customInputField.focus();
-        } else {
+        }else if(value === 'browse'){
+            browseContainer.style.display = 'block';
+        }else {
             customContainer.style.display = 'none';
         }
     });

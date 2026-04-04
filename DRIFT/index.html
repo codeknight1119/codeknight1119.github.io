@@ -57,6 +57,8 @@
             background: transparent;
             /* Dark background to see dots better */
             border-radius: 50%;
+            display: flex;
+            justify-content: center;
         }
 
         .dot {
@@ -448,8 +450,6 @@
         dots.push(dot); // Store reference for fast updates
     }
 
-    // --- 2. UPDATE FUNCTION ---
-    // Pass in your array of 360 color strings or values
     function updateRadar(colorArray) {
         // colorArray should look like: ["rgb(255,0,0)", "rgb(128,128,128)", ...]
         for (let i = 0; i < 360; i++) {
@@ -457,11 +457,10 @@
         }
     }
 
-    // Example usage: Update degree 90 to Red
+   
     function updateSingleDot(degree, rgbString) {
         dots[degree].style.backgroundColor = `rgb${rgbString}`;
     }
-    updateSingleDot(1, "(255,255,0)")
 
 </script>
 

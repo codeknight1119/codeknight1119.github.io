@@ -274,32 +274,36 @@
     let hasListYet = false;
     const GAS_LINK = 'https://script.google.com/macros/s/AKfycbwN6lcp2VlETJ4ukQlutxo3BiLPv6DwDvqkjiS7fGOxdwRRs3pxuhZ1bj805GBm8xA-/exec'
 
-    browse_search_bar.addEventListener('input', async (event) => {
-        const fullstring = event.target.value;
-        if (fullstring.length > 2) {
-            if (!hasListYet) {
-                const data = { job: "search", params: { searchString: fullstring } }
-                const options2 = {
-                    method: "POST", // Explicitly POST
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
-                    body: JSON.stringify(data),
-                    redirect: "follow" // Forces the browser to follow the redirect properly
-                };
+   browse_search_bar.addEventListener('input', async (event) => {
+    const fullstring = event.target.value;
+    
+    if (fullstring.length > 2) {
+        if (!hasListYet) {
+            // FIX 1: Changed 'params' to 'functionParams' to match GAS expectation
+            const data = { 
+                job: "search", 
+                functionParams: { searchString: fullstring } 
+            };
+            
+            const options2 = {
+                method: "POST",
+                headers: {
+                    // text/plain is correct! It bypasses CORS preflight restrictions in GAS.
+                    'Content-Type': 'text/plain;charset=utf-8' 
+                },
+                body: JSON.stringify(data),
+                redirect: "follow" 
+            };
 
-                fetch(GAS_LINK, options2)
-                    .then(response => {
-                        // This will now likely show a 'redirected' status
-                        return response.json();
-                    })
-                    .then(res => console.log(res))
-                    .catch(err => console.error("Fetch error:", err));
-            }
-        } else {
-            hasListYet = false;
+            fetch(GAS_LINK, options2)
+                .then(response => response.json())
+                .then(res => console.log("Success:", res))
+                .catch(err => console.error("Fetch error:", err));
         }
-    });
+    } else {
+        hasListYet = false; // Assuming this is defined elsewhere in your script
+    }
+});
 
 
     // Handle the Dropdown Change

@@ -76,8 +76,12 @@
        2. Rotate to the specific degree
        3. Translate (push) outward by the radius
     */
-            transform:
-                translate(-50%, -50%) rotate(calc(var(--deg) * 1deg)) translateY(calc(var(--radius) * -1px));
+            .center {
+                display: flex;
+                justify-content: center;
+            }
+
+            transform: translate(-50%, -50%) rotate(calc(var(--deg) * 1deg)) translateY(calc(var(--radius) * -1px));
         }
     </style>
 </head>
@@ -131,7 +135,9 @@
             </summary>
             <hr>
             <fieldset>
-                <div id="radar-container"></div>
+                <div class="center">
+                    <div id="radar-container"></div>
+                </div>
             </fieldset>
         </details>
 
@@ -396,8 +402,8 @@
             }
         });
     })
-    browse_search_bar.addEventListener("onkeydown", (event)=>{
-     console.log(event.target.value)
+    browse_search_bar.addEventListener("onkeydown", (event) => {
+        console.log(event.target.value)
     })
 
     function calculateDist(RSSI) {
@@ -460,7 +466,7 @@
         }
     }
 
-   
+
     function updateSingleDot(degree, rgbString) {
         dots[degree].style.backgroundColor = `rgb${rgbString}`;
     }

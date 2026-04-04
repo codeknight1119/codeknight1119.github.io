@@ -280,19 +280,23 @@
             if (!hasListYet) {
                 const data = { job: "search", params: { searchString: fullstring } }
                 const options = {
-                    method: "POST",
+                    method: "POST", // Explicitly POST
                     headers: {
+                        // Using text/plain prevents the preflight 'OPTIONS' request
+                        // which often causes the redirect-to-GET bug
                         'Content-Type': 'text/plain;charset=utf-8'
                     },
-                    body: JSON.stringify(data)
-                }
+                    body: JSON.stringify(data),
+                    redirect: "follow" // Forces the browser to follow the redirect properly
+                };
+
                 fetch(GAS_LINK, options)
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        console.log(response.json());
+                        // This will now likely show a 'redirected' status
+                        return response.json();
                     })
+                    .then(res => console.log(res))
+                    .catch(err => console.error("Fetch error:", err));
             }
         } else {
             hasListYet = false;

@@ -54,18 +54,26 @@
             position: relative;
             width: 300px;
             height: 300px;
-            background: #1a1a1a;
+            background: transparent;
+            /* Dark background to see dots better */
             border-radius: 50%;
         }
 
         .dot {
             position: absolute;
             width: 2px;
+            /* Your dotSize */
             height: 2px;
             top: 50%;
             left: 50%;
             border-radius: 50%;
             background-color: rgb(128, 128, 128);
+            /* Default color */
+
+            /* 1. Start at center
+       2. Rotate to the specific degree
+       3. Translate (push) outward by the radius
+    */
             transform:
                 translate(-50%, -50%) rotate(calc(var(--deg) * 1deg)) translateY(calc(var(--radius) * -1px));
         }
@@ -121,7 +129,7 @@
             </summary>
             <hr>
             <fieldset>
-                <div class="radar-container" id="radar"> </div>
+                <div id="radar-container"></div>
             </fieldset>
         </details>
 
@@ -423,53 +431,37 @@
         }
     });
 
-    // Update Target Frequency
-    document.getElementById("targetFrequency").addEventListener("change", async (event) => {
-        if (!writeCharacteristic) {
-            alert("Please connect a device before changing the frequency.");
-            return;
-        }
+    const container = document.getElementById("radar-container");
+    const dots = []; // Array to store our DOM elements
+    const radarRadius = 138;
 
-        const newFrequency = event.target.value;
+    // --- 1. INITIAL GENERATION ---
+    for (let i = 0; i < 360; i++) {
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
 
-        // Prevent sending an empty string if the user clears the input
-        if (!newFrequency) return;
+        // Set the CSS variables for this specific dot
+        dot.style.setProperty('--deg', i);
+        dot.style.setProperty('--radius', radarRadius);
 
-        try {
-            const commandString = `FREQ:${newFrequency}`;
-            const command = new TextEncoder().encode(commandString);
-            await writeCharacteristic.writeValueWithoutResponse(command);
-            console.log(`Sent new frequency: ${commandString}`);
-        } catch (error) {
-            console.error("Failed to send frequency update:", error);
-        }
-    });
+        container.appendChild(dot);
+        dots.push(dot); // Store reference for fast updates
+    }
 
-
-    const container = document.querySelector(".radar-container");
-    const dots = []; // We keep this array to update colors later
-
-    // 1. Generate the 360 dots
-    function createRadarDots() {
+    // --- 2. UPDATE FUNCTION ---
+    // Pass in your array of 360 color strings or values
+    function updateRadar(colorArray) {
+        // colorArray should look like: ["rgb(255,0,0)", "rgb(128,128,128)", ...]
         for (let i = 0; i < 360; i++) {
-            const dot = document.createElement("div");
-
-            // Add the class for styling
-            dot.classList.add("dot");
-
-            // Set the custom CSS variable --deg so the CSS knows where to rotate it
-            dot.style.setProperty('--deg', i);
-
-            // Append it to the container
-            container.appendChild(dot);
-
-            // Store the reference in our array for easy color updates later
-            dots.push(dot);
+            dots[i].style.backgroundColor = colorArray[i];
         }
     }
 
-    // 2. Call the function to build the radar
-    createRadarDots();
+    // Example usage: Update degree 90 to Red
+    function updateSingleDot(degree, rgbString) {
+        dots[degree].style.backgroundColor = `rgb${rgbString}`;
+    }
+    updateSingleDot(1, "(255,255,0)")
 
 </script>
 

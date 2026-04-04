@@ -272,8 +272,9 @@
 
     const input = document.querySelector('input');
     let hasListYet = false;
-    const GAS_LINK = ''
-    input.addEventListener('keyup', async (event) => {
+    const GAS_LINK = 'https://script.google.com/macros/s/AKfycbwNwTS8q3Ot0nmnr6HriaiIl0iD_A9RwdZr72An67upWNidTKeatVjMhCmLQzeznXzr/exec'
+
+    browse_search_bar.addEventListener('input', async (event) => {
         const fullstring = event.target.value;
         if (fullstring.length > 2) {
             if (!hasListYet) {
@@ -402,9 +403,7 @@
             }
         });
     })
-    browse_search_bar.addEventListener("input", (event) => {
-        console.log(event.target.value)
-    })
+
 
     function calculateDist(RSSI) {
 

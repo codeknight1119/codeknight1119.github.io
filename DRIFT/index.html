@@ -279,18 +279,16 @@
         if (fullstring.length > 2) {
             if (!hasListYet) {
                 const data = { job: "search", params: { searchString: fullstring } }
-                const options = {
+                const options2 = {
                     method: "POST", // Explicitly POST
                     headers: {
-                        // Using text/plain prevents the preflight 'OPTIONS' request
-                        // which often causes the redirect-to-GET bug
                         'Content-Type': 'text/plain;charset=utf-8'
                     },
                     body: JSON.stringify(data),
                     redirect: "follow" // Forces the browser to follow the redirect properly
                 };
 
-                fetch(GAS_LINK, options)
+                fetch(GAS_LINK, options2)
                     .then(response => {
                         // This will now likely show a 'redirected' status
                         return response.json();

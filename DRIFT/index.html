@@ -278,7 +278,7 @@
         const fullstring = event.target.value;
         if (fullstring.length > 2) {
             if (!hasListYet) {
-                const data = { job: search, params: { searchString: fullstring } }
+                const data = { job: "search", params: { searchString: fullstring } }
                 const options = {
                     medthod: "POST",
                     headers: {

@@ -272,7 +272,7 @@
 
     const input = document.querySelector('input');
     let hasListYet = false;
-    const GAS_LINK = 'https://script.google.com/macros/s/AKfycbwNwTS8q3Ot0nmnr6HriaiIl0iD_A9RwdZr72An67upWNidTKeatVjMhCmLQzeznXzr/exec'
+    const GAS_LINK = 'https://script.google.com/macros/s/AKfycby01b_lGFxHuRst8aucLDL1Lk1YlOG21KIB0H8cEwRQGUbtss4QVNfPtf_ApFBqwOIJ/exec'
 
     browse_search_bar.addEventListener('input', async (event) => {
         const fullstring = event.target.value;
@@ -282,7 +282,7 @@
                 const options = {
                     method: "POST",
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'text/plain;charset=utf-8'
                     },
                     body: JSON.stringify(data)
                 }

@@ -165,8 +165,13 @@
 
                 <div id="createNewTestSignal" style="display:none">
                     <hr>
-                    <p><strong>Signal Test Mode:</strong> Do not move your device or the transmitter during the process. <br> The device will do a full 360 spin to find you transmitter's direction, then find an average signal strength. <br> After this test this data will be saved to your browser, and you can choose to send it to the community collection for permenant keeping.</p>
+                    <p><strong>Signal Test</strong><br>Have a test transmitter one meter away transmitting on your
+                        target frequency. Do not move your device or the transmitter during the process. <br> The device
+                        will do a full 360 spin to find you transmitter's direction, then find an average signal
+                        strength. <br> After this test this data will be saved to your browser, and you can choose to
+                        send it to the community collection for permenant keeping.</p>
                     <p id="scanFeedback">Waiting to scan...</p>
+                    <p>
                     <button id="startTest">Start signal test</button>
                 </div>
 
@@ -231,79 +236,45 @@
 
         keys.forEach((val) => {
             var newElement = document.createElement("option")
-            newElement.textContent = val;
+            newElement.textContent = `${val} - ${data[val]}`;
             newElement.value = data[val]
             document.getElementById("customTestSignals").appendChild(newElement)
         })
     }
 
-
-    document.getElementById("startTest").addEventListener("click", () => {
-        do_test_signal_test = true;
-        document.getElementById("scanFeedback").innerHTML = `<b>Currently scanning for ${currentFrequency}</b>`
-        setTimeout(() => {
-            do_test_signal_test = false;
-            var num = 0;
-            signal_test_signals.forEach((val) => {
-                num += Number(val);
-            })
-            num = num / signal_test_signals.length;
-            signal_test_signals = [];
-
-            let existingData = {};
-            if (localStorage.getItem("testSignals") && localStorage.getItem("testSignals") !== "null") {
-                try {
-                    existingData = JSON.parse(localStorage.getItem("testSignals"));
-                } catch (e) {
-                    existingData = {};
-                }
-            }
-
-            existingData[String(currentFrequency)] = num;
-            localStorage.setItem("testSignals", JSON.stringify(existingData));
-
-            var newElement = document.createElement("option")
-            newElement.textContent = currentFrequency
-            newElement.value = num
-            document.getElementById("customTestSignals").appendChild(newElement)
-            document.getElementById("scanFeedback").innerHTML = `<b>Done scanning for ${currentFrequency}</b>`
-        }, 10000)
-    })
-
     const input = document.querySelector('input');
     let hasListYet = false;
     const GAS_LINK = 'https://script.google.com/macros/s/AKfycbzkCxaI98__F-lE2OxL5vb4iuiQIJZ_THynACWmEgZdjanokAyy4vgSGSX1-SVX6-wq/exec'
 
-   browse_search_bar.addEventListener('input', async (event) => {
-    const fullstring = event.target.value;
-    
-    if (fullstring.length > 2) {
-        if (!hasListYet) {
+    browse_search_bar.addEventListener('input', async (event) => {
+        const fullstring = event.target.value;
+
+        if (fullstring.length > 2 && !hasListYet) {
+
             // FIX 1: Changed 'params' to 'functionParams' to match GAS expectation
-            const data = { 
-                job: "search", 
-                functionParams: { searchString: fullstring } 
+            const data = {
+                job: "search",
+                functionParams: { searchString: fullstring }
             };
-            
+
             const options2 = {
                 method: "POST",
                 headers: {
                     // text/plain is correct! It bypasses CORS preflight restrictions in GAS.
-                    'Content-Type': 'text/plain;charset=utf-8' 
+                    'Content-Type': 'text/plain;charset=utf-8'
                 },
                 body: JSON.stringify(data),
-                redirect: "follow" 
+                redirect: "follow"
             };
 
             fetch(GAS_LINK, options2)
                 .then(response => response.json())
                 .then(res => console.log("Success:", res))
                 .catch(err => console.error("Fetch error:", err));
+        } else {
+            hasListYet = false; // Assuming this is defined elsewhere in your script
         }
-    } else {
-        hasListYet = false; // Assuming this is defined elsewhere in your script
-    }
-});
+    });
 
 
     // Handle the Dropdown Change
@@ -374,23 +345,51 @@
                             const value = event.target.value;
                             const decoder = new TextDecoder('utf-8');
                             const text = decoder.decode(value);
+                            if (!do_test_signal_test) {
+                                //normal communication
+                                //Ex latestrssi,strongestRssi,highestdirection
+                                // Split the comma string
+                                const parts = text.split(',');
+                                if (parts.length < 3) return;
 
-                            // Split the comma string
-                            const parts = text.split(',');
-                            if (parts.length < 3) return;
+                                latestRSSI = parts[0];
+                                strongestRSSIVal = parts[1];
+                                highestDirection = parts[2]; // Calculate degrees
 
-                            latestRSSI = parts[0];
-                            strongestRSSIVal = parts[1];
-                            highestDirection = (Number(parts[2]) * 7.2).toFixed(1); // Calculate degrees
+                                // Update UI
+                                document.getElementById("rssiOut").innerText = latestRSSI;
+                                document.getElementById("strongestRSSI").innerText = strongestRSSIVal;
+                                document.getElementById("direction").innerText = highestDirection;
+                            } else {
+                                //Just has either 0 or 1, a comma, and if 1, it will have the avrage signal stength at one meter
+                                if (value[0] === 1) {
+                                    //OKAY ITS EASTER AND IM TIRED WHAT THE HECK ARE YOU SUPPOSED TO CALL A NUMBER THAT IS THE AVRAGE SIGNAL STRENGTH AT ONE METER??????????????
+                                    const magicNumber = value.split("1")[1]
+                                    let existingData = {};
+                                    if (localStorage.getItem("testSignals") && localStorage.getItem("testSignals") !== "null") {
+                                        try {
+                                            existingData = JSON.parse(localStorage.getItem("testSignals"));
+                                        } catch (e) {
+                                            existingData = {};
+                                        }
+                                    }
 
-                            // Update UI
-                            document.getElementById("rssiOut").innerText = latestRSSI;
-                            document.getElementById("strongestRSSI").innerText = strongestRSSIVal;
-                            document.getElementById("direction").innerText = highestDirection;
 
-                            if (do_test_signal_test) {
-                                signal_test_signals.push(Number(latestRSSI));
+                                    existingData[String(name)] = magicNumber;
+                                    localStorage.setItem("testSignals", JSON.stringify(existingData));
+
+
+                                    var newElement = document.createElement("option")
+                                    const name = document.getElementById("newSignalName").value;
+                                    newElement.textContent = `${name}-${currentFrequency}`
+                                    newElement.value = magicNumber
+                                    document.getElementById("customTestSignals").appendChild(newElement)
+                                    document.getElementById("scanFeedback").innerHTML = `<b>Done scanning for ${currentFrequency}</b>`
+
+                                }
+
                             }
+
                         });
 
                         writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
@@ -416,36 +415,17 @@
     }
 
     // Restart Device
-    document.getElementById("restartDevice").addEventListener("click", async () => {
-        if (!writeCharacteristic) {
-            alert("Please connect a device before trying to restart it.");
-            return; // Stops the function here
-        }
-
-        try {
-            const command = new TextEncoder().encode("REBOOT");
-            await writeCharacteristic.writeValueWithoutResponse(command);
-            console.log("Restart command sent.");
-        } catch (error) {
-            console.error("Restart failed:", error);
-        }
-    });
-
+    document.getElementById("restartDevice").addEventListener("click", () => { writeMessage("REBOOT") });
     // Shutdown Device
-    document.getElementById("shutdownDevice").addEventListener("click", async () => {
-        if (!writeCharacteristic) {
-            alert("Please connect a device before trying to turn it off.");
-            return;
-        }
+    document.getElementById("shutdownDevice").addEventListener("click", () => { writeMessage("SHUTDOWN") });
+    // Run Signal Test
+    document.getElementById("startTest").addEventListener("click", () => {
+        do_test_signal_test = true;
+        writeMessage("RUNSIGNALTEST")
+        document.getElementById("scanFeedback").innerHTML = `<b>Currently scanning for ${currentFrequency}</b>`
+    })
 
-        try {
-            const command = new TextEncoder().encode("SHUTDOWN");
-            await writeCharacteristic.writeValueWithoutResponse(command);
-            console.log("Shutdown command sent.");
-        } catch (error) {
-            console.error("Shutdown failed:", error);
-        }
-    });
+
 
     const container = document.getElementById("radar-container");
     const dots = []; // Array to store our DOM elements
@@ -462,6 +442,21 @@
 
         container.appendChild(dot);
         dots.push(dot); // Store reference for fast updates
+    }
+
+    async function writeMessage(message) {
+        if (!writeCharacteristic) {
+            alert("Please connect a device before trying to run commands.");
+            return;
+        }
+
+        try {
+            const command = new TextEncoder().encode(message);
+            await writeCharacteristic.writeValueWithoutResponse(command);
+            console.log("Shutdown command sent.");
+        } catch (error) {
+            console.error("Shutdown failed:", error);
+        }
     }
 
     function updateRadar(colorArray) {

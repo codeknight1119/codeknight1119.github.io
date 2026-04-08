@@ -90,7 +90,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.6</h3>
+            <h3>v3.7</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -341,6 +341,7 @@
 
                         const notifCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef01");
                         await notifCharacteristic.startNotifications()
+
                         notifCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
                             const value = event.target.value;
                             const decoder = new TextDecoder('utf-8');
@@ -365,6 +366,7 @@
                                 if (value[0] === 1) {
                                     //OKAY ITS EASTER AND IM TIRED WHAT THE HECK ARE YOU SUPPOSED TO CALL A NUMBER THAT IS THE AVRAGE SIGNAL STRENGTH AT ONE METER??????????????
                                     const magicNumber = value.split("1")[1]
+                                    do_test_signal_test
                                     let existingData = {};
                                     if (localStorage.getItem("testSignals") && localStorage.getItem("testSignals") !== "null") {
                                         try {

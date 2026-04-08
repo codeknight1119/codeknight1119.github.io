@@ -90,7 +90,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.7</h3>
+            <h3>v3.8</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -165,6 +165,9 @@
 
                 <div id="createNewTestSignal" style="display:none">
                     <hr>
+                    <label>Signal Name (e.g., My Apartment)
+                        <input type="text" id="newSignalName" placeholder="Enter name for this test">
+                    </label>
                     <p><strong>Signal Test</strong><br>Have a test transmitter one meter away transmitting on your
                         target frequency. Do not move your device or the transmitter during the process. <br> The device
                         will do a full 360 spin to find you transmitter's direction, then find an average signal
@@ -172,7 +175,7 @@
                         send it to the community collection for permenant keeping.</p>
                     <p id="scanFeedback">Waiting to scan...</p>
                     <p>
-                    <button id="startTest">Start signal test</button>
+                        <button id="startTest">Start signal test</button>
                 </div>
 
                 <div id="browse_container" style="display:none">
@@ -363,10 +366,10 @@
                                 document.getElementById("direction").innerText = highestDirection;
                             } else {
                                 //Just has either 0 or 1, a comma, and if 1, it will have the avrage signal stength at one meter
-                                if (text[0] === 1) {
+                                if (text.startsWith("1")) {
                                     //OKAY ITS EASTER AND IM TIRED WHAT THE HECK ARE YOU SUPPOSED TO CALL A NUMBER THAT IS THE AVRAGE SIGNAL STRENGTH AT ONE METER??????????????
-                                    const magicNumber = value.split("1")[1]
-                                    do_test_signal_test
+                                    const magicNumber = text.substring(1)
+                                    do_test_signal_test = false;
                                     let existingData = {};
                                     if (localStorage.getItem("testSignals") && localStorage.getItem("testSignals") !== "null") {
                                         try {

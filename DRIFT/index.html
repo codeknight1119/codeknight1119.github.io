@@ -408,6 +408,7 @@
 
                                     const name = document.getElementById("newSignalName").value || "Unnamed Signal";
                                     existingData[String(name)] = magicNumber;
+                                    alert("DONE SCANNING: " + magicNumber)
                                     localStorage.setItem("testSignals", JSON.stringify(existingData));
 
 

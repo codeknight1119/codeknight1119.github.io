@@ -90,7 +90,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.8</h3>
+            <h3>v3.9</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -114,8 +114,9 @@
                     </div>
                     <hr>
                     <h6>Strongest signal direction</h6>
-                    <p id="direction">0.0</p>
+                    <p id="highestDirection">0.0</p>
                     <hr>
+
                     <h6>Estimated Distance</h6>
                     <div class="distance-wrapper">
                         <p id="distance">0</p> <span>feet</span>
@@ -125,6 +126,9 @@
                     <div class="distance-wrapper">
                         <p id="rssiOut">0</p> <span>dB</span>
                     </div>
+                    <h6>Last recorded signal direction</h6>
+                    <p id="latestDirection"></p>
+                    <hr>
                     <hr>
                 </fieldset>
             </details>
@@ -225,7 +229,10 @@
 
     let strongestRSSIVal = -200;
     let latestRSSI = -200;
+    let latestDirection = 0;
     let highestDirection = 0;
+    let recivedFrequencies = new Array(360).fill(-200)
+    let visualizationColors = new Array(360).fill("rgb(255, 255, 255)")
 
     let currentFrequency = 93.9
 
@@ -249,7 +256,7 @@
     let hasListYet = false;
     const GAS_LINK = 'https://script.google.com/macros/s/AKfycbzkCxaI98__F-lE2OxL5vb4iuiQIJZ_THynACWmEgZdjanokAyy4vgSGSX1-SVX6-wq/exec'
 
-    browse_search_bar.addEventListener('input', async (event) => {
+    browseSearchBar.addEventListener('input', async (event) => {
         const fullstring = event.target.value;
 
         if (fullstring.length > 2 && !hasListYet) {
@@ -359,11 +366,31 @@
                                 latestRSSI = parts[0];
                                 strongestRSSIVal = parts[1];
                                 highestDirection = parts[2]; // Calculate degrees
+                                latestDirection = parts[3]
 
                                 // Update UI
                                 document.getElementById("rssiOut").innerText = latestRSSI;
                                 document.getElementById("strongestRSSI").innerText = strongestRSSIVal;
-                                document.getElementById("direction").innerText = highestDirection;
+                                document.getElementById("highestDirection").innerText = highestDirection;
+                                document.getElementById("latestDirection").innerText = latestDirection;
+                                recivedFrequencies[latestDirection] = latestRSSI;
+                                let MaxRSSI = Math.max(...recivedFrequencies);
+                                const minRSSI = -100; // The lowest expected signal before it drops off
+                                const range = Math.max(0.1, MaxRSSI - minRSSI); // Prevents division by zero
+
+                                for (let i = 0; i < 360; i++) {
+                                    // Shift the values up so they are positive relative to the floor
+                                    let mappedValue = (recivedFrequencies[i] - minRSSI) / range;
+
+                                    const clampedValue = Math.max(0, Math.min(1, mappedValue));
+                                    const hue = clampedValue * 120; // 0 = Red (weak), 120 = Green (strong)
+                                    visualizationColors[i] = `hsl(${hue}, 100%, 50%)`;
+                                }
+                                updateRadar(visualizationColors)
+
+
+
+
                             } else {
                                 //Just has either 0 or 1, a comma, and if 1, it will have the avrage signal stength at one meter
                                 if (text.startsWith("1")) {
@@ -379,13 +406,13 @@
                                         }
                                     }
 
-
+                                    const name = document.getElementById("newSignalName").value || "Unnamed Signal";
                                     existingData[String(name)] = magicNumber;
                                     localStorage.setItem("testSignals", JSON.stringify(existingData));
 
 
                                     var newElement = document.createElement("option")
-                                    const name = document.getElementById("newSignalName").value;
+
                                     newElement.textContent = `${name}-${currentFrequency}`
                                     newElement.value = magicNumber
                                     document.getElementById("customTestSignals").appendChild(newElement)

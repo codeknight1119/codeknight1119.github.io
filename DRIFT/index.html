@@ -356,7 +356,7 @@
                             const value = event.target.value;
                             const decoder = new TextDecoder('utf-8');
                             const text = decoder.decode(value);
-                            if (!do_test_signal_test) {
+                            if (!text.startsWith("T")) {
                                 //normal communication
                                 //Ex latestrssi,strongestRssi,highestdirection
                                 // Split the comma string
@@ -393,8 +393,9 @@
 
                             } else {
                                 //Just has either 0 or 1, a comma, and if 1, it will have the avrage signal stength at one meter
-                                if (text.startsWith("1")) {
+                                if (text[1]("1")) {
                                     //OKAY ITS EASTER AND IM TIRED WHAT THE HECK ARE YOU SUPPOSED TO CALL A NUMBER THAT IS THE AVRAGE SIGNAL STRENGTH AT ONE METER??????????????
+                                    //Note, I know this is called TX power or base power, but the comment above is funny and im keeping it for people like me who inspect sites
                                     const magicNumber = text.substring(1)
                                     do_test_signal_test = false;
                                     let existingData = {};

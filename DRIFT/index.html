@@ -90,7 +90,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v3.9</h3>
+            <h3>v4.0</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -363,10 +363,10 @@
                                 const parts = text.split(',');
                                 if (parts.length < 3) return;
 
-                                latestRSSI = parts[0];
-                                strongestRSSIVal = parts[1];
-                                highestDirection = parts[2]; // Calculate degrees
-                                latestDirection = parts[3]
+                                latestRSSI = parseFloat(parts[0]);
+                                strongestRSSIVal = parseFloat(parts[1]);
+                                highestDirection = parseInt(parts[2]); // Calculate degrees
+                                latestDirection = parseInt(parts[3]);
 
                                 // Update UI
                                 document.getElementById("rssiOut").innerText = latestRSSI;
@@ -381,10 +381,13 @@
                                 for (let i = 0; i < 360; i++) {
                                     // Shift the values up so they are positive relative to the floor
                                     let mappedValue = (recivedFrequencies[i] - minRSSI) / range;
-
-                                    const clampedValue = Math.max(0, Math.min(1, mappedValue));
-                                    const hue = clampedValue * 120; // 0 = Red (weak), 120 = Green (strong)
-                                    visualizationColors[i] = `hsl(${hue}, 100%, 50%)`;
+                                    if(recivedFrequencies !== -200){
+                                        const clampedValue = Math.max(0, Math.min(1, mappedValue));
+                                        const hue = clampedValue * 120; // 0 = Red (weak), 120 = Green (strong)
+                                        visualizationColors[i] = `hsl(${hue}, 100%, 50%)`;
+                                    }else{
+                                        visualizationColors[i] = "rgb(50,50,50)";
+                                    }
                                 }
                                 updateRadar(visualizationColors)
 
@@ -393,10 +396,10 @@
 
                             } else {
                                 //Just has either 0 or 1, a comma, and if 1, it will have the avrage signal stength at one meter
-                                if (text[1]("1")) {
+                                if (text.startsWith("T1")) {
                                     //OKAY ITS EASTER AND IM TIRED WHAT THE HECK ARE YOU SUPPOSED TO CALL A NUMBER THAT IS THE AVRAGE SIGNAL STRENGTH AT ONE METER??????????????
                                     //Note, I know this is called TX power or base power, but the comment above is funny and im keeping it for people like me who inspect sites
-                                    const magicNumber = text.substring(1)
+                                    const magicNumber = text.substring(2)
                                     do_test_signal_test = false;
                                     let existingData = {};
                                     if (localStorage.getItem("testSignals") && localStorage.getItem("testSignals") !== "null") {
@@ -421,6 +424,7 @@
                                     document.getElementById("scanFeedback").innerHTML = `<b>Done scanning for ${currentFrequency}</b>`
 
                                 }
+                                return
 
                             }
 

@@ -90,7 +90,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v4.2</h3>
+            <h3>v4.3</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -464,7 +464,19 @@
         document.getElementById("scanFeedback").innerHTML = `<b>Currently scanning for ${currentFrequency}</b>`
     })
     document.getElementById("targetFrequency").addEventListener("change", (event) => {
-        writeMessage(`FREQ:${event.target.value}`)
+        const newFreq = event.target.value;
+        writeMessage(`FREQ:${newFreq}`)
+          strongestRSSIVal = -200;
+     latestRSSI = -200;
+     latestDirection = 0;
+     highestDirection = 0;
+     recivedFrequencies = []
+     visualizationColors = []
+     recivedFrequencies = new Array(360).fill(-200)
+     visualizationColors = new Array(360).fill("rgb(255, 255, 255)")
+     updateRadar()
+
+     currentFrequency = newFreq
     })
 
 

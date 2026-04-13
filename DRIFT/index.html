@@ -90,7 +90,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v4.3</h3>
+            <h3>v4.4</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -209,6 +209,7 @@
             <fieldset>
                 <label>
                     <div class="grid">
+                        <button id="disconnectDevice">Disconnect Device</button>
                         <button id="restartDevice">Restart Device</button>
                         <button id="shutdownDevice">Shutdown Device</button>
                     </div>
@@ -255,6 +256,8 @@
     const input = document.querySelector('input');
     let hasListYet = false;
     const GAS_LINK = 'https://script.google.com/macros/s/AKfycbzkCxaI98__F-lE2OxL5vb4iuiQIJZ_THynACWmEgZdjanokAyy4vgSGSX1-SVX6-wq/exec'
+
+    let device = null;
 
     browseSearchBar.addEventListener('input', async (event) => {
         const fullstring = event.target.value;
@@ -338,8 +341,10 @@
 
                 navigator.bluetooth.requestDevice(options)
                     .then((device) => {
+                        device = device;
                         out.innerHTML = "<b>Connecting to GATT Server...</b>";
                         console.log("Device Name:", device.name);
+                        device.addEventListener('gattserverdisconnected', onDisconnected);
                         return device.gatt.connect(); // Connect to the server
                     })
                     .then((server) => {
@@ -381,11 +386,11 @@
                                 for (let i = 0; i < 360; i++) {
                                     // Shift the values up so they are positive relative to the floor
                                     let mappedValue = (recivedFrequencies[i] - minRSSI) / range;
-                                    if(recivedFrequencies !== -200){
+                                    if (recivedFrequencies !== -200) {
                                         const clampedValue = Math.max(0, Math.min(1, mappedValue));
                                         const hue = clampedValue * 120; // 0 = Red (weak), 120 = Green (strong)
                                         visualizationColors[i] = `hsl(${hue}, 100%, 50%)`;
-                                    }else{
+                                    } else {
                                         visualizationColors[i] = "rgb(50,50,50)";
                                     }
                                 }
@@ -396,8 +401,8 @@
 
                             } else {
                                 //Just has either 0 or 1, a comma, and if 1, it will have the avrage signal stength at one meter
-                                if (text.startsWith("T1")) {
-                                    if (!do_test_signal_test) return 
+                                if (text.startsWith("TF")) {
+                                    if (!do_test_signal_test) return
                                     //OKAY ITS EASTER AND IM TIRED WHAT THE HECK ARE YOU SUPPOSED TO CALL A NUMBER THAT IS THE AVRAGE SIGNAL STRENGTH AT ONE METER??????????????
                                     //Note, I know this is called TX power or base power, but the comment above is funny and im keeping it for people like me who inspect sites
                                     const magicNumber = text.substring(2)
@@ -424,6 +429,10 @@
                                     document.getElementById("customTestSignals").appendChild(newElement)
                                     document.getElementById("scanFeedback").innerHTML = `<b>Done scanning for ${currentFrequency}</b>`
 
+                                } else {
+                                    const stage = Number(text[1]) - 1
+                                    const stageArray = ["Finding transmitter...", "Getting average RSSI...", "Calculating average..."]
+                                    document.getElementById("scanFeedback").innerHTML = `<b>${stageArray[stage]}</b>`
                                 }
                                 return
 
@@ -433,6 +442,7 @@
 
                         writeCharacteristic = await service.getCharacteristic("12345678-1234-5678-1234-5678abcdef02");
                         out.innerHTML = "<b>Device connected</b>"
+                        out.style.display = "none"
                     })
                     .catch((error) => {
                         out.innerHTML = `<b>Error: ${error}</b>`;
@@ -463,21 +473,40 @@
         writeMessage("RUNSIGNALTEST")
         document.getElementById("scanFeedback").innerHTML = `<b>Currently scanning for ${currentFrequency}</b>`
     })
+    document.getElementById("disconnectDevice").addEventListener("click", () => {
+        writeMessage("DISCONNECT")
+        document.getElementById("out").innerHTML = `<b>Waiting to connect</b>`;
+        document.getElementById("pairBttn").innerText = "Pair Device";
+        document.getElementById("pairBttn").style.display = "block";
+        device = null;
+    })
     document.getElementById("targetFrequency").addEventListener("change", (event) => {
         const newFreq = event.target.value;
         writeMessage(`FREQ:${newFreq}`)
-          strongestRSSIVal = -200;
-     latestRSSI = -200;
-     latestDirection = 0;
-     highestDirection = 0;
-     recivedFrequencies = []
-     visualizationColors = []
-     recivedFrequencies = new Array(360).fill(-200)
-     visualizationColors = new Array(360).fill("rgb(255, 255, 255)")
-     updateRadar()
-
-     currentFrequency = newFreq
+        currentFrequency = newFreq
+        strongestRSSIVal = -200;
+        latestRSSI = -200;
+        latestDirection = 0;
+        highestDirection = 0;
+        recivedFrequencies = []
+        visualizationColors = []
+        recivedFrequencies = new Array(360).fill(-200)
+        visualizationColors = new Array(360).fill("rgb(255, 255, 255)")
+        updateRadar()
     })
+
+    window.addEventListener('beforeunload', function (e) {
+        // Replace this with your own condition
+        // For example: if (isDataUnsaved === true)
+        if (device !== null) {
+            // Cancel the event
+            e.preventDefault();
+            alert("Please diconnect device before leaving.")
+
+            // Chrome requires returnValue to be set
+            e.returnValue = '';
+        }
+    });
 
 
 
@@ -523,6 +552,12 @@
 
     function updateSingleDot(degree, rgbString) {
         dots[degree].style.backgroundColor = `rgb${rgbString}`;
+    }
+
+    function onDisconnected(event) {
+        const device = event.target;
+        out.innerHTML = `<b style="color: red;">Device ${device.name} disconnected</b>`;
+        // Suggest a reconnect button or attempt auto-reconnect logic here
     }
 
 </script>

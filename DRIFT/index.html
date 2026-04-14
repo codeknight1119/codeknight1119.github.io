@@ -547,9 +547,9 @@
         try {
             const command = new TextEncoder().encode(message);
             await writeCharacteristic.writeValueWithoutResponse(command);
-            console.log("Shutdown command sent.");
+            console.log(`Command ${message} sent`);
         } catch (error) {
-            console.error("Shutdown failed:", error);
+            console.error("command failed:", error);
         }
     }
 

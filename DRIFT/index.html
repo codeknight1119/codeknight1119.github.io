@@ -52,20 +52,26 @@
 
         #radar-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            background: transparent;
-            /* Dark background to see dots better */
+            width: 450px;
+            /* Increased from 300px */
+            height: 450px;
+            /* Increased from 300px */
+            background: rgba(255, 255, 255, 0.03);
+            /* Slight background to see the area */
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
+            margin: 2rem auto;
+            /* Centers the block horizontally */
             display: flex;
             justify-content: center;
+            align-items: center;
         }
 
         .dot {
             position: absolute;
-            width: 2px;
+            width: 4px;
             /* Your dotSize */
-            height: 2px;
+            height: 4px;
             top: 50%;
             left: 50%;
             border-radius: 50%;
@@ -90,7 +96,7 @@
     <main class="container">
         <hgroup style="margin-top: 2rem; margin-bottom: 2rem; text-align: center;">
             <h1>DRIFT</h1>
-            <h3>v4.5</h3>
+            <h3>v4.6</h3>
             <p style="opacity: 0.7">Directional RSSI Integration Finder Technology</p>
             <br>
             <button id="pairBttn" style="color: white">Pair Device</button>
@@ -388,13 +394,15 @@
                                     let mappedValue = (recivedFrequencies[i] - minRSSI) / range;
                                     if (recivedFrequencies !== -200) {
                                         const clampedValue = Math.max(0, Math.min(1, mappedValue));
-                                        const hue = clampedValue * 120; // 0 = Red (weak), 120 = Green (strong)
-                                        visualizationColors[i] = `hsl(${hue}, 100%, 50%)`;
+                                        const hue = (1 - clampedValue) * 240;
+                                        const lightness = 40 + (clampedValue * 20);
+                                        visualizationColors[i] = `hsl(${hue}, 100%, ${lightness}%)`;
                                     } else {
                                         visualizationColors[i] = "rgb(50,50,50)";
                                     }
                                 }
-                                updateRadar(visualizationColors)
+                                updateRadar(visualizationColors);
+                                calculateDist();
 
 
 
@@ -523,7 +531,7 @@
 
     const container = document.getElementById("radar-container");
     const dots = []; // Array to store our DOM elements
-    const radarRadius = 138;
+    const radarRadius = 210;
 
     // --- 1. INITIAL GENERATION ---
     for (let i = 0; i < 360; i++) {
@@ -568,6 +576,8 @@
     function onDisconnected(event) {
         const device = event.target;
         out.innerHTML = `<b style="color: red;">Device ${device.name} disconnected</b>`;
+        pairBttn.innerText = "Pair Device";
+        pairBttn.style.display = "inline-block";
         // Suggest a reconnect button or attempt auto-reconnect logic here
     }
 

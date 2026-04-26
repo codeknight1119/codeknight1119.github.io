@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { loginGoogle, logout, setDoc, getDocument } from './firebase';
+import { loginGoogle, logout, setDoc, getDocument } from "./firebbase";
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import './App.css';
@@ -31,7 +31,6 @@ export default function App() {
 
 function Home({ user }) {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleLogin = async () => {
@@ -68,7 +67,6 @@ function Home({ user }) {
       } else {
         setIsAdmin(false);
       }
-      setLoading(false);
     };
 
     checkAdminStatus();
@@ -116,25 +114,6 @@ function Home({ user }) {
     }
   };
 
-  const EditorToolbar = ({ editor }) => {
-    if (!editor) return null;
-    return (
-      <>
-        <div className="toolbar">
-          <button onClick={() => editor.chain().focus().toggleBold().run()}>
-            Bold
-          </button>
-          <button onClick={() => editor.chain().focus().toggleItalic().run()}>
-            Italic
-          </button>
-          <button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Saving...' : '💾 Save Changes'}
-          </button>
-        </div>
-      </>
-    );
-  };
-
   return (
     <>
       <div
@@ -172,13 +151,32 @@ function Home({ user }) {
         style={{ border: '1px solid #ccc', marginTop: '20px' }}
       >
         {/* The Toolbar should only show if the user is logged in */}
-        {isAdmin && <EditorToolbar editor={editor} />}
+        {isAdmin && <EditorToolbar editor={editor} onSave={handleSave} isSaving={isSaving} />}
 
         <EditorContent editor={editor} />
       </div>
     </>
   );
 }
+
+const EditorToolbar = ({ editor, onSave, isSaving }) => {
+  if (!editor) return null;
+  return (
+    <>
+      <div className="toolbar">
+        <button onClick={() => editor.chain().focus().toggleBold().run()}>
+          Bold
+        </button>
+        <button onClick={() => editor.chain().focus().toggleItalic().run()}>
+          Italic
+        </button>
+        <button onClick={onSave} disabled={isSaving}>
+          {isSaving ? 'Saving...' : '💾 Save Changes'}
+        </button>
+      </div>
+    </>
+  );
+};
 
 async function checkAdmin(user) {
   try {

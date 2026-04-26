@@ -3,7 +3,6 @@ name: Deploy OOTOA
 on:
   push:
     branches: [ main ]
-    paths: [ 'OOTOA/**' ]  # Only run when OOTOA files change
 
 jobs:
   build-and-deploy:

@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <meta name="color-scheme" content="light dark">
-    <link href="freeAI/freeAILogo.svg" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="freeAILogo.svg">
+   
     <style>
         #mainChat {
             overflow-y: scroll;
@@ -45,7 +46,7 @@
 </body>
 <script>
     async function test() {
-         const GAS_LINK = "https://script.google.com/macros/s/AKfycbxd21I7WrXUZZWTpX5Jxe3nXwjFc5gLgj9D3x3amSox4XrPfFnKsxr4arhdAH0jjW3OLw/exec"
+         const GAS_LINK = "https://script.google.com/macros/s/AKfycbyoJXSwBT5eF43A3iK0XpTzz_NcQtlg-BkrFtET78vGwSefJ2wWnSmPMBYxZXCISS24/exec"
     const data = await fetch(GAS_LINK, {
         method : "POST",
         body: JSON.stringify({ "message": "hi" })

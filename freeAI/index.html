@@ -58,14 +58,14 @@
         messageArea.appendChild(userMessageElement)
 
 
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbxND0eFbA3lBgVbx_8AcqJRRia_R2IXCIHP0J7XB1lnj95erRZyoGkqcGGz0yiHpob93A/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycby8AFn2YPMMlr5N6ys6GfCuXvsYKZ6AIj42L426BVTR53hsfokBXF27XGpD1jxj4Qyz0Q/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify({ "message": query})
         })
         const recive = await data.json()
         console.log("Raw Output: ", recive)
-        const recivedMessage = recive.result.choices[0].message.content
+        const recivedMessage = recive.choices[0].message.content
 
         let aiMessageElement = document.createElement("p")
         aiMessageElement.innerHTML = "<strong>MODEL:</strong> " + recivedMessage

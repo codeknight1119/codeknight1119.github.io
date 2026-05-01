@@ -48,9 +48,7 @@
          const GAS_LINK = "https://script.google.com/macros/s/AKfycbxd21I7WrXUZZWTpX5Jxe3nXwjFc5gLgj9D3x3amSox4XrPfFnKsxr4arhdAH0jjW3OLw/exec"
     const data = await fetch(GAS_LINK, {
         method : "POST",
-        body: JSON.stringify({ "message": "hi" }),
-        headers: { 'Content-Type': 'application/json'},
-
+        body: JSON.stringify({ "message": "hi" })
     })
  const recive = await data.json()
  console.log(recive)

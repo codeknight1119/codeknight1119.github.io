@@ -16,8 +16,11 @@
             display: flex;
             justify-content: center;
         }
+
         #sendMessageUI {
-            display: inline;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
         }
     </style>
     <title>AI on a Student Budget</title>
@@ -34,8 +37,8 @@
         </div>
         <div id="UIBar">
             <div id="sendMessageUI">
-            <button id="sendButton">Send</button>
-            <input id="textEnter" />
+                <button id="sendButton">Send</button>
+                <input id="textEnter" />
             </div>
         </div>
     </main>

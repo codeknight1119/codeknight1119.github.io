@@ -58,7 +58,7 @@
         messageArea.appendChild(userMessageElement)
 
 
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbzjLaMtUlQzwCpxKCyXSTgBuPThhLwJcq_JEh7kMyrCp8q7Xu7PGJeqHNwJGUm6NXc0/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbwdAjrNHlPoNZy7AoAcTasQGsMBG9Zqyk8Gw8qGWhEXg7jU0_Yiapft0gdOyjkWEb-qXA/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify({ "message": query})

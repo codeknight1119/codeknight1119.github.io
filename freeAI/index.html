@@ -38,7 +38,7 @@
         </div>
         <div id="UIBar">
             <div id="sendMessageUI">
-                <button id="sendButton" onclick=queryModel>Send</button>
+                <button id="sendButton">Send</button>
                 <input id="textEnter" />
             </div>
         </div>
@@ -47,6 +47,7 @@
 <script>
     const textIn = document.getElementById("textEnter")
     const messageArea = document.getElementById("mainChat")
+    document.getElementById("sendButton").addEventListener("click", queryModel)
 
     async function queryModel() {
         try{
@@ -64,7 +65,7 @@
         })
         const recive = await data.json()
         console.log("Raw Output: ", recive)
-        const recivedMessage = recive.choices[0].content
+        const recivedMessage = recive.choices[0].message.content
 
         let aiMessageElement = document.createElement("p")
         aiMessageElement.innerHTML = "<strong>MODEL:</strong> " + recivedMessage

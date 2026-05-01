@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <meta name="color-scheme" content="light dark">
     <link rel="icon" type="image/x-icon" href="freeAILogo.svg">
-   
+
     <style>
         #mainChat {
             overflow-y: scroll;
@@ -38,24 +38,41 @@
         </div>
         <div id="UIBar">
             <div id="sendMessageUI">
-                <button id="sendButton">Send</button>
+                <button id="sendButton" onclick="queryModel">Send</button>
                 <input id="textEnter" />
             </div>
         </div>
     </main>
 </body>
 <script>
-    async function test() {
-         const GAS_LINK = "https://script.google.com/macros/s/AKfycbyoJXSwBT5eF43A3iK0XpTzz_NcQtlg-BkrFtET78vGwSefJ2wWnSmPMBYxZXCISS24/exec"
-    const data = await fetch(GAS_LINK, {
-        method : "POST",
-        body: JSON.stringify({ "message": "hi" })
-    })
- const recive = await data.json()
- console.log(recive)
+    const textIn = document.getElementById("textEnter")
+    const messageArea = document.getElementById("mainChat")
+
+    async function queryModel() {
+        try{
+        const query = textIn.value
+        textIn.value = ""
+        let userMessageElement = document.createElement("p")
+        userMessageElement.innerHTML = "<strong>USER:</strong> " + query
+        messageArea.appendChild(userMessageElement)
+
+
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbzV3CFowyVMBSfYZzbvRFBWWyMsy5I8hiV5jMC1SUNMM50u9A3Jo3lP4g6-nqgWHDVhOA/exec"
+        const data = await fetch(GAS_LINK, {
+            method: "POST",
+            body: JSON.stringify({ "message": query})
+        })
+        const recive = await data.json()
+        const recivedMessage = recive.choices[0].content
+
+        let aiMessageElement = document.createElement("p")
+        aiMessageElement.innerHTML = "<strong>MODEL:</strong> " + recivedMessage
+        messageArea.appendChild(aiMessageElement)
+    }catch(e){
+        console.error(e)
     }
-    test()
-   
+    }
+
 </script>
 
 </html>

@@ -45,8 +45,9 @@
     </main>
     <button id="login">Login</button>
 </body>
-<script type="module" src="./firebaseUtils.js"></script>
-<script>
+<script type="module">
+import * as FirebaseUtils from './firebaseUtils.js';
+
 
     const textIn = document.getElementById("textEnter")
     const messageArea = document.getElementById("mainChat")
@@ -78,7 +79,7 @@
         }
     }
     document.getElementById("login").addEventListener("click", async () => {
-       const data = await loginGoogle()
+       const data = await FirebaseUtils.loginGoogle()
        console.log(data)
     })
 

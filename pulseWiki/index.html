@@ -64,6 +64,8 @@
             letter-spacing: -0.3px;
             color: #fff;
             text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
         }
 
         header h4 {
@@ -220,7 +222,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        // Store page data globally to avoid re-fetching
         let sitePages = {};
         const mainContainer = document.getElementById("main-container");
         const titleElement = document.getElementById("title");

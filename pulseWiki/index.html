@@ -206,6 +206,10 @@
  top: 10 px;
  right: 10 px;
         }
+        .login {
+            display: flex;
+            justify-content: right;
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
 </head>
@@ -213,7 +217,8 @@
 <body>
     <header id="header">
         <h1 id="title"></h1>
-        <h4>v.28</h4>
+        <h4>v.29</h4>
+        <button id="login">Login</button>
     </header>
 
     <main id="main-container" role="main" aria-labelledby="title"></main>
@@ -222,6 +227,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
+        import * as FirebaseUtils from "./firebaseUtils"
+        let currentPages = {}
         let sitePages = {};
         const mainContainer = document.getElementById("main-container");
         const titleElement = document.getElementById("title");
@@ -409,6 +416,9 @@
             }
         });
 
+        document.getElementById("login").addEventListener("click", async () => {
+            FirebaseUtils.loginGoogle()
+        })
         init();
     </script>
 </body>

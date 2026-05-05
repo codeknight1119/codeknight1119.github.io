@@ -7,7 +7,8 @@
     <title>Pulse Wiki</title>
     <style>
         /* Page-level layout & background overlay */
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
         }
@@ -19,7 +20,8 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             color: #eaf2ff;
-            position: relative; /* for pseudo-element overlay */
+            position: relative;
+            /* for pseudo-element overlay */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             line-height: 1.6;
@@ -30,7 +32,8 @@
             content: "";
             position: fixed;
             inset: 0;
-            background: rgba(6, 12, 23, 0.55); /* tweak alpha for more/less contrast */
+            background: rgba(6, 12, 23, 0.55);
+            /* tweak alpha for more/less contrast */
             pointer-events: none;
             z-index: 0;
         }
@@ -38,13 +41,14 @@
         /* Main container that holds readable content */
         #main-container {
             position: relative;
-            z-index: 1; /* above overlay */
+            z-index: 1;
+            /* above overlay */
             max-width: 920px;
             margin: 3rem auto;
-            background: linear-gradient(180deg, rgba(15,20,30,0.45), rgba(6,12,23,0.55));
+            background: linear-gradient(180deg, rgba(15, 20, 30, 0.45), rgba(6, 12, 23, 0.55));
             border-radius: 12px;
             padding: 1.6rem 1.8rem;
-            box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
             overflow-wrap: break-word;
             color: #eaf2ff;
             font-size: 18px;
@@ -63,7 +67,7 @@
             line-height: 1.15;
             letter-spacing: -0.3px;
             color: #fff;
-            text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
             display: flex;
             justify-content: center;
         }
@@ -86,11 +90,13 @@
         }
 
         /* Make inline text blocks behave like paragraphs visually */
-        .line-container > span,
-        .line-container > p {
+        .line-container>span,
+        .line-container>p {
             display: inline-block;
-            max-width: calc(100% - 170px); /* give room for inline images */
-            min-width: 0; /* allow flex children to shrink correctly */
+            max-width: calc(100% - 170px);
+            /* give room for inline images */
+            min-width: 0;
+            /* allow flex children to shrink correctly */
             vertical-align: middle;
         }
 
@@ -117,14 +123,14 @@
             height: 36px;
             object-fit: contain;
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
         /* Clickable internal links */
         .clickable {
             color: #6fb3ff;
             text-decoration: none;
-            border-bottom: 1px dotted rgba(111,179,255,0.5);
+            border-bottom: 1px dotted rgba(111, 179, 255, 0.5);
             cursor: pointer;
             transition: color 120ms ease, transform 120ms ease;
         }
@@ -136,14 +142,14 @@
 
         /* Details / drop-down styling */
         details {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             padding: 0.6rem 0.9rem;
             border-radius: 8px;
             margin: 0.4rem 0;
             width: 100%;
         }
 
-        details > summary {
+        details>summary {
             list-style: none;
             cursor: pointer;
             user-select: none;
@@ -153,7 +159,7 @@
         }
 
         details[open] {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         /* Small Back button: make it less obtrusive */
@@ -162,9 +168,9 @@
             top: 12px;
             left: 12px;
             z-index: 3;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             color: #eaf2ff;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 0.4rem 0.6rem;
             border-radius: 6px;
             cursor: pointer;
@@ -174,7 +180,7 @@
 
         button#back-btn:hover {
             transform: translateY(-1px);
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         /* Make headings inside parsed markdown more visible */
@@ -197,7 +203,7 @@
                 max-width: 110px;
             }
 
-            .line-container > span {
+            .line-container>span {
                 max-width: 100%;
             }
         }
@@ -237,14 +243,19 @@
          */
         async function renderPage(pageKey) {
             if (!pageKey) return;
+            pageKey = decodeURIComponent(pageKey);
+
             lastPage = currentPageKey;
             currentPageKey = pageKey;
-            try{
-            const pageData = await FirebaseUtils.getDocument(`/lore/${encodeURIComponent(pageKey)}`)
-            }catch(e){
+
+
+            let page = null; // Declare outside the try block
+            try {
+                page = await FirebaseUtils.getDocument(`/lore/${encodeURIComponent(pageKey)}`)
+            } catch (e) {
                 alert(JSON.stringify(e))
             }
-            const page = pageData.body.split(",")
+            const pageBody = pageData.body.split(",")
 
             // update URL / history so links are shareable
             try {
@@ -267,7 +278,7 @@
             let currentContainer = mainContainer;
 
             // These commands control where subsequent lines are placed.
-            page.body.forEach(rawLine => {
+            pageBody.forEach(rawLine => {
                 const line = String(rawLine || "").trim();
 
                 // --- DROPDOWN HANDLING ---

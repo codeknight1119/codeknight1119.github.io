@@ -52,7 +52,7 @@ export const updateDocument = async (path, data) => {
     }
 };
 
-export const getDocument = async (path, caller) => {
+export const getDocument = async (path) => {
     try {
         const docRef = doc(db, path);
         const docSnap = await getDoc(docRef);
@@ -65,7 +65,7 @@ export const getDocument = async (path, caller) => {
         }
     }
     catch (e) {
-        alert(`get doc from ${caller} failed at link ${path} | Error: ` +
+        alert(`get doc failed at link ${path} | Error: ` +
             JSON.stringify(e));
     }
 };

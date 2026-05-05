@@ -235,12 +235,13 @@
          * Renders the content of a specific page from the stored data.
          * @param {string} pageKey - The key of the page to display (e.g., "home").
          */
-        function renderPage(pageKey) {
+        async function renderPage(pageKey) {
             if (!pageKey) return;
             lastPage = currentPageKey;
             currentPageKey = pageKey;
 
-            const page = sitePages[pageKey];
+            const pageData = await FirebaseUtils.getDocument(`/lore/${encodeURIComponent(pageKey)}`)
+            const page = pageData.body.split(",")
 
             // update URL / history so links are shareable
             try {
@@ -370,7 +371,7 @@
             });
 
             // Apply per-page style settings (like background)
-            (page.style || []).forEach(aspect => {
+            (pageData.style || []).forEach(aspect => {
                 const trimmedAspect = (aspect || "").trim();
                 if (trimmedAspect.startsWith("background:")) {
                     const src = trimmedAspect.split("background:")[1].trim();
@@ -392,7 +393,7 @@
 
                 const params = new URLSearchParams(window.location.search);
                 const startPage = params.get("page") || "home";
-                renderPage(startPage);
+                renderPage(encodeURIComponent(startPage));
             } catch (error) {
                 titleElement.textContent = "Error";
                 mainContainer.innerHTML = `<p>Failed to load page data: ${error}</p>`;

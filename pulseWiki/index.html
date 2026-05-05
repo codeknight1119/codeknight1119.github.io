@@ -239,8 +239,11 @@
             if (!pageKey) return;
             lastPage = currentPageKey;
             currentPageKey = pageKey;
-
+            try{
             const pageData = await FirebaseUtils.getDocument(`/lore/${encodeURIComponent(pageKey)}`)
+            }catch(e){
+                alert(JSON.stringify(e))
+            }
             const page = pageData.body.split(",")
 
             // update URL / history so links are shareable

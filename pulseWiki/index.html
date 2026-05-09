@@ -304,192 +304,144 @@
     <button id="back-btn" onclick="backPage()">Back</button>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module">
-        import * as FirebaseUtils from "./firebaseUtils.js"
-        let currentPages = {}
-        let sitePages = {};
-        const mainContainer = document.getElementById("main-container");
-        const titleElement = document.getElementById("title");
-        let lastPage = null;
-        let currentPageKey = null;
-        let user = null;
+<script type="module">
+    import * as FirebaseUtils from "./firebaseUtils.js"
+    
+    // 1. GLOBALS
+    let sitePages = {};
+    const mainContainer = document.getElementById("main-container");
+    const titleElement = document.getElementById("title");
+    let lastPage = null;
+    let currentPageKey = null;
+    let user = null;
 
-        async function checkUserOnStart() {
-            const userLoggedIn = await FirebaseUtils.getUserOnLoad()
-            if (userLoggedIn) {
-                user = userLoggedIn
-                console.log("signed in")
-            } else {
-                console.log("not signed in")
+    // 2. WIKI LINK PROCESSOR
+    function processWikiLinks(rawText) {
+        // Use window.renderPage so it works from the generated HTML strings
+        return rawText.replace(/\[\[(.*?)\]\]/g, (match, slug) => {
+            const encodedSlug = encodeURIComponent(slug.trim());
+            return `<a class="clickable" onclick="window.renderPage('${encodedSlug}')">${slug}</a>`;
+        });
+    }
 
-            }
+    // 3. RENDER PAGE
+    // We attach this to 'window' so the [[]] links can click it
+    window.renderPage = async function(pageKey) {
+        if (!pageKey) return;
+        pageKey = decodeURIComponent(pageKey);
+
+        // Update history for Back button
+        if (currentPageKey && currentPageKey !== pageKey) {
+            lastPage = currentPageKey;
+        }
+        currentPageKey = pageKey;
+
+        // Clear container and show loading state
+        mainContainer.innerHTML = "Loading lore...";
+        
+        let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
+
+        if (!page) {
+            mainContainer.innerHTML = `<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`;
+            titleElement.textContent = "Unknown Fragment";
+            return;
         }
 
-        /**
-         * Renders the content of a specific page from the stored data.
-         * @param {string} pageKey - The key of the page to display (e.g., "home").
-         */
-        async function renderPage(pageKey) {
-            if (!pageKey) return;
-            pageKey = decodeURIComponent(pageKey);
+        // Setup Page Meta
+        titleElement.textContent = page.title || pageKey;
+        mainContainer.innerHTML = ""; // Clear "Loading..."
 
-            lastPage = currentPageKey;
-            currentPageKey = pageKey;
-
-
-
-            let page = null; // Declare outside the try block
-            try {
-                console.log(pageKey)
-                page = await FirebaseUtils.getDocument(`/lore/${pageKey}`)
-            } catch (e) {
-                console.error("Firebase Fetch Error:", e);
-                alert("Failed to fetch page. " + JSON.stringify(e));
-            }
-            console.log(page)
-            const pageBody = page.body
-
-            pageBody.forEach((val, index) => {
-                const firstPass = processWikiLinks(val)
-                const final = marked.parse(firstPass);
-
-
-                let newContent = document.createElement("div")
-                newContent.innerHTML = final
-                mainContainer.appendChild(newContent);
-            })
-
-            // update URL / history so links are shareable
-            try {
-                history.pushState({ pageKey }, "", `?page=${encodeURIComponent(pageKey)}`);
-            } catch (e) {
-                // pushState may fail in some contexts; ignore
-            }
-
-            if (!page) {
-                mainContainer.innerHTML = `<p>Error: Page "<strong>${pageKey}</strong>" not found.</p>`;
-                titleElement.textContent = "Error";
-                return;
-            }
-
-            // Clear previous content
-            mainContainer.innerHTML = "";
-            titleElement.textContent = page.title || pageKey;
-
-            // This variable will track where new elements should be appended.
-            let currentContainer = mainContainer;
-
-
-            // Apply per-page style settings (like background)
-            (page.style.split(";")).forEach(aspect => {
-                const trimmedAspect = (aspect || "").trim();
-                if (trimmedAspect.startsWith("background:")) {
-                    const src = trimmedAspect.split("background:")[1].trim();
+        // Apply Background Style
+        if (page.style) {
+            page.style.split(";").forEach(aspect => {
+                if (aspect.trim().startsWith("background:")) {
+                    const src = aspect.split("background:")[1].trim();
                     document.body.style.backgroundImage = `url(resources/${src})`;
                 }
             });
         }
 
-        /**
-         * Initializes the application by fetching data and rendering the initial page.
-         */
-        async function init() {
-            try {
-                const response = await fetch("pages.json");
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                sitePages = await response.json();
+        // Loop through the body array
+        // NOTE: We assume 'body' is an array of strings or objects
+        const pageBody = Array.isArray(page.body) ? page.body : [page.body];
 
-                const params = new URLSearchParams(window.location.search);
-                const startPage = params.get("page") || "home";
-                renderPage(encodeURIComponent(startPage));
-            } catch (error) {
-                titleElement.textContent = "Error";
-                mainContainer.innerHTML = `<p>Failed to load page data: ${error}</p>`;
-                console.error("Error loading page:", error);
+        pageBody.forEach((section) => {
+            // Handle if section is a string or an object with .content
+            const content = typeof section === 'string' ? section : section.content;
+            
+            // Handle Campaign Visibility if section is an object
+            if (section.visibility && section.visibility !== "all") {
+                if (!user || user.campaign !== section.visibility) return; 
+            }
+
+            const firstPass = processWikiLinks(content);
+            const finalHtml = marked.parse(firstPass);
+
+            const sectionDiv = document.createElement("div");
+            sectionDiv.className = "line-container"; // Keeps your styling
+            sectionDiv.innerHTML = finalHtml;
+            mainContainer.appendChild(sectionDiv);
+        });
+
+        // Update URL
+        try {
+            history.pushState({ pageKey }, "", `?page=${encodeURIComponent(pageKey)}`);
+        } catch (e) {}
+    };
+
+    // 4. NAVIGATION
+    window.backPage = function() {
+        if (lastPage) window.renderPage(lastPage);
+    };
+
+    window.addEventListener("popstate", (ev) => {
+        if (ev.state && ev.state.pageKey) window.renderPage(ev.state.pageKey);
+    });
+
+    // 5. AUTH & INIT
+    document.getElementById("logiBttn").addEventListener("click", async () => {
+        let userData = await FirebaseUtils.loginGoogle();
+        if (userData) {
+            user = userData.user;
+            if (userData.isNew) {
+                document.getElementById("chooseUseCase").style.display = "block";
+                document.getElementById("logiBttn").style.display = "none";
+            } else {
+                document.getElementById("loginPopup").classList.remove("show");
+                location.reload(); // Refresh to update visible sections
             }
         }
+    });
 
-        function backPage() {
-            if (lastPage) renderPage(lastPage);
-        }
-
-        // Allow navigation with browser back button (optional)
-        window.addEventListener("popstate", (ev) => {
-            const state = ev.state;
-            if (state && state.pageKey) {
-                renderPage(state.pageKey);
-            }
-        });
-
-        document.getElementById("logiBttn").addEventListener("click", async () => {
-            let userData = await FirebaseUtils.loginGoogle();
-
-            if (userData) {
-                user = userData.user;
-
-                // Check if the user is new
-                if (userData.isNew) {
-                    // Show the campaign selection UI
-                    document.getElementById("chooseUseCase").style.display = "block";
-                    // Hide the Google button so they don't click it again
-                    document.getElementById("logiBttn").style.display = "none";
-                } else {
-                    // If they aren't new, they likely already have a campaign. 
-                    // Close the popup and proceed.
-                    document.getElementById("loginPopup").classList.remove("show");
-                    console.log("Existing user logged in:", user.displayName);
-                }
-            }
-        });
-
-        document.getElementById("selectuseCase").addEventListener("click", async () => {
-            const campaignSelection = document.querySelector('select[name="choose"]').value;
-
-            if (user) {
-                try {
-                    // Save the campaign to a 'users' collection using their unique ID (uid)
-                    // We use setDoc or updateDocument. Since it's a new user, 
-                    // let's ensure the document exists.
-                    await FirebaseUtils.setDoc(`users/${user.uid}`, {
-                        username: user.displayName,
-                        email: user.email,
-                        campaign: campaignSelection,
-                        role: "player",
-                        joinedAt: new Date().toISOString()
-                    });
-
-                    //  alert("Campaign saved! Welcome to " + campaignSelection);
-
-                    // Close the popup
-                    document.getElementById("loginPopup").classList.remove("show");
-                } catch (error) {
-                    console.error("Error saving campaign selection:", error);
-                    alert("Failed to save campaign. Please try again.");
-                }
-            }
-        });
-        document.getElementById("login").addEventListener("click", () => {
-            var popup = document.getElementById("loginPopup");
-            popup.classList.toggle("show");
-        })
-        document.getElementById("loginExit").addEventListener("click", () => {
-            document.getElementById("loginPopup").classList.remove("show");
-        })
-        init();
-
-        function processWikiLinks(rawText) {
-            // This Regex looks for [[Anything Inside]]
-            return rawText.replace(/\[\[(.*?)\]\]/g, (match, slug) => {
-                // We encode the slug so "Great War" becomes "Great%20War" for the URL
-                const encodedSlug = encodeURIComponent(slug.trim());
-
-                // Return a standard link that our existing renderPage() function understands
-                return `<a class="clickable" onclick="renderPage('${encodedSlug}')">${slug}</a>`;
+    document.getElementById("selectuseCase").addEventListener("click", async () => {
+        const campaign = document.querySelector('select[name="choose"]').value;
+        if (user) {
+            await FirebaseUtils.setDoc(`users/${user.uid}`, {
+                username: user.displayName,
+                campaign: campaign,
+                role: "player"
             });
+            document.getElementById("loginPopup").classList.remove("show");
+            window.renderPage(currentPageKey); // Re-render to show restricted content
         }
-    </script>
+    });
+
+    // Login UI Toggles
+    document.getElementById("login").onclick = () => document.getElementById("loginPopup").classList.toggle("show");
+    document.getElementById("loginExit").onclick = () => document.getElementById("loginPopup").classList.remove("show");
+
+    // Initialize Site
+    async function init() {
+        // Check if user is already logged in
+        user = await FirebaseUtils.getUserOnLoad();
+        
+        const params = new URLSearchParams(window.location.search);
+        const startPage = params.get("page") || "home";
+        window.renderPage(startPage);
+    }
+
+    init();
+</script>
 </body>
 
 </html>

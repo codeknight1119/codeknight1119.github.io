@@ -388,7 +388,7 @@
             });
 
             // Apply per-page style settings (like background)
-            (pageData.style || []).forEach(aspect => {
+            (page.style || []).forEach(aspect => {
                 const trimmedAspect = (aspect || "").trim();
                 if (trimmedAspect.startsWith("background:")) {
                     const src = trimmedAspect.split("background:")[1].trim();

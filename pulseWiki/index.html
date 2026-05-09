@@ -251,6 +251,7 @@
 
             let page = null; // Declare outside the try block
             try {
+                console.log(pageKey)
                 page = await FirebaseUtils.getDocument(`/lore/${pageKey}`)
             } catch (e) {
                 console.error("Firebase Fetch Error:", e);

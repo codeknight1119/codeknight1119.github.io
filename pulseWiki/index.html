@@ -288,6 +288,10 @@
             const userLoggedIn = await FirebaseUtils.getUserOnLoad()
             if (userLoggedIn) {
                 user = userLoggedIn
+                console.log("signed in")
+            } else {
+                console.log("not signed in")
+
             }
         }
 
@@ -487,7 +491,11 @@
         document.getElementById("logiBttn").addEventListener("click", async () => {
             let userData = await FirebaseUtils.loginGoogle()
             if (userData) {
-
+                user = userData.user
+                if(userData.isNew){
+                    var popup = document.getElementById("chooseUseCase");
+                     popup.style.visibility = "visible"
+                }
             }
         })
         document.getElementById("login").addEventListener("click", () => {

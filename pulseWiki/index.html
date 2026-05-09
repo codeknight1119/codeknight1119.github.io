@@ -215,23 +215,41 @@
 
         #loginPopup {
             visibility: hidden;
-            width: 160px;
-            background-color: #555;
+            width: 280px;
+            /* Increased slightly for readability */
+            background-color: #1a2332;
+            /* Match your dark theme better */
             color: #fff;
             text-align: center;
-            border-radius: 6px;
-            padding: 8px 0;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
+            border-radius: 12px;
+            padding: 20px;
+
+            /* Centering logic */
+            position: fixed;
+            z-index: 100;
+            /* High z-index to stay above everything */
+            top: 50%;
             left: 50%;
-            margin-left: -80px;
+            transform: translate(-50%, -50%);
+
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        #loginPopup .show {
+        #loginPopup.show {
             visibility: visible;
             -webkit-animation: fadeIn 1s;
             animation: fadeIn 1s
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
@@ -460,7 +478,7 @@
 
         document.getElementById("logiBttn").addEventListener("click", async () => {
             let userData = await FirebaseUtils.loginGoogle()
-            if(userData){
+            if (userData) {
 
             }
         })
@@ -469,8 +487,7 @@
             popup.classList.toggle("show");
         })
         document.getElementById("loginExit").addEventListener("click", () => {
-            var popup = document.getElementById("loginPopup");
-            popup.classList.toggle("show");
+            document.getElementById("loginPopup").classList.remove("show");
         })
         init();
     </script>

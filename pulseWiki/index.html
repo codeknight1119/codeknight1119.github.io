@@ -212,6 +212,27 @@
             display: flex;
             justify-content: right;
         }
+
+        .loginPopup {
+            visibility: hidden;
+            width: 160px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -80px;
+        }
+
+        .loginPopup .show {
+            visibility: visible;
+            -webkit-animation: fadeIn 1s;
+            animation: fadeIn 1s
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
 </head>
@@ -440,11 +461,13 @@
         document.getElementById("logiBttn").addEventListener("click", async () => {
             FirebaseUtils.loginGoogle()
         })
-        document.getElementById("login").addEventListener("click", ()=>{
-        document.getElementById("loginPopup").style.visibility = "block"
+        document.getElementById("login").addEventListener("click", () => {
+            var popup = document.getElementById("loginPopup");
+            popup.classList.toggle("show");
         })
-                document.getElementById("loginExit").addEventListener("click", ()=>{
-        document.getElementById("loginPopup").style.visibility = "none"
+        document.getElementById("loginExit").addEventListener("click", () => {
+            var popup = document.getElementById("loginPopup");
+            popup.classList.toggle("show");
         })
         init();
     </script>

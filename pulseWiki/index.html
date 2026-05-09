@@ -222,6 +222,13 @@
         <h4>v.30</h4>
         <button id="login">Login</button>
     </header>
+    <div id="loginPopup" style="display: hidden;">
+        <h3>Login</h3>
+        <p>If you are in a D&D campain <strong>YOU MUST SIGN UP</strong> and select the correct campain</p>
+        <p>If you are not in a campain, there is need to log in, if you do you can save popups and bookmarks.</p>
+        <button id="logiBttn">Login with Google</button>
+        <button id="loginExit">Exit</button>
+    </div>
 
     <main id="main-container" role="main" aria-labelledby="title"></main>
 
@@ -430,8 +437,14 @@
             }
         });
 
-        document.getElementById("login").addEventListener("click", async () => {
+        document.getElementById("logiBttn").addEventListener("click", async () => {
             FirebaseUtils.loginGoogle()
+        })
+        document.getElementById("login").addEventListener("click", ()=>{
+        document.getElementById("loginPopup").style.visibility = "block"
+        })
+                document.getElementById("loginExit").addEventListener("click", ()=>{
+        document.getElementById("loginPopup").style.visibility = "none"
         })
         init();
     </script>

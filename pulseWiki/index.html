@@ -505,45 +505,50 @@
             }
         });
 
-        // Handle the Google Login
         document.getElementById("logiBttn").addEventListener("click", async () => {
-            try {
-                let userData = await FirebaseUtils.loginGoogle();
-                if (userData) {
-                    user = userData.user;
+            let userData = await FirebaseUtils.loginGoogle();
 
-                    // Check if user is new OR if they don't have a campaign set yet
-                    if (userData.isNewUser) {
-                        document.getElementById("chooseUseCase").style.display = "block";
-                        document.getElementById("logiBttn").style.display = "none"; // Hide login button
-                    } else {
-                        // If existing user, just close the popup
-                        document.getElementById("loginPopup").classList.remove("show");
-                        console.log("Welcome back, ", user.displayName);
-                    }
+            if (userData) {
+                user = userData.user;
+
+                // Check if the user is new
+                if (userData.isNew) {
+                    // Show the campaign selection UI
+                    document.getElementById("chooseUseCase").style.display = "block";
+                    // Hide the Google button so they don't click it again
+                    document.getElementById("logiBttn").style.display = "none";
+                } else {
+                    // If they aren't new, they likely already have a campaign. 
+                    // Close the popup and proceed.
+                    document.getElementById("loginPopup").classList.remove("show");
+                    console.log("Existing user logged in:", user.displayName);
                 }
-            } catch (error) {
-                console.error("Login failed", error);
             }
         });
 
-        // Handle Campaign Selection
         document.getElementById("selectuseCase").addEventListener("click", async () => {
-            const selection = document.querySelector('select[name="choose"]').value;
+            const campaignSelection = document.querySelector('select[name="choose"]').value;
 
             if (user) {
                 try {
-                    // Save the selection to Firestore
-                    // Assuming your FirebaseUtils has a saveUserRole or similar function
-                    await FirebaseUtils.updateDocument(`users/${user.uid}`, {
-                        campaign: selection,
-                        role: "player" // or "common"
+                    // Save the campaign to a 'users' collection using their unique ID (uid)
+                    // We use setDoc or updateDocument. Since it's a new user, 
+                    // let's ensure the document exists.
+                    await FirebaseUtils.setDoc(`users/${user.uid}`, {
+                        username: user.displayName,
+                        email: user.email,
+                        campaign: campaignSelection,
+                        role: "player",
+                        joinedAt: new Date().toISOString()
                     });
 
-                    alert("Campaign selected: " + selection);
+                    alert("Campaign saved! Welcome to " + campaignSelection);
+
+                    // Close the popup
                     document.getElementById("loginPopup").classList.remove("show");
-                } catch (e) {
-                    console.error("Error saving campaign:", e);
+                } catch (error) {
+                    console.error("Error saving campaign selection:", error);
+                    alert("Failed to save campaign. Please try again.");
                 }
             }
         });

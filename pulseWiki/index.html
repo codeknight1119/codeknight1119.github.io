@@ -213,7 +213,7 @@
             justify-content: right;
         }
 
-        .loginPopup {
+        #loginPopup {
             visibility: hidden;
             width: 160px;
             background-color: #555;
@@ -228,7 +228,7 @@
             margin-left: -80px;
         }
 
-        .loginPopup .show {
+        #loginPopup .show {
             visibility: visible;
             -webkit-animation: fadeIn 1s;
             animation: fadeIn 1s
@@ -243,7 +243,7 @@
         <h4>v.30</h4>
         <button id="login">Login</button>
     </header>
-    <div id="loginPopup" style="display: hidden;">
+    <div id="loginPopup">
         <h3>Login</h3>
         <p>If you are in a D&D campain <strong>YOU MUST SIGN UP</strong> and select the correct campain</p>
         <p>If you are not in a campain, there is need to log in, if you do you can save popups and bookmarks.</p>
@@ -459,7 +459,10 @@
         });
 
         document.getElementById("logiBttn").addEventListener("click", async () => {
-            FirebaseUtils.loginGoogle()
+            let userData = await FirebaseUtils.loginGoogle()
+            if(userData){
+
+            }
         })
         document.getElementById("login").addEventListener("click", () => {
             var popup = document.getElementById("loginPopup");

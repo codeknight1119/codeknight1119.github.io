@@ -251,6 +251,15 @@
                 opacity: 1;
             }
         }
+
+        /* Add this to your <style> tag */
+        #chooseUseCase {
+            display: none;
+            /* Hide by default */
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
 </head>
@@ -266,6 +275,14 @@
         <p>If you are in a D&D campain <strong>YOU MUST SIGN UP</strong> and select the correct campain</p>
         <p>If you are not in a campain, there is need to log in, if you do you can save popups and bookmarks.</p>
         <button id="logiBttn">Login with Google</button>
+        <div id="chooseUseCase">
+            <label for="choose">Choose your usecase</label>
+            <select name="choose">
+                <option value="DND:UP">D&D: Ultimate Pulse</option>
+                <option value="DND:RP">D&D: Revitalized Pulse</option>
+            </select>
+            <button id="selectuseCase">Select</button>
+        </div>
         <button id="loginExit">Exit</button>
     </div>
 
@@ -488,16 +505,48 @@
             }
         });
 
+        // Handle the Google Login
         document.getElementById("logiBttn").addEventListener("click", async () => {
-            let userData = await FirebaseUtils.loginGoogle()
-            if (userData) {
-                user = userData.user
-                if(userData.isNew){
-                    var popup = document.getElementById("chooseUseCase");
-                     popup.style.visibility = "visible"
+            try {
+                let userData = await FirebaseUtils.loginGoogle();
+                if (userData) {
+                    user = userData.user;
+
+                    // Check if user is new OR if they don't have a campaign set yet
+                    if (userData.isNewUser) {
+                        document.getElementById("chooseUseCase").style.display = "block";
+                        document.getElementById("logiBttn").style.display = "none"; // Hide login button
+                    } else {
+                        // If existing user, just close the popup
+                        document.getElementById("loginPopup").classList.remove("show");
+                        console.log("Welcome back, ", user.displayName);
+                    }
+                }
+            } catch (error) {
+                console.error("Login failed", error);
+            }
+        });
+
+        // Handle Campaign Selection
+        document.getElementById("selectuseCase").addEventListener("click", async () => {
+            const selection = document.querySelector('select[name="choose"]').value;
+
+            if (user) {
+                try {
+                    // Save the selection to Firestore
+                    // Assuming your FirebaseUtils has a saveUserRole or similar function
+                    await FirebaseUtils.updateDocument(`users/${user.uid}`, {
+                        campaign: selection,
+                        role: "player" // or "common"
+                    });
+
+                    alert("Campaign selected: " + selection);
+                    document.getElementById("loginPopup").classList.remove("show");
+                } catch (e) {
+                    console.error("Error saving campaign:", e);
                 }
             }
-        })
+        });
         document.getElementById("login").addEventListener("click", () => {
             var popup = document.getElementById("loginPopup");
             popup.classList.toggle("show");

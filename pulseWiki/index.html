@@ -282,6 +282,14 @@
         const titleElement = document.getElementById("title");
         let lastPage = null;
         let currentPageKey = null;
+        let user = null;
+
+        async function checkUserOnStart() {
+            const userLoggedIn = await FirebaseUtils.getUserOnLoad()
+            if (userLoggedIn) {
+                user = userLoggedIn
+            }
+        }
 
         /**
          * Renders the content of a specific page from the stored data.

@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
 import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, onAuthStateChanged, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD_1epFIm97G6hyzS_f4GHkhcb4tF3gMZI",
@@ -88,4 +88,22 @@ export const logout = () => {
     catch (e) {
         alert('logout error: ' + JSON.stringify(e));
     }
+};
+
+export const listenForAuthChanges = (callback) => {
+    // onAuthStateChanged triggers immediately once Firebase confirms the initial state,
+    // and then triggers again whenever the user logs in or out.
+    return onAuthStateChanged(auth, callback);
+};
+
+export const getUserOnLoad = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(auth, 
+            (user) => {
+                unsubscribe();
+                resolve(user);
+            }, 
+            reject
+        );
+    });
 };

@@ -251,9 +251,10 @@
 
             let page = null; // Declare outside the try block
             try {
-                page = await FirebaseUtils.getDocument(`/lore/${encodeURIComponent(pageKey)}`)
+                page = await FirebaseUtils.getDocument(`/lore/${pageKey}`)
             } catch (e) {
-                alert(JSON.stringify(e))
+                console.error("Firebase Fetch Error:", e);
+                alert("Failed to fetch page. " + JSON.stringify(e));
             }
             console.log(page)
             const pageBody = page.body.split(",")

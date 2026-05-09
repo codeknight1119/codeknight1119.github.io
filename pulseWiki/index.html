@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pulse Wiki</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* Page-level layout & background overlay */
         html,
@@ -260,6 +261,17 @@
             padding-top: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        .clickable {
+            color: #6fb3ff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .clickable:hover {
+            color: #9fd2ff;
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
 </head>
@@ -325,6 +337,7 @@
             currentPageKey = pageKey;
 
 
+
             let page = null; // Declare outside the try block
             try {
                 console.log(pageKey)
@@ -334,7 +347,17 @@
                 alert("Failed to fetch page. " + JSON.stringify(e));
             }
             console.log(page)
-            const pageBody = page.body.split(",")
+            const pageBody = page.body
+
+            pageBody.forEach((val, index) => {
+                const firstPass = processWikiLinks(val)
+                const final = marked.parse(firstPass);
+
+
+                let newContent = document.createElement("div")
+                newContent.innerHTML = final
+                mainContainer.appendChild(sectionContainer);
+            })
 
             // update URL / history so links are shareable
             try {
@@ -356,112 +379,6 @@
             // This variable will track where new elements should be appended.
             let currentContainer = mainContainer;
 
-            // These commands control where subsequent lines are placed.
-            pageBody.forEach(rawLine => {
-                const line = String(rawLine || "").trim();
-
-                // --- DROPDOWN HANDLING ---
-                if (line.startsWith("{{dropDownStart:")) {
-                    const m = line.match(/\{\{dropDownStart:(.*)\}\}/);
-                    const title = m ? m[1].trim() : "Details";
-                    const details = document.createElement("details");
-                    const summary = document.createElement("summary");
-                    summary.innerHTML = marked.parseInline(title);
-                    details.appendChild(summary);
-                    currentContainer.appendChild(details);
-                    currentContainer = details; // subsequent lines go into details until dropDownEnd
-                    return;
-                }
-
-                if (line === "{{dropDownEnd}}") {
-                    currentContainer = mainContainer;
-                    return;
-                }
-
-                // --- LINE / INLINE PARSING ---
-                const lineContainer = document.createElement('div');
-                lineContainer.className = 'line-container';
-
-                // Split the line into parts: plain text and tags
-                const tagRegex = /(\{\{.*?\}\}|\[\[.*?\]\])/g;
-                const parts = line.split(tagRegex).filter(part => part);
-
-                parts.forEach(part => {
-                    if (part.startsWith('{{') && part.endsWith('}}')) {
-                        // Custom command
-                        const commandBody = part.slice(2, -2).trim();
-
-                        if (commandBody.startsWith("img:")) {
-                            const src = commandBody.slice(4).trim();
-                            const img = document.createElement("img");
-                            img.src = `resources/${src}`;
-                            img.alt = src;
-                            img.style.maxWidth = '150px';
-                            img.style.verticalAlign = 'middle';
-                            lineContainer.appendChild(img);
-
-                        } else if (commandBody.startsWith("miniCon:")) {
-                            // miniCon expects JSON (string or array) describing small icons to show inline
-                            let dataRaw = commandBody.slice("miniCon:".length).trim();
-                            try {
-                                // allow both JSON arrays and bare names
-                                let data = JSON.parse(dataRaw);
-                                // Normalize to an array of icon names
-                                let icons = [];
-                                if (Array.isArray(data)) {
-                                    icons = data;
-                                } else if (typeof data === "object" && data !== null) {
-                                    if (Array.isArray(data.icons)) icons = data.icons;
-                                    else if (data.icon) icons = [data.icon];
-                                } else if (typeof data === "string") {
-                                    icons = [data];
-                                }
-
-                                icons.forEach((iconName) => {
-                                    const img = document.createElement("img");
-                                    // prefer png, but let author use full file name if provided
-                                    const filename = iconName.includes('.') ? iconName : `${iconName}.png`;
-                                    img.src = `resources/${filename}`;
-                                    img.alt = iconName;
-                                    img.className = "miniCon";
-                                    lineContainer.appendChild(img);
-                                });
-                            } catch (e) {
-                                // If parsing failed, just show the raw text so it's not lost
-                                const fallback = document.createElement("span");
-                                fallback.textContent = dataRaw;
-                                lineContainer.appendChild(fallback);
-                            }
-                        } else {
-                            // unknown command: render it verbatim (safe)
-                            const span = document.createElement("span");
-                            span.textContent = commandBody;
-                            lineContainer.appendChild(span);
-                        }
-                    } else if (part.startsWith('[[') && part.endsWith(']]')) {
-                        // Internal link
-                        const linkText = part.substring(2, part.length - 2);
-                        const clickable = document.createElement('span');
-                        clickable.textContent = linkText;
-                        clickable.className = 'clickable';
-                        clickable.addEventListener('click', () => renderPage(linkText));
-                        lineContainer.appendChild(clickable);
-                    } else {
-                        // Regular text (may contain markdown inline)
-                        const textSpan = document.createElement('span');
-                        // Use marked.parseInline to prevent wrapping whole lines into <p>
-                        try {
-                            textSpan.innerHTML = marked.parseInline(part);
-                        } catch (e) {
-                            // If marked fails, fallback to text content to avoid XSS risk
-                            textSpan.textContent = part;
-                        }
-                        lineContainer.appendChild(textSpan);
-                    }
-                });
-
-                currentContainer.appendChild(lineContainer);
-            });
 
             // Apply per-page style settings (like background)
             (page.style.split(";")).forEach(aspect => {
@@ -543,7 +460,7 @@
                         joinedAt: new Date().toISOString()
                     });
 
-                  //  alert("Campaign saved! Welcome to " + campaignSelection);
+                    //  alert("Campaign saved! Welcome to " + campaignSelection);
 
                     // Close the popup
                     document.getElementById("loginPopup").classList.remove("show");
@@ -561,6 +478,17 @@
             document.getElementById("loginPopup").classList.remove("show");
         })
         init();
+
+        function processWikiLinks(rawText) {
+            // This Regex looks for [[Anything Inside]]
+            return rawText.replace(/\[\[(.*?)\]\]/g, (match, slug) => {
+                // We encode the slug so "Great War" becomes "Great%20War" for the URL
+                const encodedSlug = encodeURIComponent(slug.trim());
+
+                // Return a standard link that our existing renderPage() function understands
+                return `<a class="clickable" onclick="renderPage('${encodedSlug}')">${slug}</a>`;
+            });
+        }
     </script>
 </body>
 

@@ -315,6 +315,7 @@
         let currentPageKey = null;
         let user = null;
         let userData = null;
+        let isAdmin = false;
 
         // 2. WIKI LINK PROCESSOR
         function processWikiLinks(rawText) {
@@ -463,7 +464,11 @@
 
         async function getUserData() {
             userData = await FirebaseUtils.getDocument(`users/${user.uid}`)
-            console.log(userData)
+            isAdmin = userData.admin
+            if(isAdmin){
+                mainContainer.setAttribute('contenteditable', 'true');
+            }
+            //console.log(userData)
         }
 
         init();

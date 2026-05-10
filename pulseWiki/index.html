@@ -444,7 +444,7 @@
             currentPageKey = pageKey;
 
             // Clear container and show loading state
-            mainContainer.innerHTML = "Loading lore...";
+            editor.commands.setContent('<p>Loading lore...</p>');
 
             let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
 
@@ -472,6 +472,7 @@
             // NOTE: We assume 'body' is an array of strings or objects
             const pageBody = Array.isArray(page.body) ? page.body : [page.body];
             if (Array.isArray(pageBody)) {
+                let combinedHtml = "";
                 if (pageBody.length !== 0) {
                     pageBody.forEach((section) => {
                         // Handle if section is a string or an object with .content
@@ -488,15 +489,13 @@
                         const sectionDiv = document.createElement("div");
                         sectionDiv.className = "line-container"; // Keeps your styling
                         sectionDiv.innerHTML = finalHtml;
-                        mainContainer.appendChild(sectionDiv);
+                        combinedHtml += `<div class="line-container">${finalHtml}</div>`;
                     });
                 } else {
                     console.log("Array is 0, displaying placeholder")
-                    const sectionDiv = document.createElement("div");
-                    sectionDiv.className = "line-container"; // Keeps your styling
-                    sectionDiv.innerHTML = `<p>No content yet.</p>`
-                    mainContainer.appendChild(sectionDiv);
+                    combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
                 }
+                editor.commands.setContent(combinedHtml);
             }
 
 
@@ -571,7 +570,7 @@
             userData = await FirebaseUtils.getDocument(`users/${user.uid}`)
             isAdmin = userData.admin
             if (isAdmin) {
-                mainContainer.setAttribute('contenteditable', 'true');
+                editor.setEditable(true);
             }
             //console.log(userData)
         }

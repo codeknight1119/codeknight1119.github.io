@@ -386,7 +386,7 @@
                 return [
                     nodeInputRule({
                         // Ensure the regex captures the brackets so they are replaced
-                        find: /\[\[([^\]]+)\]\]$/,
+                        find: /\[\[(.+?)\]\]$/,
                         type: this.type,
                         getAttributes: match => {
                             return { slug: match[1].trim() }

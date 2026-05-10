@@ -385,10 +385,11 @@
                         mainContainer.appendChild(sectionDiv);
                     });
                 } else {
-                     const sectionDiv = document.createElement("div");
-                     sectionDiv.innerHTML = `<p>No content yet.</p>`
-                        sectionDiv.className = "line-container"; // Keeps your styling
-                        mainContainer.appendChild(sectionDiv);
+                    console.log("Array is 0, displaying placeholder")
+                    const sectionDiv = document.createElement("div");
+                    sectionDiv.className = "line-container"; // Keeps your styling
+                    sectionDiv.innerHTML = `<p>No content yet.</p>`
+                    mainContainer.appendChild(sectionDiv);
                 }
             }
 

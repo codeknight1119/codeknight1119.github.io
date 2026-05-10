@@ -423,6 +423,8 @@
                     location.reload(); // Refresh to update visible sections
                 }
             }
+            console.log(userDataLogin.user.uid)
+            userData = await FirebaseUtils.getDocument(`users/${userDataLogin.user.uid}`)
             
         });
 

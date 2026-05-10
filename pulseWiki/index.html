@@ -485,6 +485,9 @@
             const pageBody = Array.isArray(page.body) ? page.body : [page.body];
             if (Array.isArray(pageBody)) {
                 let combinedHtml = "";
+                    const sectionWrapper = document.createElement("div");
+                        sectionWrapper.className = "line-container section-editor-wrapper";
+                        mainContainer.appendChild(sectionWrapper);
                  const sectionEditor = new Editor({
                             element: sectionWrapper,
                             extensions: [StarterKit, WikiLink],
@@ -503,9 +506,7 @@
                         const content = typeof section === 'string' ? section : section.content;
 
 
-                        const sectionWrapper = document.createElement("div");
-                        sectionWrapper.className = "line-container section-editor-wrapper";
-                        mainContainer.appendChild(sectionWrapper);
+                    
 
                         // 2. Initialize a Tiptap instance for THIS specific div
                        

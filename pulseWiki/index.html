@@ -370,41 +370,46 @@
             },
 
             renderHTML({ node, HTMLAttributes }) {
+                const slug = node.attrs.slug;
+                // Basic encoding for the slug to safely pass into the string
+                const encodedSlug = encodeURIComponent(slug);
+
                 return [
                     'a',
                     {
                         ...HTMLAttributes,
                         class: 'clickable wiki-link',
-                        href: '#', // Prevents page refresh
-                        // We handle the click via the editor's event listener for better stability
+                        href: 'javascript:void(0)', // Cleaner than '#' for SPAs
+                        // Inject the custom onclick handler
+                        onclick: `window.renderPage('${encodedSlug}'); return false;`,
                     },
-                    node.attrs.slug,
+                    slug,
                 ]
             },
 
-addInputRules() {
-    return [
-        new InputRule({
-            find: /\[\[(.+?)\]\]$/,
-            handler: ({ state, range, match }) => {
-                const { tr } = state;
-                const start = range.from;
-                const end = range.to;
-                const slug = match[1].trim();
+            addInputRules() {
+                return [
+                    new InputRule({
+                        find: /\[\[(.+?)\]\]$/,
+                        handler: ({ state, range, match }) => {
+                            const { tr } = state;
+                            const start = range.from;
+                            const end = range.to;
+                            const slug = match[1].trim();
 
-                if (slug) {
-                    // This explicitly replaces the entire range (brackets included) 
-                    // with your custom node
-                    tr.replaceWith(
-                        start, 
-                        end, 
-                        this.type.create({ slug })
-                    );
-                }
+                            if (slug) {
+                                // This explicitly replaces the entire range (brackets included) 
+                                // with your custom node
+                                tr.replaceWith(
+                                    start,
+                                    end,
+                                    this.type.create({ slug })
+                                );
+                            }
+                        },
+                    }),
+                ]
             },
-        }),
-    ]
-},
         })
 
         /*
@@ -505,7 +510,7 @@ addInputRules() {
                     //   content: marked.parse(processWikiLinks(content)),
                     editable: isAdmin, // Only editable if admin
                     editorProps: {
-                        attributes: { class: 'wiki-editor-styles' }
+                        attributes: { class: 'wiki-editor-styles' },
                     }
                 });
 

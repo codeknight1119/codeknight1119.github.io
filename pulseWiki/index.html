@@ -423,9 +423,9 @@
                     document.getElementById("loginPopup").classList.remove("show");
                     location.reload(); // Refresh to update visible sections
                 }
+                getUserData()
             }
-            console.log(userDataLogin.user)
-        //    userData = await FirebaseUtils.getDocument(`users/${userDataLogin.user.uid}`)
+            
             
         });
 
@@ -450,10 +450,18 @@
         async function init() {
             // Check if user is already logged in
             user = await FirebaseUtils.getUserOnLoad();
+            if(user !== null){
+                getUserData()
+            }
 
             const params = new URLSearchParams(window.location.search);
             const startPage = params.get("page") || "home";
             window.renderPage(startPage);
+        }
+
+        async function getUserData() {
+            userData = await FirebaseUtils.getDocument(`users/${user.uid}`)
+            console.log(userData)
         }
 
         init();

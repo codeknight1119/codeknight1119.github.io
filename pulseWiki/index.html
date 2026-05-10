@@ -272,6 +272,42 @@
         .clickable:hover {
             color: #9fd2ff;
         }
+
+        .clickable wiki-link {
+            background: linear-gradient(to right,
+                    #7953cd 20%,
+                    #00affa 30%,
+                    #0190cd 70%,
+                    #764ada 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /*    text-fill-color: transparent;*/
+            background-size: 500% auto;
+            animation: textShine 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes textShine {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .wiki-editor-styles {
+            white-space: pre-wrap;
+            outline: none;
+            /* Removes the default focus ring */
+        }
+
+        /* Optional: Ensure empty paragraphs still have height so you can click into them */
+        .wiki-editor-styles p:empty::before {
+            content: " ";
+            white-space: pre-wrap;
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
 </head>
@@ -306,7 +342,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module">
         import * as FirebaseUtils from "./firebaseUtils.js"
-        import { Editor, Node, mergeAttributes } from 'https://esm.sh/@tiptap/core';
+        import { Editor, Node, mergeAttributes, nodeInputRule } from 'https://esm.sh/@tiptap/core';
         import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
 
         const WikiLink = Node.create({

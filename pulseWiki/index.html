@@ -454,12 +454,14 @@
 
 
             // Clear container and show loading state
-            activeEditors.commands.setContent('<p>Loading lore...</p>');
-
+            activeEditors.forEach((val)=>{
+                val.commands.setContent('<p>Loading lore...</p>');
+            }
+        )
             let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
 
             if (!page) {
-                activeEditors.commands.setContent(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
+                aalert(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
                 titleElement.textContent = "Unknown Fragment";
                 return;
             }

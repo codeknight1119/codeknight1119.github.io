@@ -449,14 +449,14 @@
             let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
 
             if (!page) {
-                mainContainer.innerHTML = `<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`;
+                editor.commands.setContent(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
                 titleElement.textContent = "Unknown Fragment";
                 return;
             }
 
             // Setup Page Meta
             titleElement.textContent = page.title || pageKey;
-            mainContainer.innerHTML = ""; // Clear "Loading..."
+        //    mainContainer.innerHTML = ""; // Clear "Loading..."
 
             // Apply Background Style
             if (page.style) {

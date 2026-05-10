@@ -385,10 +385,10 @@
             addInputRules() {
                 return [
                     nodeInputRule({
+                        // Ensure the regex captures the brackets so they are replaced
                         find: /\[\[([^\]]+)\]\]$/,
                         type: this.type,
                         getAttributes: match => {
-                            // match[1] is the text inside [[ ]]
                             return { slug: match[1].trim() }
                         },
                     }),
@@ -454,10 +454,10 @@
 
 
             // Clear container and show loading state
-            activeEditors.forEach((val)=>{
+            activeEditors.forEach((val) => {
                 val.commands.setContent('<p>Loading lore...</p>');
             }
-        )
+            )
             let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
 
             if (!page) {
@@ -485,20 +485,20 @@
             const pageBody = Array.isArray(page.body) ? page.body : [page.body];
             if (Array.isArray(pageBody)) {
                 let combinedHtml = "";
-                    const sectionWrapper = document.createElement("div");
-                        sectionWrapper.className = "line-container section-editor-wrapper";
-                        mainContainer.appendChild(sectionWrapper);
-                 const sectionEditor = new Editor({
-                            element: sectionWrapper,
-                            extensions: [StarterKit, WikiLink],
-                         //   content: marked.parse(processWikiLinks(content)),
-                            editable: isAdmin, // Only editable if admin
-                            editorProps: {
-                                attributes: { class: 'wiki-editor-styles' }
-                            }
-                        });
+                const sectionWrapper = document.createElement("div");
+                sectionWrapper.className = "line-container section-editor-wrapper";
+                mainContainer.appendChild(sectionWrapper);
+                const sectionEditor = new Editor({
+                    element: sectionWrapper,
+                    extensions: [StarterKit, WikiLink],
+                    //   content: marked.parse(processWikiLinks(content)),
+                    editable: isAdmin, // Only editable if admin
+                    editorProps: {
+                        attributes: { class: 'wiki-editor-styles' }
+                    }
+                });
 
-                        activeEditors.push(sectionEditor);
+                activeEditors.push(sectionEditor);
 
                 if (pageBody.length !== 0) {
                     pageBody.forEach((section) => {
@@ -506,10 +506,10 @@
                         const content = typeof section === 'string' ? section : section.content;
 
 
-                    
+
 
                         // 2. Initialize a Tiptap instance for THIS specific div
-                       
+
                         // Handle Campaign Visibility if section is an object
                         if (section.visibility && section.visibility !== "all") {
                             if (!user || user.campaign !== section.visibility) return;

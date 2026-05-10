@@ -596,9 +596,6 @@
         async function getUserData() {
             userData = await FirebaseUtils.getDocument(`users/${user.uid}`)
             isAdmin = userData.admin
-            if (isAdmin) {
-                editor.setEditable(true);
-            }
             //console.log(userData)
         }
 

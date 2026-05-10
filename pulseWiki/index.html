@@ -379,8 +379,8 @@
                     {
                         ...HTMLAttributes,
                         class: 'clickable wiki-link',
-                        href: 'javascript:void(0)', // Cleaner than '#' for SPAs
-                        // Inject the custom onclick handler
+//                        href: 'javascript:void(0)', // Cleaner than '#' for SPAs
+
                         onclick: `window.renderPage('${encodedSlug}'); return false;`,
                     },
                     slug,

@@ -414,7 +414,7 @@
         document.getElementById("logiBttn").addEventListener("click", async () => {
             let userDataLogin = await FirebaseUtils.loginGoogle();
             if (userDataLogin) {
-                user = userData.user;
+                user = userDataLogin.user;
                 if (userDataLogin.isNew) {
                     document.getElementById("chooseUseCase").style.display = "block";
                     document.getElementById("logiBttn").style.display = "none";

@@ -100,6 +100,7 @@ export const getUserOnLoad = () => {
     return new Promise((resolve, reject) => {
         const unsubscribe = onAuthStateChanged(auth, 
             (user) => {
+                console.log("userSignedIn", user)
                 unsubscribe();
                 resolve(user);
             }, 

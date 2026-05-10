@@ -396,21 +396,22 @@
             },
         })
 
-
-        const editor = new Editor({
-            element: document.querySelector('#main-container'),
-            extensions: [
-                StarterKit,
-                WikiLink
-            ],
-            content: '<p>Hello Wiki! Start typing...</p>',
-            // This makes the editor feel like a writing space
-            editorProps: {
-                attributes: {
-                    class: 'wiki-editor-styles',
-                },
-            },
-        });
+        /*
+                const editor = new Editor({
+                    element: document.querySelector('#main-container'),
+                    extensions: [
+                        StarterKit,
+                        WikiLink
+                    ],
+                    content: '<p>Hello Wiki! Start typing...</p>',
+                    // This makes the editor feel like a writing space
+                    editorProps: {
+                        attributes: {
+                            class: 'wiki-editor-styles',
+                        },
+                    },
+                    editable: false
+                });*/
 
         // 1. GLOBALS
         let sitePages = {};
@@ -433,6 +434,9 @@
 
         // 3. RENDER PAGE
         // We attach this to 'window' so the [[]] links can click it
+        let activeEditors = [];
+
+
         window.renderPage = async function (pageKey) {
             if (!pageKey) return;
             pageKey = decodeURIComponent(pageKey);
@@ -443,20 +447,43 @@
             }
             currentPageKey = pageKey;
 
+
+            activeEditors.forEach(ed => ed.destroy());
+            activeEditors = [];
+            mainContainer.innerHTML = "";
+
+
+            const sectionWrapper = document.createElement("div");
+            sectionWrapper.className = "line-container section-editor-wrapper";
+            mainContainer.appendChild(sectionWrapper);
+
+            // 2. Initialize a Tiptap instance for THIS specific div
+            const sectionEditor = new Editor({
+                element: sectionWrapper,
+                extensions: [StarterKit, WikiLink],
+                content: marked.parse(processWikiLinks(content)),
+                editable: isAdmin, // Only editable if admin
+                editorProps: {
+                    attributes: { class: 'wiki-editor-styles' }
+                }
+            });
+
+            activeEditors.push(sectionEditor);
+
             // Clear container and show loading state
-            editor.commands.setContent('<p>Loading lore...</p>');
+            activeEditors.commands.setContent('<p>Loading lore...</p>');
 
             let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
 
             if (!page) {
-                editor.commands.setContent(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
+                activeEditors.commands.setContent(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
                 titleElement.textContent = "Unknown Fragment";
                 return;
             }
 
             // Setup Page Meta
             titleElement.textContent = page.title || pageKey;
-        //    mainContainer.innerHTML = ""; // Clear "Loading..."
+            //    mainContainer.innerHTML = ""; // Clear "Loading..."
 
             // Apply Background Style
             if (page.style) {
@@ -495,7 +522,7 @@
                     console.log("Array is 0, displaying placeholder")
                     combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
                 }
-                editor.commands.setContent(combinedHtml);
+                activeEditors.commands.setContent(combinedHtml);
             }
 
 

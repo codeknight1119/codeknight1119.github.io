@@ -491,7 +491,7 @@
                  const sectionEditor = new Editor({
                             element: sectionWrapper,
                             extensions: [StarterKit, WikiLink],
-                            content: marked.parse(processWikiLinks(content)),
+                         //   content: marked.parse(processWikiLinks(content)),
                             editable: isAdmin, // Only editable if admin
                             editorProps: {
                                 attributes: { class: 'wiki-editor-styles' }

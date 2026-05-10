@@ -366,7 +366,7 @@
             // NOTE: We assume 'body' is an array of strings or objects
             const pageBody = Array.isArray(page.body) ? page.body : [page.body];
             if (Array.isArray(pageBody)) {
-                if (pageBody.length === 0) {
+                if (pageBody.length !== 0) {
                     pageBody.forEach((section) => {
                         // Handle if section is a string or an object with .content
                         const content = typeof section === 'string' ? section : section.content;
@@ -412,10 +412,10 @@
 
         // 5. AUTH & INIT
         document.getElementById("logiBttn").addEventListener("click", async () => {
-            let userData = await FirebaseUtils.loginGoogle();
-            if (userData) {
+            let userDataLogin = await FirebaseUtils.loginGoogle();
+            if (userDataLogin) {
                 user = userData.user;
-                if (userData.isNew) {
+                if (userDataLogin.isNew) {
                     document.getElementById("chooseUseCase").style.display = "block";
                     document.getElementById("logiBttn").style.display = "none";
                 } else {
@@ -423,6 +423,7 @@
                     location.reload(); // Refresh to update visible sections
                 }
             }
+            
         });
 
         document.getElementById("selectuseCase").addEventListener("click", async () => {

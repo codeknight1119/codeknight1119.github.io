@@ -306,6 +306,75 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module">
         import * as FirebaseUtils from "./firebaseUtils.js"
+        import { Editor, Node, mergeAttributes } from 'https://esm.sh/@tiptap/core';
+        import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+
+        const WikiLink = Node.create({
+            name: 'wikiLink',
+            group: 'inline',
+            inline: true,
+            selectable: true,
+            atom: true,
+
+            addAttributes() {
+                return {
+                    slug: {
+                        default: null,
+                        // This parses the slug back out when loading saved HTML
+                        parseHTML: element => element.getAttribute('data-slug'),
+                        renderHTML: attributes => ({
+                            'data-slug': attributes.slug,
+                        }),
+                    },
+                }
+            },
+
+            parseHTML() {
+                return [{ tag: 'a[data-slug]' }]
+            },
+
+            renderHTML({ node, HTMLAttributes }) {
+                return [
+                    'a',
+                    {
+                        ...HTMLAttributes,
+                        class: 'clickable wiki-link',
+                        href: '#', // Prevents page refresh
+                        // We handle the click via the editor's event listener for better stability
+                    },
+                    node.attrs.slug,
+                ]
+            },
+
+            addInputRules() {
+                return [
+                    nodeInputRule({
+                        find: /\[\[([^\]]+)\]\]$/,
+                        type: this.type,
+                        getAttributes: match => {
+                            // match[1] is the text inside [[ ]]
+                            return { slug: match[1].trim() }
+                        },
+                    }),
+                ]
+            },
+        })
+
+
+        const editor = new Editor({
+            element: document.querySelector('#main-container'),
+            extensions: [
+                StarterKit,
+                WikiBox
+            ],
+            content: '<p>Hello Wiki! Start typing...</p>',
+            // This makes the editor feel like a writing space
+            editorProps: {
+                attributes: {
+                    class: 'wiki-editor-styles',
+                },
+            },
+        });
 
         // 1. GLOBALS
         let sitePages = {};
@@ -413,7 +482,7 @@
 
         // 5. AUTH & INIT
         document.getElementById("logiBttn").addEventListener("click", async () => {
-            if (user !== null) return 
+            if (user !== null) return
             let userDataLogin = await FirebaseUtils.loginGoogle();
             if (userDataLogin) {
                 user = userDataLogin.user;
@@ -426,8 +495,8 @@
                 }
                 getUserData()
             }
-            
-            
+
+
         });
 
         document.getElementById("selectuseCase").addEventListener("click", async () => {
@@ -451,10 +520,10 @@
         async function init() {
             // Check if user is already logged in
             user = await FirebaseUtils.getUserOnLoad();
-            if(user){
-                getUserData()
-                 document.getElementById("login").disabled = true;
-                 document.getElementById("login").innerText = "Logged in"
+            if (user) {
+                await getUserData()
+                document.getElementById("login").disabled = true;
+                document.getElementById("login").innerText = `Logged in - ${userData.username}`
             }
 
             const params = new URLSearchParams(window.location.search);
@@ -465,7 +534,7 @@
         async function getUserData() {
             userData = await FirebaseUtils.getDocument(`users/${user.uid}`)
             isAdmin = userData.admin
-            if(isAdmin){
+            if (isAdmin) {
                 mainContainer.setAttribute('contenteditable', 'true');
             }
             //console.log(userData)

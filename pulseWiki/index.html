@@ -412,6 +412,7 @@
 
         // 5. AUTH & INIT
         document.getElementById("logiBttn").addEventListener("click", async () => {
+            if (user !== null) return 
             let userDataLogin = await FirebaseUtils.loginGoogle();
             if (userDataLogin) {
                 user = userDataLogin.user;

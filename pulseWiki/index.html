@@ -453,23 +453,6 @@
             mainContainer.innerHTML = "";
 
 
-            const sectionWrapper = document.createElement("div");
-            sectionWrapper.className = "line-container section-editor-wrapper";
-            mainContainer.appendChild(sectionWrapper);
-
-            // 2. Initialize a Tiptap instance for THIS specific div
-            const sectionEditor = new Editor({
-                element: sectionWrapper,
-                extensions: [StarterKit, WikiLink],
-                content: marked.parse(processWikiLinks(content)),
-                editable: isAdmin, // Only editable if admin
-                editorProps: {
-                    attributes: { class: 'wiki-editor-styles' }
-                }
-            });
-
-            activeEditors.push(sectionEditor);
-
             // Clear container and show loading state
             activeEditors.commands.setContent('<p>Loading lore...</p>');
 
@@ -504,6 +487,24 @@
                     pageBody.forEach((section) => {
                         // Handle if section is a string or an object with .content
                         const content = typeof section === 'string' ? section : section.content;
+
+
+                        const sectionWrapper = document.createElement("div");
+                        sectionWrapper.className = "line-container section-editor-wrapper";
+                        mainContainer.appendChild(sectionWrapper);
+
+                        // 2. Initialize a Tiptap instance for THIS specific div
+                        const sectionEditor = new Editor({
+                            element: sectionWrapper,
+                            extensions: [StarterKit, WikiLink],
+                            content: marked.parse(processWikiLinks(content)),
+                            editable: isAdmin, // Only editable if admin
+                            editorProps: {
+                                attributes: { class: 'wiki-editor-styles' }
+                            }
+                        });
+
+                        activeEditors.push(sectionEditor);
 
                         // Handle Campaign Visibility if section is an object
                         if (section.visibility && section.visibility !== "all") {

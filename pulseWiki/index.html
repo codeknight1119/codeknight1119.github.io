@@ -450,8 +450,10 @@
         async function init() {
             // Check if user is already logged in
             user = await FirebaseUtils.getUserOnLoad();
-            if(user !== null){
+            if(user){
                 getUserData()
+                 document.getElementById("login").disabled = true;
+                 document.getElementById("login").innerText = "Logged in"
             }
 
             const params = new URLSearchParams(window.location.search);

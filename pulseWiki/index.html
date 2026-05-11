@@ -379,7 +379,7 @@
                     {
                         ...HTMLAttributes,
                         class: 'clickable wiki-link',
-//                        href: 'javascript:void(0)', // Cleaner than '#' for SPAs
+                        //                        href: 'javascript:void(0)', // Cleaner than '#' for SPAs
 
                         onclick: `window.renderPage('${encodedSlug}'); return false;`,
                     },
@@ -475,76 +475,81 @@
             }
             )
             let page = await FirebaseUtils.getDocument(`lore/${pageKey}`);
-
-            if (!page) {
-                aalert(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
-                titleElement.textContent = "Unknown Fragment";
-                return;
-            }
-
+            /*
+                        if (!page) {
+                            alert(`<p>The page "<strong>${pageKey}</strong>" does not exist yet. <button onclick="alert('Editor coming soon!')">Create it?</button></p>`);
+                            titleElement.textContent = "Unknown Fragment";
+                            return;
+                        }
+            */
             // Setup Page Meta
             titleElement.textContent = page.title || pageKey;
             //    mainContainer.innerHTML = ""; // Clear "Loading..."
 
-            // Apply Background Style
-            if (page.style) {
-                page.style.split(";").forEach(aspect => {
-                    if (aspect.trim().startsWith("background:")) {
-                        const src = aspect.split("background:")[1].trim();
-                        document.body.style.backgroundImage = `url(resources/${src})`;
-                    }
-                });
-            }
-
-            // Loop through the body array
-            // NOTE: We assume 'body' is an array of strings or objects
-            const pageBody = Array.isArray(page.body) ? page.body : [page.body];
-            if (Array.isArray(pageBody)) {
-                let combinedHtml = "";
-                const sectionWrapper = document.createElement("div");
-                sectionWrapper.className = "line-container section-editor-wrapper";
-                mainContainer.appendChild(sectionWrapper);
-                const sectionEditor = new Editor({
-                    element: sectionWrapper,
-                    extensions: [StarterKit, WikiLink],
-                    //   content: marked.parse(processWikiLinks(content)),
-                    editable: isAdmin, // Only editable if admin
-                    editorProps: {
-                        attributes: { class: 'wiki-editor-styles' },
-                    }
-                });
-
-                activeEditors.push(sectionEditor);
-
-                if (pageBody.length !== 0) {
-                    pageBody.forEach((section) => {
-                        // Handle if section is a string or an object with .content
-                        const content = typeof section === 'string' ? section : section.content;
-
-
-
-
-                        // 2. Initialize a Tiptap instance for THIS specific div
-
-                        // Handle Campaign Visibility if section is an object
-                        if (section.visibility && section.visibility !== "all") {
-                            if (!user || user.campaign !== section.visibility) return;
-                        }
-
-                        const firstPass = processWikiLinks(content);
-                        const finalHtml = marked.parse(firstPass);
-
-                        const sectionDiv = document.createElement("div");
-                        sectionDiv.className = "line-container"; // Keeps your styling
-                        sectionDiv.innerHTML = finalHtml;
-                        combinedHtml += `<div class="line-container">${finalHtml}</div>`;
-                    });
-                } else {
-                    console.log("Array is 0, displaying placeholder")
-                    combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
+            let combinedHtml = "";
+            const sectionWrapper = document.createElement("div");
+            sectionWrapper.className = "line-container section-editor-wrapper";
+            mainContainer.appendChild(sectionWrapper);
+            const sectionEditor = new Editor({
+                element: sectionWrapper,
+                extensions: [StarterKit, WikiLink],
+                //   content: marked.parse(processWikiLinks(content)),
+                editable: isAdmin, // Only editable if admin
+                editorProps: {
+                    attributes: { class: 'wiki-editor-styles' },
                 }
-                sectionEditor.commands.setContent(combinedHtml);
+            });
+
+
+            if (page) {
+                const pageBody = Array.isArray(page.body) ? page.body : [page.body];
+                if (Array.isArray(pageBody)) {
+
+                    activeEditors.push(sectionEditor);
+
+                    if (pageBody.length !== 0) {
+                        pageBody.forEach((section) => {
+                            // Handle if section is a string or an object with .content
+                            const content = typeof section === 'string' ? section : section.content;
+
+
+
+                            // Handle Campaign Visibility if section is an object
+                            if (section.visibility && section.visibility !== "all") {
+                                if (!user || user.campaign !== section.visibility) return;
+                            }
+
+                            const firstPass = processWikiLinks(content);
+                            const finalHtml = marked.parse(firstPass);
+
+                            const sectionDiv = document.createElement("div");
+                            sectionDiv.className = "line-container"; // Keeps your styling
+                            sectionDiv.innerHTML = finalHtml;
+                            combinedHtml += `<div class="line-container">${finalHtml}</div>`;
+                        });
+                    } else {
+                        console.log("Array is 0, displaying placeholder")
+                        combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
+                    }
+
+                }
+
+                // Apply Background Style
+                if (page.style) {
+                    page.style.split(";").forEach(aspect => {
+                        if (aspect.trim().startsWith("background:")) {
+                            const src = aspect.split("background:")[1].trim();
+                            document.body.style.backgroundImage = `url(resources/${src})`;
+                        }
+                    });
+                }
+            } else {
+                combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
             }
+            sectionEditor.commands.setContent(combinedHtml);
+
+
+
 
 
 

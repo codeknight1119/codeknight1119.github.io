@@ -633,7 +633,7 @@
         }
 
         async function saveData(element){
-            FirebaseUtils.updateDocument(`/lore/$${currentPageKey}`, {body: element.innerHTML})
+            FirebaseUtils.updateDocument(`/lore/${currentPageKey}`, {body: element.innerHTML})
             //currentPageKey
         }
 

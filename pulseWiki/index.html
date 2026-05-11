@@ -438,6 +438,7 @@
         let user = null;
         let userData = null;
         let isAdmin = false;
+        let needSave = false;
 
         // 2. WIKI LINK PROCESSOR
         function processWikiLinks(rawText) {
@@ -497,6 +498,12 @@
                 editable: isAdmin, // Only editable if admin
                 editorProps: {
                     attributes: { class: 'wiki-editor-styles' },
+                },
+                onFocus({ event }) {
+                    needSave = true;
+                },
+                onBlur({event}){
+                    saveData(event.target)
                 }
             });
 
@@ -623,6 +630,11 @@
             userData = await FirebaseUtils.getDocument(`users/${user.uid}`)
             isAdmin = userData.admin
             //console.log(userData)
+        }
+
+        async function saveData(element){
+            FirebaseUtils.updateDocument(`/lore/$${currentPageKey}`, {body: element.innerHTML})
+            //currentPageKey
         }
 
         init();

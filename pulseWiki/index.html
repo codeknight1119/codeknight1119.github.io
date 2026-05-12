@@ -640,7 +640,8 @@
            if(!response){
             FirebaseUtils.setDocument(path, {
                 title: currentPageKey,
-                body: bodytext
+                body: bodytext,
+                randomVal: Math.random()
             })
            }
             //currentPageKey

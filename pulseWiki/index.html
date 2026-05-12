@@ -598,7 +598,7 @@
         document.getElementById("selectuseCase").addEventListener("click", async () => {
             const campaign = document.querySelector('select[name="choose"]').value;
             if (user) {
-                await FirebaseUtils.setDoc(`users/${user.uid}`, {
+                await FirebaseUtils.setDocument(`users/${user.uid}`, {
                     username: user.displayName,
                     campaign: campaign,
                     role: "player"

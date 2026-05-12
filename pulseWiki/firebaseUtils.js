@@ -32,7 +32,7 @@ export const loginGoogle = async () => {
     }
 };
 
-export const setDoc = async (path, data) => {
+export const setDocument = async (path, data) => {
     try {
         await firestoreSetDoc(doc(db, path), data);
         // alert(JSON.stringify(result));

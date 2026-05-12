@@ -501,14 +501,14 @@
                 onFocus({ event }) {
                     needSave = true;
                 },
-                onBlur({event}){
+                onBlur({ event }) {
                     saveData(event.target)
                 }
             });
 
 
             if (page) {
-                            titleElement.textContent = page.title || pageKey;
+                titleElement.textContent = page.title || pageKey;
                 const pageBody = Array.isArray(page.body) ? page.body : [page.body];
                 if (Array.isArray(pageBody)) {
 
@@ -532,10 +532,27 @@
                             const sectionDiv = document.createElement("div");
                             sectionDiv.className = "line-container"; // Keeps your styling
                             sectionDiv.innerHTML = finalHtml;
+                            sectionDiv.addEventListener('click', () => {
+                                // 1. Focus the element
+                                editableDiv.focus();
+
+                                // 2. Create a 'Range' and 'Selection' to move the cursor
+                                const range = document.createRange();
+                                const sel = window.getSelection();
+
+                                // Set the range to the start of the div
+                                // (Node: editableDiv, Offset: 0)
+                                range.setStart(editableDiv, 0);
+                                range.collapse(true);
+
+                                // Remove any existing selections and apply our new range
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            });
                             combinedHtml += `<div class="line-container">${finalHtml}</div>`;
                         });
                     } else {
-                       // console.log("Array is 0, displaying placeholder")
+                        // console.log("Array is 0, displaying placeholder")
                         combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
                     }
 
@@ -551,7 +568,7 @@
                     });
                 }
             } else {
-                                            titleElement.textContent = pageKey;
+                titleElement.textContent = pageKey;
                 combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
             }
             sectionEditor.commands.setContent(combinedHtml);
@@ -633,17 +650,17 @@
             //console.log(userData)
         }
 
-        async function saveData(element){
+        async function saveData(element) {
             const path = `/lore/${currentPageKey}`
             const bodytext = element.innerHTML
-           const response = await  FirebaseUtils.updateDocument(path, {body: bodytext})
-           if(!response){
-            FirebaseUtils.setDocument(path, {
-                title: currentPageKey,
-                body: bodytext,
-                randomVal: Math.random()
-            })
-           }
+            const response = await FirebaseUtils.updateDocument(path, { body: bodytext })
+            if (!response) {
+                FirebaseUtils.setDocument(path, {
+                    title: currentPageKey,
+                    body: bodytext,
+                    randomVal: Math.random()
+                })
+            }
             //currentPageKey
         }
 

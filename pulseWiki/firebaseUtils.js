@@ -110,7 +110,7 @@ export const getUserOnLoad = () => {
 export const getRandomLoreDoc = () =>{
 const randomNum = Math.random();
 
-const snapshot = await db.collection('/lore')
+const test = await db.collection('/lore')
   .where('random_pos', '>=', randomNum)
   .orderBy('random_pos')
   .limit(1)

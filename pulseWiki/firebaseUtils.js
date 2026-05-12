@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, collection, query, where, orderBy, limit, getDocs  } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, onAuthStateChanged, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 const firebaseConfig = {
@@ -107,23 +107,33 @@ export const getUserOnLoad = () => {
         );
     });
 };
-export const getRandomLoreDoc = () =>{
-const randomNum = Math.random();
-
-const test = await db.collection('/lore')
-  .where('random_pos', '>=', randomNum)
-  .orderBy('random_pos')
-  .limit(1)
-  .get();
 
 
-if (snapshot.empty) {
-  const wrapAround = await db.collection('/lore')
-    .orderBy('randomVal')
-    .limit(1)
-    .get();
-    return wrapAround
-}else{
-    return snapshot
-}
-}
+
+export const getRandomLoreDoc = async () => {
+    const randomNum = Math.random();
+    const loreRef = collection(db, 'lore');
+
+    // Build the query
+    const q = query(
+        loreRef,
+        where('random_pos', '>=', randomNum),
+        orderBy('random_pos'),
+        limit(1)
+    );
+
+    try {
+        let snapshot = await getDocs(q);
+
+        // Wrap around logic if no documents are found above the random number
+        if (snapshot.empty) {
+            const wrapQuery = query(loreRef, orderBy('random_pos'), limit(1));
+            snapshot = await getDocs(wrapQuery);
+        }
+
+        return snapshot.docs.length > 0 ? snapshot.docs[0].data() : null;
+    } catch (error) {
+        console.error("Error fetching random lore:", error);
+        return null;
+    }
+};

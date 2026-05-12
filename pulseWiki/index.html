@@ -634,7 +634,15 @@
         }
 
         async function saveData(element){
-            FirebaseUtils.updateDocument(`/lore/${currentPageKey}`, {body: element.innerHTML}, true)
+            const path = `/lore/${currentPageKey}`
+            const bodytext = element.innerHTML
+           const response = await  FirebaseUtils.updateDocument(path, {body: bodytext})
+           if(!response){
+            FirebaseUtils.setDocument(path, {
+                title: currentPageKey,
+                body: bodytext
+            })
+           }
             //currentPageKey
         }
 

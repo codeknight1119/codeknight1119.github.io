@@ -535,7 +535,7 @@
                             combinedHtml += `<div class="line-container">${finalHtml}</div>`;
                         });
                     } else {
-                        console.log("Array is 0, displaying placeholder")
+                       // console.log("Array is 0, displaying placeholder")
                         combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
                     }
 
@@ -634,7 +634,7 @@
         }
 
         async function saveData(element){
-            FirebaseUtils.updateDocument(`/lore/${currentPageKey}`, {body: element.innerHTML})
+            FirebaseUtils.updateDocument(`/lore/${currentPageKey}`, {body: element.innerHTML}, true)
             //currentPageKey
         }
 

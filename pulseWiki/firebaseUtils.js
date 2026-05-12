@@ -3,13 +3,13 @@ import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, } from
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, onAuthStateChanged, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD_1epFIm97G6hyzS_f4GHkhcb4tF3gMZI",
-  authDomain: "ootoa-537ee.firebaseapp.com",
-  projectId: "ootoa-537ee",
-  storageBucket: "ootoa-537ee.firebasestorage.app",
-  messagingSenderId: "60453385657",
-  appId: "1:60453385657:web:de970a01ebe1f0ab167268",
-  measurementId: "G-NBN13F2EY9"
+    apiKey: "AIzaSyD_1epFIm97G6hyzS_f4GHkhcb4tF3gMZI",
+    authDomain: "ootoa-537ee.firebaseapp.com",
+    projectId: "ootoa-537ee",
+    storageBucket: "ootoa-537ee.firebasestorage.app",
+    messagingSenderId: "60453385657",
+    appId: "1:60453385657:web:de970a01ebe1f0ab167268",
+    measurementId: "G-NBN13F2EY9"
 };
 
 
@@ -45,10 +45,10 @@ export const setDoc = async (path, data) => {
 export const updateDocument = async (path, data) => {
     try {
         await updateDoc(doc(db, path), data);
-        // alert(JSON.stringify(result));
+  return true
     }
     catch (e) {
-        alert(`update doc failed at ${path}` + JSON.stringify(e));
+return false
     }
 };
 
@@ -98,12 +98,11 @@ export const listenForAuthChanges = (callback) => {
 
 export const getUserOnLoad = () => {
     return new Promise((resolve, reject) => {
-        const unsubscribe = onAuthStateChanged(auth, 
+        const unsubscribe = onAuthStateChanged(auth,
             (user) => {
-                console.log("userSignedIn", user)
                 unsubscribe();
                 resolve(user);
-            }, 
+            },
             reject
         );
     });

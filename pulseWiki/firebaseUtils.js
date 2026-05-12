@@ -110,7 +110,7 @@ export const getUserOnLoad = () => {
 export const getRandomLoreDoc = () =>{
 const randomNum = Math.random();
 
-const snapshot = await db.collection('your_collection')
+const snapshot = await db.collection('/lore')
   .where('random_pos', '>=', randomNum)
   .orderBy('random_pos')
   .limit(1)
@@ -118,7 +118,7 @@ const snapshot = await db.collection('your_collection')
 
 
 if (snapshot.empty) {
-  const wrapAround = await db.collection('lore')
+  const wrapAround = await db.collection('/lore')
     .orderBy('randomVal')
     .limit(1)
     .get();

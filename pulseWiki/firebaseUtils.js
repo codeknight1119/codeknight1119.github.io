@@ -107,3 +107,23 @@ export const getUserOnLoad = () => {
         );
     });
 };
+export const getRandomLoreDoc = () =>{
+const randomNum = Math.random();
+
+const snapshot = await db.collection('your_collection')
+  .where('random_pos', '>=', randomNum)
+  .orderBy('random_pos')
+  .limit(1)
+  .get();
+
+
+if (snapshot.empty) {
+  const wrapAround = await db.collection('lore')
+    .orderBy('randomVal')
+    .limit(1)
+    .get();
+    return wrapAround
+}else{
+    return snapshot
+}
+}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AINNOVATE | AI Tools</title>
+    <style>
+        :root {
+            --bg-dark: #05070a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-cyan: #00f2ff;
+            --accent-purple: #7000ff;
+            --text-main: #e0e0e0;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #05070a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header Section */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .slogan {
+            font-size: 1.1rem;
+            color: #888;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            width: 90%;
+            padding-bottom: 100px;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+        }
+
+        .tool-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .tool-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        /* Modal / Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #111;
+            border: 1px solid var(--accent-purple);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(112, 0, 255, 0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            color: #666;
+            font-size: 1.5rem;
+        }
+
+        .prompt-view {
+            background: #000;
+            border: 1px solid #333;
+            padding: 15px;
+            height: 150px;
+            overflow-y: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--accent-cyan);
+        }
+
+        .copy-btn {
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .copy-btn:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AINNOVATE</h1>
+        <p class="slogan">AI tools for modern problems</p>
+    </header>
+
+    <main class="dashboard-grid" id="toolGrid">
+        </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 id="modalTitle" style="color: var(--accent-cyan);">Tool Title</h2>
+            <p id="modalDesc">Description goes here.</p>
+            <div class="prompt-view" id="promptView"></div>
+            <button class="copy-btn" id="copyBtn">COPY PROMPT</button>
+        </div>
+    </div>
+
+    <script>
+        const tools = [
+            { id: 1, title: "Funnifyier", icon: "icon1.png", desc: "Turns boring text into comedy gold.", prompt: "Rewrite the following text in the style of a stand-up comedian: [TEXT]" },
+            { id: 2, title: "[TITLE PENDING]", icon: "icon2.png", desc: "The mystery tool for unknown tasks.", prompt: "System analysis initiated. Waiting for user parameters..." },
+            { id: 3, title: "Interview Simulator", icon: "icon3.png", desc: "Practice high-stakes job interviews.", prompt: "Act as a Senior Tech Recruiter. Interview me for a Web Designer role." },
+            { id: 4, title: "Decliner", icon: "icon4.png", desc: "Politely say no to anything instantly.", prompt: "Draft a professional yet firm refusal email for this request: [REQUEST]" },
+            { id: 5, title: "Rule Follower", icon: "icon5.png", desc: "Ensures compliance with strict guidelines.", prompt: "Review this document and flag any violations of standard protocol." },
+            { id: 6, title: "Diagram Creator", icon: "icon6.png", desc: "Generates logic flow visual structures.", prompt: "Create a Mermaid.js flowchart for the following process: [PROCESS]" }
+        ];
+
+        const toolGrid = document.getElementById('toolGrid');
+        const modal = document.getElementById('modalOverlay');
+        const closeModal = document.getElementById('closeModal');
+
+        // Populate Grid
+        tools.forEach(tool => {
+            const card = document.createElement('div');
+            card.className = 'tool-card';
+            card.innerHTML = `
+                <img src="${tool.icon}" alt="${tool.title}" class="tool-icon" onerror="this.src='https://via.placeholder.com/80/00f2ff/fff?text=AI'">
+                <button class="tool-btn" onclick="openTool(${tool.id})">${tool.title}</button>
+            `;
+            toolGrid.appendChild(card);
+        });
+
+        // Modal Logic
+        function openTool(id) {
+            const tool = tools.find(t => t.id === id);
+            document.getElementById('modalTitle').innerText = tool.title;
+            document.getElementById('modalDesc').innerText = tool.desc;
+            document.getElementById('promptView').innerText = tool.prompt;
+            modal.style.display = 'flex';
+        }
+
+        closeModal.onclick = () => modal.style.display = 'none';
+        window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; }
+
+        // Copy Logic
+        document.getElementById('copyBtn').onclick = function() {
+            const text = document.getElementById('promptView').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = this.innerText;
+                this.innerText = "COPIED!";
+                this.style.background = "#00c853";
+                setTimeout(() => {
+                    this.innerText = originalText;
+                    this.style.background = "var(--accent-purple)";
+                }, 2000);
+            });
+        };
+    </script>
+</body>
+</html>

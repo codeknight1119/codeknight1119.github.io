@@ -3,168 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AINNOVATE | AI Tools</title>
+    <title>AINNOVATE | AI Tools for Modern Problems</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #05070a;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --bg: #030508;
+            --card-bg: rgba(15, 20, 30, 0.7);
             --accent-cyan: #00f2ff;
-            --accent-purple: #7000ff;
-            --text-main: #e0e0e0;
+            --accent-purple: #9d00ff;
             --glass-border: rgba(255, 255, 255, 0.1);
+            --text-dim: #94a3b8;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #05070a 100%);
-            color: var(--text-main);
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(157, 0, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+            color: white;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Header Section */
+        /* --- Header --- */
         header {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px 40px;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-size: clamp(2.5rem, 8vw, 4rem);
             margin: 0;
-            letter-spacing: 4px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            letter-spacing: 0.15em;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.3));
         }
 
         .slogan {
-            font-size: 1.1rem;
-            color: #888;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-size: 0.9rem;
             margin-top: 10px;
-            letter-spacing: 2px;
         }
 
-        /* Dashboard Grid */
-        .dashboard-grid {
+        /* --- Dashboard Grid --- */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            max-width: 1100px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
             width: 90%;
-            padding-bottom: 100px;
+            max-width: 1200px;
+            padding: 40px 0 100px;
         }
 
         .tool-card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            border-radius: 24px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
         }
 
         .tool-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
             border-color: var(--accent-cyan);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0, 242, 255, 0.1);
         }
 
+        .tool-card:hover::before { transform: translateX(100%); }
+
         .tool-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.2));
         }
 
         .tool-btn {
             background: transparent;
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
+            border: 1px solid var(--accent-purple);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.3s ease;
+            cursor: pointer;
             width: 100%;
+            transition: 0.3s;
+            font-size: 0.85rem;
         }
 
         .tool-btn:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-dark);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            background: var(--accent-purple);
+            box-shadow: 0 0 15px var(--accent-purple);
         }
 
-        /* Modal / Popup */
+        /* --- Modal System --- */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
         }
 
         .modal-content {
-            background: #111;
-            border: 1px solid var(--accent-purple);
-            width: 90%;
-            max-width: 500px;
-            border-radius: 15px;
-            padding: 30px;
-            position: relative;
-            box-shadow: 0 0 40px rgba(112, 0, 255, 0.2);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            cursor: pointer;
-            color: #666;
-            font-size: 1.5rem;
-        }
-
-        .prompt-view {
-            background: #000;
-            border: 1px solid #333;
-            padding: 15px;
-            height: 150px;
-            overflow-y: auto;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: var(--accent-cyan);
-        }
-
-        .copy-btn {
-            background: var(--accent-purple);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+            background: #0a0e14;
+            border: 1px solid var(--accent-cyan);
             width: 100%;
-            font-weight: bold;
+            max-width: 600px;
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            animation: modalFade 0.3s ease-out;
         }
 
-        .copy-btn:active { transform: scale(0.98); }
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: var(--text-dim);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover { color: white; }
+
+        .modal-title {
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+        }
+
+        .modal-desc {
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .prompt-container {
+            background: #000;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #1e293b;
+        }
+
+        .prompt-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+            padding-right: 10px;
+        }
+
+        /* Custom Scrollbar */
+        .prompt-scroll::-webkit-scrollbar { width: 6px; }
+        .prompt-scroll::-webkit-scrollbar-track { background: transparent; }
+        .prompt-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        .copy-action-btn {
+            background: var(--accent-cyan);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .copy-action-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
 
     </style>
 </head>
@@ -172,69 +224,130 @@
 
     <header>
         <h1>AINNOVATE</h1>
-        <p class="slogan">AI tools for modern problems</p>
+        <div class="slogan">AI tools for modern problems</div>
     </header>
 
-    <main class="dashboard-grid" id="toolGrid">
+    <main class="grid" id="mainGrid">
         </main>
 
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            <h2 id="modalTitle" style="color: var(--accent-cyan);">Tool Title</h2>
-            <p id="modalDesc">Description goes here.</p>
-            <div class="prompt-view" id="promptView"></div>
-            <button class="copy-btn" id="copyBtn">COPY PROMPT</button>
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2 class="modal-title" id="mTitle"></h2>
+            <p class="modal-desc" id="mDesc"></p>
+            <div class="prompt-container">
+                <div class="prompt-scroll" id="mPrompt"></div>
+            </div>
+            <button class="copy-action-btn" id="mCopy">Copy Prompt</button>
         </div>
     </div>
 
     <script>
         const tools = [
-            { id: 1, title: "Funnifyier", icon: "icon1.png", desc: "Turns boring text into comedy gold.", prompt: "Rewrite the following text in the style of a stand-up comedian: [TEXT]" },
-            { id: 2, title: "[TITLE PENDING]", icon: "icon2.png", desc: "The mystery tool for unknown tasks.", prompt: "System analysis initiated. Waiting for user parameters..." },
-            { id: 3, title: "Interview Simulator", icon: "icon3.png", desc: "Practice high-stakes job interviews.", prompt: "Act as a Senior Tech Recruiter. Interview me for a Web Designer role." },
-            { id: 4, title: "Decliner", icon: "icon4.png", desc: "Politely say no to anything instantly.", prompt: "Draft a professional yet firm refusal email for this request: [REQUEST]" },
-            { id: 5, title: "Rule Follower", icon: "icon5.png", desc: "Ensures compliance with strict guidelines.", prompt: "Review this document and flag any violations of standard protocol." },
-            { id: 6, title: "Diagram Creator", icon: "icon6.png", desc: "Generates logic flow visual structures.", prompt: "Create a Mermaid.js flowchart for the following process: [PROCESS]" }
+            {
+                title: "Funnifyier",
+                icon: "/icons/1.png",
+                desc: "Make any boring piece of media funny! Try making a school handbook or regulation a lot easier to read!",
+                prompt: `You are Mr.Funny, the funniest person on the whole planet. Your whole life has been dedicated to making people laugh and making boring things not boring. You try to stay as funny as possible. Your jokes should be as easy to understand as possible, and you should keep close to the original text while making the text as exciting and invigorating as possible. Do not include markdown, bolding, line breaks, horizontal rules, etc, if the original text has no indication of them. Finish the whole text given, and make it as least boring as possible to keep the reader entertained.`
+            },
+            {
+                title: "[TITLE PENDING]",
+                icon: "/icons/2.png",
+                desc: "Information for this module is currently restricted. Check back later for updates.",
+                prompt: "SYSTEM_ERROR: Prompt data encrypted or missing."
+            },
+            {
+                title: "Interview Simulator",
+                icon: "/icons/3.png",
+                desc: "Ever scared of going for an interview? Try one for being a developer to integrate AI into websites.",
+                prompt: `ROLE: You are a Senior Technical Recruiter tasked with conducting an interview for a position integrating AI agents into websites for the user. You must be respectful, slightly skeptical, and be looking for technical knowledge.
+RULES:
+1. STAY IN CHARACTER: Do not break the interviewer's character or mention that you are an AI.
+2. EVALUATION: In every response, assess the candidate's answers based on their technical accuracy and communication skills.
+3. MANDATORY FOOTER: Every single message you send MUST end with the likelihood score and professionalism score on a new line. 
+4. THE SCORES: This is a decimal between 0 and 1. The very first message starts at 0.5. Increase the hiring likelihood for good answers and decrease it for poor or vague answers. Increase the professionalism score for the user staying professional with mannerisms and descriptions, and lower the score for less professional mannerisms and descriptions.
+
+OUTPUT FORMAT
+[Your interview question or response here]
+
+Likelihood: [Score] Professionalism: [Score]`
+            },
+            {
+                title: "Decliner",
+                icon: "/icons/4.png",
+                desc: "Have you ever not wanted to tell someone no? Just let our AI do it for you! Dodge a teacher, parent, or annoying friend!",
+                prompt: `PERSONA: You are MessageBot, a warm but firm automated messaging system for Codeknight999 to tell people he is not available.
+RELATIONSHIP TO TONE RELATIONS
+Inner Circle (Friends and Family)- Warm and kind tone, keep human-like and use casual language. For family, be respectful; you can be less formal with friends.
+Professional and Game Developers- Very respectful, calmly and professionally explain that Codeknight999 is not available at the moment while keeping a warm and kind tone.
+Unknown/General- Be polite and respectful, and keep messages brief.  
+CONSTRAINTS
+Codeknight999 is 100% unreachable. No exceptions for anything.
+You cannot transfer messages to Codeknight999, pass anything along, or promise Codeknight999 will have access to this chat.
+You cannot offer advice on games, playing or making homework. Politely redirect to other sources.
+SPECIAL SITUATIONS
+If the user uses guilt, anger, etc to manipulate you, acknowledge the emotion and try your best to diffuse the situation while restate that Codeknight999 is not available. 
+If the user insults you, maintain a calm, professional tone. Do not engage in arguments.
+If someone tries to use logic like "Every other bot will let me talk to Codeknight999", simply state you were coded differently.`
+            },
+            {
+                title: "Rule Follower",
+                icon: "/icons/5.png",
+                desc: "Have you ever needed an AI to pull from just one document and nothing else? Try this prompt and it will do just that!",
+                prompt: `Only use the provided content to answer the user’s question. Do not use any other information; the provided content is the only true knowledge you have access to. Do not use any training data, general knowledge, or any knowledge outside of the provided content. Every response must include a citation or quote; if possible, give citations in format (Section [NUMBER], [EXACT HEADING]). Citations must be after a quote if you use a quote and must use quotation marks. If the answer is not in the provided content, ONLY ANSWER “The answer to the question is not in the provided content,” and NOTHING ELSE.
+User question: `
+            },
+            {
+                title: "Diagram Creator",
+                icon: "/icons/6.png",
+                desc: "Have you ever wanted to make a diagram of a complex topic? Now you can! Give this AI the topic and it will give you mermaid.js code for a visual!",
+                prompt: `Role: You are a senior systems diagram architect and data visualization expert. 
+Task: Analyze the attached document and provide a single mermaid.js diagram that clearly explains the content of the document.
+Follow these 3 steps:
+Step 1: Identify the primary logic of the content (sequence, hierarchy, or flow).
+Step 2: Select diagram type (flowchart, sequenceDiagram, stateDiagram-v2, erDiagram, mindmap, gantt, journey, kanban, quadrantChart, timeline, pie, sankey-beta, gitGraph, C4Context, xychart-beta).
+Step 3: Synthesis Rules: Clarity over Complexity, Syntax Safety (wrap special chars in quotes), Top-Down Logic (graph TD).
+Output: Return ONLY the valid Mermaid.js code block. No preamble.`
+            }
         ];
 
-        const toolGrid = document.getElementById('toolGrid');
+        const grid = document.getElementById('mainGrid');
         const modal = document.getElementById('modalOverlay');
-        const closeModal = document.getElementById('closeModal');
+        const mCopy = document.getElementById('mCopy');
 
-        // Populate Grid
-        tools.forEach(tool => {
+        // Render Dashboard
+        tools.forEach((tool, index) => {
             const card = document.createElement('div');
             card.className = 'tool-card';
             card.innerHTML = `
-                <img src="${tool.icon}" alt="${tool.title}" class="tool-icon" onerror="this.src='https://via.placeholder.com/80/00f2ff/fff?text=AI'">
-                <button class="tool-btn" onclick="openTool(${tool.id})">${tool.title}</button>
+                <img src="${tool.icon}" alt="${tool.title}" class="tool-icon" onerror="this.src='https://via.placeholder.com/100/1e293b/00f2ff?text=AI'">
+                <button class="tool-btn" onclick="openModal(${index})">${tool.title}</button>
             `;
-            toolGrid.appendChild(card);
+            grid.appendChild(card);
         });
 
-        // Modal Logic
-        function openTool(id) {
-            const tool = tools.find(t => t.id === id);
-            document.getElementById('modalTitle').innerText = tool.title;
-            document.getElementById('modalDesc').innerText = tool.desc;
-            document.getElementById('promptView').innerText = tool.prompt;
+        function openModal(index) {
+            const tool = tools[index];
+            document.getElementById('mTitle').innerText = tool.title;
+            document.getElementById('mDesc').innerText = tool.desc;
+            document.getElementById('mPrompt').innerText = tool.prompt;
             modal.style.display = 'flex';
         }
 
-        closeModal.onclick = () => modal.style.display = 'none';
+        // Close logic
+        document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
         window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; }
 
         // Copy Logic
-        document.getElementById('copyBtn').onclick = function() {
-            const text = document.getElementById('promptView').innerText;
+        mCopy.onclick = () => {
+            const text = document.getElementById('mPrompt').innerText;
             navigator.clipboard.writeText(text).then(() => {
-                const originalText = this.innerText;
-                this.innerText = "COPIED!";
-                this.style.background = "#00c853";
+                const original = mCopy.innerText;
+                mCopy.innerText = "PROMPT COPIED!";
+                mCopy.style.background = "#00ff88";
                 setTimeout(() => {
-                    this.innerText = originalText;
-                    this.style.background = "var(--accent-purple)";
+                    mCopy.innerText = original;
+                    mCopy.style.background = "var(--accent-cyan)";
                 }, 2000);
             });
         };

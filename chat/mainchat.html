@@ -73,7 +73,7 @@
 
       import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js";
 
-const messaging = getMessaging(app);
+
 
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -109,6 +109,7 @@ const messaging = getMessaging(app);
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const messaging = getMessaging(app);
 
     let myName = "";
     let currentConvId = null;

@@ -64,7 +64,7 @@
             sysPrompt = "You are an AI to help a user with daily tasks."
             FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt })
         }
-        messages.push({system: sysPrompt})
+        messages.push({ "system": sysPrompt })
     }
     getSysPrompt()
 
@@ -75,12 +75,13 @@
             let userMessageElement = document.createElement("p")
             userMessageElement.innerHTML = "<strong>USER:</strong> " + query
             messageArea.appendChild(userMessageElement)
+            messages.push({ "user": query })
 
 
             const GAS_LINK = "https://script.google.com/macros/s/AKfycbx5ubaICaRzmuitAZwSr2JjH_FZHvnZhMkvAeTrWT79tv2KY2R7calyziGDRY84nSIRmQ/exec"
             const data = await fetch(GAS_LINK, {
                 method: "POST",
-                body: JSON.stringify({ "message": query + "| Use very informal language." })
+                body: JSON.stringify(messages)
             })
             const recive = await data.json()
             console.log("Raw Output: ", recive)
@@ -88,6 +89,7 @@
 
             let aiMessageElement = document.createElement("p")
             aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
+            messages.push({ "model": recivedMessage })
             messageArea.appendChild(aiMessageElement)
         } catch (e) {
             console.error(e)

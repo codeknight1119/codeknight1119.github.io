@@ -2,15 +2,17 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyD_1epFIm97G6hyzS_f4GHkhcb4tF3gMZI",
-  authDomain: "ootoa-537ee.firebaseapp.com",
-  projectId: "ootoa-537ee",
-  storageBucket: "ootoa-537ee.firebasestorage.app",
-  messagingSenderId: "60453385657",
-  appId: "1:60453385657:web:de970a01ebe1f0ab167268",
-  measurementId: "G-NBN13F2EY9"
+  apiKey: "AIzaSyBxDclU4JShqg-SBnDJa_lMfK_c2jQzxaw",
+  authDomain: "ai-on-a-student-s-budget.firebaseapp.com",
+  projectId: "ai-on-a-student-s-budget",
+  storageBucket: "ai-on-a-student-s-budget.firebasestorage.app",
+  messagingSenderId: "374775958691",
+  appId: "1:374775958691:web:b2de426b541139b0aec316",
+  measurementId: "G-SG17HRVC1F"
 };
+
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);

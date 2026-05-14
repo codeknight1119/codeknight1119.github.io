@@ -58,13 +58,14 @@
     let sysPrompt = ""
     async function getSysPrompt() {
         try {
-            const response = await FirebaseUtils.getDocument("/system/systemPrompt")
-            sysPrompt = await response.prompt
+            const data = await FirebaseUtils.getDocument("/system/systemPrompt");
+            sysPrompt = data.prompt || "You are an AI to help a user with daily tasks.";
         } catch (e) {
-            sysPrompt = "You are an AI to help a user with daily tasks."
-            FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt })
+            sysPrompt = "You are an AI to help a user with daily tasks.";
+            FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt });
         }
-        messages.push({ "system": sysPrompt })
+        // Correct format for the model
+        messages.push({ "role": "system", "content": sysPrompt });
     }
     getSysPrompt()
 
@@ -81,7 +82,7 @@
             const GAS_LINK = "https://script.google.com/macros/s/AKfycbx5ubaICaRzmuitAZwSr2JjH_FZHvnZhMkvAeTrWT79tv2KY2R7calyziGDRY84nSIRmQ/exec"
             const data = await fetch(GAS_LINK, {
                 method: "POST",
-                body: JSON.stringify({"messages": messages})
+                body: JSON.stringify({ "messages": messages })
             })
             const recive = await data.json()
             console.log("Raw Output: ", recive)

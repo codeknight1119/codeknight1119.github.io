@@ -75,13 +75,13 @@
             let userMessageElement = document.createElement("p")
             userMessageElement.innerHTML = "<strong>USER:</strong> " + query
             messageArea.appendChild(userMessageElement)
-            messages.push({ "user": query })
+            messages.push({ "role": "user", "content": query })
 
 
             const GAS_LINK = "https://script.google.com/macros/s/AKfycbx5ubaICaRzmuitAZwSr2JjH_FZHvnZhMkvAeTrWT79tv2KY2R7calyziGDRY84nSIRmQ/exec"
             const data = await fetch(GAS_LINK, {
                 method: "POST",
-                body: JSON.stringify(messages)
+                body: JSON.stringify({"messages": messages})
             })
             const recive = await data.json()
             console.log("Raw Output: ", recive)
@@ -89,7 +89,7 @@
 
             let aiMessageElement = document.createElement("p")
             aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
-            messages.push({ "model": recivedMessage })
+            messages.push({ "role": "assistant", "content": recivedMessage })
             messageArea.appendChild(aiMessageElement)
         } catch (e) {
             console.error(e)

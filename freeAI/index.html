@@ -66,7 +66,7 @@ import * as FirebaseUtils from './firebaseUtils.js';
             const GAS_LINK = "https://script.google.com/macros/s/AKfycbx5ubaICaRzmuitAZwSr2JjH_FZHvnZhMkvAeTrWT79tv2KY2R7calyziGDRY84nSIRmQ/exec"
             const data = await fetch(GAS_LINK, {
                 method: "POST",
-                body: JSON.stringify({ "message": query })
+                body: JSON.stringify({ "message": query + "| Respond using mostly generation alpha and Z slang in a serious manner." })
             })
             const recive = await data.json()
             console.log("Raw Output: ", recive)

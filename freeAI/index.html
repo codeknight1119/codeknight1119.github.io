@@ -45,6 +45,7 @@
     </main>
     <button id="login">Login</button>
 </body>
+ <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
 <script type="module">
 import * as FirebaseUtils from './firebaseUtils.js';
 
@@ -72,7 +73,7 @@ import * as FirebaseUtils from './firebaseUtils.js';
             const recivedMessage = recive.choices[0].message.content
 
             let aiMessageElement = document.createElement("p")
-            aiMessageElement.innerHTML = "<strong>MODEL:</strong> " + recivedMessage
+            aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
             messageArea.appendChild(aiMessageElement)
         } catch (e) {
             console.error(e)

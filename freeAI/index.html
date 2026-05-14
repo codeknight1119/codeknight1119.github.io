@@ -45,14 +45,28 @@
     </main>
     <button id="login">Login</button>
 </body>
- <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
 <script type="module">
-import * as FirebaseUtils from './firebaseUtils.js';
+    import * as FirebaseUtils from './firebaseUtils.js';
 
 
     const textIn = document.getElementById("textEnter")
     const messageArea = document.getElementById("mainChat")
     document.getElementById("sendButton").addEventListener("click", queryModel)
+
+    let messages = []
+    let sysPrompt = ""
+    async function getSysPrompt() {
+        try {
+            const response = await FirebaseUtils.getDocument("/system/systemPrompt")
+            sysPrompt = await response.prompt
+        } catch (e) {
+            sysPrompt = "You are an AI to help a user with daily tasks."
+            FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt })
+        }
+        messages.push({system: sysPrompt})
+    }
+    getSysPrompt()
 
     async function queryModel() {
         try {
@@ -80,8 +94,8 @@ import * as FirebaseUtils from './firebaseUtils.js';
         }
     }
     document.getElementById("login").addEventListener("click", async () => {
-       const data = await FirebaseUtils.loginGoogle()
-       console.log(data)
+        const data = await FirebaseUtils.loginGoogle()
+        console.log(data)
     })
 
 </script>

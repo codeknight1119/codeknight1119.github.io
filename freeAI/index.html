@@ -77,16 +77,16 @@
         //under collection messages with a limit of 50
         const messageData = await FirebaseUtils.getDocuments("/messages", 50)
         if (messageData && messageData.length !== 0) {
-            messages.concat(messageData)
+            messageData.forEach((val) => {
+                messages.push(val)
+                let messageElement = document.createElement("p")
+                messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + val.content)
+                messageArea.appendChild(messageElement)
+            })
         }
         isReady = true
         console.log(messages)
-        messages.forEach((val) => {
-            if (val.role === "system") return
-            let messageElement = document.createElement("p")
-            messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + val.content)
-            messageArea.appendChild(messageElement)
-        })
+
     }
 
     getSysPrompt()

@@ -55,6 +55,11 @@
     document.getElementById("sendButton").addEventListener("click", queryModel)
 
     let messages = []
+    async function getMessages() {
+        //under collection messages with a limit of 50
+        const messageData = FirebaseUtils.getDocuments("/messages", 50)
+        console.log(messageData)
+    }
     let sysPrompt = ""
     let isReady = false;
     async function getSysPrompt() {
@@ -73,9 +78,9 @@
     getSysPrompt()
 
     async function queryModel() {
-        if (!isReady){
+        if (!isReady) {
             setTimeout(queryModel, 500)
-            return 
+            return
         }
         try {
             const query = textIn.value
@@ -90,7 +95,7 @@
             const data = await fetch(GAS_LINK, {
                 method: "POST",
                 body: JSON.stringify({ "messages": messages }),
-               
+
             })
             const recive = await data.json()
             console.log("Raw Output: ", recive)

@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -57,6 +57,24 @@ export const getDocument = async (path, caller) => {
     try {
         const docRef = doc(db, path);
         const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data();
+        }
+        else {
+            // docSnap.data() will be undefined if it doesn't exist
+            return undefined;
+        }
+    }
+    catch (e) {
+        alert(`get doc from ${caller} failed at link ${path} | Error: ` +
+            JSON.stringify(e));
+    }
+};
+
+export const getDocuments = async (path, l) => {
+    try {
+        const colRef = collection(db, path);
+        const docSnap = await getDocs(docRef, limit(l));
         if (docSnap.exists()) {
             return docSnap.data();
         }

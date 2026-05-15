@@ -74,7 +74,7 @@ export const getDocument = async (path) => {
 export const getDocuments = async (path, l) => {
     try {
         const q = query(collection(db, path), limit(l))
-        const querySnap = await getDocs(q);
+        const querySnapshot = await getDocs(q);
 
 if (querySnapshot.empty) {
             return []; // Return an empty array if no documents found

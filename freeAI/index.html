@@ -81,6 +81,12 @@
         }
         isReady = true
         console.log(messages)
+        messages.forEach((val)=>{
+
+            let messageElement = document.createElement("p")
+            messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + recivedMessage)
+            messageArea.appendChild(messageElement)
+        })
     }
 
     getSysPrompt()

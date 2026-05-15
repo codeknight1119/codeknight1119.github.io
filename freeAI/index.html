@@ -67,7 +67,7 @@
         // Correct format for the model
         messages.push({ "role": "system", "content": sysPrompt });
         console.log(sysPrompt)
-       getMessages()
+        getMessages()
     }
 
 
@@ -77,16 +77,14 @@
         //under collection messages with a limit of 50
         const messageData = await FirebaseUtils.getDocuments("/messages", 50)
         if (messageData && messageData.length !== 0) {
-            messageData.forEach((val)=>{
-                messages.push(val)
-            })
+            messages.concat(messageData)
         }
-         isReady = true
-         console.log(messages)
+        isReady = true
+        console.log(messages)
     }
 
-        getSysPrompt()
-    
+    getSysPrompt()
+
 
 
     async function queryModel() {

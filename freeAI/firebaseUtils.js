@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -73,18 +73,24 @@ export const getDocument = async (path) => {
 
 export const getDocuments = async (path, l) => {
     try {
-        const colRef = collection(db, path);
-        const docSnap = await getDocs(colRef, limit(l));
-        if (docSnap.exists()) {
-            return docSnap.data();
+        const q = query(collection(db, path), limit(l))
+        const querySnap = await getDocs(q);
+
+if (querySnapshot.empty) {
+            return []; // Return an empty array if no documents found
         }
-        else {
-            // docSnap.data() will be undefined if it doesn't exist
-            return undefined;
-        }
+        
+        // 3. Map through the documents to extract their data
+        const documents = querySnapshot.docs.map(doc => ({
+            id: doc.id,      
+            ...doc.data()    
+        }));
+
+        return documents;
     }
     catch (e) {
   console.log(e);
+  throw e
     }
 };
 

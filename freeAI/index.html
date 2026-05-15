@@ -77,7 +77,9 @@
         //under collection messages with a limit of 50
         const messageData = await FirebaseUtils.getDocuments("/messages", 50)
         if (messageData && messageData.length !== 0) {
-            messages = messageData
+            messageData.forEach((val)=>{
+                messages.push(val)
+            })
         }
          isReady = true
          console.log(messages)

@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -33,9 +33,19 @@ export const loginGoogle = async () => {
     }
 };
 
-export const setDoc = async (path, data) => {
+export const setDocument = async (path, data) => {
     try {
         await firestoreSetDoc(doc(db, path), data);
+        // alert(JSON.stringify(result));
+    }
+    catch (e) {
+        alert(`set doc failed at ${path} ` + JSON.stringify(e));
+    }
+};
+
+export const addDocument = async (path, data) => {
+    try {
+        await addDoc(doc(db, path), data);
         // alert(JSON.stringify(result));
     }
     catch (e) {

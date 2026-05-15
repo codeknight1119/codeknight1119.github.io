@@ -91,7 +91,7 @@
             messageArea.appendChild(userMessageElement)
             const userMessage = { "role": "user", "content": query }
             messages.push(userMessage)
-            FirebaseUtils.setDoc("/messages/", userMessage)
+            FirebaseUtils.addDocument("/messages/", userMessage)
 
 
             const GAS_LINK = "https://script.google.com/macros/s/AKfycbxkvaF-sl0n20SOZFIWw8vsutZBo-DLKOmdFiLC_O5J7Tt0Xjs0xLwWxI_N4XsTuId6/exec"
@@ -108,7 +108,7 @@
             aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
             const aiMessage =  {"role": "assistant", "content": recivedMessage }
             messages.push(aiMessage)
-            FirebaseUtils.setDoc("/messages/", aiMessage)
+            FirebaseUtils.addDocument("/messages/", aiMessage)
             messageArea.appendChild(aiMessageElement)
         } catch (e) {
             console.error(e)

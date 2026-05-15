@@ -60,6 +60,7 @@
         const messageData = FirebaseUtils.getDocuments("/messages", 50)
         console.log(messageData)
     }
+    getMessages()
     let sysPrompt = ""
     let isReady = false;
     async function getSysPrompt() {

@@ -53,7 +53,7 @@ export const updateDocument = async (path, data) => {
     }
 };
 
-export const getDocument = async (path, caller) => {
+export const getDocument = async (path) => {
     try {
         const docRef = doc(db, path);
         const docSnap = await getDoc(docRef);
@@ -74,7 +74,7 @@ export const getDocument = async (path, caller) => {
 export const getDocuments = async (path, l) => {
     try {
         const colRef = collection(db, path);
-        const docSnap = await getDocs(docRef, limit(l));
+        const docSnap = await getDocs(colRef, limit(l));
         if (docSnap.exists()) {
             return docSnap.data();
         }
@@ -84,8 +84,7 @@ export const getDocuments = async (path, l) => {
         }
     }
     catch (e) {
-        alert(`get doc from ${caller} failed at link ${path} | Error: ` +
-            JSON.stringify(e));
+  console.log(e);
     }
 };
 

@@ -57,7 +57,7 @@
     let messages = []
     async function getMessages() {
         //under collection messages with a limit of 50
-        const messageData = FirebaseUtils.getDocuments("/messages", 50)
+        const messageData = await FirebaseUtils.getDocuments("/messages", 50)
         console.log(messageData)
     }
     getMessages()

@@ -81,10 +81,10 @@
         }
         isReady = true
         console.log(messages)
-        messages.forEach((val)=>{
-
+        messages.forEach((val) => {
+            if (val.role === "system") return
             let messageElement = document.createElement("p")
-            messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + recivedMessage)
+            messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + val.content)
             messageArea.appendChild(messageElement)
         })
     }

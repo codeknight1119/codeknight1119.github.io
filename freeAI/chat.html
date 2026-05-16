@@ -74,7 +74,7 @@
             margin-left: 50px;
         }
 
-        
+
 
         /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
         #main {
@@ -93,6 +93,12 @@
                 font-size: 18px;
             }
         }
+
+        #openBttn {
+            position: absolute;
+            top: 10;
+            left: 10;
+        }
     </style>
     <title>AI on a Student Budget</title>
 </head>
@@ -105,6 +111,7 @@
     </header>
     <main class="container">
         <div id="main">
+            <button onclick="openNav()">&#9776;</button>
             <div class="sidebar">
                 <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
             </div>

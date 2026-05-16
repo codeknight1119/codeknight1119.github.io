@@ -3,173 +3,177 @@
 
 
 <head>
-   <meta charset="utf-8" />
-   <meta name="viewport" content="width=device-width,initial-scale=1" />
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-   <meta name="color-scheme" content="light dark">
-   <link rel="icon" type="image/x-icon" href="freeAILogo.svg">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/x-icon" href="freeAILogo.svg">
 
 
-   <style>
-       #mainChat {
-           overflow-y: scroll;
-       }
+    <style>
+        #mainChat {
+            overflow-y: scroll;
+        }
 
 
-       #title {
-           display: flex;
-           justify-content: center;
-       }
+        #title {
+            display: flex;
+            justify-content: center;
+        }
 
 
-       #sendMessageUI {
-           display: flex;
-           flex-direction: row;
-           gap: 10px;
-       }
-   </style>
-   <title>AI on a Student Budget</title>
+        #sendMessageUI {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+    </style>
+    <title>AI on a Student Budget</title>
 </head>
 
 
 <body>
-   <header>
-       <h1 id="title">AI on a Student Budget</h1>
-       <hr />
-   </header>
-   <main class="container">
-       <div id="mainChat">
+    <header>
+        <h1 id="title">AI on a Student Budget</h1>
+        <hr />
+    </header>
+    <main class="container">
+        <div id="mainChat">
 
 
-       </div>
-       <div id="UIBar">
-           <div id="sendMessageUI">
-               <button id="sendButton">Send</button>
-               <input id="textEnter" />
-           </div>
-       </div>
-   </main>
-   <button id="login">Login</button>
+        </div>
+        <div id="UIBar">
+            <div id="sendMessageUI">
+                <button id="sendButton">Send</button>
+                <input id="textEnter" />
+            </div>
+        </div>
+    </main>
+    <button id="login">Login</button>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
 <script type="module">
-   import * as FirebaseUtils from './firebaseUtils.js';
+    import * as FirebaseUtils from './firebaseUtils.js';
 
-let convs = new Map()
 
-async function getConversations() {
-  const convData  = await FirebaseUtils.getDocuments("/conversations", 15, {field : "timestamp", direction: "desc"})
-console.log(convData)
-}
 
-async function init() {
-    const data = await FirebaseUtils.isSignedIn()
-    
-    // 1. If the user isn't signed in at all, send them back to login
-    if (!data) {
-        window.location.href = "https://codeknight1119.github.io/freeAI/"
-        return; // Stop execution here
+    async function init() {
+        const data = await FirebaseUtils.isSignedIn()
+
+        // 1. If the user isn't signed in at all, send them back to login
+        if (!data) {
+            window.location.href = "https://codeknight1119.github.io/freeAI/"
+            return; // Stop execution here
+        }
+
+        // 2. Fetch the allowed users list
+        const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
+
+        // 3. Fix the variable name here (changed userData to allowedUsers)
+        if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
+            window.location.href = "https://codeknight1119.github.io/freeAI/"
+        }
     }
-    
-    // 2. Fetch the allowed users list
-    const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
-    
-    // 3. Fix the variable name here (changed userData to allowedUsers)
-    if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
-        window.location.href = "https://codeknight1119.github.io/freeAI/"
+    init()
+
+
+    let convs = new Map()
+
+    async function getConversations() {
+        const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" })
+        console.log(convData)
     }
-}
-init()
-
-
-   const textIn = document.getElementById("textEnter")
-   const messageArea = document.getElementById("mainChat")
-   document.getElementById("sendButton").addEventListener("click", queryModel)
-
-
-   let sysPrompt = ""
-   let isReady = false;
-   async function getSysPrompt() {
-       try {
-           const data = await FirebaseUtils.getDocument("/system/systemPrompt");
-           sysPrompt = data.prompt || "You are an AI to help a user with daily tasks.";
-       } catch (e) {
-           sysPrompt = "You are an AI to help a user with daily tasks.";
-           await FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt });
-       }
-       messages.push({ "role": "system", "content": sysPrompt });
-       getMessages()
-   }
+    getConversations()
 
 
 
+    const textIn = document.getElementById("textEnter")
+    const messageArea = document.getElementById("mainChat")
+    document.getElementById("sendButton").addEventListener("click", queryModel)
 
 
-
-   let messages = []
-   async function getMessages() {
-       //under collection messages with a limit of 50
-       const messageData = await FirebaseUtils.getDocuments("/messages", 50)
-       if (messageData && messageData.length !== 0) {
-           messageData.forEach((val) => {
-               messages.push(val)
-               let messageElement = document.createElement("p")
-               messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + val.content)
-               messageArea.appendChild(messageElement)
-           })
-       }
-       isReady = true
-   }
-
-
-   getSysPrompt()
-
-
-
-   async function queryModel() {
-       if (!isReady) {
-           setTimeout(queryModel, 500)
-           return
-       }
-       try {
-           const query = textIn.value
-           textIn.value = ""
-           let userMessageElement = document.createElement("p")
-           userMessageElement.innerHTML = "<strong>USER:</strong> " + query
-           messageArea.appendChild(userMessageElement)
-           const userMessage = { "role": "user", "content": query }
-           messages.push(userMessage)
-           FirebaseUtils.addDocument("/messages/", userMessage)
+    let sysPrompt = ""
+    let isReady = false;
+    async function getSysPrompt() {
+        try {
+            const data = await FirebaseUtils.getDocument("/system/systemPrompt");
+            sysPrompt = data.prompt || "You are an AI to help a user with daily tasks.";
+        } catch (e) {
+            sysPrompt = "You are an AI to help a user with daily tasks.";
+            await FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt });
+        }
+        messages.push({ "role": "system", "content": sysPrompt });
+        getMessages()
+    }
 
 
 
 
-           const GAS_LINK = "https://script.google.com/macros/s/AKfycbxkvaF-sl0n20SOZFIWw8vsutZBo-DLKOmdFiLC_O5J7Tt0Xjs0xLwWxI_N4XsTuId6/exec"
-           const data = await fetch(GAS_LINK, {
-               method: "POST",
-               body: JSON.stringify({ "messages": messages }),
 
 
-           })
-           const recive = await data.json()
-           console.log("Raw Output: ", recive)
-           const recivedMessage = recive.choices[0].message.content
+    let messages = []
+    async function getMessages() {
+        //under collection messages with a limit of 50
+        const messageData = await FirebaseUtils.getDocuments("/messages", 50)
+        if (messageData && messageData.length !== 0) {
+            messageData.forEach((val) => {
+                messages.push(val)
+                let messageElement = document.createElement("p")
+                messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + val.content)
+                messageArea.appendChild(messageElement)
+            })
+        }
+        isReady = true
+    }
 
 
-           let aiMessageElement = document.createElement("p")
-           aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
-           const aiMessage = { "role": "assistant", "content": recivedMessage }
-           messages.push(aiMessage)
-           FirebaseUtils.addDocument("/messages/", aiMessage)
-           messageArea.appendChild(aiMessageElement)
-       } catch (e) {
-           console.error(e)
-       }
-   }
+    getSysPrompt()
+
+
+
+    async function queryModel() {
+        if (!isReady) {
+            setTimeout(queryModel, 500)
+            return
+        }
+        try {
+            const query = textIn.value
+            textIn.value = ""
+            let userMessageElement = document.createElement("p")
+            userMessageElement.innerHTML = "<strong>USER:</strong> " + query
+            messageArea.appendChild(userMessageElement)
+            const userMessage = { "role": "user", "content": query }
+            messages.push(userMessage)
+            FirebaseUtils.addDocument("/messages/", userMessage)
+
+
+
+
+            const GAS_LINK = "https://script.google.com/macros/s/AKfycbxkvaF-sl0n20SOZFIWw8vsutZBo-DLKOmdFiLC_O5J7Tt0Xjs0xLwWxI_N4XsTuId6/exec"
+            const data = await fetch(GAS_LINK, {
+                method: "POST",
+                body: JSON.stringify({ "messages": messages }),
+
+
+            })
+            const recive = await data.json()
+            console.log("Raw Output: ", recive)
+            const recivedMessage = recive.choices[0].message.content
+
+
+            let aiMessageElement = document.createElement("p")
+            aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
+            const aiMessage = { "role": "assistant", "content": recivedMessage }
+            messages.push(aiMessage)
+            FirebaseUtils.addDocument("/messages/", aiMessage)
+            messageArea.appendChild(aiMessageElement)
+        } catch (e) {
+            console.error(e)
+        }
+    }
 
 
 </script>
 
 
 </html>
-

@@ -51,7 +51,7 @@
     async function init() {
         const data = FirebaseUtils.isSignedIn()
         console.log(data)
-        if (data !== undefined) {
+        if (data) {
             const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
             if (allowedUsers.users.includes(data.user.uid)) {
                 window.location.href = "https://codeknight1119.github.io/freeAI/chat.html"

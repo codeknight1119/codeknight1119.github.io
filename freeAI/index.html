@@ -42,7 +42,7 @@
         FirebaseUtils.setDocument("/system/allowedUsers", {users: [data.user.uid]})
        }
        if(userData.users.includes(data.user.uid)){
-        window.location.href("https://codeknight1119.github.io/freeAI/chat.html")
+        window.location.href = "https://codeknight1119.github.io/freeAI/chat.html"
        }else{
         text.innerText = "You are not allowed to acess this content."
        }

@@ -97,9 +97,7 @@ init()
            sysPrompt = "You are an AI to help a user with daily tasks.";
            await FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt });
        }
-       // Correct format for the model
        messages.push({ "role": "system", "content": sysPrompt });
-       console.log(sysPrompt)
        getMessages()
    }
 
@@ -121,9 +119,6 @@ init()
            })
        }
        isReady = true
-       console.log(messages)
-
-
    }
 
 

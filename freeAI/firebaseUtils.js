@@ -89,19 +89,19 @@ export const getDocuments = async (path, l, docParam) => {
             constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));
         }
 
-
         if (typeof l === 'number' && l > 0) {
             constraints.push(limit(l))
         }
 
+        // FIX: Define collectionRef before using it
+        const collectionRef = collection(db, path); 
         const q = query(collectionRef, ...constraints);
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-            return []; // Return an empty array if no documents found
+            return [];
         }
 
-        // 3. Map through the documents to extract their data
         const documents = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -116,14 +116,21 @@ export const getDocuments = async (path, l, docParam) => {
 };
 
 export const isSignedIn = () => {
-    try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        return user;
-    }
-    catch (e) {
-        alert('error + ' + JSON.stringify(e));
-    }
+    return new Promise((resolve, reject) => {
+        try {
+            const auth = getAuth();
+            const unsubscribe = auth.onAuthStateChanged(
+                (user) => {
+                    unsubscribe(); // Stop listening after the first check
+                    resolve(user);
+                },
+                (error) => reject(error)
+            );
+        } catch (e) {
+            alert('error + ' + JSON.stringify(e));
+            reject(e);
+        }
+    });
 };
 
 export const logout = () => {

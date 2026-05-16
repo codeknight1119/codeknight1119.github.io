@@ -85,8 +85,8 @@ export const getDocuments = async (path, l, docParam) => {
     try {
         let constraints = []
 
-        if (order && order.field) {
-            constraints.push(orderBy(order.field, order.direction || 'asc'));
+        if (docParam && docParam.field) {
+            constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));
         }
 
 

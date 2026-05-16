@@ -49,7 +49,7 @@
     })
 
     async function init() {
-        const data = isSignedIn()
+        const data = FirebaseUtils.isSignedIn()
         if (!data) {
             window.location.href = "https://codeknight1119.github.io/freeAI/"
         }

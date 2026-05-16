@@ -59,7 +59,7 @@ let convs = new Map()
 
 async function getConversations() {
   const convData  = await FirebaseUtils.getDocuments("/conversations", 15, {field : "timestamp", direction: "desc"})
-
+console.log(convData)
 }
 
 

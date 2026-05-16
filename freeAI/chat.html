@@ -64,10 +64,10 @@ console.log(convData)
 
 
    async function init() {
-       const data = FirebaseUtils.isSignedIn()
-       if(!data){
-           window.location.href = "https://codeknight1119.github.io/freeAI/"
-       }
+       const data = await FirebaseUtils.isSignedIn()
+      // if(!data){
+        //   window.location.href = "https://codeknight1119.github.io/freeAI/"
+      // }
        const allowedUsers =  await FirebaseUtils.getDocument("/system/allowedUsers")
         if(!userData.users.includes(data.user.uid)){
        window.location.href = "https://codeknight1119.github.io/freeAI/"

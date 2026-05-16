@@ -1,16 +1,16 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBxDclU4JShqg-SBnDJa_lMfK_c2jQzxaw",
-  authDomain: "ai-on-a-student-s-budget.firebaseapp.com",
-  projectId: "ai-on-a-student-s-budget",
-  storageBucket: "ai-on-a-student-s-budget.firebasestorage.app",
-  messagingSenderId: "374775958691",
-  appId: "1:374775958691:web:b2de426b541139b0aec316",
-  measurementId: "G-SG17HRVC1F"
+    apiKey: "AIzaSyBxDclU4JShqg-SBnDJa_lMfK_c2jQzxaw",
+    authDomain: "ai-on-a-student-s-budget.firebaseapp.com",
+    projectId: "ai-on-a-student-s-budget",
+    storageBucket: "ai-on-a-student-s-budget.firebasestorage.app",
+    messagingSenderId: "374775958691",
+    appId: "1:374775958691:web:b2de426b541139b0aec316",
+    measurementId: "G-SG17HRVC1F"
 };
 
 
@@ -81,26 +81,37 @@ export const getDocument = async (path) => {
     }
 };
 
-export const getDocuments = async (path, l) => {
+export const getDocuments = async (path, l, docParam) => {
     try {
-        const q = query(collection(db, path), limit(l))
+        let constraints = []
+
+        if (order && order.field) {
+            constraints.push(orderBy(order.field, order.direction || 'asc'));
+        }
+
+
+        if (typeof l === 'number' && l > 0) {
+            constraints.push(limit(l))
+        }
+
+        const q = query(collectionRef, ...constraints);
         const querySnapshot = await getDocs(q);
 
-if (querySnapshot.empty) {
+        if (querySnapshot.empty) {
             return []; // Return an empty array if no documents found
         }
-        
+
         // 3. Map through the documents to extract their data
         const documents = querySnapshot.docs.map(doc => ({
-            id: doc.id,      
-            ...doc.data()    
+            id: doc.id,
+            ...doc.data()
         }));
 
         return documents;
     }
     catch (e) {
-  console.log(e);
-  throw e
+        console.log(e);
+        throw e
     }
 };
 

@@ -49,6 +49,16 @@
 <script type="module">
     import * as FirebaseUtils from './firebaseUtils.js';
 
+    async function init() {
+        const data = isSignedIn()
+        if(!data){
+            window.location.href = "https://codeknight1119.github.io/freeAI/"
+        }
+        const allowedUsers =  await FirebaseUtils.getDocument("/system/allowedUsers")
+         if(!userData.users.includes(data.user.uid)){
+        window.location.href = "https://codeknight1119.github.io/freeAI/"
+       }
+    }
 
     const textIn = document.getElementById("textEnter")
     const messageArea = document.getElementById("mainChat")
@@ -129,10 +139,6 @@
             console.error(e)
         }
     }
-    document.getElementById("login").addEventListener("click", async () => {
-        const data = await FirebaseUtils.loginGoogle()
-        console.log(data)
-    })
 
 </script>
 

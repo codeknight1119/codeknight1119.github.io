@@ -26,7 +26,7 @@
         <h1 id="title">AI on a Student Budget</h1>
         <hr />
     </header>
-<h1 id="mainMessage"> Login to contenue</h1>
+    <h1 id="mainMessage"> Login to contenue</h1>
     <button id="login">Login</button>
 </body>
 <script type="module">
@@ -36,17 +36,29 @@
     document.getElementById("login").addEventListener("click", async () => {
         const data = await FirebaseUtils.loginGoogle()
         console.log(data.user.uid)
-       const userData = await FirebaseUtils.getDocument("/system/allowedUsers")
-       console.log(userData)
-       if(userData === undefined){
-        FirebaseUtils.setDocument("/system/allowedUsers", {users: [data.user.uid]})
-       }
-       if(userData.users.includes(data.user.uid)){
-        window.location.href = "https://codeknight1119.github.io/freeAI/chat.html"
-       }else{
-        text.innerText = "You are not allowed to acess this content."
-       }
+        const userData = await FirebaseUtils.getDocument("/system/allowedUsers")
+        console.log(userData)
+        if (userData === undefined) {
+            FirebaseUtils.setDocument("/system/allowedUsers", { users: [data.user.uid] })
+        }
+        if (userData.users.includes(data.user.uid)) {
+            window.location.href = "https://codeknight1119.github.io/freeAI/chat.html"
+        } else {
+            text.innerText = "You are not allowed to acess this content."
+        }
     })
+
+    async function init() {
+        const data = isSignedIn()
+        if (!data) {
+            window.location.href = "https://codeknight1119.github.io/freeAI/"
+        }
+        const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
+        if (!userData.users.includes(data.user.uid)) {
+            window.location.href = "https://codeknight1119.github.io/freeAI/"
+        }
+    }
+    init()
 
 </script>
 

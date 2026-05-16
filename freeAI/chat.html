@@ -62,18 +62,24 @@ async function getConversations() {
 console.log(convData)
 }
 
-
-   async function init() {
-       const data = await FirebaseUtils.isSignedIn()
-      // if(!data){
-        //   window.location.href = "https://codeknight1119.github.io/freeAI/"
-      // }
-       const allowedUsers =  await FirebaseUtils.getDocument("/system/allowedUsers")
-        if(!allowedUsers.users.includes(data.user.uid)){
-       window.location.href = "https://codeknight1119.github.io/freeAI/"
-      }
-   }
-   init()
+async function init() {
+    const data = await FirebaseUtils.isSignedIn()
+    
+    // 1. If the user isn't signed in at all, send them back to login
+    if (!data) {
+        window.location.href = "https://codeknight1119.github.io/freeAI/"
+        return; // Stop execution here
+    }
+    
+    // 2. Fetch the allowed users list
+    const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
+    
+    // 3. Fix the variable name here (changed userData to allowedUsers)
+    if (!allowedUsers || !allowedUsers.users.includes(data.user.uid)) {
+        window.location.href = "https://codeknight1119.github.io/freeAI/"
+    }
+}
+init()
 
 
    const textIn = document.getElementById("textEnter")

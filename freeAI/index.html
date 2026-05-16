@@ -35,10 +35,10 @@
 
     document.getElementById("login").addEventListener("click", async () => {
         const data = await FirebaseUtils.loginGoogle()
-        console.log(data)
+        console.log(data.user.uid)
        const userData = await FirebaseUtils.getDocument("/system/allowedUsers")
        console.log(userData)
-       if(!userData){
+       if(userData === undefined){
         FirebaseUtils.setDocument("/system/allowedUsers", {users: [data.user.uid]})
        }
        if(userData.users.includes(data.user.uid)){

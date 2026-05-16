@@ -39,7 +39,7 @@
        const userData = await FirebaseUtils.getDocument("/system/allowedUsers")
        console.log(userData)
        if(!userData){
-        setDocument("/system/allowedUsers", {users: [data.uid]})
+        FirebaseUtils.setDocument("/system/allowedUsers", {users: [data.uid]})
        }
        if(userData.users.includes(data.uid)){
         window.location.href("https://codeknight1119.github.io/freeAI/chat.html")

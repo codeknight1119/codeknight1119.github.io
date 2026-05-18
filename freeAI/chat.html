@@ -245,7 +245,7 @@
 
             const body = {
                 model: "katanemo/Arch-Router-1.5B:hf-inference",
-                params: { messages: messages }
+                params: JSON.stringify({ messages: messages })
             };
 
             const receive = await queryGas(body);

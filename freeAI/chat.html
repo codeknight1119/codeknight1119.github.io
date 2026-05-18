@@ -129,8 +129,8 @@
 
             <div id="UIBar">
                 <div id="sendMessageUI">
-                    <button id="sendButton">Send</button>
                     <input id="textEnter" placeholder="Type a message..." />
+                    <button id="sendButton">Send</button>
                 </div>
             </div>
             <button id="login" style="margin-top: 20px;">Login</button>
@@ -152,36 +152,32 @@
     document.getElementById("closeBttn").addEventListener("click", closeNav);
     document.getElementById("newConvBttn").addEventListener("click", createNewConversation);
 
-    //Variables section
-    let sysPrompt = ""
+    // Variables section
+    let sysPrompt = "";
     let isReady = false;
     let currentConversationId = null;
     let messages = [];
-    let convs = new Map()
-    ///
+    let convs = new Map();
 
     async function init() {
-        const data = await FirebaseUtils.isSignedIn()
+        const data = await FirebaseUtils.isSignedIn();
 
         if (!data) {
-            window.location.href = "https://codeknight1119.github.io/freeAI/"
+            window.location.href = "https://codeknight1119.github.io/freeAI/";
             return;
         }
 
-        const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
+        const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers");
 
         if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
-            window.location.href = "https://codeknight1119.github.io/freeAI/"
+            window.location.href = "https://codeknight1119.github.io/freeAI/";
         }
     }
-    init()
+    init();
 
-
-
-    const textIn = document.getElementById("textEnter")
-    const messageArea = document.getElementById("mainChat")
-    document.getElementById("sendButton").addEventListener("click", queryModel)
-
+    const textIn = document.getElementById("textEnter");
+    const messageArea = document.getElementById("mainChat");
+    document.getElementById("sendButton").addEventListener("click", queryModel);
 
     async function getSysPrompt() {
         try {
@@ -192,25 +188,20 @@
             await FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt });
         }
         messages.push({ "role": "system", "content": sysPrompt });
-        getConversations()
+        getConversations();
     }
 
-
-
-
     async function getConversations() {
-        const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" })
+        const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" });
         const container = document.getElementById("conversationsList");
-        container.innerHTML = ""; // Reset old content
+        container.innerHTML = "";
 
         if (convData && convData.length !== 0) {
             convData.forEach((val) => {
                 convs.set(val.id, val);
 
-                // Construct a custom anchor for every chat history entry
                 let convLink = document.createElement("a");
                 convLink.href = "javascript:void(0)";
-                // Fallback to snippet ID parsing if there is no set title string
                 convLink.innerText = val.title || "Chat " + val.id.substring(0, 6);
                 convLink.onclick = () => loadConversation(val.id);
 
@@ -225,64 +216,53 @@
         isReady = true;
     }
 
-    /*
-    async function getMessages() {
-        const messageData = await FirebaseUtils.getDocuments("/messages", 50)
-        if (messageData && messageData.length !== 0) {
-            messageData.forEach((val) => {
-                messages.push(val)
-                let messageElement = document.createElement("p")
-                messageElement.innerHTML = marked.parse(`**${(val.role).toUpperCase()}:** ` + val.content)
-                messageArea.appendChild(messageElement)
-            })
-        }
-        isReady = true
-    }*/
-
-    getSysPrompt()
+    getSysPrompt();
 
     async function queryModel() {
         if (!isReady) {
-            setTimeout(queryModel, 500)
-            return
+            setTimeout(queryModel, 500);
+            return;
         }
         try {
+            const query = textIn.value;
+            if (!query.trim()) return;
+
             if (currentConversationId === null) {
-                const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() })
-                currentConversationId = newConv.id
-                setUpConv(createNewConversation)
-
+                const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() });
+                currentConversationId = newConv.id;
+                // PATCH: Pass the query string directly so it can create a title summary immediately
+                setUpConv(currentConversationId, query);
             }
-            const query = textIn.value
-            if (!query.trim()) return; // Stop empty strings
 
-            textIn.value = ""
-            let userMessageElement = document.createElement("p")
-            userMessageElement.innerHTML = "<strong>USER:</strong> " + query
-            messageArea.appendChild(userMessageElement)
-            const userMessage = { "role": "user", "content": query }
-            messages.push(userMessage)
-            FirebaseUtils.addDocument(`conversations/messages/${currentConversationId}`, userMessage)
+            textIn.value = "";
+            let userMessageElement = document.createElement("p");
+            userMessageElement.innerHTML = "<strong>USER:</strong> " + query;
+            messageArea.appendChild(userMessageElement);
+
+            const userMessage = { "role": "user", "content": query };
+            messages.push(userMessage);
+            await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
             const body = {
                 model: "katanemo/Arch-Router-1.5B:hf-inference",
-                params: {
-                    messages: messages
-                }
+                params: { messages: messages }
+            };
 
-            }
+            const receive = await queryGas(body);
+            const receivedMessage = receive.choices[0].message.content;
 
-            const recive = await queryGas(body)
-            const recivedMessage = recive.choices[0].message.content
+            let aiMessageElement = document.createElement("p");
+            aiMessageElement.innerHTML = marked.parse("**MODEL:** " + receivedMessage);
 
-            let aiMessageElement = document.createElement("p")
-            aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
-            const aiMessage = { "role": "assistant", "content": recivedMessage }
-            messages.push(aiMessage)
-            FirebaseUtils.addDocument(`conversations/messages/${currentConversationId}`, aiMessage)
-            messageArea.appendChild(aiMessageElement)
+            const aiMessage = { "role": "assistant", "content": receivedMessage };
+            messages.push(aiMessage);
+            await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, aiMessage);
+            messageArea.appendChild(aiMessageElement);
+
+            // Auto-scroll chat area
+            messageArea.scrollTop = messageArea.scrollHeight;
         } catch (e) {
-            console.error(e)
+            console.error(e);
         }
     }
 
@@ -299,46 +279,77 @@
     function createNewConversation() {
         messageArea.innerHTML = "";
         messages = [{ "role": "system", "content": sysPrompt }];
+        currentConversationId = null; // Clean slate state
         closeNav();
-        console.log("Started a clean presentation window context.");
     }
 
-    function loadConversation(id) {
-        messageArea.innerHTML = "";
+    // PATCH: Rewritten to properly track IDs and load historic messages
+    async function loadConversation(id) {
+        messageArea.innerHTML = "<p>Loading history...</p>";
+        closeNav();
+
+        currentConversationId = id;
         messages = [{ "role": "system", "content": sysPrompt }];
-        currentConversationId = null; // Reset the state to trigger a new DB entry later
-        closeNav();
+
+        try {
+            // Read subcollection paths sequentially
+            const history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50);
+            messageArea.innerHTML = "";
+
+            if (history && history.length > 0) {
+                history.forEach((msg) => {
+                    messages.push({ role: msg.role, content: msg.content });
+                    let msgDoc = document.createElement("p");
+                    if (msg.role === "user") {
+                        msgDoc.innerHTML = "<strong>USER:</strong> " + msg.content;
+                    } else {
+                        msgDoc.innerHTML = marked.parse("**MODEL:** " + msg.content);
+                    }
+                    messageArea.appendChild(msgDoc);
+                });
+                messageArea.scrollTop = messageArea.scrollHeight;
+            }
+        } catch (e) {
+            console.error("Error reading chat history: ", e);
+            messageArea.innerHTML = "<p>Could not load history.</p>";
+        }
     }
 
-    async function setUpConv(id) {
-        const messagesConv = convs.get(id)
-        const firstMessage = messagesConv[0]
-        const body = {
-            model: "facebook/bart-large-cnn",
-            params: {
-                inputs: firstMessage,
-                parameters: {
-                    max_length: 50,
-                    min_length: 5,
-                    do_sample: false
+    // PATCH: Rewritten to process incoming prompt text and save summary back to Firestore
+    async function setUpConv(id, firstPromptText) {
+        try {
+            const body = {
+                model: "facebook/bart-large-cnn",
+                params: {
+                    inputs: firstPromptText,
+                    parameters: {
+                        max_length: 25,
+                        min_length: 5,
+                        do_sample: false
+                    }
                 }
-            }
+            };
+            const data = await queryGas(body);
+            // Assuming your endpoint outputs summary_text or similar properties
+            const titleText = (data && data.summary_text) ? data.summary_text : firstPromptText.substring(0, 20) + "...";
 
+            // Save title directly back to the document root reference
+            await FirebaseUtils.setDoc(`/conversations/${id}`, { title: titleText }, { merge: true });
+            getConversations(); // Refresh history sidebar UI
+        } catch (err) {
+            console.error("Failed to generate custom title summary: ", err);
         }
-        const data = await queryGas(body)
-        console.log(data)
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbx093GWSVsgqIB2K6ckvmD6j8EoMNGxq7nBgsXHp2QxEgqqI6feRv6PEZI_yrNMvVUa/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbx093GWSVsgqIB2K6ckvmD6j8EoMNGxq7nBgsXHp2QxEgqqI6feRv6PEZI_yrNMvVUa/exec";
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),
-        })
-        const recive = await data.json()
-        return recive
+        });
+        const receive = await data.json();
+        return receive;
     }
-
 </script>
 
 </html>

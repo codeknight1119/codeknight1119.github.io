@@ -45,8 +45,8 @@ export const setDocument = async (path, data) => {
 
 export const addDocument = async (path, data) => {
     try {
-       const data =  await addDoc(collection(db, path), data);
-       return data;
+       const docAdded =  await addDoc(collection(db, path), data);
+       return docAdded;
         // alert(JSON.stringify(result));
     }
     catch (e) {

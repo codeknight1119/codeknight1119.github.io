@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
 
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -9,18 +8,17 @@
     <meta name="color-scheme" content="light dark">
     <link rel="icon" type="image/x-icon" href="freeAILogo.svg">
 
-
     <style>
         #mainChat {
             overflow-y: scroll;
+            margin-bottom: 20px;
+            max-height: 60vh;
         }
-
 
         #title {
             display: flex;
             justify-content: center;
         }
-
 
         #sendMessageUI {
             display: flex;
@@ -28,44 +26,35 @@
             gap: 10px;
         }
 
-        /*Giving credit where credit is due, thanks W3!*/
+        /* Sidebar container styling */
         .sidebar {
             height: 100%;
-            /* 100% Full-height */
             width: 0;
-            /* 0 width - change this with JavaScript */
             position: fixed;
-            /* Stay in place */
-            z-index: 1;
-            /* Stay on top */
+            z-index: 2; /* Put above main content */
             top: 0;
             left: 0;
             background-color: #111;
-            /* Black*/
             overflow-x: hidden;
-            /* Disable horizontal scroll */
             padding-top: 60px;
-            /* Place content 60px from the top */
             transition: 0.5s;
-            /* 0.5 second transition effect to slide in the sidebar */
         }
 
-        /* The sidebar links */
+        /* Sidebar links & conversation items */
         .sidebar a {
             padding: 8px 8px 8px 32px;
             text-decoration: none;
-            font-size: 25px;
+            font-size: 18px;
             color: #818181;
             display: block;
             transition: 0.3s;
         }
 
-        /* When you mouse over the navigation links, change their color */
         .sidebar a:hover {
             color: #f1f1f1;
         }
 
-        /* Position and style the close button (top right corner) */
+        /* Position and style the close button */
         .sidebar .closebtn {
             position: absolute;
             top: 0;
@@ -74,107 +63,132 @@
             margin-left: 50px;
         }
 
+        /* New Conversation Button Styling */
+        .new-conv-btn {
+            margin: 0 20px 20px 32px;
+            width: calc(100% - 52px);
+            background-color: #232323;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
+        .new-conv-btn:hover {
+            background-color: #333;
+        }
 
-        /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
         #main {
             transition: margin-left .5s;
-            /* If you want a transition effect */
             padding: 20px;
         }
 
-        /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
         @media screen and (max-height: 450px) {
-            .sidebar {
-                padding-top: 15px;
-            }
-
-            .sidebar a {
-                font-size: 18px;
-            }
+            .sidebar { padding-top: 15px; }
+            .sidebar a { font-size: 16px; }
         }
 
         #openBttn {
-            position: absolute;
-            top: 10;
-            left: 10;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
         }
     </style>
     <title>AI on a Student Budget</title>
 </head>
 
-
 <body>
+    <div id="sideBar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <button class="new-conv-btn" onclick="createNewConversation()">+ New Conversation</button>
+        <hr style="border-color: #222; margin: 0 0 15px 0;"/>
+        <div id="conversationsList">
+            </div>
+    </div>
+
     <header>
         <h1 id="title">AI on a Student Budget</h1>
         <hr />
     </header>
-    <main class="container">
-         <button id="login">Login</button>
-        <div id="main">
-            <button onclick="openNav()">&#9776;</button>
-            <div class="sidebar">
-                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-                <button class="new-conv-btn" onclick="createNewConversation()">+ New Conversation</button>
-                <hr style="border-color: #222; margin: 0 0 15px 0;" />
-                <div id="conversationsList">
 
-                </div>
-            </div>
-            <div id="mainChat">
-            </div>
+    <main class="container">
+        <div id="main">
+            <button id="openBttn" onclick="openNav()">&#9776;</button>
+            
+            <div id="mainChat"></div>
+            
             <div id="UIBar">
                 <div id="sendMessageUI">
                     <button id="sendButton">Send</button>
-                    <input id="textEnter" />
+                    <input id="textEnter" placeholder="Type a message..." />
                 </div>
             </div>
+            <button id="login" style="margin-top: 20px;">Login</button>
+        </div>
     </main>
+
 </body>
+
 <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
 <script type="module">
     import * as FirebaseUtils from './firebaseUtils.js';
 
-
+    // Global accessibility adjustments
+    window.openNav = openNav;
+    window.closeNav = closeNav;
+    window.createNewConversation = createNewConversation;
 
     async function init() {
         const data = await FirebaseUtils.isSignedIn()
 
-        // 1. If the user isn't signed in at all, send them back to login
         if (!data) {
             window.location.href = "https://codeknight1119.github.io/freeAI/"
-            return; // Stop execution here
+            return; 
         }
 
-        // 2. Fetch the allowed users list
         const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
 
-        // 3. Fix the variable name here (changed userData to allowedUsers)
         if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
             window.location.href = "https://codeknight1119.github.io/freeAI/"
         }
     }
     init()
 
-
     let convs = new Map()
 
     async function getConversations() {
         const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" })
-        if (convData.length !== 0) {
+        const container = document.getElementById("conversationsList");
+        container.innerHTML = ""; // Reset old content
 
+        if (convData && convData.length !== 0) {
+            convData.forEach((val) => {
+                convs.set(val.id, val);
+                
+                // Construct a custom anchor for every chat history entry
+                let convLink = document.createElement("a");
+                convLink.href = "javascript:void(0)";
+                // Fallback to snippet ID parsing if there is no set title string
+                convLink.innerText = val.title || "Chat " + val.id.substring(0, 6);
+                convLink.onclick = () => loadConversation(val.id);
+                
+                container.appendChild(convLink);
+            });
         } else {
-
+            let emptyNotice = document.createElement("p");
+            emptyNotice.style = "color: #555; padding-left: 32px; font-size: 14px;";
+            emptyNotice.innerText = "No historical chats found.";
+            container.appendChild(emptyNotice);
         }
     }
     getConversations()
 
-
-
     const textIn = document.getElementById("textEnter")
     const messageArea = document.getElementById("mainChat")
     document.getElementById("sendButton").addEventListener("click", queryModel)
-
 
     let sysPrompt = ""
     let isReady = false;
@@ -190,14 +204,8 @@
         getMessages()
     }
 
-
-
-
-
-
     let messages = []
     async function getMessages() {
-        //under collection messages with a limit of 50
         const messageData = await FirebaseUtils.getDocuments("/messages", 50)
         if (messageData && messageData.length !== 0) {
             messageData.forEach((val) => {
@@ -210,10 +218,7 @@
         isReady = true
     }
 
-
     getSysPrompt()
-
-
 
     async function queryModel() {
         if (!isReady) {
@@ -222,6 +227,8 @@
         }
         try {
             const query = textIn.value
+            if(!query.trim()) return; // Stop empty strings
+            
             textIn.value = ""
             let userMessageElement = document.createElement("p")
             userMessageElement.innerHTML = "<strong>USER:</strong> " + query
@@ -230,20 +237,13 @@
             messages.push(userMessage)
             FirebaseUtils.addDocument("/messages/", userMessage)
 
-
-
-
             const GAS_LINK = "https://script.google.com/macros/s/AKfycbxkvaF-sl0n20SOZFIWw8vsutZBo-DLKOmdFiLC_O5J7Tt0Xjs0xLwWxI_N4XsTuId6/exec"
             const data = await fetch(GAS_LINK, {
                 method: "POST",
                 body: JSON.stringify({ "messages": messages }),
-
-
             })
             const recive = await data.json()
-            console.log("Raw Output: ", recive)
             const recivedMessage = recive.choices[0].message.content
-
 
             let aiMessageElement = document.createElement("p")
             aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
@@ -257,17 +257,27 @@
     }
 
     function openNav() {
-        document.getElementById("sidebar").style.width = "250px";
+        document.getElementById("sideBar").style.width = "250px";
         document.getElementById("main").style.marginLeft = "250px";
     }
 
-    /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
     function closeNav() {
-        document.getElementById("sidebar").style.width = "0";
+        document.getElementById("sideBar").style.width = "0";
         document.getElementById("main").style.marginLeft = "0";
     }
 
-</script>
+    function createNewConversation() {
+        messageArea.innerHTML = "";
+        messages = [{ "role": "system", "content": sysPrompt }];
+        closeNav();
+        console.log("Started a clean presentation window context.");
+    }
 
+    function loadConversation(id) {
+        console.log("Request details for Document Entry: " + id);
+        // Add database fetch routine matching conversation architecture here
+        closeNav();
+    }
+</script>
 
 </html>

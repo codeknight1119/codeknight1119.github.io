@@ -229,7 +229,6 @@
 
             if (currentConversationId === null) {
                 const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() });
-                console.log(newConv)
                 currentConversationId = newConv.id;
                 // PATCH: Pass the query string directly so it can create a title summary immediately
                 setUpConv(currentConversationId, query);
@@ -250,6 +249,7 @@
             };
 
             const receive = await queryGas(body);
+            console.log(receive)
             const receivedMessage = receive.choices[0].message.content;
 
             let aiMessageElement = document.createElement("p");
@@ -335,7 +335,7 @@
             const titleText = (data && data.summary_text) ? data.summary_text : firstPromptText.substring(0, 20) + "...";
 
             // Save title directly back to the document root reference
-            await FirebaseUtils.setDoc(`/conversations/${id}`, { title: titleText }, { merge: true });
+            await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             getConversations(); // Refresh history sidebar UI
         } catch (err) {
             console.error("Failed to generate custom title summary: ", err);

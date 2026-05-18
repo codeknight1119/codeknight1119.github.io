@@ -243,12 +243,7 @@
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
-            const body = {
-                model: "katanemo/Arch-Router-1.5B:hf-inference",
-                params: JSON.stringify({ messages: messages })
-            };
-
-            const receive = await queryGas(body);
+            const receive = await queryGas("conversation", {params: JSON.stringify({ messages: messages })});
             console.log(receive)
             const receivedMessage = receive.choices[0].message.content;
 
@@ -320,7 +315,7 @@
     async function setUpConv(id, firstPromptText) {
         try {
             const body = {
-                model: "facebook/bart-large-cnn",
+                task : "convName",
                 params: {
                     inputs: firstPromptText,
                     parameters: {
@@ -342,11 +337,11 @@
         }
     }
 
-    async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbwrNUI0YSFW8_-LhtQsnWPDQ7QmLiHpQduKbR5XPvXi29nyTAbYja5yFgV2HVCDRAOT/exec"
+    async function queryGas(task, body) {
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbyA1CM14c3jZkeT-Ugx8s86759Dikgvbts8KoWnJdAw6-iCFaoA0VfrZa0VRtQ5-67N/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
-            body: JSON.stringify(body),
+            body: {task: task, params: body},
         });
         const receive = await data.json();
         return receive;

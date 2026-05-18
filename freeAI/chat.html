@@ -31,7 +31,8 @@
             height: 100%;
             width: 0;
             position: fixed;
-            z-index: 2; /* Put above main content */
+            z-index: 2;
+            /* Put above main content */
             top: 0;
             left: 0;
             background-color: #111;
@@ -85,8 +86,13 @@
         }
 
         @media screen and (max-height: 450px) {
-            .sidebar { padding-top: 15px; }
-            .sidebar a { font-size: 16px; }
+            .sidebar {
+                padding-top: 15px;
+            }
+
+            .sidebar a {
+                font-size: 16px;
+            }
         }
 
         #openBttn {
@@ -101,14 +107,6 @@
 </head>
 
 <body>
-    <div id="sideBar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <button class="new-conv-btn" onclick="createNewConversation()">+ New Conversation</button>
-        <hr style="border-color: #222; margin: 0 0 15px 0;"/>
-        <div id="conversationsList">
-            </div>
-    </div>
-
     <header>
         <h1 id="title">AI on a Student Budget</h1>
         <hr />
@@ -116,10 +114,17 @@
 
     <main class="container">
         <div id="main">
-            <button id="openBttn" onclick="openNav()">&#9776;</button>
-            
+            <div id="sideBar" class="sidebar">
+                <a href="javascript:void(0)" id="closeBttn" class="closebtn">&times;</a>
+                <button id="newConvBttn" class="new-conv-btn">+ New Conversation</button>
+                <hr style="border-color: #222; margin: 0 0 15px 0;" />
+                <div id="conversationsList"></div>
+            </div>
+
+            <button id="openBttn">&#9776;</button>
+
             <div id="mainChat"></div>
-            
+
             <div id="UIBar">
                 <div id="sendMessageUI">
                     <button id="sendButton">Send</button>
@@ -141,12 +146,16 @@
     window.closeNav = closeNav;
     window.createNewConversation = createNewConversation;
 
+    document.getElementById("openBttn").addEventListener("click", openNav);
+    document.getElementById("closeBttn").addEventListener("click", closeNav);
+    document.getElementById("newConvBttn").addEventListener("click", createNewConversation);
+
     async function init() {
         const data = await FirebaseUtils.isSignedIn()
 
         if (!data) {
             window.location.href = "https://codeknight1119.github.io/freeAI/"
-            return; 
+            return;
         }
 
         const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
@@ -167,14 +176,14 @@
         if (convData && convData.length !== 0) {
             convData.forEach((val) => {
                 convs.set(val.id, val);
-                
+
                 // Construct a custom anchor for every chat history entry
                 let convLink = document.createElement("a");
                 convLink.href = "javascript:void(0)";
                 // Fallback to snippet ID parsing if there is no set title string
                 convLink.innerText = val.title || "Chat " + val.id.substring(0, 6);
                 convLink.onclick = () => loadConversation(val.id);
-                
+
                 container.appendChild(convLink);
             });
         } else {
@@ -227,8 +236,8 @@
         }
         try {
             const query = textIn.value
-            if(!query.trim()) return; // Stop empty strings
-            
+            if (!query.trim()) return; // Stop empty strings
+
             textIn.value = ""
             let userMessageElement = document.createElement("p")
             userMessageElement.innerHTML = "<strong>USER:</strong> " + query

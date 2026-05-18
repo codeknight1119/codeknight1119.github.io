@@ -243,7 +243,7 @@
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
-            const receive = await queryGas("conversation", {params: JSON.stringify({ messages: messages })});
+            const receive = await queryGas("conversation", { params: JSON.stringify({ messages: messages }) });
             console.log(receive)
             const receivedMessage = receive.choices[0].message.content;
 
@@ -314,18 +314,16 @@
     // PATCH: Rewritten to process incoming prompt text and save summary back to Firestore
     async function setUpConv(id, firstPromptText) {
         try {
-            const body = {
-                task : "convName",
-                params: {
-                    inputs: firstPromptText,
-                    parameters: {
-                        max_length: 25,
-                        min_length: 5,
-                        do_sample: false
-                    }
+            const params = {
+                inputs: firstPromptText,
+                parameters: {
+                    max_length: 25,
+                    min_length: 5,
+                    do_sample: false
                 }
             };
-            const data = await queryGas(body);
+            const data = await queryGas("convName", params);
+            console.log(data)
             // Assuming your endpoint outputs summary_text or similar properties
             const titleText = (data && data.summary_text) ? data.summary_text : firstPromptText.substring(0, 20) + "...";
 
@@ -338,10 +336,10 @@
     }
 
     async function queryGas(task, body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbyA1CM14c3jZkeT-Ugx8s86759Dikgvbts8KoWnJdAw6-iCFaoA0VfrZa0VRtQ5-67N/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycby9mBPpT3TZxinWKr3Y3CFwYjGTN5-ijldfS1ZK2flQfxI1m90DQvyGNkeiWbTlBk2i/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
-            body: {task: task, params: body},
+            body: JSON.parse({ task: task, params: body }),
         });
         const receive = await data.json();
         return receive;

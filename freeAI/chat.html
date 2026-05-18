@@ -243,7 +243,7 @@
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
-            const receive = await queryGas("conversation", { params: JSON.stringify({ messages: messages }) });
+            const receive = await queryGas("conversation", { params: { messages: messages } });
             console.log(receive)
             const receivedMessage = receive.choices[0].message.content;
 
@@ -336,10 +336,10 @@
     }
 
     async function queryGas(task, body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycby9mBPpT3TZxinWKr3Y3CFwYjGTN5-ijldfS1ZK2flQfxI1m90DQvyGNkeiWbTlBk2i/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbzTsTTE1g1AxY-L3SH4GwYx_T-lRdjlZJsBxdgDjTHuO22hzsdAXT7QhknzafElQ4Y2/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
-            body: JSON.parse({ task: task, params: body }),
+            body: JSON.stringify({ task: task, params: body }),
         });
         const receive = await data.json();
         return receive;

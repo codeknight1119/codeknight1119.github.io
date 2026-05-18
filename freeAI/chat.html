@@ -229,7 +229,8 @@
 
             if (currentConversationId === null) {
                 const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() });
-                currentConversationId = await newConv.id;
+                console.log(newConv)
+                currentConversationId = newConv.id;
                 // PATCH: Pass the query string directly so it can create a title summary immediately
                 setUpConv(currentConversationId, query);
             }

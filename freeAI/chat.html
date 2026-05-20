@@ -319,7 +319,7 @@
                 {"role": "user", "content": firstPromptText}
             ]
 
-            const data = await queryGas(params);
+            const data = await queryGas({"messages": params});
             console.log(data)
             // Assuming your endpoint outputs summary_text or similar properties
             const titleText = data.choices[0].message.content;

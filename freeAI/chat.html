@@ -109,10 +109,11 @@
 
 <body>
     <header>
+        <button id="openBttn">&#9776;</button>
         <h1 id="title">AI on a Student Budget</h1>
         <hr />
     </header>
-    <button id="openBttn">&#9776;</button>
+    
 
     <main class="container">
         <div id="main">
@@ -336,7 +337,7 @@
     }
 
     async function queryGas(task, body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbxOTG1_umd9mZqdwE5xbc6y4uSYf8Us5vmlK1L4VKlAnE0u1v6nnatQ5pG-gsGI5dMB/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbyzqnmkAVjKlA1g7b14t8E8z5e2X9xCkcs2_bsy_xQn9-kx4pFKt8VUu7U8LVN2Mdel/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify({ task: task, params: body }),

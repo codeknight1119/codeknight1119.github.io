@@ -100,7 +100,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 10px;
+           /* padding: 10px;*/
             color: inherit;
         }
     </style>
@@ -244,7 +244,7 @@
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
-            const receive = await queryGas("conversation", { messages: messages });
+            const receive = await queryGas({ messages: messages });
             const receivedMessage = receive.choices[0].message.content;
 
             let aiMessageElement = document.createElement("p");
@@ -314,18 +314,15 @@
     // PATCH: Rewritten to process incoming prompt text and save summary back to Firestore
     async function setUpConv(id, firstPromptText) {
         try {
-            const params = {
-                inputs: firstPromptText,
-                parameters: {
-                    max_length: 25,
-                    min_length: 5,
-                    do_sample: false
-                }
-            };
-            const data = await queryGas("convName", params);
+            const params = [
+                {"role": "system", "content": "Create a name for this conversation based on the message from the user. Keep the name under 10 words."},
+                {"role": "user", "content": firstPromptText}
+            ]
+
+            const data = await queryGas(params);
             console.log(data)
             // Assuming your endpoint outputs summary_text or similar properties
-            const titleText = (data && data.summary_text) ? data.summary_text : firstPromptText.substring(0, 20) + "...";
+            const titleText = data.choices[0].message.content;
 
             // Save title directly back to the document root reference
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
@@ -335,11 +332,11 @@
         }
     }
 
-    async function queryGas(task, body) {
+    async function queryGas(body) {
         const GAS_LINK = "https://script.google.com/macros/s/AKfycbxP7iY6NmbLfCtEy4C4eRAY7OtgTvmoy_UEmPgz-JLF6hJAWEjg0VIxaVq8n4nDK-Nk/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
-            body: JSON.stringify({ task: task, params: body }),
+            body: JSON.stringify(body),
         });
         const receive = await data.json();
         return receive;

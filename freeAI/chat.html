@@ -100,7 +100,7 @@
             background: none;
             border: none;
             cursor: pointer;
-           /* padding: 10px;*/
+            /* padding: 10px;*/
             color: inherit;
         }
     </style>
@@ -113,7 +113,7 @@
         <h1 id="title">AI on a Student Budget</h1>
         <hr />
     </header>
-    
+
 
     <main class="container">
         <div id="main">
@@ -177,6 +177,13 @@
     init();
 
     const textIn = document.getElementById("textEnter");
+
+    textIn.addEventListener("keydown", (event) => {
+        if (event.code === "Enter") {
+            queryModel()
+        }
+    })
+
     const messageArea = document.getElementById("mainChat");
     document.getElementById("sendButton").addEventListener("click", queryModel);
 
@@ -315,12 +322,12 @@
     async function setUpConv(id, firstPromptText) {
         try {
             const params = [
-                {"role": "system", "content": "Create a name for this conversation based on the message from the user. Keep the name under 10 words."},
-                {"role": "user", "content": firstPromptText}
+                { "role": "system", "content": "Create a name for this conversation based on the message from the user. Keep the name under 10 words." },
+                { "role": "user", "content": firstPromptText }
             ]
 
-            const data = await queryGas({"messages": params});
-            console.log(data)
+            const data = await queryGas({ "messages": params });
+            //   console.log(data)
             // Assuming your endpoint outputs summary_text or similar properties
             const titleText = data.choices[0].message.content;
 
@@ -341,6 +348,8 @@
         const receive = await data.json();
         return receive;
     }
+
+    KeyboardEvent.
 </script>
 
 </html>

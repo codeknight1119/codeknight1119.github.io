@@ -198,6 +198,7 @@
     let shiftDown = false;
     textIn.addEventListener("keydown", (event) => {
         if (event.code === "Enter" && !event.shiftKey) {
+            event.preventDefault()
             queryModel()
         }
         if (event.code === "Enter" && event.shiftKey) {

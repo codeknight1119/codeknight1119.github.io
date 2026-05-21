@@ -197,11 +197,15 @@
     const textIn = document.getElementById("textEnter");
     let shiftDown = false;
     textIn.addEventListener("keydown", (event) => {
+
         if (event.code === "Enter" && !event.shiftKey) {
             event.preventDefault()
+
             queryModel()
         }
         if (event.code === "Enter" && event.shiftKey) {
+            event.preventDefault()
+
             const start = this.selectionStart;
             const end = this.selectionEnd;
             const currentValue = this.value;
@@ -314,12 +318,12 @@
     const msgTemplate = document.getElementById("messageTemplate")
     function renderMessage(sender, content) {
         const clone = msgTemplate.content.cloneNode(true);
-        const content = marked.parse(`**${sender.toUpperCase()}:** ` + content);
-        clone.querySelector(".messageContent").innerHTML = content
+        const messageMark = marked.parse(`**${sender.toUpperCase()}:** ` + content);
+        clone.querySelector(".messageContent").innerHTML = messageMark
         messageArea.scrollTop = messageArea.scrollHeight;
         const copyBtn = clone.querySelector('.copy');
         copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(text)
+            navigator.clipboard.writeText(messageMark)
                 .then(() => {
                     copyBtn.textContent = 'Copied!';
                     copyBtn.classList.add('copied');

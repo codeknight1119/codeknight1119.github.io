@@ -142,7 +142,7 @@
                 <template id="messageTemplate">
                     <div class="messageContent">
                     </div>
-                    <div class="actions"><button class="copy">Copy</button></div>
+                    <div class="actions"><button class="copy secondary" style="width: 50%; height: 50%;" >Copy</button></div>
                 </template>
             </div>
 
@@ -380,13 +380,7 @@
             if (history && history.length > 0) {
                 history.forEach((msg) => {
                     messages.push({ role: msg.role, content: msg.content });
-                    let msgDoc = document.createElement("p");
-                    if (msg.role === "user") {
-                        msgDoc.innerHTML = "<strong>USER:</strong> " + msg.content;
-                    } else {
-                        msgDoc.innerHTML = marked.parse("**MODEL:** " + msg.content);
-                    }
-                    messageArea.appendChild(msgDoc);
+                    renderMessage(msg.role, msg.content)
                 });
                 messageArea.scrollTop = messageArea.scrollHeight;
             }

@@ -221,6 +221,14 @@
             emptyNotice.innerText = "No conversations, try making one!";
             container.appendChild(emptyNotice);
         }
+        getLastConv()
+    }
+
+    function getLastConv() {
+        const lastConv = localStorage.getItem("lastConv")
+        if (lastConv) {
+            loadConversation(lastConv)
+        }
         isReady = true;
     }
 
@@ -288,6 +296,7 @@
 
     // PATCH: Rewritten to properly track IDs and load historic messages
     async function loadConversation(id) {
+        localStorage.setItem("lastConv", id)
         messageArea.innerHTML = "<p>Loading history...</p>";
         closeNav();
 
@@ -295,8 +304,14 @@
         messages = [{ "role": "system", "content": sysPrompt }];
 
         try {
-            // Read subcollection paths sequentially
-            const history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50);
+            let mapData = convs.get(id)
+            let history;
+            if (mapData.messages) {
+                history = mapData.messages
+            } else {
+                history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50);
+                mapData.messages = history
+            }
             messageArea.innerHTML = "";
 
             if (history && history.length > 0) {
@@ -333,6 +348,7 @@
 
             // Save title directly back to the document root reference
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
+            convs.get(id).name = titleText;
             getConversations(); // Refresh history sidebar UI
         } catch (err) {
             console.error("Failed to generate custom title summary: ", err);

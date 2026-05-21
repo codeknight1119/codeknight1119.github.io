@@ -51,6 +51,17 @@
             transition: 0.3s;
         }
 
+        .sidebar a.selected {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #000000;
+            display: block;
+            transition: 0.3s;
+            background-color: white;
+            border-radius: 8px;
+        }
+
         .sidebar a:hover {
             color: #f1f1f1;
         }
@@ -211,6 +222,9 @@
                 let convLink = document.createElement("a");
                 convLink.href = "javascript:void(0)";
                 convLink.innerText = val.title || "Chat " + val.id.substring(0, 6);
+                
+                convLink.id = val.id
+
                 convLink.onclick = () => loadConversation(val.id);
 
                 container.appendChild(convLink);
@@ -331,6 +345,15 @@
             console.error("Error reading chat history: ", e);
             messageArea.innerHTML = "<p>Could not load history.</p>";
         }
+
+        const container = document.getElementById("conversationsList");
+
+        container.children.forEach((val)=>{val.classList.remove('active')})
+
+        container.getElementById(id).classList.add("selected")
+
+
+
     }
 
     // PATCH: Rewritten to process incoming prompt text and save summary back to Firestore

@@ -346,11 +346,13 @@
             messageArea.innerHTML = "<p>Could not load history.</p>";
         }
 
+
         const container = document.getElementById("conversationsList");
 
-        Array.from(container.children).forEach((val) => { val.classList.remove('active') })
-
-        container.getElementById(id).classList.add("selected")
+        Array.from(container.children).forEach((val) => {
+            val.classList.remove('active');
+        });
+        document.getElementById(id).classList.add("active");
     }
 
     // PATCH: Rewritten to process incoming prompt text and save summary back to Firestore

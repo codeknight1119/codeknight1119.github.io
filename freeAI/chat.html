@@ -141,7 +141,7 @@
 
             <div id="UIBar">
                 <div id="sendMessageUI">
-                    <input id="textEnter" placeholder="Type a message..." />
+                    <textarea id="textEnter" placeholder="Type a message..." />
                     <button id="sendButton">Send</button>
                 </div>
             </div>
@@ -188,12 +188,27 @@
     init();
 
     const textIn = document.getElementById("textEnter");
-
+    let shiftDown = false;
     textIn.addEventListener("keydown", (event) => {
-        if (event.code === "Enter") {
+        if (event.code === "Enter" && !event.shiftKey) {
             queryModel()
         }
+        if (event.code === "Enter" && event.shiftKey) {
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            const currentValue = this.value;
+
+            // 3. Split the text and insert the newline character (\n)
+            this.value = currentValue.substring(0, start) + "\n" + currentValue.substring(end);
+
+            // 4. Put the cursor right back after the newly inserted newline
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+        if (event.code === "Shift") {
+            shiftDown = true
+        }
     })
+
 
     const messageArea = document.getElementById("mainChat");
     document.getElementById("sendButton").addEventListener("click", queryModel);

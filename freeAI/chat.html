@@ -51,7 +51,7 @@
             transition: 0.3s;
         }
 
-        .sidebar a.selected {
+        .sidebar a.active {
             padding: 8px 8px 8px 32px;
             text-decoration: none;
             font-size: 18px;
@@ -352,7 +352,7 @@
         Array.from(container.children).forEach((val) => {
             val.classList.remove('active');
         });
-        
+
         document.getElementById(id).classList.add("active");
     }
 

@@ -374,6 +374,7 @@
                 history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50);
                 mapData.messages = history
             }
+            history = history.toReversed()
             messageArea.innerHTML = "";
 
             if (history && history.length > 0) {

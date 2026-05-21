@@ -137,7 +137,14 @@
 
 
 
-            <div id="mainChat"></div>
+            <div id="mainChat">
+
+                <template id="messageTemplate">
+                    <div class="messageContent">
+                    </div>
+                    <div class="actions"><button class="copy">Copy</button></div>
+                </template>
+            </div>
 
             <div id="UIBar">
                 <div id="sendMessageUI">
@@ -280,9 +287,7 @@
             }
 
             textIn.value = "";
-            let userMessageElement = document.createElement("p");
-            userMessageElement.innerHTML = "<strong>USER:</strong> " + query;
-            messageArea.appendChild(userMessageElement);
+            renderMessage("user", query)
 
             const userMessage = { "role": "user", "content": query };
             messages.push(userMessage);
@@ -291,19 +296,42 @@
             const receive = await queryGas({ messages: messages });
             const receivedMessage = receive.choices[0].message.content;
 
-            let aiMessageElement = document.createElement("p");
-            aiMessageElement.innerHTML = marked.parse("**MODEL:** " + receivedMessage);
+
+            renderMessage("model", receivedMessage)
 
             const aiMessage = { "role": "assistant", "content": receivedMessage };
             messages.push(aiMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, aiMessage);
-            messageArea.appendChild(aiMessageElement);
 
             // Auto-scroll chat area
             messageArea.scrollTop = messageArea.scrollHeight;
         } catch (e) {
             console.error(e);
         }
+    }
+
+    const msgTemplate = document.getElementById("messageTemplate")
+    function renderMessage(sender, content) {
+        const clone = msgTemplate.content.cloneNode(true);
+        const content = marked.parse(`**${sender.toUpperCase()}:** ` + content);
+        clone.querySelector(".messageContent").innerHTML = content
+        messageArea.scrollTop = messageArea.scrollHeight;
+        const copyBtn = clone.querySelector('.copy');
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+        });
+        messageArea.appendChild(clone)
     }
 
     function openNav() {

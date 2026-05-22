@@ -51,7 +51,7 @@
         if (data) {
             const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers")
             if (allowedUsers.users.includes(data.uid)) {
-                window.location.href = "https://codeknight1119.github.io/freeAI/chat.html"
+                window.location.href = "https://codeknight1119.github.io/freeAI/s3/chat.html"
             }
         }
     }

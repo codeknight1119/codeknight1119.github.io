@@ -130,7 +130,7 @@
         <div id="main">
             <div id="sideBar" class="sidebar">
                 <a href="javascript:void(0)" id="closeBttn" class="closebtn">&times;</a>
-                <button id="logout" style="margin-top: 20px;">Logout</button>
+                <button id="logout" style="margin-top: 20px;" class="new-conv-btn">Logout</button>
                 <hr style="border-color: #222; margin: 0 0 15px 0;" />
                 <button id="newConvBttn" class="new-conv-btn">+ New Conversation</button>
                 <hr style="border-color: #222; margin: 0 0 15px 0;" />
@@ -406,7 +406,7 @@
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbzoR4BT4ImTcLJFKd1jnGZECRxe_eMmpyjhnPFyUbb6-dYnv10_th6sAntOKzDNWQ4u/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycby4JG65rY2gpeYIfZ4O7fT2vw9CRiajMgkin4-44c6fOp3GO3-USZbybpg2CVGAuZGW/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),

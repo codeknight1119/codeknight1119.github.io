@@ -398,7 +398,7 @@
 
             // Save title directly back to the document root reference
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
-            convs.get(id).name = titleText;
+            convs.get(id)["name"] = titleText;
             getConversations(); // Refresh history sidebar UI
         } catch (err) {
             console.error("Failed to generate custom title summary: ", err);

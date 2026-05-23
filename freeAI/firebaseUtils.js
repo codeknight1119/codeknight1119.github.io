@@ -33,9 +33,6 @@ export const loginGoogle = async () => {
     }
 };
 
-export const logout = function(){
-    signOut()
-}
 
 export const setDocument = async (path, data) => {
     try {

@@ -243,13 +243,13 @@
         getLastConv()
     }
 
-    function getLastConv() {
-        const lastConv = localStorage.getItem("lastConv")
-        if (lastConv) {
-            loadConversation(lastConv)
-        }
-        isReady = true;
+function getLastConv() {
+    const lastConvId = localStorage.getItem("lastConv");
+    if (lastConvId && convs.has(lastConvId)) {
+        loadConversation(convs.get(lastConvId));
     }
+    isReady = true;
+}
 
     getConversations();
 
@@ -424,10 +424,11 @@
     document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${id}`, { sysPrompt: newSysPrompt })
-        this.innerText = "Saved!"
+        const btn = event.currentTarget;
+        btn.innerText = "Saved!"
         setTimeout(()=>{
-            this.innerText = "Save"
-        }, 200)
+            btn.innerText = "Save"
+        }, 1000)
     })
 </script>
 

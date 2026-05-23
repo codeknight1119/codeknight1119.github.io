@@ -156,6 +156,7 @@
                 <details name="systemPrompt">
                     <summary>System Prompt</summary>
                     <textArea id="currentSysPrompt"></textArea>
+                    <button id="saveCurrentSysPrompt">Save</button>
                 </details>
             </div>
         </div>
@@ -423,9 +424,9 @@
     document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${id}`, { sysPrompt: newSysPrompt })
-        this.value = "Saved!"
+        this.innerText = "Saved!"
         setTimeout(()=>{
-            this.value = "Save"
+            this.innerText = "Save"
         }, 200)
     })
 </script>

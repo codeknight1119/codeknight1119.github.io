@@ -153,6 +153,10 @@
                     <textarea id="textEnter" placeholder="Type a message..."></textarea>
                     <button id="sendButton">Send</button>
                 </div>
+                <details name="systemPrompt">
+                    <summary>System Prompt</summary>
+                    <textArea id="currentSysPrompt"></textArea>
+                </details>
             </div>
         </div>
     </main>
@@ -202,24 +206,13 @@
             event.preventDefault()
 
             queryModel()
-        }                
+        }
     })
 
 
     const messageArea = document.getElementById("mainChat");
     document.getElementById("sendButton").addEventListener("click", queryModel);
 
-    async function getSysPrompt() {
-        try {
-            const data = await FirebaseUtils.getDocument("/system/systemPrompt");
-            sysPrompt = data.prompt || "You are an AI to help a user with daily tasks.";
-        } catch (e) {
-            sysPrompt = "You are an AI to help a user with daily tasks.";
-            await FirebaseUtils.setDoc("/system/systemPrompt", { prompt: sysPrompt });
-        }
-        messages.push({ "role": "system", "content": sysPrompt });
-        getConversations();
-    }
 
     async function getConversations() {
         const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" });
@@ -236,7 +229,7 @@
 
                 convLink.id = val.id
 
-                convLink.onclick = () => loadConversation(val.id);
+                convLink.onclick = () => loadConversation(val);
 
                 container.appendChild(convLink);
             });
@@ -257,7 +250,7 @@
         isReady = true;
     }
 
-    getSysPrompt();
+    getConversations();
 
     async function queryModel() {
         if (!isReady) {
@@ -271,7 +264,7 @@
             if (currentConversationId === null) {
                 const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() });
                 currentConversationId = newConv.id;
-                
+
                 setUpConv(currentConversationId, query);
             }
 
@@ -340,14 +333,20 @@
         closeNav();
     }
 
-    // PATCH: Rewritten to properly track IDs and load historic messages
-    async function loadConversation(id) {
+    async function loadConversation(conv) {
+        const id = conv.id
         localStorage.setItem("lastConv", id)
         messageArea.innerHTML = "<p>Loading history...</p>";
         closeNav();
 
         currentConversationId = id;
-        messages = [{ "role": "system", "content": sysPrompt }];
+        let systemPrompt = conv.sysPrompt
+        if (!systemPrompt) {
+            sysPrompt = "You are an AI to help a user with daily tasks.";
+            FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt })
+        }
+        messages = [{ "role": "system", "content": systemPrompt }];
+        document.getElementById("currentSysPrompt").value = systemPrompt
 
         try {
             let mapData = convs.get(id)
@@ -400,6 +399,7 @@
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             convs.get(id)["name"] = titleText;
             getConversations(); // Refresh history sidebar UI
+            await FirebaseUtils.setDocument(`/conversations/${id}`, { role: "system", content: "" })
         } catch (err) {
             console.error("Failed to generate custom title summary: ", err);
         }
@@ -420,6 +420,14 @@
         window.location.href = "https://codeknight1119.github.io/freeAI/s3";
     })
 
+    document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
+        const newSysPrompt = document.getElementById("currentSysPrompt").value
+        await FirebaseUtils.setDocument(`/conversations/${id}`, { sysPrompt: newSysPrompt })
+        this.value = "Saved!"
+        setTimeout(()=>{
+            this.value = "Save"
+        }, 200)
+    })
 </script>
 
 </html>

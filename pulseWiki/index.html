@@ -308,6 +308,79 @@
             content: " ";
             white-space: pre-wrap;
         }
+
+        /* Parent Container */
+        .sortable-list-wrapper {
+            border: 2px dashed #ddd;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .sortable-list-controls {
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .sortable-list-controls button {
+            cursor: pointer;
+            padding: 4px 8px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Children Items */
+        .sortable-item-wrapper {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin: 6px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .sortable-item-handle {
+            cursor: grab;
+            padding: 0 10px;
+            color: #aaa;
+            user-select: none;
+        }
+
+        .sortable-item-handle:active {
+            cursor: grabbing;
+        }
+
+        .sortable-item-content {
+            flex-grow: 1;
+        }
+
+        /* --- Toggle State Logic via CSS --- */
+
+        /* When in Viewing Mode: Hide handles and freeze editing */
+        .sortable-list-wrapper.is-viewing {
+            border-style: solid;
+            border-color: #eee;
+            background: transparent;
+        }
+
+        .sortable-list-wrapper.is-viewing .sortable-item-handle {
+            display: none;
+            /* Hide drag handles */
+        }
+
+        .sortable-list-wrapper.is-viewing .sortable-item-wrapper {
+            border: none;
+            margin: 0;
+            padding: 4px 0;
+        }
+
+        .sortable-list-wrapper.is-viewing .sortable-item-content {
+            pointer-events: none;
+            /* Safely prevents text modification without destroying the DOM */
+        }
     </style>
     <link rel="icon" type="image/png" href="resources/pulseSymbol.png" />
 </head>
@@ -344,90 +417,8 @@
         import * as FirebaseUtils from "./firebaseUtils.js"
         import { Editor, Node, mergeAttributes, nodeInputRule, InputRule } from 'https://esm.sh/@tiptap/core';
         import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+        import * as TiptapAddons from "./tiptapAddons.js"
 
-        const WikiLink = Node.create({
-            name: 'wikiLink',
-            group: 'inline',
-            inline: true,
-            selectable: true,
-            // atom: true,
-
-            addAttributes() {
-                return {
-                    slug: {
-                        default: null,
-                        // This parses the slug back out when loading saved HTML
-                        parseHTML: element => element.getAttribute('data-slug'),
-                        renderHTML: attributes => ({
-                            'data-slug': attributes.slug,
-                        }),
-                    },
-                }
-            },
-
-            parseHTML() {
-                return [{ tag: 'a[data-slug]' }]
-            },
-
-            renderHTML({ node, HTMLAttributes }) {
-                const slug = node.attrs.slug;
-                // Basic encoding for the slug to safely pass into the string
-                const encodedSlug = encodeURIComponent(slug);
-
-                return [
-                    'a',
-                    {
-                        ...HTMLAttributes,
-                        class: 'clickable wiki-link',
-                        //                        href: 'javascript:void(0)', // Cleaner than '#' for SPAs
-
-                        onclick: `window.renderPage('${encodedSlug}'); return false;`,
-                    },
-                    slug,
-                ]
-            },
-
-            addInputRules() {
-                return [
-                    new InputRule({
-                        find: /\[\[(.+?)\]\]$/,
-                        handler: ({ state, range, match }) => {
-                            const { tr } = state;
-                            const start = range.from;
-                            const end = range.to;
-                            const slug = match[1].trim();
-
-                            if (slug) {
-                                // This explicitly replaces the entire range (brackets included) 
-                                // with your custom node
-                                tr.replaceWith(
-                                    start,
-                                    end,
-                                    this.type.create({ slug })
-                                );
-                            }
-                        },
-                    }),
-                ]
-            },
-        })
-
-        /*
-                const editor = new Editor({
-                    element: document.querySelector('#main-container'),
-                    extensions: [
-                        StarterKit,
-                        WikiLink
-                    ],
-                    content: '<p>Hello Wiki! Start typing...</p>',
-                    // This makes the editor feel like a writing space
-                    editorProps: {
-                        attributes: {
-                            class: 'wiki-editor-styles',
-                        },
-                    },
-                    editable: false
-                });*/
 
         // 1. GLOBALS
         let sitePages = {};
@@ -492,7 +483,7 @@
             mainContainer.appendChild(sectionWrapper);
             const sectionEditor = new Editor({
                 element: sectionWrapper,
-                extensions: [StarterKit, WikiLink],
+                extensions: [StarterKit, TiptapAddons.SortableItem, TiptapAddons.WikiLink, TiptapAddons.SortableList],
                 //   content: marked.parse(processWikiLinks(content)),
                 editable: isAdmin, // Only editable if admin
                 editorProps: {

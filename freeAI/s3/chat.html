@@ -342,7 +342,8 @@
         closeNav();
 
         currentConversationId = id;
-        let systemPrompt = conv.sysPrompt
+        let systemPrompt = sysPrompt = conv.sysPrompt
+        
         if (!systemPrompt) {
             sysPrompt = systemPrompt = "You are an AI to help a user with daily tasks.";
             FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt })
@@ -423,11 +424,14 @@
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
         const currentConvData = convs.get(currentConversationId)
-        console.log(currentConvData)
-        const systemDoc = currentConvData.messages.find(item => item.role === "system")
-        systemDoc.content = newSysPrompt
-console.log(convs.get(currentConversationId))
-        const btn = event.currentTarget;
+        if (!currentConvData) {
+            sysPrompt = newSysPrompt
+        } else {
+            const systemDoc = currentConvData.messages.find(item => item.role === "system")
+            systemDoc.content = newSysPrompt
+            console.log(convs.get(currentConversationId))
+            const btn = event.currentTarget;
+        }
         btn.innerText = "Saved!"
         setTimeout(() => {
             btn.innerText = "Save"

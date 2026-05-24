@@ -179,6 +179,7 @@
     document.getElementById("newConvBttn").addEventListener("click", createNewConversation);
 
     // Variables section
+    let defaultSysPrompt = "You are an AI to help a user with daily tasks."
     let sysPrompt = "";
     let isReady = false;
     let currentConversationId = null;
@@ -330,7 +331,7 @@
 
     function createNewConversation() {
         messageArea.innerHTML = "";
-        sysPrompt = "You are an AI to help a user with daily tasks."
+        sysPrompt = defaultSysPrompt
         document.getElementById("currentSysPrompt").value = sysPrompt
         messages = [{ "role": "system", "content": sysPrompt }];
         currentConversationId = null; // Clean slate state
@@ -348,7 +349,7 @@
         let systemPrompt = sysPrompt = conv.sysPrompt
 
         if (!systemPrompt) {
-            sysPrompt = systemPrompt = "You are an AI to help a user with daily tasks.";
+            sysPrompt = systemPrompt = defaultSysPrompt;
             FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt })
         }
         messages = [{ "role": "system", "content": systemPrompt }];

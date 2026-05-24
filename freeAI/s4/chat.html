@@ -331,6 +331,7 @@
     function createNewConversation() {
         messageArea.innerHTML = "";
         sysPrompt = "You are an AI to help a user with daily tasks."
+        document.getElementById("currentSysPrompt").value = sysPrompt
         messages = [{ "role": "system", "content": sysPrompt }];
         currentConversationId = null; // Clean slate state
 

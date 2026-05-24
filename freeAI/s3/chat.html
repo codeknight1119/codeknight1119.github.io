@@ -273,7 +273,7 @@
             textIn.value = "";
             renderMessage("user", query)
 
-            const userMessage = { "role": "user", "content": query, "timestamp": Date.now()};
+            const userMessage = { "role": "user", "content": query, "timestamp": Date.now() };
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
@@ -283,7 +283,7 @@
 
             renderMessage("model", receivedMessage)
 
-            const aiMessage = { "role": "assistant", "content": receivedMessage, "timestamp": Date.now()}
+            const aiMessage = { "role": "assistant", "content": receivedMessage, "timestamp": Date.now() }
             messages.push(aiMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, aiMessage);
 
@@ -396,7 +396,7 @@
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             const convData = convs.get(id)
-            convData.title = titleText; 
+            convData.title = titleText;
             getConversations();
 
         } catch (err) {
@@ -422,6 +422,10 @@
     document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
+        const currentConvData = convs.get(currentConversationId)
+        const systemDoc = currentConvData.messages.find(item => item.role === "system")
+        systemDoc.content = newSysPrompt
+console.log(convs.get(currentConvData))
         const btn = event.currentTarget;
         btn.innerText = "Saved!"
         setTimeout(() => {

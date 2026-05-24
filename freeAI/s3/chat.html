@@ -423,6 +423,7 @@
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
         const currentConvData = convs.get(currentConversationId)
+        console.log(currentConvData)
         const systemDoc = currentConvData.messages.find(item => item.role === "system")
         systemDoc.content = newSysPrompt
 console.log(convs.get(currentConversationId))

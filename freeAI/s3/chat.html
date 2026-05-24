@@ -243,13 +243,13 @@
         getLastConv()
     }
 
-function getLastConv() {
-    const lastConvId = localStorage.getItem("lastConv");
-    if (lastConvId && convs.has(lastConvId)) {
-        loadConversation(convs.get(lastConvId));
+    function getLastConv() {
+        const lastConvId = localStorage.getItem("lastConv");
+        if (lastConvId && convs.has(lastConvId)) {
+            loadConversation(convs.get(lastConvId));
+        }
+        isReady = true;
     }
-    isReady = true;
-}
 
     getConversations();
 
@@ -343,7 +343,7 @@ function getLastConv() {
         currentConversationId = id;
         let systemPrompt = conv.sysPrompt
         if (!systemPrompt) {
-            sysPrompt = "You are an AI to help a user with daily tasks.";
+            sysPrompt = systemPrompt = "You are an AI to help a user with daily tasks.";
             FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt })
         }
         messages = [{ "role": "system", "content": systemPrompt }];
@@ -358,7 +358,7 @@ function getLastConv() {
                 history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50);
                 mapData.messages = history
             }
-            history = history.toReversed()
+            //  history = history.toReversed()
             messageArea.innerHTML = "";
 
             if (history && history.length > 0) {
@@ -383,24 +383,20 @@ function getLastConv() {
         document.getElementById(id).classList.add("active");
     }
 
-    // PATCH: Rewritten to process incoming prompt text and save summary back to Firestore
     async function setUpConv(id, firstPromptText) {
         try {
             const params = [
                 { "role": "system", "content": "Create a name for this conversation based on the message from the user. Keep the name under 10 words." },
                 { "role": "user", "content": firstPromptText }
-            ]
+            ];
 
             const data = await queryGas({ "messages": params });
-            //   console.log(data)
-            // Assuming your endpoint outputs summary_text or similar properties
             const titleText = data.choices[0].message.content;
 
-            // Save title directly back to the document root reference
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
-            convs.get(id)["name"] = titleText;
-            getConversations(); // Refresh history sidebar UI
-            await FirebaseUtils.setDocument(`/conversations/${id}`, { role: "system", content: "" })
+            convs.get(id)["title"] = titleText; 
+            getConversations();
+
         } catch (err) {
             console.error("Failed to generate custom title summary: ", err);
         }
@@ -423,10 +419,10 @@ function getLastConv() {
 
     document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value
-        await FirebaseUtils.setDocument(`/conversations/${id}`, { sysPrompt: newSysPrompt })
+        await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
         const btn = event.currentTarget;
         btn.innerText = "Saved!"
-        setTimeout(()=>{
+        setTimeout(() => {
             btn.innerText = "Save"
         }, 1000)
     })

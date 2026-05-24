@@ -420,7 +420,8 @@
         window.location.href = "https://codeknight1119.github.io/freeAI/s3";
     })
 
-    document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
+    const saveButton = document.getElementById("saveCurrentSysPrompt")
+    saveButton.addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
         const currentConvData = convs.get(currentConversationId)
@@ -432,9 +433,9 @@
             console.log(convs.get(currentConversationId))   
         }
         
-        document.getElementById("saveCurrentSysPrompt").innerText = "Saved!"
+        saveButton.innerText = "Saved!"
         setTimeout(() => {
-            btn.innerText = "Save"
+            saveButton.innerText = "Save"
         }, 1000)
     })
 </script>

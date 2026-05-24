@@ -394,7 +394,8 @@
             const titleText = data.choices[0].message.content;
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
-            convs.get(id)["title"] = titleText; 
+            const convData = convs.get(id)
+            convData.title = titleText; 
             getConversations();
 
         } catch (err) {

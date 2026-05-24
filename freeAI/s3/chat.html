@@ -425,7 +425,7 @@
         const currentConvData = convs.get(currentConversationId)
         const systemDoc = currentConvData.messages.find(item => item.role === "system")
         systemDoc.content = newSysPrompt
-console.log(convs.get(currentConvData))
+console.log(convs.get(currentConversationId))
         const btn = event.currentTarget;
         btn.innerText = "Saved!"
         setTimeout(() => {

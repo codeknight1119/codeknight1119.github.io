@@ -272,7 +272,7 @@
             textIn.value = "";
             renderMessage("user", query)
 
-            const userMessage = { "role": "user", "content": query };
+            const userMessage = { "role": "user", "content": query, "timestamp": Date.now()};
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
 
@@ -282,7 +282,7 @@
 
             renderMessage("model", receivedMessage)
 
-            const aiMessage = { "role": "assistant", "content": receivedMessage };
+            const aiMessage = { "role": "assistant", "content": receivedMessage, "timestamp": Date.now()}
             messages.push(aiMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, aiMessage);
 
@@ -355,7 +355,7 @@
             if (mapData.messages) {
                 history = mapData.messages
             } else {
-                history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50);
+                history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50, { field: "timestamp", direction: "asc" });
                 mapData.messages = history
             }
             //  history = history.toReversed()
@@ -372,7 +372,7 @@
             console.error("Error reading chat history: ", e);
             messageArea.innerHTML = "<p>Could not load history.</p>";
         }
-
+ƒ
 
         const container = document.getElementById("conversationsList");
 

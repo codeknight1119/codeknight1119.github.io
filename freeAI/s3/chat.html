@@ -343,7 +343,7 @@
 
         currentConversationId = id;
         let systemPrompt = sysPrompt = conv.sysPrompt
-        
+
         if (!systemPrompt) {
             sysPrompt = systemPrompt = "You are an AI to help a user with daily tasks.";
             FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt })
@@ -397,7 +397,11 @@
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             const convData = convs.get(id)
-            convData.title = titleText;
+            if (!convData) {
+                convData.set(id, { title: titleText })
+            } else {
+                convData.title = titleText;
+            }
             getConversations();
 
         } catch (err) {
@@ -422,22 +426,41 @@
 
     const saveButton = document.getElementById("saveCurrentSysPrompt")
     saveButton.addEventListener("click", async () => {
-        const newSysPrompt = document.getElementById("currentSysPrompt").value
-        await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
-        const currentConvData = convs.get(currentConversationId)
-        if (!currentConvData) {
-            sysPrompt = newSysPrompt
+        const newSysPrompt = document.getElementById("currentSysPrompt").value;
+
+        // 1. Update the global system prompt variable
+        sysPrompt = newSysPrompt;
+
+        // 2. Update the active messages array so the AI actually uses it on the next send
+        const activeSysMessage = messages.find(item => item.role === "system");
+        if (activeSysMessage) {
+            activeSysMessage.content = newSysPrompt;
         } else {
-            const systemDoc = currentConvData.messages.find(item => item.role === "system")
-            systemDoc.content = newSysPrompt
-            console.log(convs.get(currentConversationId))   
+            messages.unshift({ role: "system", content: newSysPrompt });
         }
-        
-        saveButton.innerText = "Saved!"
+
+        // 3. Only update Firebase if the conversation has actually been created
+        if (currentConversationId) {
+            // Use updateDocument to prevent overwriting the title/timestamp
+            await FirebaseUtils.updateDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt });
+
+            // Safely update the local cache if it exists
+            const currentConvData = convs.get(currentConversationId);
+            if (currentConvData) {
+                currentConvData.sysPrompt = newSysPrompt;
+                if (currentConvData.messages) {
+                    const systemDoc = currentConvData.messages.find(item => item.role === "system");
+                    if (systemDoc) systemDoc.content = newSysPrompt;
+                }
+            }
+        }
+
+        // UI Feedback
+        saveButton.innerText = "Saved!";
         setTimeout(() => {
-            saveButton.innerText = "Save"
-        }, 1000)
-    })
+            saveButton.innerText = "Save";
+        }, 1000);
+    });
 </script>
 
 </html>

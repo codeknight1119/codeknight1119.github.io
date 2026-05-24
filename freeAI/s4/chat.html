@@ -420,10 +420,14 @@
             body: JSON.stringify(body),
         });
         const receive = await data.json();
-        if(receive.choices[0].message.toolsUsed){
-            messages.push({role: "tool", content: receive.choices[0].message.toolsUsed})
+        if (receive.choices[0].message.toolsUsed) {
+            const toolsUsed = receive.choices[0].message.toolsUsed
+            toolsUsed.forEach((toolCall)=>{
+                messages.push({ role: "tool", content: toolCall})
+            })
+            console.log(messages)
         }
-     //   console.log(receive)
+        //   console.log(receive)
         return receive;
     }
 

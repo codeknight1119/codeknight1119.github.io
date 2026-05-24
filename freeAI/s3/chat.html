@@ -420,7 +420,7 @@
         window.location.href = "https://codeknight1119.github.io/freeAI/s3";
     })
 
-    document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {
+    document.getElementById("saveCurrentSysPrompt").addEventListener("click", async (event) => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value
         await FirebaseUtils.setDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt })
         const currentConvData = convs.get(currentConversationId)

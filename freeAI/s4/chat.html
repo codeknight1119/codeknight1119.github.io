@@ -413,12 +413,13 @@
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbzb8NNXLNRlClVOrOY-AO88tZKQ9MrqaeMUuH4Fl8kEdcKoe4-eQayGIh40413luZ6MRQ/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycby0zI4tnKuw9Occx_mPQu6DLINgYVvf_EKuffDeI6HNFdZCxI2BXReMhH1Zg8RdK_r-Qw/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),
         });
         const receive = await data.json();
+        console.log(receive)
         return receive;
     }
 

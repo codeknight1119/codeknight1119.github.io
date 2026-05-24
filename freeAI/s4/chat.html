@@ -189,14 +189,14 @@
         const data = await FirebaseUtils.isSignedIn();
 
         if (!data) {
-            window.location.href = "https://codeknight1119.github.io/freeAI/s3";
+            window.location.href = "https://codeknight1119.github.io/freeAI/s4";
             return;
         }
 
         const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers");
 
         if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
-            window.location.href = "https://codeknight1119.github.io/freeAI/s3";
+            window.location.href = "https://codeknight1119.github.io/freeAI/s4";
         }
     }
     init();
@@ -416,7 +416,7 @@
 
     document.getElementById("logout").addEventListener("click", () => {
         FirebaseUtils.logout()
-        window.location.href = "https://codeknight1119.github.io/freeAI/s3";
+        window.location.href = "https://codeknight1119.github.io/freeAI/s4";
     })
 
     document.getElementById("saveCurrentSysPrompt").addEventListener("click", async () => {

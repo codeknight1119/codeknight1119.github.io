@@ -280,7 +280,11 @@
             console.log(messages)
             const receive = await queryGas({ messages: messages });
             const receivedMessage = receive.choices[0].message.content;
-
+            if (receive.toolCalls) {
+                receive.toolCalls.forEach((val) => {
+                    messages.push(val)
+                })
+            }
 
             renderMessage("model", receivedMessage)
 
@@ -398,11 +402,6 @@
 
             const data = await queryGas({ "messages": params });
             const titleText = data.choices[0].message.content;
-            if (data.toolCalls) {
-                data.toolCalls.forEach((val) => {
-                    console.log(val)
-                })
-            }
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             const convData = convs.get(id)

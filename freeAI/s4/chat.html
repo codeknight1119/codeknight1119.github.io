@@ -402,7 +402,7 @@
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             const convData = convs.get(id)
             if (!convData) {
-                convData.set(id, { title: titleText })
+                convs.set(id, { title: titleText });
             } else {
                 convData.title = titleText;
             }
@@ -414,21 +414,12 @@
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycby0zI4tnKuw9Occx_mPQu6DLINgYVvf_EKuffDeI6HNFdZCxI2BXReMhH1Zg8RdK_r-Qw/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycby0zI4tnKuw9Occx_mPQu6DLINgYVvf_EKuffDeI6HNFdZCxI2BXReMhH1Zg8RdK_r-Qw/exec";
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),
         });
-        const receive = await data.json();
-        if (receive.choices[0].message.toolsUsed) {
-            const toolsUsed = receive.choices[0].message.toolsUsed
-            toolsUsed.forEach((toolCall)=>{
-                messages.push({ role: "tool", content: toolCall})
-            })
-            console.log(messages)
-        }
-        //   console.log(receive)
-        return receive;
+        return await data.json();
     }
 
     document.getElementById("logout").addEventListener("click", () => {

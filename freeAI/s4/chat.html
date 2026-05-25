@@ -398,6 +398,11 @@
 
             const data = await queryGas({ "messages": params });
             const titleText = data.choices[0].message.content;
+            if (data.toolCalls) {
+                data.toolCalls.forEach((val) => {
+                    console.log(val)
+                })
+            }
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
             const convData = convs.get(id)
@@ -414,13 +419,12 @@
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbyWqOAEVV9Adc3Y5nfnRRf9yzFxd01G8X3Ubcq1GkS0TodChZiktGI8AinZGGFxMa19Zw/exec";
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbzOPsFPrO9ZTuhJt9GtMns2GlOCWK8El8cFyOKKwkbaSfiQRbLdqwoMUPrC72E-gwaj0w/exec";
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),
         });
         const messageBack = await data.json();
-        console.log(messageBack)
         return messageBack
     }
 

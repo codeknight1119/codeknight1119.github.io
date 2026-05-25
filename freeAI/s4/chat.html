@@ -277,7 +277,6 @@
             const userMessage = { "role": "user", "content": query, "timestamp": Date.now() };
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
-            console.log(messages)
             const receive = await queryGas({ messages: messages });
             const receivedMessage = receive.choices[0].message.content;
             if (receive.toolCalls) {

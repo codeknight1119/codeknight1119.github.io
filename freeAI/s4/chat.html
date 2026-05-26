@@ -268,9 +268,9 @@
         const storedDate = new Date(storedTokenData.timestamp)
         const currentDate = new Date()
 
-        const isNewYear = curr.getFullYear() > prev.getFullYear();
+        const isNewYear = currentDate.getFullYear() > storedDate.getFullYear();
 
-        const isNextMonthSameYear = (curr.getFullYear() === prev.getFullYear()) && (curr.getMonth() > prev.getMonth());
+        const isNextMonthSameYear = (currentDate.getFullYear() === storedDate.getFullYear()) && (currentDate.getMonth() > storedDate.getMonth());
 
         if (isNewYear || isNextMonthSameYear) {
             tokensUsed = 1000000

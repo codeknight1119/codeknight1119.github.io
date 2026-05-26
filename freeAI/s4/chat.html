@@ -270,7 +270,7 @@
         }
         const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. | ${1000000 - tokensUsed} left`
         document.getElementById("tokenText").innerHTML = updatedtext
-        await FirebaseUtils.updateDocument({timestamp: new Date(), tokens: tokensUsed})
+        await FirebaseUtils.updateDocument('/system/tokenUsage', {timestamp: new Date(), tokens: tokensUsed})
     }
 
     async function setUpTokenCount() {

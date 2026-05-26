@@ -468,6 +468,7 @@
             body: JSON.stringify(body),
         });
         const messageBack = await data.json();
+        console.log(messageBack)
         return messageBack
     }
 
@@ -480,10 +481,8 @@
     saveButton.addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value;
 
-        // 1. Update the global system prompt variable
         sysPrompt = newSysPrompt;
 
-        // 2. Update the active messages array so the AI actually uses it on the next send
         const activeSysMessage = messages.find(item => item.role === "system");
         if (activeSysMessage) {
             activeSysMessage.content = newSysPrompt;
@@ -491,12 +490,9 @@
             messages.unshift({ role: "system", content: newSysPrompt });
         }
 
-        // 3. Only update Firebase if the conversation has actually been created
         if (currentConversationId) {
-            // Use updateDocument to prevent overwriting the title/timestamp
             await FirebaseUtils.updateDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt });
 
-            // Safely update the local cache if it exists
             const currentConvData = convs.get(currentConversationId);
             if (currentConvData) {
                 currentConvData.sysPrompt = newSysPrompt;
@@ -507,7 +503,6 @@
             }
         }
 
-        // UI Feedback
         saveButton.innerText = "Saved!";
         setTimeout(() => {
             saveButton.innerText = "Save";

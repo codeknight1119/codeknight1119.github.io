@@ -272,7 +272,11 @@
     }
 
     async function setUpTokenCount() {
-        const storedTokenData = FirebaseUtils.getDocument('/system/tokenUsage')
+        let storedTokenData = FirebaseUtils.getDocument('/system/tokenUsage')
+        if(!storedTokenData){
+            storedTokenData = {timestamp: new Date(), tokens: 1000000}
+            FirebaseUtils.setDocument("/system/tokenUsage", storedTokenData)
+        }
         const storedDate = new Date(storedTokenData.timestamp)
         const currentDate = new Date()
 

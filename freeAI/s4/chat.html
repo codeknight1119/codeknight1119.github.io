@@ -114,6 +114,15 @@
             /* padding: 10px;*/
             color: inherit;
         }
+
+        #tokenText {
+            font-size: 50px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            justify-content: flex-end;
+            color: inherit;
+        }
     </style>
     <title>AI on a Student Budget</title>
 </head>
@@ -122,6 +131,7 @@
     <header>
         <button id="openBttn">&#9776;</button>
         <h1 id="title">AI on a Student Budget</h1>
+        <p id="tokenText">Estimated token usage: .../1,000,000</p>
         <hr />
     </header>
 
@@ -250,7 +260,31 @@
         if (lastConvId && convs.has(lastConvId)) {
             loadConversation(convs.get(lastConvId));
         }
+        setUpTokenCount()
+    }
+
+    async function setUpTokenCount() {
+        const storedTokenData = FirebaseUtils.getDocument('/system/tokenUsage')
+        const storedDate = new Date(storedTokenData.timestamp)
+        const currentDate = new Date()
+
+        const isNewYear = curr.getFullYear() > prev.getFullYear();
+
+        const isNextMonthSameYear = (curr.getFullYear() === prev.getFullYear()) && (curr.getMonth() > prev.getMonth());
+
+        if (isNewYear || isNextMonthSameYear) {
+            tokensUsed = 1000000
+            updateTokensUsed()
+        }
         isReady = true;
+    }
+
+    function updateTokensUsed(number) {
+        if (number) {
+            tokensUsed -= number;
+        }
+        const text = `Rough Token Consumption: ${tokensUsed}/1000000. \n ${1000000 - tokensUsed} left`
+        document.getElementById("tokenText").innerText = text
     }
 
     getConversations();

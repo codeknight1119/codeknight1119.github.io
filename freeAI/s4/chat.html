@@ -263,6 +263,14 @@
         setUpTokenCount()
     }
 
+    function updateTokensUsed(number) {
+        if (number) {
+            tokensUsed -= number;
+        }
+        const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. \n ${1000000 - tokensUsed} left`
+        document.getElementById("tokenText").innerHTML = updatedtext
+    }
+
     async function setUpTokenCount() {
         const storedTokenData = FirebaseUtils.getDocument('/system/tokenUsage')
         const storedDate = new Date(storedTokenData.timestamp)
@@ -279,13 +287,7 @@
         isReady = true;
     }
 
-    function updateTokensUsed(number) {
-        if (number) {
-            tokensUsed -= number;
-        }
-        const text = `Rough Token Consumption: ${tokensUsed}/1000000. \n ${1000000 - tokensUsed} left`
-        document.getElementById("tokenText").innerText = text
-    }
+
 
     getConversations();
 

@@ -154,7 +154,9 @@
                 <template id="messageTemplate">
                     <div class="messageContent">
                     </div>
-                    <div class="actions"><button class="copy secondary" style="scale:50%">Copy</button></div>
+                    <div class="actions"><button class="copy secondary" style="scale:50%">Copy</button>
+                        <p class="tokenUsage"></p>
+                    </div>
                     <hr style="border-color: #222; margin: 0 0 15px 0;" />
                 </template>
             </div>
@@ -270,7 +272,7 @@
         }
         const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. | ${1000000 - tokensUsed} left`
         document.getElementById("tokenText").innerHTML = updatedtext
-        await FirebaseUtils.updateDocument('/system/tokenUsage', {timestamp: new Date(), tokens: tokensUsed})
+        await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: new Date(), tokens: tokensUsed })
     }
 
     async function setUpTokenCount() {
@@ -331,8 +333,9 @@
                     messages.push(val)
                 })
             }
+            
 
-            renderMessage("model", receivedMessage)
+            renderMessage("model", receivedMessage, receive.usage.total_tokens)
 
             const aiMessage = { "role": "assistant", "content": receivedMessage, "timestamp": Date.now() }
             messages.push(aiMessage);
@@ -346,7 +349,7 @@
     }
 
     const msgTemplate = document.getElementById("messageTemplate")
-    function renderMessage(sender, content) {
+    function renderMessage(sender, content, tokens) {
         const clone = msgTemplate.content.cloneNode(true);
         const messageMark = marked.parse(`**${sender.toUpperCase()}:** ` + content);
         clone.querySelector(".messageContent").innerHTML = messageMark
@@ -366,6 +369,9 @@
                     console.error('Could not copy text: ', err);
                 });
         });
+        if (tokens) {
+            clone.querySelector(".tokenUse").innerText = "Tokens: " + tokens
+        }
         messageArea.appendChild(clone)
     }
 

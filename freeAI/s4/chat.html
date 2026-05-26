@@ -195,6 +195,7 @@
     let currentConversationId = null;
     let messages = [];
     let convs = new Map();
+    let tokensUsed = 0;
 
     async function init() {
         const data = await FirebaseUtils.isSignedIn();
@@ -272,22 +273,26 @@
     }
 
     async function setUpTokenCount() {
-        let storedTokenData = FirebaseUtils.getDocument('/system/tokenUsage')
-        if(!storedTokenData){
-            storedTokenData = {timestamp: new Date(), tokens: 1000000}
-            FirebaseUtils.setDocument("/system/tokenUsage", storedTokenData)
+        let storedTokenData = await FirebaseUtils.getDocument('/system/tokenUsage');
+
+        if (!storedTokenData) {
+            storedTokenData = { timestamp: new Date().getTime(), tokens: 1000000 };
+            await FirebaseUtils.setDocument("/system/tokenUsage", storedTokenData);
         }
-        const storedDate = new Date(storedTokenData.timestamp)
-        const currentDate = new Date()
+
+        const storedDate = new Date(storedTokenData.timestamp);
+        const currentDate = new Date();
 
         const isNewYear = currentDate.getFullYear() > storedDate.getFullYear();
-
         const isNextMonthSameYear = (currentDate.getFullYear() === storedDate.getFullYear()) && (currentDate.getMonth() > storedDate.getMonth());
 
         if (isNewYear || isNextMonthSameYear) {
-            tokensUsed = 1000000
-            updateTokensUsed()
+            tokensUsed = 1000000;
+            await FirebaseUtils.setDocument("/system/tokenUsage", { timestamp: currentDate.getTime(), tokens: 1000000 });
+        } else {
+            tokensUsed = storedTokenData.tokens || 1000000;
         }
+        updateTokensUsed();
         isReady = true;
     }
 

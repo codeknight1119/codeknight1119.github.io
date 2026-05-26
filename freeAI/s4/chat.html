@@ -270,6 +270,7 @@
         }
         const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. | ${1000000 - tokensUsed} left`
         document.getElementById("tokenText").innerHTML = updatedtext
+        await FirebaseUtils.updateDocument({timestamp: new Date(), tokens: tokensUsed})
     }
 
     async function setUpTokenCount() {
@@ -293,6 +294,7 @@
             tokensUsed = storedTokenData.tokens || 1000000;
         }
         updateTokensUsed();
+
         isReady = true;
     }
 
@@ -468,7 +470,8 @@
             body: JSON.stringify(body),
         });
         const messageBack = await data.json();
-        console.log(messageBack)
+        const tokenUssage = messageBack.usage.total_tokens
+        updateTokensUsed(tokenUssage)
         return messageBack
     }
 

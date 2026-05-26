@@ -116,7 +116,7 @@
         }
 
         #tokenText {
-            font-size: 50px;
+            font-size: 10px;
             background: none;
             border: none;
             cursor: pointer;
@@ -268,7 +268,7 @@
         if (number) {
             tokensUsed -= number;
         }
-        const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. \n ${1000000 - tokensUsed} left`
+        const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. | ${1000000 - tokensUsed} left`
         document.getElementById("tokenText").innerHTML = updatedtext
     }
 

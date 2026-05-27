@@ -273,7 +273,7 @@
         if(output){
             tokensUsed += (output * 0.00000010)
         }
-        const updatedtext = `Rough Token Consumption: $${tokensUsed}/$0.10. | ${0.10-tokensUsed} left`
+        const updatedtext = `Rough Token Consumption: $${tokensUsed}/$0.10. | ${0.10 - tokensUsed} left`
         document.getElementById("tokenText").innerHTML = updatedtext
         await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: new Date(), tokens: String(tokensUsed) })
     }

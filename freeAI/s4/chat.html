@@ -266,21 +266,24 @@
         setUpTokenCount()
     }
 
-    async function updateTokensUsed(number) {
-        if (number) {
-            tokensUsed -= number;
+    async function updateTokensUsed(input, output) {
+        if (input) {
+            tokensUsed += (input * 0.00000004);
         }
-        const updatedtext = `Rough Token Consumption: ${tokensUsed}/1000000. | ${1000000 - tokensUsed} left`
+        if(output){
+            tokensUsed += (output * 0.00000010)
+        }
+        const updatedtext = `Rough Token Consumption: $${tokensUsed}/$0.10. | ${0.10-tokensUsed} left`
         document.getElementById("tokenText").innerHTML = updatedtext
-        await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: new Date(), tokens: tokensUsed })
+        await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: new Date(), tokens: String(tokensUsed) })
     }
 
     async function setUpTokenCount() {
         let storedTokenData = await FirebaseUtils.getDocument('/system/tokenUsage');
 
         if (!storedTokenData) {
-            storedTokenData = { timestamp: new Date().getTime(), tokens: 1000000 };
-            await FirebaseUtils.setDocument("/system/tokenUsage", storedTokenData);
+            storedTokenData = { timestamp: new Date().getTime(), tokens: 0 };
+            await FirebaseUtils.setDocument("/system/tokenUsage", String(storedTokenData));
         }
 
         const storedDate = new Date(storedTokenData.timestamp);
@@ -290,10 +293,10 @@
         const isNextMonthSameYear = (currentDate.getFullYear() === storedDate.getFullYear()) && (currentDate.getMonth() > storedDate.getMonth());
 
         if (isNewYear || isNextMonthSameYear) {
-            tokensUsed = 1000000;
-            await FirebaseUtils.setDocument("/system/tokenUsage", { timestamp: currentDate.getTime(), tokens: 1000000 });
+            tokensUsed = 0;
+            await FirebaseUtils.setDocument("/system/tokenUsage", { timestamp: currentDate.getTime(), tokens: 0 });
         } else {
-            tokensUsed = storedTokenData.tokens || 1000000;
+            tokensUsed = Number(storedTokenData.tokens) || 0;
         }
         updateTokensUsed();
 
@@ -476,6 +479,7 @@
             body: JSON.stringify(body),
         });
         const messageBack = await data.json();
+        console.log(messageBack)
         const tokenUssage = messageBack.usage.total_tokens
         updateTokensUsed(tokenUssage)
         return messageBack

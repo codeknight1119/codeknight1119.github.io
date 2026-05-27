@@ -32,7 +32,6 @@
             width: 0;
             position: fixed;
             z-index: 2;
-            /* Put above main content */
             top: 0;
             left: 0;
             background-color: #111;
@@ -66,7 +65,6 @@
             color: #f1f1f1;
         }
 
-        /* Position and style the close button */
         .sidebar .closebtn {
             position: absolute;
             top: 0;
@@ -75,7 +73,6 @@
             margin-left: 50px;
         }
 
-        /* New Conversation Button Styling */
         .new-conv-btn {
             margin: 0 20px 20px 32px;
             width: calc(100% - 52px);
@@ -111,7 +108,6 @@
             background: none;
             border: none;
             cursor: pointer;
-            /* padding: 10px;*/
             color: inherit;
         }
 
@@ -135,7 +131,6 @@
         <hr />
     </header>
 
-
     <main class="container">
         <div id="main">
             <div id="sideBar" class="sidebar">
@@ -147,14 +142,11 @@
                 <div id="conversationsList"></div>
             </div>
 
-
-
             <div id="mainChat">
-
                 <template id="messageTemplate">
-                    <div class="messageContent">
-                    </div>
-                    <div class="actions"><button class="copy secondary" style="scale:50%">Copy</button>
+                    <div class="messageContent"></div>
+                    <div class="actions">
+                        <button class="copy secondary" style="scale:50%">Copy</button>
                         <p class="tokenUse"></p>
                     </div>
                     <hr style="border-color: #222; margin: 0 0 15px 0;" />
@@ -168,13 +160,12 @@
                 </div>
                 <details name="systemPrompt">
                     <summary>System Prompt</summary>
-                    <textArea id="currentSysPrompt"></textArea>
+                    <textarea id="currentSysPrompt"></textarea>
                     <button id="saveCurrentSysPrompt">Save</button>
                 </details>
             </div>
         </div>
     </main>
-
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
@@ -213,22 +204,17 @@
             window.location.href = "https://codeknight1119.github.io/freeAI/s3";
         }
     }
-    init();
 
     const textIn = document.getElementById("textEnter");
-    let shiftDown = false;
     textIn.addEventListener("keydown", (event) => {
         if (event.code === "Enter" && !event.shiftKey) {
-            event.preventDefault()
-
-            queryModel()
+            event.preventDefault();
+            queryModel();
         }
-    })
-
+    });
 
     const messageArea = document.getElementById("mainChat");
     document.getElementById("sendButton").addEventListener("click", queryModel);
-
 
     async function getConversations() {
         const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" });
@@ -242,9 +228,7 @@
                 let convLink = document.createElement("a");
                 convLink.href = "javascript:void(0)";
                 convLink.innerText = val.title || "Chat " + val.id.substring(0, 6);
-
-                convLink.id = val.id
-
+                convLink.id = val.id;
                 convLink.onclick = () => loadConversation(val);
 
                 container.appendChild(convLink);
@@ -255,7 +239,7 @@
             emptyNotice.innerText = "No conversations, try making one!";
             container.appendChild(emptyNotice);
         }
-        getLastConv()
+        // FIX: Removed getLastConv() from here to prevent recursive loop overrides during new chat creation
     }
 
     function getLastConv() {
@@ -263,30 +247,35 @@
         if (lastConvId && convs.has(lastConvId)) {
             loadConversation(convs.get(lastConvId));
         }
-        setUpTokenCount()
     }
 
     async function updateTokensUsed(input, output) {
-        if (input) {
-            tokensUsed += (input * 0.00000004);
-        }
-        if(output){
-            tokensUsed += (output * 0.00000010)
-        }
-        const updatedtext = `Rough Token Consumption: $${tokensUsed}/$0.10. | ${0.10 - tokensUsed} left`
-        document.getElementById("tokenText").innerHTML = updatedtext
-        await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: new Date(), tokens: String(tokensUsed) })
+        if (input) tokensUsed += (input * 0.00000004);
+        if (output) tokensUsed += (output * 0.00000010);
+        
+        // FIX: Added .toFixed(5) to prevent floating point display bugs breaking layouts
+        const updatedtext = `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$0.10. | ${(0.10 - tokensUsed).toFixed(5)} left`;
+        document.getElementById("tokenText").innerHTML = updatedtext;
+        await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: Date.now(), tokens: String(tokensUsed) });
     }
 
     async function setUpTokenCount() {
         let storedTokenData = await FirebaseUtils.getDocument('/system/tokenUsage');
 
         if (!storedTokenData) {
-            storedTokenData = { timestamp: new Date().getTime(), tokens: 0 };
-            await FirebaseUtils.setDocument("/system/tokenUsage", String(storedTokenData));
+            storedTokenData = { timestamp: Date.now(), tokens: "0" };
+            // FIX: Removed String() wrapper which wrote "[object Object]" to Firestore
+            await FirebaseUtils.setDocument("/system/tokenUsage", storedTokenData);
         }
 
-        const storedDate = new Date(storedTokenData.timestamp);
+        // Handle Firestore Timestamp object transformation vs Primitive Number
+        let timestampVal = storedTokenData.timestamp;
+        if (timestampVal && typeof timestampVal === 'object') {
+            if (typeof timestampVal.toDate === 'function') timestampVal = timestampVal.toDate().getTime();
+            else if (timestampVal.seconds) timestampVal = timestampVal.seconds * 1000;
+        }
+
+        const storedDate = new Date(timestampVal || Date.now());
         const currentDate = new Date();
 
         const isNewYear = currentDate.getFullYear() > storedDate.getFullYear();
@@ -294,18 +283,13 @@
 
         if (isNewYear || isNextMonthSameYear) {
             tokensUsed = 0;
-            await FirebaseUtils.setDocument("/system/tokenUsage", { timestamp: currentDate.getTime(), tokens: 0 });
+            await FirebaseUtils.setDocument("/system/tokenUsage", { timestamp: Date.now(), tokens: "0" });
         } else {
             tokensUsed = Number(storedTokenData.tokens) || 0;
         }
-        updateTokensUsed();
-
+        await updateTokensUsed();
         isReady = true;
     }
-
-
-
-    getConversations();
 
     async function queryModel() {
         if (!isReady) {
@@ -317,65 +301,63 @@
             if (!query.trim()) return;
 
             if (currentConversationId === null) {
-                const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() });
+                const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: Date.now() });
                 currentConversationId = newConv.id;
-
+                // FIX: Set local storage immediately so it tracks as the latest active conversation
+                localStorage.setItem("lastConv", currentConversationId);
                 setUpConv(currentConversationId, query);
             }
 
             textIn.value = "";
-            renderMessage("user", query)
+            renderMessage("user", query);
 
             const userMessage = { "role": "user", "content": query, "timestamp": Date.now() };
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
+            
             const receive = await queryGas({ messages: messages });
             const receivedMessage = receive.choices[0].message.content;
+            
             if (receive.toolCalls) {
                 receive.toolCalls.forEach((val) => {
-                    messages.push(val)
-                })
+                    messages.push(val);
+                });
             }
-            
 
-            renderMessage("model", receivedMessage, receive.usage.total_tokens)
+            renderMessage("model", receivedMessage, receive.usage?.total_tokens);
 
-            const aiMessage = { "role": "assistant", "content": receivedMessage, "timestamp": Date.now() }
+            const aiMessage = { "role": "assistant", "content": receivedMessage, "timestamp": Date.now() };
             messages.push(aiMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, aiMessage);
 
-            // Auto-scroll chat area
             messageArea.scrollTop = messageArea.scrollHeight;
         } catch (e) {
             console.error(e);
         }
     }
 
-    const msgTemplate = document.getElementById("messageTemplate")
+    const msgTemplate = document.getElementById("messageTemplate");
     function renderMessage(sender, content, tokens) {
         const clone = msgTemplate.content.cloneNode(true);
         const messageMark = marked.parse(`**${sender.toUpperCase()}:** ` + content);
-        clone.querySelector(".messageContent").innerHTML = messageMark
+        clone.querySelector(".messageContent").innerHTML = messageMark;
         messageArea.scrollTop = messageArea.scrollHeight;
+        
         const copyBtn = clone.querySelector('.copy');
         copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(messageMark)
+            // FIX: copy the pure text `content` value rather than the raw compiled HTML string
+            navigator.clipboard.writeText(content)
                 .then(() => {
                     copyBtn.textContent = 'Copied!';
-                    copyBtn.classList.add('copied');
-                    setTimeout(() => {
-                        copyBtn.textContent = 'Copy';
-                        copyBtn.classList.remove('copied');
-                    }, 2000);
+                    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
                 })
-                .catch(err => {
-                    console.error('Could not copy text: ', err);
-                });
+                .catch(err => { console.error('Could not copy text: ', err); });
         });
+        
         if (tokens) {
-            clone.querySelector(".tokenUse").innerText = "Tokens: " + tokens
+            clone.querySelector(".tokenUse").innerText = "Tokens: " + tokens;
         }
-        messageArea.appendChild(clone)
+        messageArea.appendChild(clone);
     }
 
     function openNav() {
@@ -383,6 +365,7 @@
         document.getElementById("main").style.marginLeft = "250px";
     }
 
+    // Explicitly tracking navigation states
     function closeNav() {
         document.getElementById("sideBar").style.width = "0";
         document.getElementById("main").style.marginLeft = "0";
@@ -390,46 +373,45 @@
 
     function createNewConversation() {
         messageArea.innerHTML = "";
-        sysPrompt = defaultSysPrompt
-        document.getElementById("currentSysPrompt").value = sysPrompt
+        sysPrompt = defaultSysPrompt;
+        document.getElementById("currentSysPrompt").value = sysPrompt;
         messages = [{ "role": "system", "content": sysPrompt }];
-        currentConversationId = null; // Clean slate state
-
+        currentConversationId = null; 
         closeNav();
     }
 
     async function loadConversation(conv) {
-        const id = conv.id
-        localStorage.setItem("lastConv", id)
+        const id = conv.id;
+        localStorage.setItem("lastConv", id);
         messageArea.innerHTML = "<p>Loading history...</p>";
         closeNav();
 
         currentConversationId = id;
-        let systemPrompt = sysPrompt = conv.sysPrompt
+        let systemPrompt = sysPrompt = conv.sysPrompt;
 
         if (!systemPrompt) {
             sysPrompt = systemPrompt = defaultSysPrompt;
-            FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt })
+            conv.sysPrompt = sysPrompt; // Sync internal local reference state
+            FirebaseUtils.updateDocument(`conversations/${id}`, { sysPrompt: sysPrompt });
         }
         messages = [{ "role": "system", "content": systemPrompt }];
-        document.getElementById("currentSysPrompt").value = systemPrompt
+        document.getElementById("currentSysPrompt").value = systemPrompt;
 
         try {
-            let mapData = convs.get(id)
+            let mapData = convs.get(id);
             let history;
-            if (mapData.messages) {
-                history = mapData.messages
+            if (mapData && mapData.messages) {
+                history = mapData.messages;
             } else {
                 history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50, { field: "timestamp", direction: "asc" });
-                mapData.messages = history
+                if(mapData) mapData.messages = history;
             }
-            //  history = history.toReversed()
             messageArea.innerHTML = "";
 
             if (history && history.length > 0) {
                 history.forEach((msg) => {
                     messages.push({ role: msg.role, content: msg.content });
-                    renderMessage(msg.role, msg.content)
+                    renderMessage(msg.role, msg.content);
                 });
                 messageArea.scrollTop = messageArea.scrollHeight;
             }
@@ -438,14 +420,13 @@
             messageArea.innerHTML = "<p>Could not load history.</p>";
         }
 
-
         const container = document.getElementById("conversationsList");
-
         Array.from(container.children).forEach((val) => {
             val.classList.remove('active');
         });
 
-        document.getElementById(id).classList.add("active");
+        const activeLink = document.getElementById(id);
+        if (activeLink) activeLink.classList.add("active");
     }
 
     async function setUpConv(id, firstPromptText) {
@@ -459,9 +440,10 @@
             const titleText = data.choices[0].message.content;
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
-            const convData = convs.get(id)
+            const convData = convs.get(id);
             if (!convData) {
-                convs.set(id, { title: titleText });
+                // FIX: Added full fallback object metadata configuration mapping
+                convs.set(id, { id: id, title: titleText, sysPrompt: defaultSysPrompt });
             } else {
                 convData.title = titleText;
             }
@@ -478,22 +460,17 @@
             method: "POST",
             body: JSON.stringify(body),
         });
-        const messageBack = await data.json();
-        console.log(messageBack)
-      //  const tokenUssage = messageBack.usage.total_tokens
-        //updateTokensUsed(tokenUssage)
-        return messageBack
+        return await data.json();
     }
 
     document.getElementById("logout").addEventListener("click", () => {
-        FirebaseUtils.logout()
+        FirebaseUtils.logout();
         window.location.href = "https://codeknight1119.github.io/freeAI/s3";
-    })
+    });
 
-    const saveButton = document.getElementById("saveCurrentSysPrompt")
+    const saveButton = document.getElementById("saveCurrentSysPrompt");
     saveButton.addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value;
-
         sysPrompt = newSysPrompt;
 
         const activeSysMessage = messages.find(item => item.role === "system");
@@ -517,10 +494,17 @@
         }
 
         saveButton.innerText = "Saved!";
-        setTimeout(() => {
-            saveButton.innerText = "Save";
-        }, 1000);
+        setTimeout(() => { saveButton.innerText = "Save"; }, 1000);
     });
+
+    // FIX: Standardized, controlled single-run App initialization sequence lifecycle setup 
+    async function initApp() {
+        await init();
+        await getConversations();
+        getLastConv();
+        await setUpTokenCount();
+    }
+    initApp();
 </script>
 
 </html>

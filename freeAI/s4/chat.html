@@ -249,15 +249,28 @@
         }
     }
 
-    async function updateTokensUsed(input, output) {
-        if (input) tokensUsed += (input * 0.00000004);
-        if (output) tokensUsed += (output * 0.00000010);
-        
-        // FIX: Added .toFixed(5) to prevent floating point display bugs breaking layouts
-        const updatedtext = `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$0.10. | ${(0.10 - tokensUsed).toFixed(5)} left`;
-        document.getElementById("tokenText").innerHTML = updatedtext;
-        await FirebaseUtils.updateDocument('/system/tokenUsage', { timestamp: Date.now(), tokens: String(tokensUsed) });
-    }
+function renderTokenDisplay() {
+    const budget = 0.10;
+    const remaining = Math.max(0, budget - tokensUsed);
+
+    document.getElementById("tokenText").innerText =
+        `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$${budget.toFixed(2)} | $${remaining.toFixed(5)} left`;
+}
+
+async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
+    // Pricing calculation
+    const inputCost = inputTokens * 0.00000004;
+    const outputCost = outputTokens * 0.00000010;
+
+    tokensUsed += inputCost + outputCost;
+
+    renderTokenDisplay();
+
+    await FirebaseUtils.updateDocument('/system/tokenUsage', {
+        timestamp: Date.now(),
+        tokens: tokensUsed.toFixed(8)
+    });
+}
 
     async function setUpTokenCount() {
         let storedTokenData = await FirebaseUtils.getDocument('/system/tokenUsage');
@@ -287,7 +300,7 @@
         } else {
             tokensUsed = Number(storedTokenData.tokens) || 0;
         }
-        await updateTokensUsed();
+        renderTokenDisplay();
         isReady = true;
     }
 

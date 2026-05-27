@@ -460,7 +460,9 @@
             method: "POST",
             body: JSON.stringify(body),
         });
-        return await data.json();
+        const dataGot = await data.json();
+        console.log(dataGot)
+        return dataGot
     }
 
     document.getElementById("logout").addEventListener("click", () => {

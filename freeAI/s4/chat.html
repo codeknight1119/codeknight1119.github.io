@@ -462,6 +462,7 @@
         });
         const dataGot = await data.json();
         console.log(dataGot)
+        updateTokensUsed(dataGot.usage.prompt_tokens, dataGot.usage.completion_tokens)
         return dataGot
     }
 

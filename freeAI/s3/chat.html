@@ -197,7 +197,11 @@
 
         if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
             window.location.href = "https://codeknight1119.github.io/freeAI/s3";
+            return;
         }
+
+        // Pass true to automatically look up and load the last active session on initial boot
+        getConversations(true);
     }
     init();
 
@@ -216,7 +220,8 @@
     document.getElementById("sendButton").addEventListener("click", queryModel);
 
 
-    async function getConversations() {
+    
+    async function getConversations(loadLast = false) {
         const convData = await FirebaseUtils.getDocuments("/conversations", 15, { field: "timestamp", direction: "desc" });
         const container = document.getElementById("conversationsList");
         container.innerHTML = "";
@@ -233,6 +238,11 @@
 
                 convLink.onclick = () => loadConversation(val);
 
+                // Highlight the active conversation item gracefully
+                if (currentConversationId && val.id === currentConversationId) {
+                    convLink.classList.add("active");
+                }
+
                 container.appendChild(convLink);
             });
         } else {
@@ -241,7 +251,11 @@
             emptyNotice.innerText = "No conversations, try making one!";
             container.appendChild(emptyNotice);
         }
-        getLastConv()
+        
+        if (loadLast) {
+            getLastConv();
+        }
+        isReady = true;
     }
 
     function getLastConv() {
@@ -249,10 +263,7 @@
         if (lastConvId && convs.has(lastConvId)) {
             loadConversation(convs.get(lastConvId));
         }
-        isReady = true;
     }
-
-    getConversations();
 
     async function queryModel() {
         if (!isReady) {
@@ -266,6 +277,11 @@
             if (currentConversationId === null) {
                 const newConv = await FirebaseUtils.addDocument("/conversations", { title: "Generating title...", timestamp: new Date().getTime() });
                 currentConversationId = newConv.id;
+                
+                
+                localStorage.setItem("lastConv", currentConversationId);
+
+                getConversations(false);
 
                 setUpConv(currentConversationId, query);
             }
@@ -331,7 +347,13 @@
     function createNewConversation() {
         messageArea.innerHTML = "";
         messages = [{ "role": "system", "content": sysPrompt }];
-        currentConversationId = null; // Clean slate state
+        currentConversationId = null; 
+
+        const container = document.getElementById("conversationsList");
+        Array.from(container.children).forEach((val) => {
+            val.classList.remove('active');
+        });
+
         closeNav();
     }
 
@@ -354,13 +376,12 @@
         try {
             let mapData = convs.get(id)
             let history;
-            if (mapData.messages) {
+            if (mapData && mapData.messages) {
                 history = mapData.messages
             } else {
                 history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50, { field: "timestamp", direction: "asc" });
-                mapData.messages = history
+                if (mapData) mapData.messages = history;
             }
-            //  history = history.toReversed()
             messageArea.innerHTML = "";
 
             if (history && history.length > 0) {
@@ -382,7 +403,8 @@
             val.classList.remove('active');
         });
 
-        document.getElementById(id).classList.add("active");
+        const activeLink = document.getElementById(id);
+        if (activeLink) activeLink.classList.add("active");
     }
 
     async function setUpConv(id, firstPromptText) {
@@ -396,13 +418,16 @@
             const titleText = data.choices[0].message.content;
 
             await FirebaseUtils.updateDocument(`/conversations/${id}`, { title: titleText });
-            const convData = convs.get(id)
-            if (!convData) {
-                convData.set(id, { title: titleText })
+            
+        
+            if (!convs.has(id)) {
+                convs.set(id, { id: id, title: titleText });
             } else {
-                convData.title = titleText;
+                convs.get(id).title = titleText;
             }
-            getConversations();
+            
+            
+            getConversations(false); 
 
         } catch (err) {
             console.error("Failed to generate custom title summary: ", err);
@@ -410,7 +435,7 @@
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycby4JG65rY2gpeYIfZ4O7fT2vw9CRiajMgkin4-44c6fOp3GO3-USZbybpg2CVGAuZGW/exec"
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbwJ0juIdCcLZTVq5e2yT-PPGnAiToGUG3z8xQ-in9FoT_9MhCgn-2EzQB_bX8-wPitPJA/exec"
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),
@@ -428,10 +453,8 @@
     saveButton.addEventListener("click", async () => {
         const newSysPrompt = document.getElementById("currentSysPrompt").value;
 
-        // 1. Update the global system prompt variable
         sysPrompt = newSysPrompt;
 
-        // 2. Update the active messages array so the AI actually uses it on the next send
         const activeSysMessage = messages.find(item => item.role === "system");
         if (activeSysMessage) {
             activeSysMessage.content = newSysPrompt;
@@ -439,12 +462,9 @@
             messages.unshift({ role: "system", content: newSysPrompt });
         }
 
-        // 3. Only update Firebase if the conversation has actually been created
         if (currentConversationId) {
-            // Use updateDocument to prevent overwriting the title/timestamp
             await FirebaseUtils.updateDocument(`/conversations/${currentConversationId}`, { sysPrompt: newSysPrompt });
 
-            // Safely update the local cache if it exists
             const currentConvData = convs.get(currentConversationId);
             if (currentConvData) {
                 currentConvData.sysPrompt = newSysPrompt;
@@ -455,7 +475,6 @@
             }
         }
 
-        // UI Feedback
         saveButton.innerText = "Saved!";
         setTimeout(() => {
             saveButton.innerText = "Save";

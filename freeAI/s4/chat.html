@@ -127,7 +127,7 @@
     <header>
         <button id="openBttn">&#9776;</button>
         <h1 id="title">AI on a Student Budget</h1>
-        <p id="tokenText">Estimated token usage: .../1,000,000</p>
+  <p id="tokenText">Estimated token usage: .../1,000,000</p>
         <hr />
     </header>
 
@@ -254,7 +254,7 @@ function renderTokenDisplay() {
     const remaining = Math.max(0, budget - tokensUsed);
 
     document.getElementById("tokenText").innerText =
-        `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$${budget.toFixed(2)} | $${remaining.toFixed(5)} left`;
+        `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$${budget.toFixed(2)}`;
 }
 
 async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {

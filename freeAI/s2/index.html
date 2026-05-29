@@ -73,7 +73,7 @@
     let messages = []
     async function getMessages() {
         //under collection messages with a limit of 50
-        const messageData = await FirebaseUtils.getDocuments("/messages", 50)
+        const messageData = await FirebaseUtils.getDocuments("/messages", 50, {field: "timestamp"})
         if (messageData && messageData.length !== 0) {
             messageData.forEach((val) => {
                 messages.push(val)
@@ -119,8 +119,9 @@
 
             let aiMessageElement = document.createElement("p")
             aiMessageElement.innerHTML = marked.parse("**MODEL:** " + recivedMessage)
-            const aiMessage = { "role": "assistant", "content": recivedMessage }
+            let aiMessage = { "role": "assistant", "content": recivedMessage }
             messages.push(aiMessage)
+            aiMessage.timestamp = Date.now()
             FirebaseUtils.addDocument("/messages/", aiMessage)
             messageArea.appendChild(aiMessageElement)
         } catch (e) {

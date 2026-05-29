@@ -25,7 +25,7 @@ export const loginGoogle = async () => {
         return {
             user: result.user,
             isNew: getAdditionalUserInfo(result).isNewUser,
-        }; // Return this so the component can use the user data
+        }; 
     }
     catch (error) {
         console.error(error);
@@ -73,7 +73,6 @@ export const getDocument = async (path) => {
             return docSnap.data();
         }
         else {
-            // docSnap.data() will be undefined if it doesn't exist
             return undefined;
         }
     }
@@ -95,7 +94,7 @@ export const getDocuments = async (path, l, docParam) => {
             constraints.push(limit(l))
         }
 
-        // FIX: Define collectionRef before using it
+        
         const collectionRef = collection(db, path); 
         const q = query(collectionRef, ...constraints);
         const querySnapshot = await getDocs(q);
@@ -123,7 +122,7 @@ export const isSignedIn = () => {
             const auth = getAuth();
             const unsubscribe = auth.onAuthStateChanged(
                 (user) => {
-                    unsubscribe(); // Stop listening after the first check
+                    unsubscribe(); 
                     resolve(user);
                 },
                 (error) => reject(error)

@@ -102,8 +102,9 @@
             let userMessageElement = document.createElement("p")
             userMessageElement.innerHTML = "<strong>USER:</strong> " + query
             messageArea.appendChild(userMessageElement)
-            const userMessage = { "role": "user", "content": query }
+            let userMessage = { "role": "user", "content": query }
             messages.push(userMessage)
+            userMessage.timestamp = Date.now()
             FirebaseUtils.addDocument("/messages/", userMessage)
 
 

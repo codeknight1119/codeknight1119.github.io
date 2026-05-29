@@ -107,7 +107,7 @@
             FirebaseUtils.addDocument("/messages/", userMessage)
 
 
-            const GAS_LINK = "https://script.google.com/macros/s/AKfycbxkvaF-sl0n20SOZFIWw8vsutZBo-DLKOmdFiLC_O5J7Tt0Xjs0xLwWxI_N4XsTuId6/exec"
+            const GAS_LINK = "https://script.google.com/macros/s/AKfycbyUvW90j9LrrvMxmtpoaz0rkOsO_hCOcHfy2o5GYwyS2rOnUBxRehK2Ia5GFPnV_BtN/exec"
             const data = await fetch(GAS_LINK, {
                 method: "POST",
                 body: JSON.stringify({ "messages": messages }),

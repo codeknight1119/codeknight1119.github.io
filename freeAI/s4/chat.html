@@ -478,7 +478,7 @@
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "hhttps://script.google.com/macros/s/AKfycbyvQ0ERNJzXiw6eKJSqx82cq2dM4IHbqrsiP6KG9SY-Wv8HCPHIqIVNgYjvqA1x_QWewg/exec";
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbyvQ0ERNJzXiw6eKJSqx82cq2dM4IHbqrsiP6KG9SY-Wv8HCPHIqIVNgYjvqA1x_QWewg/exec";
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),

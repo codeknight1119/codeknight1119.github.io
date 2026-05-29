@@ -201,7 +201,7 @@
         const allowedUsers = await FirebaseUtils.getDocument("/system/allowedUsers");
 
         if (!allowedUsers || !allowedUsers.users.includes(data.uid)) {
-            window.location.href = "https://codeknight1119.github.io/freeAI/s3";
+            window.location.href = "https://codeknight1119.github.io/freeAI/s4";
         }
     }
 
@@ -468,7 +468,7 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbyqpAcz0Tg9aTkMkKG30cbzbqiXYc5az4tHT3VwNJrC6Q7ylkigPBsNxAcY9KE3ItQHLA/exec";
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycbxbjzp0gWQKQxnH4bf-QwPILjCuvDXTUUnXvAoG2CFr6tQAF1loiG3g1P2uQv95CwlHWA/exec";
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),

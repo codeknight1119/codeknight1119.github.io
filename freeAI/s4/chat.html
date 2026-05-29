@@ -127,7 +127,7 @@
     <header>
         <button id="openBttn">&#9776;</button>
         <h1 id="title">AI on a Student Budget</h1>
-  <p id="tokenText">Estimated token usage: .../1,000,000</p>
+        <p id="tokenText">Estimated token usage: .../1,000,000</p>
         <hr />
     </header>
 
@@ -249,28 +249,28 @@
         }
     }
 
-function renderTokenDisplay() {
-    const budget = 0.10;
-    const remaining = Math.max(0, budget - tokensUsed);
+    function renderTokenDisplay() {
+        const budget = 0.10;
+        const remaining = Math.max(0, budget - tokensUsed);
 
-    document.getElementById("tokenText").innerText =
-        `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$${budget.toFixed(2)}`;
-}
+        document.getElementById("tokenText").innerText =
+            `Rough Token Consumption: $${tokensUsed.toFixed(5)}/$${budget.toFixed(2)}`;
+    }
 
-async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
-    // Pricing calculation
-    const inputCost = inputTokens * 0.00000004;
-    const outputCost = outputTokens * 0.00000010;
+    async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
+        // Pricing calculation
+        const inputCost = inputTokens * 0.00000004;
+        const outputCost = outputTokens * 0.00000010;
 
-    tokensUsed += inputCost + outputCost;
+        tokensUsed += inputCost + outputCost;
 
-    renderTokenDisplay();
+        renderTokenDisplay();
 
-    await FirebaseUtils.updateDocument('/system/tokenUsage', {
-        timestamp: Date.now(),
-        tokens: tokensUsed.toFixed(8)
-    });
-}
+        await FirebaseUtils.updateDocument('/system/tokenUsage', {
+            timestamp: Date.now(),
+            tokens: tokensUsed.toFixed(8)
+        });
+    }
 
     async function setUpTokenCount() {
         let storedTokenData = await FirebaseUtils.getDocument('/system/tokenUsage');
@@ -327,13 +327,17 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
             const userMessage = { "role": "user", "content": query, "timestamp": Date.now() };
             messages.push(userMessage);
             await FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, userMessage);
-            
+
             const receive = await queryGas({ messages: messages });
             const receivedMessage = receive.choices[0].message.content;
-            
+
             if (receive.toolCalls) {
                 receive.toolCalls.forEach((val) => {
                     messages.push(val);
+                    FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, {
+                        ...val,
+                        timestamp: Date.now()
+                    })
                 });
             }
 
@@ -355,7 +359,7 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
         const messageMark = marked.parse(`**${sender.toUpperCase()}:** ` + content);
         clone.querySelector(".messageContent").innerHTML = messageMark;
         messageArea.scrollTop = messageArea.scrollHeight;
-        
+
         const copyBtn = clone.querySelector('.copy');
         copyBtn.addEventListener('click', () => {
             // FIX: copy the pure text `content` value rather than the raw compiled HTML string
@@ -366,7 +370,7 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
                 })
                 .catch(err => { console.error('Could not copy text: ', err); });
         });
-        
+
         if (tokens) {
             clone.querySelector(".tokenUse").innerText = "Tokens: " + tokens;
         }
@@ -389,7 +393,7 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
         sysPrompt = defaultSysPrompt;
         document.getElementById("currentSysPrompt").value = sysPrompt;
         messages = [{ "role": "system", "content": sysPrompt }];
-        currentConversationId = null; 
+        currentConversationId = null;
         closeNav();
     }
 
@@ -417,14 +421,19 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
                 history = mapData.messages;
             } else {
                 history = await FirebaseUtils.getDocuments(`conversations/${id}/messages`, 50, { field: "timestamp", direction: "asc" });
-                if(mapData) mapData.messages = history;
+                if (mapData) mapData.messages = history;
             }
             messageArea.innerHTML = "";
 
             if (history && history.length > 0) {
                 history.forEach((msg) => {
                     messages.push({ role: msg.role, content: msg.content });
-                    renderMessage(msg.role, msg.content);
+                    if (msg.role === "tool") return
+                    if (msg.role === "assistant" && msg.tool_calls) return;
+                    if (msg.role === "system") return;
+                    if (msg.content) {
+                        renderMessage(msg.role, msg.content);
+                    }
                 });
                 messageArea.scrollTop = messageArea.scrollHeight;
             }
@@ -468,7 +477,7 @@ async function updateTokensUsed(inputTokens = 0, outputTokens = 0) {
     }
 
     async function queryGas(body) {
-        const GAS_LINK = "https://script.google.com/macros/s/AKfycbxbjzp0gWQKQxnH4bf-QwPILjCuvDXTUUnXvAoG2CFr6tQAF1loiG3g1P2uQv95CwlHWA/exec";
+        const GAS_LINK = "https://script.google.com/macros/s/AKfycby3myDEDqZvUSyE-ejNqigtsYcZmmabJVDZXBH_cKu1mKeTMiqvgev7nVoXUQSTkTJqig/exec";
         const data = await fetch(GAS_LINK, {
             method: "POST",
             body: JSON.stringify(body),

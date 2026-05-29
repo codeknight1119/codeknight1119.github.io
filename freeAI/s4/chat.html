@@ -333,6 +333,7 @@
 
             if (receive.toolCalls) {
                 receive.toolCalls.forEach((val) => {
+                    console.log(val)
                     messages.push(val);
                     FirebaseUtils.addDocument(`conversations/${currentConversationId}/messages`, {
                         ...val,

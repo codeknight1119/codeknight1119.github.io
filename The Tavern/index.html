@@ -33,6 +33,9 @@
     </div>
     <script type="module">
         import * as FirebaseUtils from `.firebaseUtils.js`
+        document.getElementById("login").addEventListener("click", ()=>{
+            FirebaseUtils.login()
+        })
     </script>
 </body>
 

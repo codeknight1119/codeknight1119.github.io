@@ -4,13 +4,13 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUse
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyBxDclU4JShqg-SBnDJa_lMfK_c2jQzxaw",
-    authDomain: "ai-on-a-student-s-budget.firebaseapp.com",
-    projectId: "ai-on-a-student-s-budget",
-    storageBucket: "ai-on-a-student-s-budget.firebasestorage.app",
-    messagingSenderId: "374775958691",
-    appId: "1:374775958691:web:b2de426b541139b0aec316",
-    measurementId: "G-SG17HRVC1F"
+  apiKey: "AIzaSyCQSv-B_1LiYwW6_XDMCesK-K-uUwx4SvE",
+  authDomain: "wchs-thetavern.firebaseapp.com",
+  projectId: "wchs-thetavern",
+  storageBucket: "wchs-thetavern.firebasestorage.app",
+  messagingSenderId: "1067002790985",
+  appId: "1:1067002790985:web:5835522f0afede84deeb98",
+  measurementId: "G-L2LD6HTME2"
 };
 
 

@@ -51,5 +51,5 @@ if(!userCheck){
 //////////////////////////////////////////////////////////////////////
 
 let pages = [
-    {}
+    {name: "Guild Bulletin", type:"tool", toolId: "GB", icon: "ra-wooden-sign"}
 ]

@@ -79,7 +79,7 @@
                             allowed: false,
                             role: "player",
                         }
-                        await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, data)
+                        await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, userData)
                         toggleVis()
                         return
                     }

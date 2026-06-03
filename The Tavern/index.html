@@ -51,6 +51,7 @@
 
         async function checkLogin() {
             const data = await FirebaseUtils.isSignedIn()
+            console.log(data)
             handleLogin(data)
         }
 

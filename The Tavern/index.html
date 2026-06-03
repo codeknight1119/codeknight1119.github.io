@@ -79,7 +79,7 @@
                     return 
                 }
                 const userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
-                if(!user.allowed){
+                if(!userData.allowed){
                     toggleVis()
                     return
                 }else{

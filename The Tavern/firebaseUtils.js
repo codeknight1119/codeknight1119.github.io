@@ -126,10 +126,7 @@ export const isSignedIn = () => {
                     if (user) {
                         const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
                         
-                        resolve({
-                            user: user,
-                            isNew: isNew,
-                        });
+                        resolve(user);
                     } else {
                         resolve(null);
                     }

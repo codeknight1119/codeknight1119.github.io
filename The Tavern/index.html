@@ -51,8 +51,7 @@
 
         async function checkLogin() {
             const data = await FirebaseUtils.isSignedIn()
-            console.log(data)
-            handleLogin(data)
+            handleLogin({user: data})
         }
         checkLogin()
 
@@ -73,7 +72,6 @@
                     let userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
                     console.log(userData)
                     if (!userData) {
-                        console.log("new account")
                         userData  = {
                             name: signIn.user.displayName,
                             allowed: false,

@@ -71,6 +71,7 @@
             try {
                 if (signIn) {
                     let userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
+                    console.log(userData)
                     if (!userData) {
                         console.log("new account")
                         userData  = {

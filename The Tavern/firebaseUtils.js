@@ -123,7 +123,16 @@ export const isSignedIn = () => {
             const unsubscribe = auth.onAuthStateChanged(
                 (user) => {
                     unsubscribe(); 
-                    resolve(user);
+                    if (user) {
+                        const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
+                        
+                        resolve({
+                            user: user,
+                            isNew: isNew,
+                        });
+                    } else {
+                        resolve(null);
+                    }
                 },
                 (error) => reject(error)
             );

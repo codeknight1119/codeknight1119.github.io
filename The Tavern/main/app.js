@@ -1,3 +1,7 @@
+  import * as FirebaseUtils from "../firebaseUtils.js"//////////////////////////////////////////////////////////////////////
+/////////////////////////SITE UTILS///////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
 const toggleButton = document.getElementById("toggle-btn")
 const sidebar = document.getElementById("sidebar")
 
@@ -9,7 +13,6 @@ toggleButton.addEventListener("click", (event)=>{
          ul.previousElementSibling.classList.remove("rotate")
     })
 })
-
 
 function toggleSubMenu(event){
 this.nextElementSibling.classList.toggle("show")    
@@ -25,3 +28,12 @@ const dropdowns = document.querySelectorAll('.dropdown-btn');
 dropdowns.forEach((val)=>{
     val.addEventListener("click", toggleSubMenu)
 })
+
+//////////////////////////////////////////////////////////////////////
+/////////////////////////PAGE RENDERING///////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+const user = await FirebaseUtils.isSignedIn()
+if(!user || !user.allowed){
+    window.location.href = "https://codeknight1119.github.io/The%20Tavern"
+}

@@ -68,31 +68,31 @@
         }
 
         async function handleLogin(signIn) {
-            try{
-            if (signIn) {
-                if (signIn.isNew) {
-                    console.log("new account")
-                    const data = {
-                        name: signIn.user.displayName,
-                        allowed: false,
-                        role: "player",
+            try {
+                if (signIn) {
+                    let userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
+                    if (!userData) {
+                        console.log("new account")
+                        userData  = {
+                            name: signIn.user.displayName,
+                            allowed: false,
+                            role: "player",
+                        }
+                        await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, data)
+                        toggleVis()
+                        return
                     }
-                    await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, data)
-                    toggleVis()
-                    return 
-                }
-                const userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
-                if(!userData || ! userData.allowed){
-                    toggleVis()
-                    return
-                }else{
-                    window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
-                }
+                    if (!userData.allowed) {
+                        toggleVis()
+                        return
+                    } else {
+                        window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+                    }
 
+                }
+            } catch (e) {
+                console.error("login error: ", e)
             }
-        }catch(e){
-            console.error("login error: ", e)
-        }
         }
     </script>
 </body>

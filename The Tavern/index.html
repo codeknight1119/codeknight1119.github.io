@@ -66,6 +66,7 @@
         }
 
         async function handleLogin(signIn) {
+            try{
             if (signIn) {
                 if (signIn.isNew) {
                     const data = {
@@ -86,6 +87,9 @@
                 }
 
             }
+        }catch(e){
+            console.error("login error: ", e)
+        }
         }
     </script>
 </body>

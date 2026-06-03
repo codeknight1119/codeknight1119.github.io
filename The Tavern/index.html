@@ -26,9 +26,16 @@
         </header>
 
         <main class="paper container">
-            <p>The WCHS D&D club hub is just a click away! Sign in and get verified by an Officer to join the fun!</p>
-            <br>
-            <button id="login">Login</button>
+            <div id="loginSignUp">
+                <p>The WCHS D&D club hub is just a click away! Sign in and get verified by an Officer to join the fun!
+                </p>
+                <br>
+                <button id="login">Login/Sign Up</button>
+            </div>
+            <div id="getVerified" hidden>
+                <p>You are signed in but not verified, please tell an Officer to let you into the club!
+                </p>
+            </div>
         </main>
 
         <footer>
@@ -37,8 +44,28 @@
     </div>
     <script type="module">
         import * as FirebaseUtils from "./firebaseUtils.js"
+        const loginSignUpEl = document.getElementById("loginSignUp")
+        const getVerifiedEl = document.getElementById("getVerified")
+
+
+
+        async function checkLogin() {
+            const data = await FirebaseUtils.isSignedIn()
+            handleLogin(data)
+        }
+
+
         document.getElementById("login").addEventListener("click", async () => {
             const signIn = await FirebaseUtils.loginGoogle()
+            await handleLogin(signIn)
+        })
+
+        function toggleVis() {
+            loginSignUpEl.hidden = true;
+            getVerifiedEl.hidden = false;
+        }
+
+        async function handleLogin(signIn) {
             if (signIn) {
                 if (signIn.isNew) {
                     const data = {
@@ -46,11 +73,20 @@
                         allowed: false,
                         role: "player",
                     }
-                    await FirebaseUtils.setDoc(`users/${signIn.user.uid}`, data)
-                    
+                    await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, data)
+                    toggleVis()
+                    return 
                 }
+                const userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
+                if(!user.allowed){
+                    toggleVis()
+                    return
+                }else{
+                    window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+                }
+
             }
-        })
+        }
     </script>
 </body>
 

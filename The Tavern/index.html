@@ -69,6 +69,7 @@
             try{
             if (signIn) {
                 if (signIn.isNew) {
+                    console.log("new account")
                     const data = {
                         name: signIn.user.displayName,
                         allowed: false,

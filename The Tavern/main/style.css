@@ -20,6 +20,7 @@ html{
 header {
     display: flex;
     justify-content: center;
+    border-bottom: 1px solid var(--line-clr);
 }
 
 body{
@@ -149,17 +150,13 @@ dropdown-btn i{
     background-color: var(--hover-clr);
 }
 
-i.ra{
-    
-}
-
 
 .cinzel-title {
   font-family: "Cinzel", serif;
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
-  font-size: 2.5rem;
+  font-size: 5rem;
   -webkit-text-stroke: 1.5px #D8B26F;
   color: #422607;
   padding: 1em;

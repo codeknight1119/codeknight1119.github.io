@@ -65,6 +65,6 @@ everyonePages.forEach((val, index)=>{
     const text = newEl.querySelector('.sidebarText')
     const icon = newEl.querySelector(".ra")
     text.innerText = val.name
-    icon.classList.add(icon)
+    icon.classList.add(val.icon)
     parentSidebar.append(newEl)
 })

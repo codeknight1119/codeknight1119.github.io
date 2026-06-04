@@ -116,7 +116,7 @@ function handleSidebarClick(event){
         break;
   }
 }
-
+const mainContentArea = document.getElementById("mainContentArea")
 async function renderTool(id) {
   console.log(`Rendering tool: ${id}`)  
   const toolData = everyonePages.find((obj) => obj.id === id)
@@ -124,6 +124,7 @@ async function renderTool(id) {
   switch(toolData.toolType){
     case("board"):
       const boards = FirebaseUtils.getDocuments(`tools/${toolId}/boards`, 15, {feild: "timestamp"})
+      if(boards.length === 0) return
       boards.forEach((board)=>{
         const htmlText= `
         <section>
@@ -132,6 +133,8 @@ async function renderTool(id) {
         </section>
         `
       })
+      mainContentArea.innerHTML = htmlText
+
     break
 
   }

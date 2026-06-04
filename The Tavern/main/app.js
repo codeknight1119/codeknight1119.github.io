@@ -83,7 +83,7 @@ reversedEveryonePages.forEach((val, index)=>{
     if(index === (reversedEveryonePages.length - 1)){
         currentSelectedSidebar = li 
         li.classList.add("active")
-        handleSidebarClick(li)
+        li.click()
     }
     
     parentSidebar.prepend(fragment)

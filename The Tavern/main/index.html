@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=400..900&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <nav id="sidebar">
         <ul>
@@ -20,25 +22,14 @@
                 </button>
             </li>
         </ul>
-        <ul>
-            <li class="active">
-                <a href="index.html">
-                    <i class="ra ra-2x ra-wooden-sign"></i>
-                    <span>Bulletin</span>
-                </a>
-            </li>
-            <li>
-                <a>
-                    <i class="ra ra-2x ra-horn-call"></i>
-                    <span>Event Board</span>
-                </a>
-            </li>
-            <li>
-                <a>
-                    <i class="ra ra-2x ra-speech-bubbles"></i>
-                    <span>Officer's Desk</span>
-                </a>
-            </li>
+            <template id="sidebarTemplate">
+                <li>
+                    <a class="nav-btn">
+                        <i class="ra ra-2x"></i>
+                        <span class="sidebarText">Bulletin</span>
+                    </a>
+                </li>
+            </template>
             <li>
                 <button class="dropdown-btn">
                     <i class="ra ra-2x ra-player"></i>
@@ -53,12 +44,13 @@
                     </ul>
                 </div>
             </li>
-        </ul>  
+        </ul>
     </nav>
-            <main>
+    <main>
         <header>
             <h1 class="cinzel-title">The Tavern</h1>
         </header>
     </main>
 </body>
+
 </html>

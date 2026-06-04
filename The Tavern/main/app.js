@@ -50,6 +50,21 @@ if(!userCheck){
 /////////////////////////PAGE RENDERING///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-let pages = [
-    {name: "Guild Bulletin", type:"tool", toolId: "GB", icon: "ra-wooden-sign"}
+const everyonePages = [
+    {name: "Guild Bulletin", type:"tool", toolId: "GB", icon: "ra-wooden-sign"},
+    {name: "Quest Board", type:"tool", toolId: "QB", icon: "ra-horn-call"},
+    {name: "Officer's Desk", type:"tool", toolId: "OD", icon: "ra-horn-call"},
+    {name: "Tavern Talk", type:"chat", chatId: "TT", icon: "ra-speech-bubbles"},
 ]
+
+const template = document.getElementById("sidebarTemplate")
+const parentSidebar = document.getElementById("sidebar")
+
+everyonePages.forEach((val, index)=>{
+    let newEl = template.content.cloneNode(true)
+    const text = newEl.querySelector('.sidebarText')
+    const icon = newEl.querySelector(".ra")
+    text.innerText = val.name
+    icon.classList.add(icon)
+    parentSidebar.append(newEl)
+})

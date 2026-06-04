@@ -89,6 +89,9 @@ reversedEveryonePages.forEach((val, index)=>{
     parentSidebar.prepend(fragment)
 })
 
+const chatUI = document.getElementById("chatTools")
+
+
 function handleSidebarClick(event){
     event.preventDefault()
 
@@ -121,6 +124,7 @@ function handleSidebarClick(event){
 }
 const mainContentArea = document.getElementById("mainContentArea")
 async function renderTool(id) {
+    chatUI.hidden = true;
   console.log(`Rendering tool: ${id}`)  
   const toolData = everyonePages.find((obj) => obj.id === id)
  
@@ -149,14 +153,16 @@ async function renderTool(id) {
 
   }
 }
-
 async function renderChat(id) {
+chatUI.hidden = false
   console.log(`Rendering Chat: ${id}`)
   const messages =  await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {feild: "timestamp"})
   if(messages.length === 0){
     mainContentArea.innerHTML = `<h3>No Messages</h3>`
     return 
   }
+  
+
   messages.forEach((val)=>{
     const htmlText = `
     <div class="message ${val.sender.uid === user.uid? "mine":"notMine"}"><strong><p>${val.sender}:</p></strong><p>${val.message}</p></div>

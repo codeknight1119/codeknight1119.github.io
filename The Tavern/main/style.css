@@ -181,6 +181,14 @@ dropdown-btn i {
     padding: 1em;
     border: 1px solid var(--line-clr);
 }
+#sendBtn{
+    color: var(--base-clr);
+    outline: 1px solid var(--line-clr);
+
+    i{
+        transform: rotateY(180deg);
+    }
+}
 
 
 .cinzel-title {

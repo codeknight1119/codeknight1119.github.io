@@ -123,8 +123,11 @@ async function renderTool(id) {
  
   switch(toolData.toolType){
     case("board"):
-      const boards = FirebaseUtils.getDocuments(`tools/${toolId}/boards`, 15, {feild: "timestamp"})
-      if(boards.length === 0) return
+      const boards = await FirebaseUtils.getDocuments(`tools/${toolId}/boards`, 15, {feild: "timestamp"})
+      if(boards.length === 0){
+        mainContentArea.innerHTML = `<h3>No Messages</h3>`
+        return
+      }
       boards.forEach((board)=>{
          const parsedBody = marked.parse(board.body)
         const htmlText= `
@@ -135,12 +138,20 @@ async function renderTool(id) {
         `
       })
       mainContentArea.innerHTML = htmlText
-
     break
 
   }
 }
 
 async function renderChat(id) {
-  console.log(`Rendering Chat: ${id}`)  
+  console.log(`Rendering Chat: ${id}`)
+  const messages =  await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {feild: "timestamp"})
+  if(messages.length === 0){
+    mainContentArea.innerHTML = `<h3>No Messages</h3>`
+    return 
+  }
+  messages.forEach((val)=>{
+
+  })
+
 }

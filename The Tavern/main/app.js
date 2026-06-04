@@ -52,8 +52,8 @@ if(!userCheck){
 //////////////////////////////////////////////////////////////////////
 
 const everyonePages = [
-    {name: "Guild Bulletin", type:"tool", id: "GB", icon: "ra-wooden-sign"},
-    {name: "Quest Board", type:"tool", id: "QB", icon: "ra-horn-call"},
+    {name: "Guild Bulletin", type:"tool", id: "GB", icon: "ra-wooden-sign", toolType:"board"},
+    {name: "Quest Board", type:"tool", id: "QB", icon: "ra-horn-call", toolType:"board"},
     {name: "Officer's Desk", type:"tool", id: "OD", icon: "ra-sheriff"},
     {name: "Tavern Talk", type:"chat", id: "TT", icon: "ra-speech-bubbles"},
 ]
@@ -77,7 +77,7 @@ reversedEveryonePages.forEach((val, index)=>{
     a.dataset.id = val.id
     a.addEventListener("click", handleSidebarClick)
 
-    if(index === 0){
+    if(index === (reversedEveryonePages.length - 1)){
         currentSelectedSidebar = li 
         li.classList.add("active")
     }
@@ -118,6 +118,7 @@ function handleSidebarClick(event){
 
 async function renderTool(id) {
   console.log(`Rendering tool: ${id}`)  
+
 }
 
 async function renderChat(id) {

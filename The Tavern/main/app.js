@@ -80,7 +80,7 @@ everyonePages.forEach((val, index)=>{
         li.classList.add("active")
     }
     
-    parentSidebar.append(newEl)
+    parentSidebar.append(fragment)
 })
 
 function handleSidebarClick(event){

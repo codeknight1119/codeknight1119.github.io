@@ -62,7 +62,7 @@ const template = document.getElementById("sidebarTemplate")
 const parentSidebar = document.getElementById("everySidebarParent")
 
 everyonePages.forEach((val, index)=>{
-    let fragement = template.content.cloneNode(true)
+    let fragment = template.content.cloneNode(true)
     
     const li = fragment.querySelector('li')
     const a = fragment.querySelector('.nav-btn')

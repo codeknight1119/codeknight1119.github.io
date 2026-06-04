@@ -45,6 +45,8 @@ dropdowns.forEach((val)=>{
 const userCheck = await FirebaseUtils.isSignedIn()
 if(!userCheck){
     window.location.href = "https://codeknight1119.github.io/The%20Tavern"
+}else{
+    console.log("signed in ", userCheck)
 }
 
 

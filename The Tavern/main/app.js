@@ -130,6 +130,7 @@ async function renderTool(id) {
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
         return
       }
+      let finalHTMLText = "";
       boards.forEach((board)=>{
          const parsedBody = marked.parse(board.body)
         const htmlText= `
@@ -138,8 +139,9 @@ async function renderTool(id) {
         <p>${parsedBody}</p>
         </section>
         `
+        finalHTMLText += htmlText
       })
-      mainContentArea.innerHTML = htmlText
+      mainContentArea.innerHTML = finalHTMLText
     break
 
   }

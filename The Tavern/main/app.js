@@ -1,4 +1,5 @@
-  import * as FirebaseUtils from "../firebaseUtils.js"
+import * as FirebaseUtils from "../firebaseUtils.js"
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////GLOBAL VARS//////////////////////////////////
@@ -118,7 +119,22 @@ function handleSidebarClick(event){
 
 async function renderTool(id) {
   console.log(`Rendering tool: ${id}`)  
+  const toolData = everyonePages.find((obj) => obj.id === id)
+  const parsedBody = marked.parse(id.body)
+  switch(toolData.toolType){
+    case("board"):
+      const boards = FirebaseUtils.getDocuments(`tools/${toolId}/boards`, 15, {feild: "timestamp"})
+      boards.forEach((val)=>{
+        const htmlText= `
+        <section>
+        <h2 class="cinzel-title">${val.title}</h2>
+        <p>${parsedBody}</p>
+        </section>
+        `
+      })
+    break
 
+  }
 }
 
 async function renderChat(id) {

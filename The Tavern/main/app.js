@@ -83,6 +83,7 @@ reversedEveryonePages.forEach((val, index)=>{
     if(index === (reversedEveryonePages.length - 1)){
         currentSelectedSidebar = li 
         li.classList.add("active")
+        handleSidebarClick(li)
     }
     
     parentSidebar.prepend(fragment)
@@ -161,7 +162,6 @@ async function renderChat(id) {
     <div class="message ${val.sender.uid === user.uid? "mine":"notMine"}"><strong><p>${val.sender}:</p></strong><p>${val.message}</p></div>
     `
     mainContentArea.innerHTML = htmlText
-
   })
 
 }

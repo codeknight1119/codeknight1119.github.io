@@ -58,7 +58,7 @@ const everyonePages = [
 ]
 
 const template = document.getElementById("sidebarTemplate")
-const parentSidebar = document.getElementById("sidebar")
+const parentSidebar = document.getElementById("everySidebarParent")
 
 everyonePages.forEach((val, index)=>{
     let newEl = template.content.cloneNode(true)

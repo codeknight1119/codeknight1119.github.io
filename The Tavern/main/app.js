@@ -52,10 +52,10 @@ if(!userCheck){
 //////////////////////////////////////////////////////////////////////
 
 const everyonePages = [
-    {name: "Guild Bulletin", type:"tool", toolId: "GB", icon: "ra-wooden-sign"},
-    {name: "Quest Board", type:"tool", toolId: "QB", icon: "ra-horn-call"},
-    {name: "Officer's Desk", type:"tool", toolId: "OD", icon: "ra-horn-call"},
-    {name: "Tavern Talk", type:"chat", chatId: "TT", icon: "ra-speech-bubbles"},
+    {name: "Guild Bulletin", type:"tool", id: "GB", icon: "ra-wooden-sign"},
+    {name: "Quest Board", type:"tool", id: "QB", icon: "ra-horn-call"},
+    {name: "Officer's Desk", type:"tool", id: "OD", icon: "ra-horn-call"},
+    {name: "Tavern Talk", type:"chat", id: "TT", icon: "ra-speech-bubbles"},
 ]
 
 const template = document.getElementById("sidebarTemplate")
@@ -74,3 +74,20 @@ everyonePages.forEach((val, index)=>{
     
     parentSidebar.append(newEl)
 })
+
+function handleSidebarClick(event){
+    const button = event.target
+    const idVal = button.value
+  const pageData = everyonePages.find((obj)=>{obj.id === idVal})
+  currentSelectedSidebar.classList.toggle("active")
+  
+  switch (pageData.type) {
+    case "tool":
+        renderTool(idVal)
+        break;
+  
+    case "chat":
+        renderChat(idVal)
+        break;
+  }
+}

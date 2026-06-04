@@ -54,7 +54,7 @@ if(!userCheck){
 const everyonePages = [
     {name: "Guild Bulletin", type:"tool", id: "GB", icon: "ra-wooden-sign"},
     {name: "Quest Board", type:"tool", id: "QB", icon: "ra-horn-call"},
-    {name: "Officer's Desk", type:"tool", id: "OD", icon: "ra-horn-call"},
+    {name: "Officer's Desk", type:"tool", id: "OD", icon: "ra-sheriff"},
     {name: "Tavern Talk", type:"chat", id: "TT", icon: "ra-speech-bubbles"},
 ]
 
@@ -62,24 +62,46 @@ const template = document.getElementById("sidebarTemplate")
 const parentSidebar = document.getElementById("everySidebarParent")
 
 everyonePages.forEach((val, index)=>{
-    let newEl = template.content.cloneNode(true)
-    const text = newEl.querySelector('.sidebarText')
-    const icon = newEl.querySelector(".ra")
+    let fragement = template.content.cloneNode(true)
+    
+    const li = fragment.querySelector('li')
+    const a = fragment.querySelector('.nav-btn')
+    const text = fragment.querySelector('.sidebarText')
+    const icon = fragment.querySelector(".ra")
+
     text.innerText = val.name
     icon.classList.add(val.icon)
+
+    a.dataset.id = val.id
+    a.addEventListener("click", handleSidebarClick)
+
     if(index === 0){
-        currentSelectedSidebar = newEl
-        icon.classList.add("active")
+        currentSelectedSidebar = li 
+        li.classList.add("active")
     }
     
     parentSidebar.append(newEl)
 })
 
 function handleSidebarClick(event){
-    const button = event.target
-    const idVal = button.value
-  const pageData = everyonePages.find((obj)=>{obj.id === idVal})
+    event.preventDefault()
+
+    const targetAnchor = event.target.closest('.nav-btn')
+    if (!targetAnchor) return
+
+    const idVal = targetAnchor.dataset.id
+
+  const pageData = everyonePages.find((obj) => obj.id === idVal)
+  if (!pageData) return
   currentSelectedSidebar.classList.toggle("active")
+
+  if (currentSelectedSidebar) {
+        currentSelectedSidebar.classList.remove("active")
+    }
+
+    const clickedLi = targetAnchor.parentElement
+    clickedLi.classList.add("active")
+    currentSelectedSidebar = clickedLi
   
   switch (pageData.type) {
     case "tool":

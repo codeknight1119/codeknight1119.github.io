@@ -61,7 +61,9 @@ const everyonePages = [
 const template = document.getElementById("sidebarTemplate")
 const parentSidebar = document.getElementById("everySidebarParent")
 
-everyonePages.forEach((val, index)=>{
+const reversedEveryonePages = everyonePages.toReversed()
+
+reversedEveryonePages.forEach((val, index)=>{
     let fragment = template.content.cloneNode(true)
     
     const li = fragment.querySelector('li')

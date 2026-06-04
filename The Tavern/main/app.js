@@ -120,14 +120,14 @@ function handleSidebarClick(event){
 async function renderTool(id) {
   console.log(`Rendering tool: ${id}`)  
   const toolData = everyonePages.find((obj) => obj.id === id)
-  const parsedBody = marked.parse(id.body)
+  const parsedBody = marked.parse(board.body)
   switch(toolData.toolType){
     case("board"):
       const boards = FirebaseUtils.getDocuments(`tools/${toolId}/boards`, 15, {feild: "timestamp"})
-      boards.forEach((val)=>{
+      boards.forEach((board)=>{
         const htmlText= `
         <section>
-        <h2 class="cinzel-title">${val.title}</h2>
+        <h2 class="cinzel-title">${board.title}</h2>
         <p>${parsedBody}</p>
         </section>
         `

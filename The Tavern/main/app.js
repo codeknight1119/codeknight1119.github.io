@@ -151,11 +151,8 @@ async function renderChat(id) {
     return 
   }
   messages.forEach((val)=>{
-    let classList = "message"
-    if(val.sender === user.uid) {classList += " myMessage"}
-
     const htmlText = `
-    <div class="message"><strong><p>${val.sender}:</p></strong><p>${val.message}</p></div>
+    <div class="message ${val.sender.uid === user.uid? "mine":"notMine"}"><strong><p>${val.sender}:</p></strong><p>${val.message}</p></div>
     `
     mainContentArea.innerHTML = htmlText
 

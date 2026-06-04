@@ -80,7 +80,7 @@ everyonePages.forEach((val, index)=>{
         li.classList.add("active")
     }
     
-    parentSidebar.append(fragment)
+    parentSidebar.prepend(fragment)
 })
 
 function handleSidebarClick(event){
@@ -112,4 +112,12 @@ function handleSidebarClick(event){
         renderChat(idVal)
         break;
   }
+}
+
+async function renderTool(id) {
+  console.log(`Rendering tool: ${id}`)  
+}
+
+async function renderChat(id) {
+  console.log(`Rendering Chat: ${id}`)  
 }

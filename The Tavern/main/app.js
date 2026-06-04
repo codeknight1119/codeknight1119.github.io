@@ -4,6 +4,7 @@
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
+let currentSelectedSidebar = null 
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
@@ -66,5 +67,10 @@ everyonePages.forEach((val, index)=>{
     const icon = newEl.querySelector(".ra")
     text.innerText = val.name
     icon.classList.add(val.icon)
+    if(index === 0){
+        currentSelectedSidebar = newEl
+        icon.classList.add("active")
+    }
+    
     parentSidebar.append(newEl)
 })

@@ -120,12 +120,13 @@ const mainContentArea = document.getElementById("mainContentArea")
 async function renderTool(id) {
   console.log(`Rendering tool: ${id}`)  
   const toolData = everyonePages.find((obj) => obj.id === id)
-  const parsedBody = marked.parse(board.body)
+ 
   switch(toolData.toolType){
     case("board"):
       const boards = FirebaseUtils.getDocuments(`tools/${toolId}/boards`, 15, {feild: "timestamp"})
       if(boards.length === 0) return
       boards.forEach((board)=>{
+         const parsedBody = marked.parse(board.body)
         const htmlText= `
         <section>
         <h2 class="cinzel-title">${board.title}</h2>

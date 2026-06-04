@@ -141,6 +141,8 @@ async function renderTool(id) {
         `
         finalHTMLText += htmlText
       })
+      finalHTMLText.prepend("<div class='boardMessage'")
+      finalHTMLText.append("</div>")
       mainContentArea.innerHTML = finalHTMLText
     break
 

@@ -176,6 +176,12 @@ dropdown-btn i {
     flex-direction: flex-end;
 }
 
+.boardMessage {
+    justify-content: center;
+    padding: 1em;
+    border: 1px solid var(--line-clr);
+}
+
 
 .cinzel-title {
     font-family: "Cinzel", serif;

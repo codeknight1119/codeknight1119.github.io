@@ -9,6 +9,7 @@ let currentSelectedSidebar = null
 const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
 let ss_CHATS = new Map()
+let activeChat = null;
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
@@ -104,25 +105,26 @@ function handleSidebarClick(event){
     const targetAnchor = event.target.closest('.nav-btn')
     if (!targetAnchor) return
     const clickedLi = targetAnchor.parentElement
-    if(clickedLi == currentSelectedSidebar) return
+    if(clickedLi === currentSelectedSidebar) return
 
     const idVal = targetAnchor.dataset.id
+    const pageData = everyonePages.find((obj) => obj.id === idVal)
+    
+    console.log("pagedata", pageData)
+    if (!pageData) return
 
-  const pageData = everyonePages.find((obj) => obj.id === idVal)
-  console.log("pagedata", pageData)
-  if (!pageData) return
-  currentSelectedSidebar.classList.toggle("active")
-
-  if (currentSelectedSidebar) {
+    if (currentSelectedSidebar) {
         currentSelectedSidebar.classList.remove("active")
     }
+    
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
-loadSidebar({tool: pageData.tool, id:idVal})
-  }
+
+    loadSidebar(pageData)
+}
 
 function loadSidebar(data){
-  switch (data.tool) {
+  switch (data.type) {
     case "tool":
         renderTool(data.id)
         break;
@@ -175,6 +177,7 @@ const BOARD_COUNT = 15
 
 async function renderChat(id) {
     chatUI.hidden = false;
+    activeChat = id;
     console.log(`Rendering Chat: ${id}`)
     
     const messages = await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {field: "timestamp"})
@@ -189,7 +192,7 @@ async function renderChat(id) {
     messages.forEach((val) => {
         const isMine = (user && val.sender.uid === user.uid) ? "mine" : "notMine";
         
-        const displayName = val.sender.name || val.sender.displayName || "Unknown Traveler";
+        const displayName = val.sender.name || val.sender.displayName;
 
         const htmlText = `
         <div class="message ${isMine}">
@@ -202,4 +205,10 @@ async function renderChat(id) {
     });
 
     mainContentArea.innerHTML = finalChatHTML;
+}
+
+const chatArea = document.getElementById("")
+async function handleChatMesage(){
+ if(activeChat === null) return 
+
 }

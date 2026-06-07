@@ -8,6 +8,8 @@ let user = null;
 let currentSelectedSidebar = null 
 const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
+let ss_CHATS = new Map()
+
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -107,6 +109,7 @@ function handleSidebarClick(event){
     const idVal = targetAnchor.dataset.id
 
   const pageData = everyonePages.find((obj) => obj.id === idVal)
+  console.log("pagedata", pageData)
   if (!pageData) return
   currentSelectedSidebar.classList.toggle("active")
 

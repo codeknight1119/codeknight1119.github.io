@@ -5,7 +5,7 @@ import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
-let currentSelectedSidebar = null 
+let currentSelectedSidebar = null
 const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
 let ss_CHATS = new Map()
@@ -18,42 +18,42 @@ let activeChat = null;
 const toggleButton = document.getElementById("toggle-btn")
 const sidebar = document.getElementById("sidebar")
 
-toggleButton.addEventListener("click", (event)=>{
+toggleButton.addEventListener("click", (event) => {
     sidebar.classList.toggle("close")
     toggleButton.classList.toggle("rotate")
-    Array.from(sidebar.getElementsByClassName("show")).forEach((ul)=>{
-         ul.classList.remove("show")
-         ul.previousElementSibling.classList.remove("rotate")
+    Array.from(sidebar.getElementsByClassName("show")).forEach((ul) => {
+        ul.classList.remove("show")
+        ul.previousElementSibling.classList.remove("rotate")
     })
 })
 
-function toggleSubMenu(event){
-  this.nextElementSibling.classList.toggle("show")    
-  this.classList.toggle("rotate")
-  if(sidebar.classList.contains("close")){
-      sidebar.classList.toggle("close")
-      toggleButton.classList.toggle("rotate")
-      }
+function toggleSubMenu(event) {
+    this.nextElementSibling.classList.toggle("show")
+    this.classList.toggle("rotate")
+    if (sidebar.classList.contains("close")) {
+        sidebar.classList.toggle("close")
+        toggleButton.classList.toggle("rotate")
+    }
 }
 
 const dropdowns = document.querySelectorAll('.dropdown-btn');
 
-dropdowns.forEach((val)=>{
+dropdowns.forEach((val) => {
     val.addEventListener("click", toggleSubMenu)
 })
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////AUTH/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-async function checkUser(){
-const userCheck = await FirebaseUtils.isSignedIn()
-if(!userCheck){
-    window.location.href = "https://codeknight1119.github.io/The%20Tavern"
-}else{
-    console.log("signed in ")
-    user = userCheck
-    FirebaseUtils.ALog("User signed in", {uid: userCheck.uid, name: userCheck.displayName})
-}
+async function checkUser() {
+    const userCheck = await FirebaseUtils.isSignedIn()
+    if (!userCheck) {
+        window.location.href = "https://codeknight1119.github.io/The%20Tavern"
+    } else {
+        console.log("signed in ")
+        user = userCheck
+        FirebaseUtils.ALog("User signed in", { uid: userCheck.uid, name: userCheck.displayName })
+    }
 }
 checkUser()
 
@@ -62,10 +62,10 @@ checkUser()
 //////////////////////////////////////////////////////////////////////
 
 const everyonePages = [
-    {name: "Guild Bulletin", type:"tool", id: "GB", icon: "ra-wooden-sign", toolType:"board"},
-    {name: "Quest Board", type:"tool", id: "QB", icon: "ra-horn-call", toolType:"board"},
-    {name: "Officer's Desk", type:"tool", id: "OD", icon: "ra-sheriff"},
-    {name: "Tavern Talk", type:"chat", id: "TT", icon: "ra-speech-bubbles"},
+    { name: "Guild Bulletin", type: "tool", id: "GB", icon: "ra-wooden-sign", toolType: "board" },
+    { name: "Quest Board", type: "tool", id: "QB", icon: "ra-horn-call", toolType: "board" },
+    { name: "Officer's Desk", type: "tool", id: "OD", icon: "ra-sheriff" },
+    { name: "Tavern Talk", type: "chat", id: "TT", icon: "ra-speech-bubbles" },
 ]
 
 const template = document.getElementById("sidebarTemplate")
@@ -73,9 +73,9 @@ const parentSidebar = document.getElementById("everySidebarParent")
 
 const reversedEveryonePages = everyonePages.toReversed()
 
-reversedEveryonePages.forEach((val, index)=>{
+reversedEveryonePages.forEach((val, index) => {
     let fragment = template.content.cloneNode(true)
-    
+
     const li = fragment.querySelector('li')
     const a = fragment.querySelector('.nav-btn')
     const text = fragment.querySelector('.sidebarText')
@@ -87,29 +87,29 @@ reversedEveryonePages.forEach((val, index)=>{
     a.dataset.id = val.id
     a.addEventListener("click", handleSidebarClick)
 
-    if(index === (reversedEveryonePages.length - 1)){
-        currentSelectedSidebar = li 
+    if (index === (reversedEveryonePages.length - 1)) {
+        currentSelectedSidebar = li
         li.classList.add("active")
-        loadSidebar(val)  
+        loadSidebar(val)
     }
-    
+
     parentSidebar.prepend(fragment)
 })
 
 
 
 
-function handleSidebarClick(event){
+function handleSidebarClick(event) {
     event.preventDefault()
 
     const targetAnchor = event.target.closest('.nav-btn')
     if (!targetAnchor) return
     const clickedLi = targetAnchor.parentElement
-    if(clickedLi === currentSelectedSidebar) return
+    if (clickedLi === currentSelectedSidebar) return
 
     const idVal = targetAnchor.dataset.id
     const pageData = everyonePages.find((obj) => obj.id === idVal)
-    
+
     console.log("pagedata", pageData)
     if (!pageData) return
 
@@ -117,7 +117,7 @@ function handleSidebarClick(event){
     if (currentSelectedSidebar) {
         currentSelectedSidebar.classList.remove("active")
     }
-    
+
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
 
@@ -125,75 +125,75 @@ function handleSidebarClick(event){
     loadSidebar(pageData)
 }
 
-function loadSidebar(data){
-  switch (data.type) {
-    case "tool":
-        renderTool(data.id)
-        break;
-  
-    case "chat":
-        renderChat(data.id)
-        break;
-  }
+function loadSidebar(data) {
+    switch (data.type) {
+        case "tool":
+            renderTool(data.id)
+            break;
+
+        case "chat":
+            renderChat(data.id)
+            break;
+    }
 }
 
 const mainContentArea = document.getElementById("mainContentArea")
 
 async function renderTool(id) {
     chatUI.hidden = true;
-  console.log(`Rendering tool: ${id}`)  
-  const toolData = everyonePages.find((obj) => obj.id === id)
- 
-const BOARD_COUNT = 15
+    console.log(`Rendering tool: ${id}`)
+    const toolData = everyonePages.find((obj) => obj.id === id)
 
-  switch(toolData.toolType){
-    case("board"):
-      let boards;
-      if(ss_TOOLS.get(id)){
-        boards = ss_TOOLS.get(id).slice(1, BOARD_COUNT)
-      }else{
-        boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, BOARD_COUNT)
-        ss_TOOLS.set(id, boards)
-      }
-      if(boards.length === 0){
-        mainContentArea.innerHTML = `<h3>No Messages</h3>`
-        return
-      }
-      let finalHTMLText = "";
-      boards.forEach((board)=>{
-         const parsedBody = marked.parse(board.body)
-        const htmlText= `
+    const BOARD_COUNT = 15
+
+    switch (toolData.toolType) {
+        case ("board"):
+            let boards;
+            if (ss_TOOLS.get(id)) {
+                boards = ss_TOOLS.get(id)
+            } else {
+                boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, BOARD_COUNT)
+                ss_TOOLS.set(id, boards)
+            }
+            if (boards.length === 0) {
+                mainContentArea.innerHTML = `<h3>No Messages</h3>`
+                return
+            }
+            let finalHTMLText = "";
+            boards.forEach((board) => {
+                const parsedBody = marked.parse(board.body)
+                const htmlText = `
         <section class='boardMessage'>
         <h3 class="cinzel-title">${board.title}</h3>
         <p>${parsedBody}</p>
         </section>
         `
-        finalHTMLText += htmlText
-      })
-      finalHTMLText = "<div>" + finalHTMLText + "</div>"
-      mainContentArea.innerHTML = finalHTMLText
-    break
+                finalHTMLText += htmlText
+            })
+            finalHTMLText = "<div>" + finalHTMLText + "</div>"
+            mainContentArea.innerHTML = finalHTMLText
+            break
 
-  }
+    }
 }
 
 async function renderChat(id) {
     chatUI.hidden = false;
     activeChat = id;
     console.log(`Rendering Chat: ${id}`)
-    
-    const messages = await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {field: "timestamp"})
-    
-    if(messages.length === 0){
+
+    const messages = await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, { field: "timestamp" })
+
+    if (messages.length === 0) {
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
-        return 
+        return
     }
-  
+
     let finalChatHTML = "";
 
     messages.forEach((val) => {
         const isMine = (user && val.sender.uid === user.uid) ? "mine" : "notMine";
-        
+
         const displayName = val.sender.name || val.sender.displayName;
 
         const htmlText = `
@@ -202,7 +202,7 @@ async function renderChat(id) {
             <p>${val.message}</p>
         </div>
         `;
-        
+
         finalChatHTML += htmlText;
     });
 
@@ -211,8 +211,16 @@ async function renderChat(id) {
 
 const chatArea = document.getElementById("sendBar")
 async function handleChatMesage(){
- if(activeChat === null) return 
-const sendData = {
-    
+    if (activeChat === null) return
+    const sendData = {
+        content: chatArea.innerHTML,
+        username: user.displayName,
+        uid: user.uid,
+        timestamp: Date.now()
+    }
+    FirebaseUtils.addDocument(`conversations/${activeChat}`, sendData)
+    ss_CHATS.get(activeChat).push(sendData)
+    renderMessage(sendData)
 }
-}
+
+document.getElementById("sendBtn").addEventListener("click", handleChatMesage)

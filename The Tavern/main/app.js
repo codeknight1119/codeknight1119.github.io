@@ -156,14 +156,14 @@ const BOARD_COUNT = 15
       boards.forEach((board)=>{
          const parsedBody = marked.parse(board.body)
         const htmlText= `
-        <section>
-        <h2 class="cinzel-title">${board.title}</h2>
+        <section class='boardMessage'>
+        <h3 class="cinzel-title">${board.title}</h3>
         <p>${parsedBody}</p>
         </section>
         `
         finalHTMLText += htmlText
       })
-      finalHTMLText = "<div class='boardMessage'" + finalHTMLText + "</div>"
+      finalHTMLText = "<div>" + finalHTMLText + "</div>"
       mainContentArea.innerHTML = finalHTMLText
     break
 

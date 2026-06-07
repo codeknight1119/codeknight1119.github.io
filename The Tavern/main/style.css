@@ -186,8 +186,10 @@ dropdown-btn i {
 }
 
 .boardMessage {
-    justify-content: center;
-    align-items: center;
+display: flex;
+    flex-direction: column; 
+    align-items: center;    
+    justify-content: center; 
     padding: 0.5em;
     margin: 1em;
     border: 1px solid var(--line-clr);

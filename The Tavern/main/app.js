@@ -100,6 +100,8 @@ function handleSidebarClick(event){
 
     const targetAnchor = event.target.closest('.nav-btn')
     if (!targetAnchor) return
+    const clickedLi = targetAnchor.parentElement
+    if(clickedLi == currentSelectedSidebar) return
 
     const idVal = targetAnchor.dataset.id
 
@@ -110,8 +112,6 @@ function handleSidebarClick(event){
   if (currentSelectedSidebar) {
         currentSelectedSidebar.classList.remove("active")
     }
-
-    const clickedLi = targetAnchor.parentElement
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
 loadSidebar({type: pageData.type, id:idVal})
@@ -162,7 +162,7 @@ async function renderTool(id) {
 }
 
 async function renderChat(id) {
-chatUI.hidden = false
+chatUI.removeAttribute('hidden') = false
   console.log(`Rendering Chat: ${id}`)
   const messages =  await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {feild: "timestamp"})
   if(messages.length === 0){

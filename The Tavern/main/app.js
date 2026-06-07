@@ -171,7 +171,6 @@ const BOARD_COUNT = 15
 }
 
 async function renderChat(id) {
-  
     chatUI.hidden = false;
     console.log(`Rendering Chat: ${id}`)
     

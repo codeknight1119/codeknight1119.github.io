@@ -221,8 +221,11 @@ dropdown-btn i {
 }
 
 #sendBtn {
-    color: var(--base-clr);
+background: none;
+    border: none;
+    color: var(--accent-clr);
     outline: 1px solid var(--line-clr);
+    cursor: pointer;         
 
     i {
         transform: rotateY(180deg);

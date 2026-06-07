@@ -46,7 +46,7 @@ const userCheck = await FirebaseUtils.isSignedIn()
 if(!userCheck){
     window.location.href = "https://codeknight1119.github.io/The%20Tavern"
 }else{
-    console.log("signed in ", userCheck)
+    console.log("signed in ")
     FirebaseUtils.ALog("User signed in", {uid: userCheck.uid, name: userCheck.displayName})
 }
 
@@ -84,7 +84,7 @@ reversedEveryonePages.forEach((val, index)=>{
     if(index === (reversedEveryonePages.length - 1)){
         currentSelectedSidebar = li 
         li.classList.add("active")
-        //do something here to load its sidebar page
+        loadSidebar(val)  
     }
     
     parentSidebar.prepend(fragment)
@@ -113,16 +113,21 @@ function handleSidebarClick(event){
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
   
-  switch (pageData.type) {
+  
+}
+
+function loadSidebar(data){
+  switch (data.type) {
     case "tool":
-        renderTool(idVal)
+        renderTool(data.id)
         break;
   
     case "chat":
-        renderChat(idVal)
+        renderChat(data.id)
         break;
   }
 }
+
 const mainContentArea = document.getElementById("mainContentArea")
 async function renderTool(id) {
     chatUI.hidden = true;

@@ -5,13 +5,13 @@ import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/12.12
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCQSv-B_1LiYwW6_XDMCesK-K-uUwx4SvE",
-  authDomain: "wchs-thetavern.firebaseapp.com",
-  projectId: "wchs-thetavern",
-  storageBucket: "wchs-thetavern.firebasestorage.app",
-  messagingSenderId: "1067002790985",
-  appId: "1:1067002790985:web:5835522f0afede84deeb98",
-  measurementId: "G-L2LD6HTME2"
+    apiKey: "AIzaSyCQSv-B_1LiYwW6_XDMCesK-K-uUwx4SvE",
+    authDomain: "wchs-thetavern.firebaseapp.com",
+    projectId: "wchs-thetavern",
+    storageBucket: "wchs-thetavern.firebasestorage.app",
+    messagingSenderId: "1067002790985",
+    appId: "1:1067002790985:web:5835522f0afede84deeb98",
+    measurementId: "G-L2LD6HTME2"
 };
 
 
@@ -27,7 +27,7 @@ export const loginGoogle = async () => {
         return {
             user: result.user,
             isNew: getAdditionalUserInfo(result).isNewUser,
-        }; 
+        };
     }
     catch (error) {
         console.error(error);
@@ -48,8 +48,8 @@ export const setDocument = async (path, data) => {
 
 export const addDocument = async (path, data) => {
     try {
-       const docAdded =  await addDoc(collection(db, path), data);
-       return docAdded;
+        const docAdded = await addDoc(collection(db, path), data);
+        return docAdded;
         // alert(JSON.stringify(result));
     }
     catch (e) {
@@ -96,8 +96,8 @@ export const getDocuments = async (path, l, docParam) => {
             constraints.push(limit(l))
         }
 
-        
-        const collectionRef = collection(db, path); 
+
+        const collectionRef = collection(db, path);
         const q = query(collectionRef, ...constraints);
         const querySnapshot = await getDocs(q);
 
@@ -124,10 +124,10 @@ export const isSignedIn = () => {
             const auth = getAuth();
             const unsubscribe = auth.onAuthStateChanged(
                 (user) => {
-                    unsubscribe(); 
+                    unsubscribe();
                     if (user) {
                         const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
-                        
+
                         resolve(user);
                     } else {
                         resolve(null);
@@ -151,6 +151,6 @@ export const logout = () => {
     }
 };
 
-export const ALog = (name, data)=>{
-logEvent(analytics, name, data)
+export const ALog = (name, data) => {
+    logEvent(analytics, name, data)
 }

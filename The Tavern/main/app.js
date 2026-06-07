@@ -6,6 +6,7 @@ import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 //////////////////////////////////////////////////////////////////////
 let user = null;
 let currentSelectedSidebar = null 
+const chatUI = document.getElementById("chatTools")
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
@@ -90,7 +91,7 @@ reversedEveryonePages.forEach((val, index)=>{
     parentSidebar.prepend(fragment)
 })
 
-const chatUI = document.getElementById("chatTools")
+
 
 
 function handleSidebarClick(event){
@@ -129,6 +130,7 @@ function loadSidebar(data){
 }
 
 const mainContentArea = document.getElementById("mainContentArea")
+
 async function renderTool(id) {
     chatUI.hidden = true;
   console.log(`Rendering tool: ${id}`)  
@@ -158,6 +160,7 @@ async function renderTool(id) {
 
   }
 }
+
 async function renderChat(id) {
 chatUI.hidden = false
   console.log(`Rendering Chat: ${id}`)

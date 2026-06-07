@@ -113,6 +113,7 @@ function handleSidebarClick(event){
     console.log("pagedata", pageData)
     if (!pageData) return
 
+    // Cleaned up class toggling
     if (currentSelectedSidebar) {
         currentSelectedSidebar.classList.remove("active")
     }
@@ -120,6 +121,7 @@ function handleSidebarClick(event){
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
 
+    // Pass the entire pageData object directly
     loadSidebar(pageData)
 }
 
@@ -210,5 +212,7 @@ async function renderChat(id) {
 const chatArea = document.getElementById("sendBar")
 async function handleChatMesage(){
  if(activeChat === null) return 
-
+const sendData = {
+    
+}
 }

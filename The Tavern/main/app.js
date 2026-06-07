@@ -17,7 +17,7 @@ const chatArea = document.getElementById("sendBar")
 
 const messageInput = new Editor({
     element: chatArea,
-    extentions: [StarterKit],
+    extensions: [StarterKit],
     editorProps: {
         attributes: { class: 'message-input-styles' },
     },
@@ -220,19 +220,20 @@ async function renderChat(id) {
 async function handleChatMesage() {
     if (activeChat === null) return
     const sendData = {
-        content: chatArea.innerHTML,
+        content: messageInput.getHTML(),
         username: user.displayName,
         uid: user.uid,
         timestamp: Date.now()
     }
-    chatArea.innerHTML = "";
+    messageInput.commands.clearContent();
     FirebaseUtils.addDocument(`conversations/${activeChat}`, sendData)
     ss_CHATS.get(activeChat).push(sendData)
     renderMessage(sendData)
 }
 
 chatArea.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault(); 
         handleChatMesage();
     }
 })

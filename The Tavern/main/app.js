@@ -207,7 +207,7 @@ async function renderChat(id) {
     mainContentArea.innerHTML = finalChatHTML;
 }
 
-const chatArea = document.getElementById("")
+const chatArea = document.getElementById("sendBar")
 async function handleChatMesage(){
  if(activeChat === null) return 
 

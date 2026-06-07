@@ -162,7 +162,7 @@ async function renderTool(id) {
 }
 
 async function renderChat(id) {
-chatUI.removeAttribute('hidden') = false
+chatUI.removeAttribute('hidden')
   console.log(`Rendering Chat: ${id}`)
   const messages =  await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {feild: "timestamp"})
   if(messages.length === 0){

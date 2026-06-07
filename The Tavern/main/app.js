@@ -1,5 +1,7 @@
 import * as FirebaseUtils from "../firebaseUtils.js"
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+import { Editor } from 'https://esm.sh/@tiptap/core';
+import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////GLOBAL VARS//////////////////////////////////
@@ -10,6 +12,16 @@ const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
 let ss_CHATS = new Map()
 let activeChat = null;
+
+const chatArea = document.getElementById("sendBar")
+
+const messageInput = new Editor({
+    element: chatArea,
+    extentions: [StarterKit],
+    editorProps: {
+        attributes: { class: 'message-input-styles' },
+    },
+})
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
@@ -50,7 +62,6 @@ async function checkUser() {
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
-        console.log("signed in ")
         user = userCheck
         FirebaseUtils.ALog("User signed in", { uid: userCheck.uid, name: userCheck.displayName })
     }
@@ -110,7 +121,6 @@ function handleSidebarClick(event) {
     const idVal = targetAnchor.dataset.id
     const pageData = everyonePages.find((obj) => obj.id === idVal)
 
-    console.log("pagedata", pageData)
     if (!pageData) return
 
     // Cleaned up class toggling
@@ -141,7 +151,6 @@ const mainContentArea = document.getElementById("mainContentArea")
 
 async function renderTool(id) {
     chatUI.hidden = true;
-    console.log(`Rendering tool: ${id}`)
     const toolData = everyonePages.find((obj) => obj.id === id)
 
     const BOARD_COUNT = 15
@@ -180,8 +189,6 @@ async function renderTool(id) {
 async function renderChat(id) {
     chatUI.hidden = false;
     activeChat = id;
-    console.log(`Rendering Chat: ${id}`)
-
     const messages = await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, { field: "timestamp" })
 
     if (messages.length === 0) {
@@ -199,7 +206,7 @@ async function renderChat(id) {
         const htmlText = `
         <div class="message ${isMine}">
             <strong><p>${displayName}:</p></strong>
-            <p>${val.message}</p>
+            <p>${val.content}</p>
         </div>
         `;
 
@@ -209,8 +216,8 @@ async function renderChat(id) {
     mainContentArea.innerHTML = finalChatHTML;
 }
 
-const chatArea = document.getElementById("sendBar")
-async function handleChatMesage(){
+
+async function handleChatMesage() {
     if (activeChat === null) return
     const sendData = {
         content: chatArea.innerHTML,
@@ -218,9 +225,17 @@ async function handleChatMesage(){
         uid: user.uid,
         timestamp: Date.now()
     }
+    chatArea.innerHTML = "";
     FirebaseUtils.addDocument(`conversations/${activeChat}`, sendData)
     ss_CHATS.get(activeChat).push(sendData)
     renderMessage(sendData)
 }
 
+chatArea.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        handleChatMesage();
+    }
+})
+
 document.getElementById("sendBtn").addEventListener("click", handleChatMesage)
+

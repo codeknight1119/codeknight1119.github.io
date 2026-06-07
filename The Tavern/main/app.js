@@ -118,11 +118,11 @@ function handleSidebarClick(event){
     }
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
-loadSidebar({type: pageData.type, id:idVal})
+loadSidebar({tool: pageData.tool, id:idVal})
   }
 
 function loadSidebar(data){
-  switch (data.type) {
+  switch (data.tool) {
     case "tool":
         renderTool(data.id)
         break;

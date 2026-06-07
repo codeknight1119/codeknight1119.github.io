@@ -178,8 +178,16 @@ dropdown-btn i {
 
 .boardMessage {
     justify-content: center;
-    padding: 1em;
+    align-items: center;
+    padding: 0.5em;
+    margin: 1em;
     border: 1px solid var(--line-clr);
+    border-radius: 5px;
+}
+
+#mainContentArea{
+display: flex;
+justify-content: center;
 }
 #sendBtn{
     color: var(--base-clr);

@@ -163,7 +163,7 @@ async function renderTool(id) {
 }
 
 async function renderChat(id) {
-    // 1. Unhide consistently using the boolean property
+  
     chatUI.hidden = false;
     console.log(`Rendering Chat: ${id}`)
     

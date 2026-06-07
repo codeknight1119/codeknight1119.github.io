@@ -47,6 +47,7 @@ if(!userCheck){
     window.location.href = "https://codeknight1119.github.io/The%20Tavern"
 }else{
     console.log("signed in ", userCheck)
+    FirebaseUtils.ALog("User signed in", {uid: user.uid, name: user.displayName})
 }
 
 

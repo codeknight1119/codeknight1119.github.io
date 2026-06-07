@@ -47,7 +47,7 @@ if(!userCheck){
     window.location.href = "https://codeknight1119.github.io/The%20Tavern"
 }else{
     console.log("signed in ", userCheck)
-    FirebaseUtils.ALog("User signed in", {uid: user.uid, name: user.displayName})
+    FirebaseUtils.ALog("User signed in", {uid: userCheck.uid, name: userCheck.displayName})
 }
 
 
@@ -84,7 +84,7 @@ reversedEveryonePages.forEach((val, index)=>{
     if(index === (reversedEveryonePages.length - 1)){
         currentSelectedSidebar = li 
         li.classList.add("active")
-        li.click()
+        //do something here to load its sidebar page
     }
     
     parentSidebar.prepend(fragment)

@@ -32,6 +32,14 @@ body {
     grid-template-columns: auto 1fr;
 }
 
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden
+}
+
 #sidebar {
     box-sizing: border-box;
     height: 100vh;
@@ -162,8 +170,9 @@ dropdown-btn i {
     padding: 0.25em;
     border: 1px solid var(--line-clr);
     background-color: var(--accent-clr);
+
     p {
-        color : var(--text-clr)
+        color: var(--text-clr)
     }
 
 }
@@ -185,15 +194,37 @@ dropdown-btn i {
     border-radius: 5px;
 }
 
-#mainContentArea{
-display: flex;
-justify-content: center;
+#mainContentArea {
+    flex: 1;
+    overflow-y: auto;
+    justify-content: center;
+    padding: 1em;
 }
-#sendBtn{
+#chatTools:not([hidden]){
+    display: flex;
+    gap: 0.5em;
+    padding: 1em;
+    border-top: 1px solid var(--line-clr);
+  /*  background-color: rgba(0, 0, 0, 0.2); /* Optional: darkens the chat area slightly */
+    align-items: center;
+}
+
+#sendBar {
+    flex-grow: 1;
+    height: 2.5rem;
+    resize: none;
+    padding: 0.5em;
+    border-radius: 4px;
+    border: 1px solid var(--line-clr);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-clr);
+}
+
+#sendBtn {
     color: var(--base-clr);
     outline: 1px solid var(--line-clr);
 
-    i{
+    i {
         transform: rotateY(180deg);
     }
 }

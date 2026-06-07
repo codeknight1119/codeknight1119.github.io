@@ -139,7 +139,7 @@ async function renderTool(id) {
  
   switch(toolData.toolType){
     case("board"):
-      const boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, 15, {feild: "timestamp"})
+      const boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, 15, {field: "timestamp"})
       if(boards.length === 0){
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
         return

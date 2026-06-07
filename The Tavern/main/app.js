@@ -25,12 +25,12 @@ toggleButton.addEventListener("click", (event)=>{
 })
 
 function toggleSubMenu(event){
-this.nextElementSibling.classList.toggle("show")    
-this.classList.toggle("rotate")
-if(sidebar.classList.contains("close")){
-        sidebar.classList.toggle("close")
-        toggleButton.classList.toggle("rotate")
-    }
+  this.nextElementSibling.classList.toggle("show")    
+  this.classList.toggle("rotate")
+  if(sidebar.classList.contains("close")){
+      sidebar.classList.toggle("close")
+      toggleButton.classList.toggle("rotate")
+      }
 }
 
 const dropdowns = document.querySelectorAll('.dropdown-btn');
@@ -42,7 +42,7 @@ dropdowns.forEach((val)=>{
 //////////////////////////////////////////////////////////////////////
 /////////////////////////AUTH/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-
+async function checkUser(){
 const userCheck = await FirebaseUtils.isSignedIn()
 if(!userCheck){
     window.location.href = "https://codeknight1119.github.io/The%20Tavern"
@@ -50,7 +50,8 @@ if(!userCheck){
     console.log("signed in ")
     FirebaseUtils.ALog("User signed in", {uid: userCheck.uid, name: userCheck.displayName})
 }
-
+}
+checkUser()
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////PAGE RENDERING///////////////////////////////
@@ -113,9 +114,8 @@ function handleSidebarClick(event){
     const clickedLi = targetAnchor.parentElement
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
-  
-  
-}
+loadSidebar({type: pageData.type, id:idVal})
+  }
 
 function loadSidebar(data){
   switch (data.type) {

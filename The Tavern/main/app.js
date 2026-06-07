@@ -7,7 +7,7 @@ import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 let user = null;
 let currentSelectedSidebar = null 
 const chatUI = document.getElementById("chatTools")
-
+let ss_TOOLS = new Map()
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -137,9 +137,17 @@ async function renderTool(id) {
   console.log(`Rendering tool: ${id}`)  
   const toolData = everyonePages.find((obj) => obj.id === id)
  
+const BOARD_COUNT = 15
+
   switch(toolData.toolType){
     case("board"):
-      const boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, 15)
+      let boards;
+      if(ss_TOOLS.get(id)){
+        boards = ss_TOOLS.get(id).slice(1, BOARD_COUNT)
+      }else{
+        boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, BOARD_COUNT)
+        ss_TOOLS.set(id, boards)
+      }
       if(boards.length === 0){
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
         return

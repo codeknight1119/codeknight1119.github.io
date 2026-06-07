@@ -48,6 +48,7 @@ if(!userCheck){
     window.location.href = "https://codeknight1119.github.io/The%20Tavern"
 }else{
     console.log("signed in ")
+    user = userCheck
     FirebaseUtils.ALog("User signed in", {uid: userCheck.uid, name: userCheck.displayName})
 }
 }
@@ -162,20 +163,33 @@ async function renderTool(id) {
 }
 
 async function renderChat(id) {
-chatUI.removeAttribute('hidden')
-  console.log(`Rendering Chat: ${id}`)
-  const messages =  await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {feild: "timestamp"})
-  if(messages.length === 0){
-    mainContentArea.innerHTML = `<h3>No Messages</h3>`
-    return 
-  }
+    // 1. Unhide consistently using the boolean property
+    chatUI.hidden = false;
+    console.log(`Rendering Chat: ${id}`)
+    
+    const messages = await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, {field: "timestamp"})
+    
+    if(messages.length === 0){
+        mainContentArea.innerHTML = `<h3>No Messages</h3>`
+        return 
+    }
   
+    let finalChatHTML = "";
 
-  messages.forEach((val)=>{
-    const htmlText = `
-    <div class="message ${val.sender.uid === user.uid? "mine":"notMine"}"><strong><p>${val.sender}:</p></strong><p>${val.message}</p></div>
-    `
-    mainContentArea.innerHTML = htmlText
-  })
+    messages.forEach((val) => {
+        const isMine = (user && val.sender.uid === user.uid) ? "mine" : "notMine";
+        
+        const displayName = val.sender.name || val.sender.displayName || "Unknown Traveler";
 
+        const htmlText = `
+        <div class="message ${isMine}">
+            <strong><p>${displayName}:</p></strong>
+            <p>${val.message}</p>
+        </div>
+        `;
+        
+        finalChatHTML += htmlText;
+    });
+
+    mainContentArea.innerHTML = finalChatHTML;
 }

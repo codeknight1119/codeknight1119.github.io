@@ -224,6 +224,7 @@ function renderMessage(data){
         `;
     const messageEl = document.createElement("div")
     messageEl.innerHTML = htmlText
+    mainContentArea.insertAdjacentHTML('beforeend', htmlText);
 }
 
 async function handleChatMesage() {

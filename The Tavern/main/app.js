@@ -207,26 +207,30 @@ async function renderChat(id) {
         return
     }
 
-    let finalChatHTML = "";
 
     messages.forEach((val) => {
-        const isMine = (user && val.sender.uid === user.uid) ? "mine" : "notMine";
+      renderMessage(val)
+    });
 
-        const displayName = val.sender.name || val.sender.displayName;
-        const parsedContent = marked.parse(val.content);
+    mainContentArea.innerHTML = finalChatHTML;
+}
+
+function renderMessage(data){
+      const isMine = (user && data.sender.uid === user.uid) ? "mine" : "notMine";
+
+        const displayName = data.sender.name || data.sender.displayName;
+        const parsedContent = marked.parse(data.content);
         const htmlText = `
         <div class="message ${isMine}">
             <strong><p>${displayName}:</p></strong>
             <div>${parsedContent}</div>
         </div>
         `;
+    const messageEl = document.createElement("div")
+    messageEl.innerHTML = htmlText
+    mainContentArea.appendChild(messageEl)
 
-        finalChatHTML += htmlText;
-    });
-
-    mainContentArea.innerHTML = finalChatHTML;
 }
-
 
 async function handleChatMesage() {
     if (activeChat === null) return

@@ -19,8 +19,7 @@ const chatArea = document.getElementById("sendBar")
 const messageInput = new Editor({
     element: chatArea,
     extensions: [StarterKit, Markdown.configure({
-            html: false,
-            transformPastedText: true,
+            transformPastedText: true, // Converts copied markdown into visual styles on paste
         }),],
     editorProps: {
         attributes: { class: 'message-input-styles' },

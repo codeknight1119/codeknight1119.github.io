@@ -2,7 +2,7 @@ import * as FirebaseUtils from "../firebaseUtils.js"
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import { Editor } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
-import Markdown from 'https://cdn.jsdelivr.net/npm/tiptap-markdown@0.9.0/dist/tiptap-markdown.umd.min.js';
+import { Markdown } from 'https://esm.sh/@tiptap-pro/extension-markdown';
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////GLOBAL VARS//////////////////////////////////

@@ -230,9 +230,11 @@ async function renderChat(id) {
 
 async function handleChatMesage() {
     if (activeChat === null) return
-
+    
+    const markdownContent = messageInput.storage.markdown.getMarkdown();
+    
     const sendData = {
-        content: messageInput.storage.markdown.getMarkdown(), 
+        content: markdownContent, 
         username: user.displayName,
         uid: user.uid,
         timestamp: Date.now()

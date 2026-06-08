@@ -18,7 +18,10 @@ const chatArea = document.getElementById("sendBar")
 
 const messageInput = new Editor({
     element: chatArea,
-    extensions: [StarterKit, Markdown],
+    extensions: [StarterKit, Markdown.configure({
+            html: false,
+            transformPastedText: true,
+        }),],
     editorProps: {
         attributes: { class: 'message-input-styles' },
         handleKeyDown: (view, event) => {
@@ -228,17 +231,20 @@ async function renderChat(id) {
 
 async function handleChatMesage() {
     if (activeChat === null) return
+
     const sendData = {
-        content: messageInput.getText(),
+        content: messageInput.storage.markdown.getMarkdown(), 
         username: user.displayName,
         uid: user.uid,
         timestamp: Date.now()
     }
+    
     messageInput.commands.clearContent();
     FirebaseUtils.addDocument(`conversations/${activeChat}`, sendData)
-    if (!ss_CHATS.get(activeChat)) {
+    
+    if(!ss_CHATS.get(activeChat)){
         ss_CHATS.set(activeChat, [sendData])
-    } else {
+    }else{
         ss_CHATS.get(activeChat).push(sendData)
     }
     renderMessage(sendData)

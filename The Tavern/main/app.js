@@ -231,7 +231,7 @@ async function renderChat(id) {
 async function handleChatMesage() {
     if (activeChat === null) return
     
-    const markdownContent = messageInput.storage.markdown.getMarkdown();
+    const markdownContent = messageInput.getMarkdown();
     
     const sendData = {
         content: markdownContent, 

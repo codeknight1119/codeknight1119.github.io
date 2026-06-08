@@ -50,7 +50,6 @@ export const addDocument = async (path, data) => {
     try {
         const docAdded = await addDoc(collection(db, path), data);
         return docAdded;
-        // alert(JSON.stringify(result));
     }
     catch (e) {
         alert(`set doc failed at ${path} ` + JSON.stringify(e));

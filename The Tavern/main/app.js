@@ -206,13 +206,9 @@ async function renderChat(id) {
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
         return
     }
-
-
     messages.forEach((val) => {
       renderMessage(val)
     });
-
-    mainContentArea.innerHTML = finalChatHTML;
 }
 
 function renderMessage(data){

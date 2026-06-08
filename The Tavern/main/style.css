@@ -168,8 +168,9 @@ dropdown-btn i {
 
 .message {
     padding: 0.25em;
-    border: 1px solid var(--line-clr);
-    background-color: var(--accent-clr);
+    border: 1.5px solid var(--line-clr);
+    background-color: var(--base-clr);
+    border-radius: 5px;
 
     p {
         color: var(--text-clr)
@@ -179,6 +180,7 @@ dropdown-btn i {
 
 .message.mine {
     flex-direction: flex-start;
+    border-radius: 1px;
 }
 
 .message.notMine {
@@ -207,7 +209,6 @@ display: flex;
     gap: 0.5em;
     padding: 1em;
     border-top: 1px solid var(--line-clr);
-  /*  background-color: rgba(0, 0, 0, 0.2); /* Optional: darkens the chat area slightly */
     align-items: center;
 }
 

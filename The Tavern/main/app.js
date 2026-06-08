@@ -216,9 +216,9 @@ async function renderChat(id) {
 }
 
 function renderMessage(data){
-      const isMine = (user && data.sender.uid === user.uid) ? "mine" : "notMine";
+      const isMine = (user && data.uid === user.uid) ? "mine" : "notMine";
 
-        const displayName = data.sender.name || data.sender.displayName;
+        const displayName = data.name || data.sender.displayName;
         const parsedContent = marked.parse(data.content);
         const htmlText = `
         <div class="message ${isMine}">

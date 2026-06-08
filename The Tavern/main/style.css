@@ -163,7 +163,6 @@ dropdown-btn i {
 
 #mainMessageArea {
     display: flex;
-
 }
 
 .message {
@@ -171,20 +170,25 @@ dropdown-btn i {
     border: 1.5px solid var(--line-clr);
     background-color: var(--base-clr);
     border-radius: 5px;
+    width: fit-content;
+    max-width: 75%;
+
 
     p {
-        color: var(--text-clr)
+        color: var(--text-clr);
+        margin: 4px 0;
     }
 
 }
 
 .message.mine {
-    flex-direction: flex-start;
-    border-radius: 1px;
+    align-self: flex-start;
+    border-radius: 8px 8px 1px 8px;
 }
 
 .message.notMine {
-    flex-direction: flex-end;
+    align-self: flex-end;
+    border-radius: 8px 8px 1px 8px;
 }
 
 .boardMessage {
@@ -203,6 +207,7 @@ display: flex;
     overflow-y: auto;
     justify-content: center;
     padding: 1em;
+    
 }
 #chatTools:not([hidden]){
     display: flex;

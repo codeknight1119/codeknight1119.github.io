@@ -20,6 +20,14 @@ const messageInput = new Editor({
     extensions: [StarterKit],
     editorProps: {
         attributes: { class: 'message-input-styles' },
+        handleKeyDown : (view, event)=>{
+            if(event.key === "Enter" && !event.shiftKey){
+                event.preventDefault();
+                handleChatMesage();
+                return true;
+            }
+            return false
+        }
     },
 })
 
@@ -227,16 +235,13 @@ async function handleChatMesage() {
     }
     messageInput.commands.clearContent();
     FirebaseUtils.addDocument(`conversations/${activeChat}`, sendData)
+    if(!ss_CHATS.get(activeChat)){
+        ss_CHATS.set(activeChat, [sendData])
+    }else{
     ss_CHATS.get(activeChat).push(sendData)
+    }
     renderMessage(sendData)
 }
-
-chatArea.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault(); 
-        handleChatMesage();
-    }
-})
 
 document.getElementById("sendBtn").addEventListener("click", handleChatMesage)
 

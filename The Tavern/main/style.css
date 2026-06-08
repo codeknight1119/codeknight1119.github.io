@@ -163,6 +163,8 @@ dropdown-btn i {
 
 #mainMessageArea {
     display: flex;
+    flex-direction: column;
+    gap: 0.25em;
 }
 
 .message {
@@ -182,13 +184,13 @@ dropdown-btn i {
 }
 
 .message.mine {
-    align-self: flex-start;
-    border-radius: 8px 8px 1px 8px;
+    align-self: flex-end; 
+    border-radius: 8px 8px 1px 8px; 
 }
 
 .message.notMine {
-    align-self: flex-end;
-    border-radius: 8px 8px 1px 8px;
+    align-self: flex-start; 
+    border-radius: 8px 8px 8px 1px; 
 }
 
 .boardMessage {

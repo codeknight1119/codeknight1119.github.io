@@ -142,7 +142,7 @@ function handleSidebarClick(event) {
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
 
-    // Pass the entire pageData object directly
+   mainContentArea.innerHTML = ""
     loadSidebar(pageData)
 }
 
@@ -228,8 +228,6 @@ function renderMessage(data){
         `;
     const messageEl = document.createElement("div")
     messageEl.innerHTML = htmlText
-    mainContentArea.appendChild(messageEl)
-
 }
 
 async function handleChatMesage() {

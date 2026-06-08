@@ -240,14 +240,15 @@ async function handleChatMesage() {
     }
     
     messageInput.commands.clearContent();
-    await FirebaseUtils.addDocument(`rooms/${activeChat}/messages`, sendData)
-    
-    if(!ss_CHATS.get(activeChat)){
+        if(!ss_CHATS.get(activeChat)){
         ss_CHATS.set(activeChat, [sendData])
     }else{
         ss_CHATS.get(activeChat).push(sendData)
     }
     renderMessage(sendData)
+    
+    await FirebaseUtils.addDocument(`rooms/${activeChat}/messages`, sendData)
+
 }
 
 document.getElementById("sendBtn").addEventListener("click", handleChatMesage)

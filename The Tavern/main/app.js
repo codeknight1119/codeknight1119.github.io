@@ -20,8 +20,8 @@ const messageInput = new Editor({
     extensions: [StarterKit],
     editorProps: {
         attributes: { class: 'message-input-styles' },
-        handleKeyDown : (view, event)=>{
-            if(event.key === "Enter" && !event.shiftKey){
+        handleKeyDown: (view, event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 handleChatMesage();
                 return true;
@@ -210,11 +210,11 @@ async function renderChat(id) {
         const isMine = (user && val.sender.uid === user.uid) ? "mine" : "notMine";
 
         const displayName = val.sender.name || val.sender.displayName;
-
+        const parsedContent = marked.parse(val.content);
         const htmlText = `
         <div class="message ${isMine}">
             <strong><p>${displayName}:</p></strong>
-            <p>${val.content}</p>
+            <div>${parsedContent}</div>
         </div>
         `;
 
@@ -228,17 +228,17 @@ async function renderChat(id) {
 async function handleChatMesage() {
     if (activeChat === null) return
     const sendData = {
-        content: messageInput.getHTML(),
+        content: messageInput.getText(),
         username: user.displayName,
         uid: user.uid,
         timestamp: Date.now()
     }
     messageInput.commands.clearContent();
     FirebaseUtils.addDocument(`conversations/${activeChat}`, sendData)
-    if(!ss_CHATS.get(activeChat)){
+    if (!ss_CHATS.get(activeChat)) {
         ss_CHATS.set(activeChat, [sendData])
-    }else{
-    ss_CHATS.get(activeChat).push(sendData)
+    } else {
+        ss_CHATS.get(activeChat).push(sendData)
     }
     renderMessage(sendData)
 }

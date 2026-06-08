@@ -2,6 +2,7 @@ import * as FirebaseUtils from "../firebaseUtils.js"
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import { Editor } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+import Markdown from 'https://esm.sh/@tiptap/markdown';
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////GLOBAL VARS//////////////////////////////////
@@ -17,7 +18,7 @@ const chatArea = document.getElementById("sendBar")
 
 const messageInput = new Editor({
     element: chatArea,
-    extensions: [StarterKit],
+    extensions: [StarterKit, Markdown],
     editorProps: {
         attributes: { class: 'message-input-styles' },
         handleKeyDown: (view, event) => {

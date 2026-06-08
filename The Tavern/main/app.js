@@ -142,7 +142,7 @@ function handleSidebarClick(event) {
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
 
-   mainContentArea.innerHTML = ""
+   mainContentArea.replaceChildren();
     loadSidebar(pageData)
 }
 

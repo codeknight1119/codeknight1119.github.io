@@ -241,7 +241,7 @@ async function handleChatMesage() {
     }
     
     messageInput.commands.clearContent();
-    await FirebaseUtils.addDocument(`conversations/${activeChat}/messages`, sendData)
+    await FirebaseUtils.addDocument(`rooms/${activeChat}/messages`, sendData)
     
     if(!ss_CHATS.get(activeChat)){
         ss_CHATS.set(activeChat, [sendData])

@@ -162,9 +162,13 @@ dropdown-btn i {
 }
 
 #mainMessageArea {
+    flex: 1;
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding: 1em;
     display: flex;
     flex-direction: column;
-    gap: 0.25em;
+    ;
 }
 
 .message {
@@ -184,20 +188,20 @@ dropdown-btn i {
 }
 
 .message.mine {
-    align-self: flex-end; 
-    border-radius: 8px 8px 1px 8px; 
+    align-self: flex-end;
+    border-radius: 8px 8px 1px 8px;
 }
 
 .message.notMine {
-    align-self: flex-start; 
-    border-radius: 8px 8px 8px 1px; 
+    align-self: flex-start;
+    border-radius: 8px 8px 8px 1px;
 }
 
 .boardMessage {
-display: flex;
-    flex-direction: column; 
-    align-items: center;    
-    justify-content: center; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 0.5em;
     margin: 1em;
     border: 1px solid var(--line-clr);
@@ -209,9 +213,10 @@ display: flex;
     overflow-y: auto;
     justify-content: center;
     padding: 1em;
-    
+
 }
-#chatTools:not([hidden]){
+
+#chatTools:not([hidden]) {
     display: flex;
     gap: 0.5em;
     padding: 1em;
@@ -231,11 +236,11 @@ display: flex;
 }
 
 #sendBtn {
-background: none;
+    background: none;
     border: none;
     color: var(--accent-clr);
     outline: 1px solid var(--line-clr);
-    cursor: pointer;         
+    cursor: pointer;
 
     i {
         transform: rotateY(180deg);
@@ -260,12 +265,12 @@ background: none;
 }
 
 .ProseMirror {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .ProseMirror-focused {
-  outline: none !important;
-  box-shadow: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }

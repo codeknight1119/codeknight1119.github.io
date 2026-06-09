@@ -161,16 +161,13 @@ dropdown-btn i {
     background-color: var(--hover-clr);
 }
 
-#mainMessageArea {
+#mainContentArea {
     flex: 1;
     overflow-y: auto;
     justify-content: flex-start;
     padding: 1em;
     display: flex;
     flex-direction: column;
-
-
-    
 }
 
 .message {
@@ -210,13 +207,7 @@ dropdown-btn i {
     border-radius: 5px;
 }
 
-#mainContentArea {
-    flex: 1;
-    overflow-y: auto;
-    justify-content: center;
-    padding: 1em;
 
-}
 
 #chatTools:not([hidden]) {
     display: flex;

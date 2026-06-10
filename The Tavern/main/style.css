@@ -177,7 +177,7 @@ dropdown-btn i {
     background-color: var(--base-clr);
     border-radius: 5px;
     width: fit-content;
-    max-width: 75%;
+    width: 75%;
 
 
     p {

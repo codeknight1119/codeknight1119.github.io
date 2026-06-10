@@ -85,12 +85,6 @@ checkUser()
 /////////////////////////PAGE RENDERING///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-/*const everyonePages = [
-    { name: "Guild Bulletin", type: "tool", id: "GB", icon: "ra-wooden-sign", toolType: "board" },
-    { name: "Quest Board", type: "tool", id: "QB", icon: "ra-horn-call", toolType: "board" },
-    { name: "Officer's Desk", type: "tool", id: "OD", icon: "ra-sheriff" },
-    { name: "Tavern Talk", type: "chat", id: "TT", icon: "ra-speech-bubbles" },
-]*/
 
 const everyonePages = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value:"all" })
 console.log(everyonePages)

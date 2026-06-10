@@ -74,7 +74,7 @@
                     if (!userData) {
                         userData  = {
                             name: signIn.user.displayName,
-                            allowed: true,
+                            allowed: false,
                             role: "player",
                         }
                         await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, userData)

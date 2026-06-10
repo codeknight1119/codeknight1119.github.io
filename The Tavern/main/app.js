@@ -89,7 +89,7 @@ checkUser()
 
 async function getMyFeatures() {
     if(user !== null){
-        let permsArray = user.permissions.splice()
+        let permsArray = user.permissions.slice()
         console.log("base ", user.permissions)
         console.log("splice ", permsArray)
     permsArray.push("any")

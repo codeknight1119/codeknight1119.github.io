@@ -85,12 +85,15 @@ checkUser()
 /////////////////////////PAGE RENDERING///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-const everyonePages = [
+/*const everyonePages = [
     { name: "Guild Bulletin", type: "tool", id: "GB", icon: "ra-wooden-sign", toolType: "board" },
     { name: "Quest Board", type: "tool", id: "QB", icon: "ra-horn-call", toolType: "board" },
     { name: "Officer's Desk", type: "tool", id: "OD", icon: "ra-sheriff" },
     { name: "Tavern Talk", type: "chat", id: "TT", icon: "ra-speech-bubbles" },
-]
+]*/
+
+const everyonePages = await FirebaseUtils.getDocuments("/features", undefined, undefined, {field:"allowed", value:"all" })
+console.log(everyonePages)
 
 const template = document.getElementById("sidebarTemplate")
 const parentSidebar = document.getElementById("everySidebarParent")
@@ -202,7 +205,7 @@ async function renderTool(id) {
 async function renderChat(id) {
     chatUI.hidden = false;
     activeChat = id;
-    const messages = await FirebaseUtils.getDocuments(`rooms/${id}/messages`, 50, { field: "timestamp" })
+    const messages = await FirebaseUtils.getDocuments(`features/${id}/messages`, 50, { field: "timestamp" })
 
     if (messages.length === 0) {
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
@@ -249,7 +252,7 @@ async function handleChatMesage() {
     }
     renderMessage(sendData)
     
-    await FirebaseUtils.addDocument(`rooms/${activeChat}/messages`, sendData)
+    await FirebaseUtils.addDocument(`features/${activeChat}/messages`, sendData)
 
 }
 

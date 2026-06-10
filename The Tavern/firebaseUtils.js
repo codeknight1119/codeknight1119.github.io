@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, where } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js';
 
@@ -83,9 +83,13 @@ export const getDocument = async (path) => {
     }
 };
 
-export const getDocuments = async (path, l, docParam) => {
+export const getDocuments = async (path, l, docParam, arrayFilter) => {
     try {
         let constraints = []
+
+        if (arrayFilter && arrayFilter.field && arrayFilter.value !== undefined) {
+            constraints.push(where(arrayFilter.field, 'array-contains', arrayFilter.value));
+        }
 
         if (docParam && docParam.field) {
             constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));

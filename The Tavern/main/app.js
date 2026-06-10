@@ -90,8 +90,10 @@ checkUser()
 async function getMyFeatures() {
     if(user !== null){
         let permsArray = user.permissions.splice()
+        console.log("base ", user.permissions)
+        console.log("splice ", permsArray)
     permsArray.push("any")
-    console.log(permsArray)
+    console.log("all added, ", permsArray)
      myFeatures = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value: permsArray })
     const template = document.getElementById("sidebarTemplate")
     const parentSidebar = document.getElementById("everySidebarParent")

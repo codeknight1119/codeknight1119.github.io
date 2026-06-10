@@ -171,7 +171,7 @@ async function renderTool(id) {
             if (ss_TOOLS.get(id)) {
                 boards = ss_TOOLS.get(id)
             } else {
-                boards = await FirebaseUtils.getDocuments(`tools/${id}/boards`, BOARD_COUNT)
+                boards = await FirebaseUtils.getDocuments(`features/${id}/boards`, BOARD_COUNT)
                 ss_TOOLS.set(id, boards)
             }
             if (boards.length === 0) {

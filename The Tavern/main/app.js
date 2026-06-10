@@ -10,6 +10,7 @@ import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
+let myFeatures = null;
 let currentSelectedSidebar = null
 const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
@@ -89,12 +90,12 @@ checkUser()
 async function getMyFeatures() {
     if(user !== null){
         let permsArray = user.permissions.splice()
-permsArray.push("any")
-    const myFeatures = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value: permsArray })
+    permsArray.push("any")
+     myFeatures = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value: permsArray })
     const template = document.getElementById("sidebarTemplate")
     const parentSidebar = document.getElementById("everySidebarParent")
 
-    const reversedFeatures = everyonePages.toReversed()
+    const reversedFeatures = myFeatures.toReversed()
 
     reversedFeatures.forEach((val, index) => {
     let fragment = template.content.cloneNode(true)
@@ -142,7 +143,7 @@ function handleSidebarClick(event) {
     if (clickedLi === currentSelectedSidebar) return
 
     const idVal = targetAnchor.dataset.id
-    const pageData = everyonePages.find((obj) => obj.id === idVal)
+    const pageData = myFeatures.find((obj) => obj.id === idVal)
 
     if (!pageData) return
 
@@ -174,7 +175,7 @@ const mainContentArea = document.getElementById("mainContentArea")
 
 async function renderTool(id) {
     chatUI.hidden = true;
-    const toolData = everyonePages.find((obj) => obj.id === id)
+    const toolData = myFeatures.find((obj) => obj.id === id)
 
     const BOARD_COUNT = 15
 

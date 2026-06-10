@@ -75,8 +75,7 @@ async function checkUser() {
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
-        user = userCheck
-        FirebaseUtils.ALog("User signed in", { uid: userCheck.uid, name: userCheck.displayName })
+        user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
     }
 }
 checkUser()
@@ -86,15 +85,18 @@ checkUser()
 //////////////////////////////////////////////////////////////////////
 
 
-const everyonePages = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value:"all" })
-console.log(everyonePages)
 
-const template = document.getElementById("sidebarTemplate")
-const parentSidebar = document.getElementById("everySidebarParent")
+async function getMyFeatures() {
+    if(user !== null){
+        let permsArray = user.permissions.splice()
+permsArray.push("any")
+    const myFeatures = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value: permsArray })
+    const template = document.getElementById("sidebarTemplate")
+    const parentSidebar = document.getElementById("everySidebarParent")
 
-const reversedEveryonePages = everyonePages.toReversed()
+    const reversedFeatures = everyonePages.toReversed()
 
-reversedEveryonePages.forEach((val, index) => {
+    reversedFeatures.forEach((val, index) => {
     let fragment = template.content.cloneNode(true)
 
     const li = fragment.querySelector('li')
@@ -108,7 +110,7 @@ reversedEveryonePages.forEach((val, index) => {
     a.dataset.id = val.id
     a.addEventListener("click", handleSidebarClick)
 
-    if (index === (reversedEveryonePages.length - 1)) {
+    if (index === (reversedFeatures.length - 1)) {
         currentSelectedSidebar = li
         li.classList.add("active")
         loadSidebar(val)
@@ -116,6 +118,17 @@ reversedEveryonePages.forEach((val, index) => {
 
     parentSidebar.prepend(fragment)
 })
+
+    }else{
+        setTimeout(() => {
+        await getMyFeatures()
+        }, 100);
+    }
+}
+getMyFeatures()
+
+
+
 
 
 

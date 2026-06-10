@@ -87,8 +87,12 @@ export const getDocuments = async (path, l, docParam, arrayFilter) => {
     try {
         let constraints = []
 
-        if (arrayFilter && arrayFilter.field && arrayFilter.value !== undefined) {
-            constraints.push(where(arrayFilter.field, 'array-contains', arrayFilter.value));
+        if (arrayFilter && arrayFilter.field && arrayFilter.value) {
+            if (Array.isArray(arrayFilter.value)) {
+                constraints.push(where(arrayFilter.field, 'array-contains-any', arrayFilter.value));
+            } else {
+                constraints.push(where(arrayFilter.field, 'array-contains', arrayFilter.value));
+            }
         }
 
         if (docParam && docParam.field) {

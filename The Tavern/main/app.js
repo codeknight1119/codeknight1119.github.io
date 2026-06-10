@@ -91,6 +91,7 @@ async function getMyFeatures() {
     if(user !== null){
         let permsArray = user.permissions.splice()
     permsArray.push("any")
+    console.log(permsArray)
      myFeatures = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value: permsArray })
     const template = document.getElementById("sidebarTemplate")
     const parentSidebar = document.getElementById("everySidebarParent")
@@ -126,7 +127,7 @@ async function getMyFeatures() {
         }, 100);
     }
 }
-getMyFeatures()
+await getMyFeatures()
 
 
 

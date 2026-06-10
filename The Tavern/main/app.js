@@ -120,7 +120,7 @@ permsArray.push("any")
 })
 
     }else{
-        setTimeout(() => {
+        setTimeout(async () => {
         await getMyFeatures()
         }, 100);
     }

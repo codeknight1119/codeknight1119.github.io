@@ -143,7 +143,7 @@ function handleSidebarClick(event) {
     if (clickedLi === currentSelectedSidebar) return
 
     const idVal = targetAnchor.dataset.id
-    const pageData = myFeatures.find((obj) => obj.id === idVal)
+    const pageData = getFeatureById(idVal)
 
     if (!pageData) return
 
@@ -171,11 +171,15 @@ function loadSidebar(data) {
     }
 }
 
+function getFeatureById(id){
+    return myFeatures.find((obj) => obj.id === id)
+}
+
 const mainContentArea = document.getElementById("mainContentArea")
 
 async function renderTool(id) {
     chatUI.hidden = true;
-    const toolData = myFeatures.find((obj) => obj.id === id)
+    const toolData = getFeatureById(id)
 
     const BOARD_COUNT = 15
 

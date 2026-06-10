@@ -92,7 +92,7 @@ checkUser()
     { name: "Tavern Talk", type: "chat", id: "TT", icon: "ra-speech-bubbles" },
 ]*/
 
-const everyonePages = await FirebaseUtils.getDocuments("/features", undefined, undefined, {field:"allowed", value:"all" })
+const everyonePages = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority", direction: "desc"}, {field:"allowed", value:"all" })
 console.log(everyonePages)
 
 const template = document.getElementById("sidebarTemplate")

@@ -86,7 +86,9 @@ checkUser()
 /////////////////////////PAGE RENDERING///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-
+function hideFeatureHTML(){
+    Array.from(document.getElementsByClassName("featureHTML")).forEach((val)=>{val.hidden = true})
+}
 
 async function getMyFeatures() {
     if (user !== null) {
@@ -128,7 +130,6 @@ async function getMyFeatures() {
 
 function handleSidebarClick(event) {
     event.preventDefault()
-
     const targetAnchor = event.target.closest('.nav-btn')
     if (!targetAnchor) return
     const clickedLi = targetAnchor.parentElement
@@ -152,6 +153,7 @@ function handleSidebarClick(event) {
 }
 
 function loadSidebar(data) {
+        hideFeatureHTML()
     switch (data.type) {
         case "tool":
             renderTool(data.id)

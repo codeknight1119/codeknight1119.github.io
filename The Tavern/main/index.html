@@ -62,6 +62,18 @@
             <input type="text" id="boardTitle" placeholder="titleText" class="cinzel-title"></input>
             <div id="mainBody"></div>
         </div>
+        <div id="userPermsUI" hidden>
+            <p><strong>Select a filter or enter a search and press the find button to begin</strong></p>
+            <div id="userSearchOutput"><p>No search yet</p></div>
+            <div id="userSearchFilters">
+                <label for="filterDropdown">Choose a filter</label>
+                <select name="filterDropdown" id="filterDropdown">
+                    <option value="searchName">Search by name</option>
+                    <option value="notAllowed">Not allowed users (recent signups)</option>
+                </select>
+            </div>
+            <button id="userSearchBttn">Find Users</button>
+        </div>
     </main>
 </body>
 

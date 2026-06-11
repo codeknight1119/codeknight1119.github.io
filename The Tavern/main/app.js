@@ -91,7 +91,6 @@ async function getMyFeatures() {
     if (user !== null) {
         let permsArray = user.permissions.slice()
         permsArray.push("all")
-        console.log("all added, ", permsArray)
         myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permsArray })
         const template = document.getElementById("sidebarTemplate")
         const parentSidebar = document.getElementById("everySidebarParent")
@@ -128,11 +127,6 @@ async function getMyFeatures() {
     }
 }
 await getMyFeatures()
-
-
-
-
-
 
 
 function handleSidebarClick(event) {
@@ -213,6 +207,11 @@ async function renderTool(id) {
             break
 
     }
+    case("userPermissions"):
+    const ui = document.getElementById("userPermsUI")
+    ui.hidden = false
+
+    break
 }
 
 async function renderChat(id) {

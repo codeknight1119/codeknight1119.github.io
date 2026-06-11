@@ -77,6 +77,7 @@ async function checkUser() {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
         user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
+        await getMyFeatures()
     }
 }
 checkUser()
@@ -120,13 +121,9 @@ async function getMyFeatures() {
             parentSidebar.prepend(fragment)
         })
 
-    } else {
-        setTimeout(async () => {
-            await getMyFeatures()
-        }, 100);
     }
 }
-await getMyFeatures()
+
 
 
 function handleSidebarClick(event) {

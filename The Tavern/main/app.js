@@ -195,23 +195,24 @@ async function renderTool(id) {
             boards.forEach((board) => {
                 const parsedBody = marked.parse(board.body)
                 const htmlText = `
-        <section class='boardMessage'>
-        <h3 class="cinzel-title">${board.title}</h3>
-        <p>${parsedBody}</p>
-        </section>
-        `
+                    <section class='boardMessage'>
+                    <h3 class="cinzel-title">${board.title}</h3>
+                    <p>${parsedBody}</p>
+                    </section>
+                    `
                 finalHTMLText += htmlText
             })
             finalHTMLText = "<div>" + finalHTMLText + "</div>"
             mainContentArea.innerHTML = finalHTMLText
             break
+    case("userPermissions"):
+        const ui = document.getElementById("userPermsUI")
+        ui.hidden = false
+
+        break
 
     }
-    case("userPermissions"):
-    const ui = document.getElementById("userPermsUI")
-    ui.hidden = false
 
-    break
 }
 
 async function renderChat(id) {

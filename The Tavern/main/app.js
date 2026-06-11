@@ -2,7 +2,7 @@ import * as FirebaseUtils from "../firebaseUtils.js"
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import { Editor } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
-import { Markdown } from 'https://esm.sh/@tiptap/markdown'; 
+import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 
 
 
@@ -22,8 +22,8 @@ const chatArea = document.getElementById("sendBar")
 const messageInput = new Editor({
     element: chatArea,
     extensions: [StarterKit, Markdown.configure({
-            transformPastedText: true, // Converts copied markdown into visual styles on paste
-        }),],
+        transformPastedText: true, // Converts copied markdown into visual styles on paste
+    }),],
     editorProps: {
         attributes: { class: 'message-input-styles' },
         handleKeyDown: (view, event) => {
@@ -88,44 +88,42 @@ checkUser()
 
 
 async function getMyFeatures() {
-    if(user !== null){
+    if (user !== null) {
         let permsArray = user.permissions.slice()
-        console.log("base ", user.permissions)
-        console.log("splice ", permsArray)
-    permsArray.push("any")
-    console.log("all added, ", permsArray)
-     myFeatures = await FirebaseUtils.getDocuments("/features", undefined, {field: "priority"}, {field:"allowed", value: permsArray })
-    const template = document.getElementById("sidebarTemplate")
-    const parentSidebar = document.getElementById("everySidebarParent")
+        permsArray.push("any")
+        console.log("all added, ", permsArray)
+        myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: Array(permsArray) })
+        const template = document.getElementById("sidebarTemplate")
+        const parentSidebar = document.getElementById("everySidebarParent")
 
-    const reversedFeatures = myFeatures.toReversed()
+        const reversedFeatures = myFeatures.toReversed()
 
-    reversedFeatures.forEach((val, index) => {
-    let fragment = template.content.cloneNode(true)
+        reversedFeatures.forEach((val, index) => {
+            let fragment = template.content.cloneNode(true)
 
-    const li = fragment.querySelector('li')
-    const a = fragment.querySelector('.nav-btn')
-    const text = fragment.querySelector('.sidebarText')
-    const icon = fragment.querySelector(".ra")
+            const li = fragment.querySelector('li')
+            const a = fragment.querySelector('.nav-btn')
+            const text = fragment.querySelector('.sidebarText')
+            const icon = fragment.querySelector(".ra")
 
-    text.innerText = val.name
-    icon.classList.add(val.icon.trim())
+            text.innerText = val.name
+            icon.classList.add(val.icon.trim())
 
-    a.dataset.id = val.id
-    a.addEventListener("click", handleSidebarClick)
+            a.dataset.id = val.id
+            a.addEventListener("click", handleSidebarClick)
 
-    if (index === (reversedFeatures.length - 1)) {
-        currentSelectedSidebar = li
-        li.classList.add("active")
-        loadSidebar(val)
-    }
+            if (index === (reversedFeatures.length - 1)) {
+                currentSelectedSidebar = li
+                li.classList.add("active")
+                loadSidebar(val)
+            }
 
-    parentSidebar.prepend(fragment)
-})
+            parentSidebar.prepend(fragment)
+        })
 
-    }else{
+    } else {
         setTimeout(async () => {
-        await getMyFeatures()
+            await getMyFeatures()
         }, 100);
     }
 }
@@ -158,7 +156,7 @@ function handleSidebarClick(event) {
     clickedLi.classList.add("active")
     currentSelectedSidebar = clickedLi
 
-   mainContentArea.replaceChildren();
+    mainContentArea.replaceChildren();
     loadSidebar(pageData)
 }
 
@@ -174,7 +172,7 @@ function loadSidebar(data) {
     }
 }
 
-function getFeatureById(id){
+function getFeatureById(id) {
     return myFeatures.find((obj) => obj.id === id)
 }
 
@@ -227,16 +225,16 @@ async function renderChat(id) {
         return
     }
     messages.forEach((val) => {
-      renderMessage(val)
+        renderMessage(val)
     });
 }
 
-function renderMessage(data){
-      const isMine = (user && data.uid === user.uid) ? "mine" : "notMine";
+function renderMessage(data) {
+    const isMine = (user && data.uid === user.uid) ? "mine" : "notMine";
 
-        const displayName = data.username || data.name;
-        const parsedContent = marked.parse(data.content);
-        const htmlText = `
+    const displayName = data.username || data.name;
+    const parsedContent = marked.parse(data.content);
+    const htmlText = `
         <div class="message ${isMine}">
             <strong><p>${displayName}:</p></strong>
             <div>${parsedContent}</div>
@@ -249,24 +247,24 @@ function renderMessage(data){
 
 async function handleChatMesage() {
     if (activeChat === null) return
-    
+
     const markdownContent = messageInput.getMarkdown();
-    
+
     const sendData = {
-        content: markdownContent, 
+        content: markdownContent,
         username: user.displayName,
         uid: user.uid,
         timestamp: Date.now()
     }
-    
+
     messageInput.commands.clearContent();
-        if(!ss_CHATS.get(activeChat)){
+    if (!ss_CHATS.get(activeChat)) {
         ss_CHATS.set(activeChat, [sendData])
-    }else{
+    } else {
         ss_CHATS.get(activeChat).push(sendData)
     }
     renderMessage(sendData)
-    
+
     await FirebaseUtils.addDocument(`features/${activeChat}/messages`, sendData)
 
 }

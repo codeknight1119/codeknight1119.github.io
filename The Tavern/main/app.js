@@ -109,7 +109,7 @@ async function getMyFeatures() {
     const icon = fragment.querySelector(".ra")
 
     text.innerText = val.name
-    icon.classList.add(val.icon)
+    icon.classList.add(val.icon.trim())
 
     a.dataset.id = val.id
     a.addEventListener("click", handleSidebarClick)

@@ -90,7 +90,7 @@ checkUser()
 async function getMyFeatures() {
     if (user !== null) {
         let permsArray = user.permissions.slice()
-        permsArray.push("any")
+        permsArray.push("all")
         console.log("all added, ", permsArray)
         myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permsArray })
         const template = document.getElementById("sidebarTemplate")

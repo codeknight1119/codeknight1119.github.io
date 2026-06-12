@@ -263,7 +263,7 @@ async function handleChatMesage() {
         timestamp: Date.now()
     }
 
-    Object.kets(sendData).forEach((val)=>{
+    Object.keys(sendData).forEach((val)=>{
         console.log(val +" : "+sendData[val])
     })
 

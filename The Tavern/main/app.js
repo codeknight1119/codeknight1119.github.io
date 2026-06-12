@@ -257,7 +257,7 @@ async function handleChatMesage() {
 console.log(user)
     const sendData = {
         content: markdownContent ?? messageInput.getText(),
-        username: user.displayName,
+        username: user.name,
         uid: user.uid,
         timestamp: Date.now()
     }

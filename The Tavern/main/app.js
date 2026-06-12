@@ -160,6 +160,7 @@ function loadSidebar(data) {
             break;
 
         case "chat":
+            console.log("loading chat "+ data.id)
             renderChat(data.id)
             break;
     }
@@ -217,6 +218,7 @@ mainContentArea.innerHTML = "<p><strong>Search to find users</strong></p>"
 async function renderChat(id) {
     chatUI.hidden = false;
     activeChat = id;
+    console.log("rendering chat " + id)
     const messages = await FirebaseUtils.getDocuments(`features/${id}/messages`, 50, { field: "timestamp" })
 
     if (messages.length === 0) {
@@ -254,7 +256,7 @@ async function handleChatMesage() {
     if (activeChat === null) return
 
     const markdownContent = messageInput.getMarkdown();
-console.log(user)
+
     const sendData = {
         content: markdownContent ?? messageInput.getText(),
         username: user.name,

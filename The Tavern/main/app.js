@@ -77,6 +77,7 @@ async function checkUser() {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
         user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
+        user.uid = userCheck.uid
         await getMyFeatures()
     }
 }

@@ -263,6 +263,10 @@ async function handleChatMesage() {
         timestamp: Date.now()
     }
 
+    Object.kets(sendData).forEach((val)=>{
+        console.log(val +" : "+sendData[val])
+    })
+
     messageInput.commands.clearContent();
     if (!ss_CHATS.get(activeChat)) {
         ss_CHATS.set(activeChat, [sendData])

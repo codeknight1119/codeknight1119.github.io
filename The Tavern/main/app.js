@@ -219,7 +219,6 @@ async function renderChat(id) {
     chatUI.hidden = false;
     activeChat = id;
     const messages = await FirebaseUtils.getDocuments(`features/${id}/messages`, 50, { field: "timestamp" })
-    console.log(messages)
 
     if (messages.length === 0) {
         mainContentArea.innerHTML = `<h3>No Messages</h3>`
@@ -263,10 +262,6 @@ async function handleChatMesage() {
         uid: user.uid,
         timestamp: Date.now()
     }
-
-    Object.keys(sendData).forEach((val)=>{
-        console.log(val +" : "+sendData[val])
-    })
 
     messageInput.commands.clearContent();
     if (!ss_CHATS.get(activeChat)) {

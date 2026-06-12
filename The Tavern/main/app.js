@@ -254,7 +254,7 @@ async function handleChatMesage() {
     if (activeChat === null) return
 
     const markdownContent = messageInput.getMarkdown();
-
+console.log(user)
     const sendData = {
         content: markdownContent ?? messageInput.getText(),
         username: user.displayName,

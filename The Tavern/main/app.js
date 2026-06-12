@@ -207,7 +207,7 @@ async function renderTool(id) {
     case("userPermissions"):
         const ui = document.getElementById("userPermsUI")
         ui.hidden = false
-
+mainContentArea.innerHTML = "<p><strong>Search to find users</strong></p>"
         break
 
     }

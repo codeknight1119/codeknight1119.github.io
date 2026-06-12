@@ -51,7 +51,7 @@ export const addDocument = async (path, data) => {
         return docAdded;
     }
     catch (e) {
-        console.error(`set doc failed at ${path} ` + JSON.stringify(e));
+        console.error(`add doc failed at ${path} ` + JSON.stringify(e));
     }
 };
 

@@ -240,6 +240,12 @@ function renderMessage(data) {
         </div>
         `;
     const messageEl = document.createElement("div")
+    if(!ss_CHATS.get(currentSelectedSidebar)){
+        mainContentArea.innerHTML = ""
+        ss_CHATS.set(currentSelectedSidebar, [data])
+    }else{
+        ss_CHATS.get(currentSelectedSidebar).push(data)
+    }
     messageEl.innerHTML = htmlText
     mainContentArea.insertAdjacentHTML('beforeend', htmlText);
 }

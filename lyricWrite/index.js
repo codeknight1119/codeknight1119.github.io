@@ -89,6 +89,9 @@ function updateSongOrder() {
 
   if (changedItems.length > 0) {
     console.log("These items changed position:", changedItems);
+    changedItems.forEach((val)=>{
+        processChange(`songs/${changedItems.title}`, {order: newOrder})
+    })
     
   } else {
     console.log("Item dropped, but the overall order remained the same.");

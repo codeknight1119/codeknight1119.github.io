@@ -4,16 +4,16 @@ let currentSave = [
 ]
 
 let currentlySaved = true;
-
+const list = document.querySelector('.sortable-list');
 async function setUpMainPage() {
-    const songsToAdd = await FBUtils.getDocuments("/songs", 50, {field: "order"})
-    const list = document.querySelector('.sortable-list');
-const songBtnTemplate = document.getElementById("songBtnTemplate")
-songsToAdd.forEach((val)=>{
-const newSongBtn = songBtnTemplate.content.cloneNode(true)
-newSongBtn.querySelector("#title").innerText = val.title
-list.appendChild(newSongBtn)
-})
+  const songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" })
+
+  const songBtnTemplate = document.getElementById("songBtnTemplate")
+  songsToAdd.forEach((val) => {
+    const newSongBtn = songBtnTemplate.content.cloneNode(true)
+    newSongBtn.querySelector("#title").innerText = val.title
+    list.appendChild(newSongBtn)
+  })
 }
 
 
@@ -21,60 +21,60 @@ list.appendChild(newSongBtn)
 let draggingItem = null;
 
 list.addEventListener('dragstart', (e) => {
-draggingItem = e.target;
-e.target.classList.add('dragging');
+  draggingItem = e.target;
+  e.target.classList.add('dragging');
 });
 
 list.addEventListener('dragend', (e) => {
-e.target.classList.remove('dragging');
-document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
-draggingItem = null;
-updateSongOrder();
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+  draggingItem = null;
+  updateSongOrder();
 });
 
 list.addEventListener('dragover', (e) => {
-e.preventDefault();
-const draggingOverItem = getDragAfterElement(list, e.clientY);
+  e.preventDefault();
+  const draggingOverItem = getDragAfterElement(list, e.clientY);
 
-// Remove .over from all items
-document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+  // Remove .over from all items
+  document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
 
-if (draggingOverItem) {
+  if (draggingOverItem) {
     draggingOverItem.classList.add('over'); // Add .over to the hovered item
     list.insertBefore(draggingItem, draggingOverItem);
-} else {
+  } else {
     list.appendChild(draggingItem); // Append to the end if no item below
-}
+  }
 });
 
 function getDragAfterElement(container, y) {
-const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
+  const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
 
-return draggableElements.reduce((closest, child) => {
+  return draggableElements.reduce((closest, child) => {
     const box = child.getBoundingClientRect();
     const offset = y - box.top - box.height / 2;
     if (offset < 0 && offset > closest.offset) {
-    return { offset: offset, element: child };
+      return { offset: offset, element: child };
     } else {
-    return closest;
+      return closest;
     }
-}, { offset: Number.NEGATIVE_INFINITY }).element;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
 
 function updateSongOrder() {
   const currentDOMItems = list.querySelectorAll('.sortable-item');
-  
+
   // Array to keep track of ONLY the elements that actually moved
   const changedItems = [];
 
   currentDOMItems.forEach((item, index) => {
     const titleText = item.querySelector("#title").innerText;
     const song = songsToAdd.find(s => s.title === titleText);
-    
+
     if (song) {
       if (song.order !== index) {
-        
+
         // 2. Track the change before updating the object
         changedItems.push({
           title: song.title,
@@ -82,17 +82,17 @@ function updateSongOrder() {
           newOrder: index
         });
 
-        song.order = index; 
+        song.order = index;
       }
     }
   });
 
   if (changedItems.length > 0) {
     console.log("These items changed position:", changedItems);
-    changedItems.forEach((val)=>{
-        processChange(`songs/${val.title}`, {order: val.newOrder})
+    changedItems.forEach((val) => {
+      processChange(`songs/${val.title}`, { order: val.newOrder })
     })
-    
+
   } else {
     console.log("Item dropped, but the overall order remained the same.");
   }
@@ -102,20 +102,20 @@ function updateSongOrder() {
 }
 
 function processChange(path, newData) {
-    let index = currentSave.findIndex(obj => obj.path === path);
-    
-    if (index === -1) {
-        currentSave.push({ path, ...newData });
-    } else {
-        currentSave[index] = { ...currentSave[index], ...newData };
-    }
-    console.log(currentSave)
+  let index = currentSave.findIndex(obj => obj.path === path);
+
+  if (index === -1) {
+    currentSave.push({ path, ...newData });
+  } else {
+    currentSave[index] = { ...currentSave[index], ...newData };
+  }
+  console.log(currentSave)
 }
 
 async function saveCurrent() {
-    currentSave.forEach((change)=>{
-FBUtils.updateDocument(change.path, change.data)
-    })
-    currentSave = []
-    currentlySaved = true
+  currentSave.forEach((change) => {
+    FBUtils.updateDocument(change.path, change.data)
+  })
+  currentSave = []
+  currentlySaved = true
 }

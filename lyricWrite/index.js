@@ -7,6 +7,7 @@ let currentlySaved = true;
 const list = document.querySelector('.sortable-list');
 async function setUpMainPage() {
   const songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" })
+  console.log(songsToAdd)
 
   const songBtnTemplate = document.getElementById("songBtnTemplate")
   songsToAdd.forEach((val) => {

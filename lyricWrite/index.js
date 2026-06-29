@@ -5,18 +5,18 @@ let currentSave = [
 
 let currentlySaved = true;
 
-const songsToAdd = [
-    {title:"Veiled", order: 0},
-    {title:"Ultimate Chaos", order: 1}
-]
-
-const list = document.querySelector('.sortable-list');
+async function setUpMainPage() {
+    const songsToAdd = await FBUtils.getDocuments("/songs", 50, {field: "order"})
+    const list = document.querySelector('.sortable-list');
 const songBtnTemplate = document.getElementById("songBtnTemplate")
 songsToAdd.forEach((val)=>{
 const newSongBtn = songBtnTemplate.content.cloneNode(true)
 newSongBtn.querySelector("#title").innerText = val.title
 list.appendChild(newSongBtn)
 })
+}
+
+
 
 let draggingItem = null;
 

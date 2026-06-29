@@ -7,10 +7,11 @@
     border-radius: 10px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
+
 .sortable-item {
     padding: 15px 20px;
     margin: 8px 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(184, 184, 184, 0.8);
     border-radius: 5px;
     font-size: 1.1em;
     color: #333;
@@ -18,15 +19,31 @@
     cursor: grab;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
+
+button {
+    padding: 15px 20px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    font-size: 1.1em;
+    color: #3a3a3a;
+    font-weight: bold;
+}
+
 .sortable-item:hover {
     background: #e8f0ff;
     transform: scale(1.03);
 }
+
 .dragging {
     opacity: 0.7;
     transform: rotate(-2deg);
 }
+
 .over {
     border: 2px dashed #ff8c42;
     background: #fff3e0;

@@ -5,48 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Web Page</title>
-    
-    <script src="./index.js" defer type="module"></script>
-    
-    <link rel="stylesheet" href="./style.css">
-    
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-            margin: 40px auto;
-            max-width: 650px;
-            padding: 0 10px;
-            background-color: #f9f9f9;
-            color: #333;
-        }
 
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-    </style>
+    <script src="./index.js" defer type="module"></script>
+
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <div class="header">
-        <h2 id="pageTitle">LyricWrite</h2>
-        <hr>
+    <div class="pageEnter">
+        <div class="header">
+            <h2 id="pageTitle">LyricWrite</h2>
+            <hr>
+        </div>
+        <div class="card">
+            <h2 id="sectionTitle">Songs</h2>
+            <ul class="sortable-list">
+                <template id="songBtnTemplate">
+                    <li class="sortable-item" draggable="true">
+                        <div>
+                            <p class="title"></p>
+                            <button class="loadBtn">Work on song</button>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
     </div>
-    <div class="card">
-        <h2 id="sectionTitle">Songs</h2>
-        <ul class="sortable-list">
-            <template id="songBtnTemplate">
-                <li class="sortable-item" draggable="true">
-                    <div>
-                        <p class="title"></p>
-                        <button class="loadBtn">Work on song</button>
-                    </div>
-                </li>
-            </template>
-        </ul>
+    <div id="songEdit">
+        <div class="header">
+             <h2 class="pageTitle"></h2>
+            <hr>
+        </div>
+        <div id="songPartsHolder">
+
+        </div>
     </div>
 
 </body>

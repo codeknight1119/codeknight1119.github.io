@@ -98,13 +98,20 @@ function updateSongOrder() {
   songsToAdd.sort((a, b) => a.order - b.order);
 }
 
-function processChange(path, data){
-
+function processChange(path, newData) {
+    let index = currentSave.findIndex(obj => obj.path === path);
+    
+    if (index === -1) {
+        currentSave.push({ path, ...newData });
+    } else {
+        currentSave[index] = { ...currentSave[index], ...newData };
+    }
+    console.log(currentSave)
 }
 
 async function saveCurrent() {
     currentSave.forEach((change)=>{
-//setDoc(change.path, change.data)
+FBUtils.updateDocument(change.path, change.data)
     })
     currentSave = []
     currentlySaved = true

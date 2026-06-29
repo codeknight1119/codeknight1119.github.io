@@ -22,7 +22,7 @@ async function setUpMainPage() {
   })
 }
 
-
+await setUpMainPage()
 
 let draggingItem = null;
 

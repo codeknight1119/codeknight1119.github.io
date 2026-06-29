@@ -11,6 +11,7 @@ async function setUpMainPage() {
   const songBtnTemplate = document.getElementById("songBtnTemplate")
   songsToAdd.forEach((val) => {
     const newSongBtn = songBtnTemplate.content.cloneNode(true)
+  
     newSongBtn.querySelector("#title").innerText = val.title
     
     newSongBtn.addEventListener("click", (val)=>{

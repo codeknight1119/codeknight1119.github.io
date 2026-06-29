@@ -1,24 +1,44 @@
+:root {
+    /* Dark Mode Base Colors */
+    --bg-list: rgba(18, 18, 24, 0.85);
+    --bg-item: rgba(45, 45, 58, 0.9);
+    --text-light: #ffffff;
+    --text-dark: #0d0d11;
+    
+    /* Neon Highlights */
+    --neon-teal: #00f2fe;
+    --neon-pink: #ff007f;
+    --neon-yellow: #cfff04;
+    
+    /* Global Layout Variables */
+    --radius-large: 10px;
+    --radius-small: 5px;
+    --shadow-list: 0 8px 25px rgba(0, 0, 0, 0.5);
+    --shadow-item: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .sortable-list {
     list-style: none;
     padding: 0;
     width: 350px;
     margin: auto;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    background: var(--bg-list);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-list);
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Soft border to define the edge in dark mode */
 }
 
 .sortable-item {
     padding: 15px 20px;
     margin: 8px 0;
-    background: rgba(184, 184, 184, 0.8);
-    border-radius: 5px;
+    background: var(--bg-item);
+    border-radius: var(--radius-small);
     font-size: 1.1em;
-    color: #333;
+    color: var(--text-light);
     font-weight: bold;
     cursor: grab;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.2s, transform 0.2s;
+    box-shadow: var(--shadow-item);
+    transition: background 0.2s, transform 0.2s, color 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -27,16 +47,23 @@
 button {
     padding: 15px 20px;
     margin: 8px 0;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 5px;
+    background: var(--neon-teal);
+    border-radius: var(--radius-small);
     font-size: 1.1em;
-    color: #3a3a3a;
+    color: var(--text-dark);
     font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
 }
 
+/* Hover & Dragging States */
+
 .sortable-item:hover {
-    background: #e8f0ff;
+    background: rgba(55, 55, 73, 1);
+    color: var(--neon-yellow);
     transform: scale(1.03);
+    box-shadow: 0 0 12px rgba(207, 255, 4, 0.4); /* Neon yellow glow */
 }
 
 .dragging {
@@ -45,6 +72,6 @@ button {
 }
 
 .over {
-    border: 2px dashed #ff8c42;
-    background: #fff3e0;
+    border: 2px dashed var(--neon-pink);
+    background: rgba(255, 0, 127, 0.15); /* Translucent electric pink tint */
 }

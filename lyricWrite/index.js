@@ -13,9 +13,11 @@ async function setUpMainPage() {
   songsToAdd.forEach((val) => {
     const newSongBtn = songBtnTemplate.content.cloneNode(true)
   
-    newSongBtn.querySelector("#title").innerText = val.title
+    newSongBtn.querySelector(".title").innerText = val.title
+
+    const loadBtn = newSongBtn.querySelector(".loadBtn")
     
-    newSongBtn.addEventListener("click", (val)=>{
+    loadBtn.addEventListener("click", (val)=>{
       loadSong(val.title)
     })
     list.appendChild(newSongBtn)

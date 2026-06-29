@@ -1,4 +1,16 @@
+const songsToAdd = [
+    {title:"Veiled"},
+    {title:"Ultimate Chaos"}
+]
+
 const list = document.querySelector('.sortable-list');
+const songBtnTemplate = document.getElementById("songBtnTemplate")
+songsToAdd.forEach((val)=>{
+const newSongBtn = songBtnTemplate.content.cloneNode(true)
+newSongBtn.querySelector("#title").innerText = val.title
+list.appendChild(newSongBtn)
+})
+
   let draggingItem = null;
 
   list.addEventListener('dragstart', (e) => {

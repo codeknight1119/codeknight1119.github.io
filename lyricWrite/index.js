@@ -12,6 +12,10 @@ async function setUpMainPage() {
   songsToAdd.forEach((val) => {
     const newSongBtn = songBtnTemplate.content.cloneNode(true)
     newSongBtn.querySelector("#title").innerText = val.title
+    
+    newSongBtn.addEventListener("click", (val)=>{
+      loadSong(val.title)
+    })
     list.appendChild(newSongBtn)
   })
 }
@@ -118,4 +122,9 @@ async function saveCurrent() {
   })
   currentSave = []
   currentlySaved = true
+}
+
+
+async function loadSong(name) {
+ console.log(`Loading ${name}`) 
 }

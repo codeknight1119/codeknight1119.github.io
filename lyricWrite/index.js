@@ -90,7 +90,7 @@ function updateSongOrder() {
   if (changedItems.length > 0) {
     console.log("These items changed position:", changedItems);
     changedItems.forEach((val)=>{
-        processChange(`songs/${changedItems.title}`, {order: changedItems.newOrder})
+        processChange(`songs/${val.title}`, {order: val.newOrder})
     })
     
   } else {

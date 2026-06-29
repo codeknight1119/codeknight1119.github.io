@@ -17,7 +17,7 @@ async function setUpMainPage() {
 
     const loadBtn = newSongBtn.querySelector(".loadBtn")
     
-    loadBtn.addEventListener("click", (val)=>{
+    loadBtn.addEventListener("click", ()=>{
       loadSong(val.title)
     })
     list.appendChild(newSongBtn)

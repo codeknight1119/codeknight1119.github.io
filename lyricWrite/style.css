@@ -164,7 +164,7 @@ body {
 
 /* Optional: Gives desktop users a subtle hint that it's clickable */
 .editable-text:hover {
-  background-color: #f5f5f5;
+  background-color: rgba(49, 49, 103, 0.9);;
 }
 
 /* The Input Box */

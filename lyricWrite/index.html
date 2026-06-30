@@ -23,7 +23,11 @@
                 <template id="songBtnTemplate">
                     <li class="sortable-item" draggable="true">
                         <div>
-                            <p class="title"></p>
+                            <div class="editable-container" id="titleContainer">
+                                <span class="editable-text" id="songTitle"></span>
+
+                                <input type="text" class="editable-input" id="songInput" value="">
+                            </div>
                             <button class="loadBtn">Work on song</button>
                         </div>
                     </li>
@@ -34,7 +38,7 @@
     </div>
     <div id="songEdit">
         <div class="header">
-             <h2 class="pageTitle"></h2>
+            <h2 class="pageTitle"></h2>
             <hr>
         </div>
         <div id="songPartsHolder">

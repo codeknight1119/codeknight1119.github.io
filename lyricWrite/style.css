@@ -96,3 +96,57 @@ body {
     border: 1px solid rgba(0, 242, 254, 0.2); /* Subtle teal border border to make it pop */
     backdrop-filter: blur(10px); /* Gives it a premium frosted glass effect against the dark bg */
 }
+
+/* Keeps the text and input grouped together */
+.editable-container {
+  display: inline-block;
+}
+
+/* The Text Display */
+.editable-text {
+  display: inline-block;
+  cursor: pointer;
+  
+  /* THE HITBOX TRICK: 
+     Add padding to make it easy to tap on mobile, 
+     then add negative margins of the exact same size 
+     so it doesn't push your other layout elements around. */
+  padding: 12px 16px; 
+  margin: -12px -16px;
+  
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+/* Optional: Gives desktop users a subtle hint that it's clickable */
+.editable-text:hover {
+  background-color: #f5f5f5; 
+}
+
+/* The Input Box */
+.editable-input {
+  display: none; /* Hidden by default */
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  
+  /* Match the padding of the text so it doesn't jump when clicked */
+  padding: 12px 16px;
+  margin: -12px -16px;
+  
+  border: 1px solid #007BFF; /* Subtle highlight to show it's active */
+  border-radius: 4px;
+  outline: none;
+  background: white;
+}
+
+/* --- Toggling Logic --- */
+
+/* When the container has the 'is-editing' class, hide text and show input */
+.is-editing .editable-text {
+  display: none;
+}
+
+.is-editing .editable-input {
+  display: inline-block;
+}

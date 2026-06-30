@@ -12,7 +12,7 @@ async function setUpMainPage() {
 
   MS_songsToAdd.forEach((val) => {
     createNewSongBtn(val.title, val.id);
-    if(val.order > MS_maxSongOrder){
+    if (val.order > MS_maxSongOrder) {
       MS_maxSongOrder = val.order
     }
   });
@@ -24,12 +24,50 @@ function createNewSongBtn(name, id) {
 
 
   newSongBtn.dataset.songId = id;
-  newSongBtn.querySelector(".title").innerText = name;
+  newSongBtn.querySelector("#songTitle").innerText = name;
 
   const loadBtn = newSongBtn.querySelector(".loadBtn");
   loadBtn.addEventListener("click", () => {
     loadSong(id);
   });
+
+  const container = newSongBtn.querySelector('#titleContainer');
+  const textDisplay = newSongBtn.querySelector('#songTitle');
+  const textInput = newSongBtn.querySelector('#songInput');
+
+  // 1. Enter Edit Mode
+  textDisplay.addEventListener('click', () => {
+    container.classList.add('is-editing');
+
+    // Make sure input matches the current text
+    textInput.value = textDisplay.textContent;
+
+    // Focus the input and select the text for easy overriding
+    textInput.focus();
+    textInput.select();
+  });
+
+  // 2. Save Function
+  function saveEdit() {
+    // Only save if they didn't leave it completely blank
+    if (textInput.value.trim() !== '') {
+      textDisplay.textContent = textInput.value;
+    }
+    processChange(`songs/${id}`, {title: textDisplay.textContent})
+    container.classList.remove('is-editing');
+  }
+
+  // 3. Save when the user taps outside the input box (loses focus)
+  textInput.addEventListener('blur', saveEdit);
+
+  textInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      saveEdit();
+      textInput.blur(); 
+    }
+  });
+
+
 
   list.appendChild(newSongBtnFragment);
 }
@@ -84,12 +122,12 @@ function getDragAfterElement(container, y) {
 
 // Added missing "click" argument here
 document.querySelector("#addSong").addEventListener("click", async () => {
-    MS_maxSongOrder ++
-  const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder ++ });
-  
+  MS_maxSongOrder++
+  const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder++ });
+
   // Keep local array in sync
   MS_songsToAdd.push({ id: newSong.id, title: "New Song", order: MS_songsToAdd.length });
-  
+
   createNewSongBtn("New Song", newSong.id);
 });
 
@@ -143,16 +181,16 @@ async function saveCurrent() {
   const promises = currentSave.map((change) => {
     return FBUtils.updateDocument(change.path, change.data);
   });
-  
+
   // Wait for all updates to finish completely
   await Promise.all(promises);
-  
+
   currentSave = [];
   currentlySaved = true;
 }
 
 async function loadSong(id) {
   await saveCurrent();
-  const data = await FBUtils.getDocument(`songs/${id}`); 
+  const data = await FBUtils.getDocument(`songs/${id}`);
   console.log("Loaded song data:", data);
 }

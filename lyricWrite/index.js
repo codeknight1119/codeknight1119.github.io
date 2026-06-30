@@ -78,7 +78,7 @@ function getDragAfterElement(container, y) {
 // --- Event Listeners & Database Sync ---
 
 // Added missing "click" argument here
-document.querySelector(".addSong").addEventListener("click", async () => {
+document.querySelector("#addSong").addEventListener("click", async () => {
   const newSong = await FBUtils.addDocument("/songs", { title: "New Song" });
   
   // Keep local array in sync
@@ -148,8 +148,6 @@ async function saveCurrent() {
 
 async function loadSong(id) {
   await saveCurrent();
-  // Note: If you are looking for a specific doc by ID, you typically 
-  // use getDocument(path), not getDocuments(collection, limit, query)
   const data = await FBUtils.getDocument(`songs/${id}`); 
   console.log("Loaded song data:", data);
 }

@@ -62,7 +62,7 @@ button {
   box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
 }
 
-.sortable-item>div {
+.sortable-item > div {
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -139,6 +139,7 @@ body {
   box-shadow: var(--shadow-list), var(--border-glow);
   border: 1px solid rgba(0, 242, 254, 0.2);
   backdrop-filter: blur(10px);
+  overflow-y: scroll;
 }
 
 /* Keeps the text and input grouped together */

@@ -1,37 +1,38 @@
-import * as FBUtils from "./firebaseUtils.js"
-let currentSave = [
+import * as FBUtils from "./firebaseUtils.js";
 
-]
-
+let currentSave = [];
 let currentlySaved = true;
+let songsToAdd = []; // Moved to global scope so updateSongOrder can see it
 const list = document.querySelector('.sortable-list');
+const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope
 
 async function setUpMainPage() {
-  const songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" })
+  songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
 
-  const songBtnTemplate = document.getElementById("songBtnTemplate")
   songsToAdd.forEach((val) => {
-    createNewSongBtn(val.title, val.id)
-  })
+    createNewSongBtn(val.title, val.id);
+  });
 }
 
-function createNewSongBtn(name, id){
-  const newSongBtn = songBtnTemplate.content.cloneNode(true)
+function createNewSongBtn(name, id) {
+  const newSongBtnFragment = songBtnTemplate.content.cloneNode(true);
+  const newSongBtn = newSongBtnFragment.firstElementChild; // Target the actual element inside the fragment
 
-  newSongBtn.dataset.songId = id
-  
-    newSongBtn.querySelector(".title").innerText = name
+  newSongBtn.dataset.songId = id;
+  newSongBtn.querySelector(".title").innerText = name;
 
-    const loadBtn = newSongBtn.querySelector(".loadBtn")
-    
-    loadBtn.addEventListener("click", ()=>{
-      loadSong(id)
-    })
-    list.appendChild(newSongBtn)
+  const loadBtn = newSongBtn.querySelector(".loadBtn");
+  loadBtn.addEventListener("click", () => {
+    loadSong(id);
+  });
+
+  list.appendChild(newSongBtnFragment);
 }
 
-await setUpMainPage()
+// Initial load
+await setUpMainPage();
 
+// --- Drag and Drop Logic ---
 let draggingItem = null;
 
 list.addEventListener('dragstart', (e) => {
@@ -50,14 +51,13 @@ list.addEventListener('dragover', (e) => {
   e.preventDefault();
   const draggingOverItem = getDragAfterElement(list, e.clientY);
 
-  // Remove .over from all items
   document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
 
   if (draggingOverItem) {
-    draggingOverItem.classList.add('over'); // Add .over to the hovered item
+    draggingOverItem.classList.add('over');
     list.insertBefore(draggingItem, draggingOverItem);
   } else {
-    list.appendChild(draggingItem); // Append to the end if no item below
+    list.appendChild(draggingItem);
   }
 });
 
@@ -75,28 +75,29 @@ function getDragAfterElement(container, y) {
   }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
+// --- Event Listeners & Database Sync ---
 
-document.querySelector(".addSong").addEventListener(async ()=>{
-const newSong = await FBUtils.addDocument("/songs", {title:"New Song"})
-createNewSongBtn("New Song", newSong.id)
-processChange(`song/${newSong.id}`, {title:"New Song"})
-
-})
+// Added missing "click" argument here
+document.querySelector(".addSong").addEventListener("click", async () => {
+  const newSong = await FBUtils.addDocument("/songs", { title: "New Song" });
+  
+  // Keep local array in sync
+  songsToAdd.push({ id: newSong.id, title: "New Song", order: songsToAdd.length });
+  
+  createNewSongBtn("New Song", newSong.id);
+  processChange(`songs/${newSong.id}`, { title: "New Song" });
+});
 
 function updateSongOrder() {
   const currentDOMItems = list.querySelectorAll('.sortable-item');
-
-  // Array to keep track of ONLY the elements that actually moved
   const changedItems = [];
 
   currentDOMItems.forEach((item, index) => {
-    const titleText = item.querySelector("#title").innerText;
+    const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
     const song = songsToAdd.find(s => s.title === titleText);
 
     if (song) {
       if (song.order !== index) {
-
-        // 2. Track the change before updating the object
         changedItems.push({
           title: song.title,
           oldOrder: song.order,
@@ -112,13 +113,11 @@ function updateSongOrder() {
   if (changedItems.length > 0) {
     console.log("These items changed position:", changedItems);
     changedItems.forEach((val) => {
-      processChange(`songs/${val.id}`, { order: val.newOrder })
-    })
-
+      processChange(`songs/${val.id}`, { order: val.newOrder });
+    });
   } else {
     console.log("Item dropped, but the overall order remained the same.");
   }
-
 
   songsToAdd.sort((a, b) => a.order - b.order);
 }
@@ -127,24 +126,30 @@ function processChange(path, newData) {
   let index = currentSave.findIndex(obj => obj.path === path);
 
   if (index === -1) {
-    currentSave.push({ path, ...newData });
+    // Keep data payload nested or separated so saveCurrent can parse it easily
+    currentSave.push({ path, data: newData });
   } else {
-    currentSave[index] = { ...currentSave[index], ...newData };
+    currentSave[index].data = { ...currentSave[index].data, ...newData };
   }
-  console.log(currentSave)
+  console.log(currentSave);
 }
 
 async function saveCurrent() {
-  currentSave.forEach((change) => {
-    FBUtils.updateDocument(change.path, change.data)
-  })
-  currentSave = []
-  currentlySaved = true
+  const promises = currentSave.map((change) => {
+    return FBUtils.updateDocument(change.path, change.data);
+  });
+  
+  // Wait for all updates to finish completely
+  await Promise.all(promises);
+  
+  currentSave = [];
+  currentlySaved = true;
 }
 
-
 async function loadSong(id) {
-  await saveCurrent()
-const data = FBUtils.getDocuments(`songs/${id}`, 15, {field : "order"})
-console.log(data)
+  await saveCurrent();
+  // Note: If you are looking for a specific doc by ID, you typically 
+  // use getDocument(path), not getDocuments(collection, limit, query)
+  const data = await FBUtils.getDocument(`songs/${id}`); 
+  console.log("Loaded song data:", data);
 }

@@ -76,8 +76,10 @@ function getDragAfterElement(container, y) {
 }
 
 
-document.querySelector(".addSong").addEventListener(()=>{
-createNewSongBtn("New Song")
+document.querySelector(".addSong").addEventListener(async ()=>{
+const newSong = await FBUtils.addDocument("/songs", {title:"New Song"})
+createNewSongBtn("New Song", newSong.id)
+processChange(path:`song/${newSong.id}`, {title:"New Song"})
 
 })
 

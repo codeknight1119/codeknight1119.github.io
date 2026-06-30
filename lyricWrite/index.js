@@ -5,23 +5,29 @@ let currentSave = [
 
 let currentlySaved = true;
 const list = document.querySelector('.sortable-list');
+
 async function setUpMainPage() {
   const songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" })
-  console.log(songsToAdd)
 
   const songBtnTemplate = document.getElementById("songBtnTemplate")
   songsToAdd.forEach((val) => {
-    const newSongBtn = songBtnTemplate.content.cloneNode(true)
+    createNewSongBtn(val.title, val.id)
+  })
+}
+
+function createNewSongBtn(name, id){
+  const newSongBtn = songBtnTemplate.content.cloneNode(true)
+
+  newSongBtn.dataset.songId = id
   
-    newSongBtn.querySelector(".title").innerText = val.title
+    newSongBtn.querySelector(".title").innerText = name
 
     const loadBtn = newSongBtn.querySelector(".loadBtn")
     
     loadBtn.addEventListener("click", ()=>{
-      loadSong(val.title)
+      loadSong(id)
     })
     list.appendChild(newSongBtn)
-  })
 }
 
 await setUpMainPage()
@@ -70,6 +76,11 @@ function getDragAfterElement(container, y) {
 }
 
 
+document.querySelector(".addSong").addEventListener(()=>{
+createNewSongBtn("New Song")
+
+})
+
 function updateSongOrder() {
   const currentDOMItems = list.querySelectorAll('.sortable-item');
 
@@ -88,6 +99,7 @@ function updateSongOrder() {
           title: song.title,
           oldOrder: song.order,
           newOrder: index
+          id: item.dataset.songId
         });
 
         song.order = index;
@@ -98,7 +110,7 @@ function updateSongOrder() {
   if (changedItems.length > 0) {
     console.log("These items changed position:", changedItems);
     changedItems.forEach((val) => {
-      processChange(`songs/${val.title}`, { order: val.newOrder })
+      processChange(`songs/${val.id}`, { order: val.newOrder })
     })
 
   } else {
@@ -129,6 +141,8 @@ async function saveCurrent() {
 }
 
 
-async function loadSong(name) {
- console.log(`Loading ${name}`) 
+async function loadSong(id) {
+  await saveCurrent()
+const data = FBUtils.getDocuments(`songs/${id}`, 15, {field : "order"})
+console.log(data)
 }

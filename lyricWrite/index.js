@@ -52,7 +52,7 @@ function createNewSongBtn(name, id) {
   // 2. Save Function
   function saveEdit() {
     // Only save if they didn't leave it completely blank
-    if (textInput.value.trim() !== '' || textInput.value.trim() !== newSongBtn.dataset.lastSongName) {
+    if (textInput.value.trim() !== '' && textInput.value.trim() !== newSongBtn.dataset.lastSongName) {
       textDisplay.textContent = textInput.value;
       newSongBtn.dataset.lastSongName = textInput.value
       processChange(`songs/${id}`, { title: textDisplay.textContent })

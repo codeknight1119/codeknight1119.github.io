@@ -2,7 +2,7 @@ import * as FBUtils from "./firebaseUtils.js";
 
 let currentSave = [];
 let currentlySaved = true;
-let MS_MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
+let MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
 let MS_maxSongOrder = 0;
 const list = document.querySelector('.sortable-list');
 const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope

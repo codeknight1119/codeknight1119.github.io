@@ -2,21 +2,26 @@ import * as FBUtils from "./firebaseUtils.js";
 
 let currentSave = [];
 let currentlySaved = true;
-let songsToAdd = []; // Moved to global scope so updateSongOrder can see it
+let MS_MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
+let MS_maxSongOrder = 0;
 const list = document.querySelector('.sortable-list');
 const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope
 
 async function setUpMainPage() {
-  songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
+  MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
 
-  songsToAdd.forEach((val) => {
+  MS_songsToAdd.forEach((val) => {
     createNewSongBtn(val.title, val.id);
+    if(val.order > MS_maxSongOrder){
+      MS_maxSongOrder = val.order
+    }
   });
 }
 
 function createNewSongBtn(name, id) {
   const newSongBtnFragment = songBtnTemplate.content.cloneNode(true);
   const newSongBtn = newSongBtnFragment.firstElementChild; // Target the actual element inside the fragment
+
 
   newSongBtn.dataset.songId = id;
   newSongBtn.querySelector(".title").innerText = name;
@@ -79,13 +84,13 @@ function getDragAfterElement(container, y) {
 
 // Added missing "click" argument here
 document.querySelector("#addSong").addEventListener("click", async () => {
-  const newSong = await FBUtils.addDocument("/songs", { title: "New Song" });
+    MS_maxSongOrder ++
+  const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder ++ });
   
   // Keep local array in sync
-  songsToAdd.push({ id: newSong.id, title: "New Song", order: songsToAdd.length });
+  MS_songsToAdd.push({ id: newSong.id, title: "New Song", order: MS_songsToAdd.length });
   
   createNewSongBtn("New Song", newSong.id);
-  processChange(`songs/${newSong.id}`, { title: "New Song" });
 });
 
 function updateSongOrder() {
@@ -94,7 +99,7 @@ function updateSongOrder() {
 
   currentDOMItems.forEach((item, index) => {
     const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
-    const song = songsToAdd.find(s => s.title === titleText);
+    const song = MS_songsToAdd.find(s => s.title === titleText);
 
     if (song) {
       if (song.order !== index) {
@@ -119,7 +124,7 @@ function updateSongOrder() {
     console.log("Item dropped, but the overall order remained the same.");
   }
 
-  songsToAdd.sort((a, b) => a.order - b.order);
+  MS_songsToAdd.sort((a, b) => a.order - b.order);
 }
 
 function processChange(path, newData) {

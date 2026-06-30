@@ -61,141 +61,140 @@ function createNewSongBtn(name, id) {
     }
 
     container.classList.remove('is-editing');
-
-    // 3. Save when the user taps outside the input box (loses focus)
-    textInput.addEventListener('blur', saveEdit);
-
-    textInput.addEventListener('keypress', (event) => {
-      if (event.key === 'Enter') {
-        saveEdit();
-        textInput.blur();
-      }
-    });
-
-
-
-    list.appendChild(newSongBtnFragment);
   }
+  // 3. Save when the user taps outside the input box (loses focus)
+  textInput.addEventListener('blur', saveEdit);
 
-  // Initial load
-  await setUpMainPage();
-
-  // --- Drag and Drop Logic ---
-  let draggingItem = null;
-
-  list.addEventListener('dragstart', (e) => {
-    draggingItem = e.target;
-    e.target.classList.add('dragging');
-  });
-
-  list.addEventListener('dragend', (e) => {
-    e.target.classList.remove('dragging');
-    document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
-    draggingItem = null;
-    updateSongOrder();
-  });
-
-  list.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    const draggingOverItem = getDragAfterElement(list, e.clientY);
-
-    document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
-
-    if (draggingOverItem) {
-      draggingOverItem.classList.add('over');
-      list.insertBefore(draggingItem, draggingOverItem);
-    } else {
-      list.appendChild(draggingItem);
+  textInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      saveEdit();
+      textInput.blur();
     }
   });
 
-  function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
+  list.appendChild(newSongBtnFragment);
+}
 
-    return draggableElements.reduce((closest, child) => {
-      const box = child.getBoundingClientRect();
-      const offset = y - box.top - box.height / 2;
-      if (offset < 0 && offset > closest.offset) {
-        return { offset: offset, element: child };
-      } else {
-        return closest;
-      }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
+
+// Initial load
+await setUpMainPage();
+
+// --- Drag and Drop Logic ---
+let draggingItem = null;
+
+list.addEventListener('dragstart', (e) => {
+  draggingItem = e.target;
+  e.target.classList.add('dragging');
+});
+
+list.addEventListener('dragend', (e) => {
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+  draggingItem = null;
+  updateSongOrder();
+});
+
+list.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  const draggingOverItem = getDragAfterElement(list, e.clientY);
+
+  document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+
+  if (draggingOverItem) {
+    draggingOverItem.classList.add('over');
+    list.insertBefore(draggingItem, draggingOverItem);
+  } else {
+    list.appendChild(draggingItem);
   }
+});
 
-  // --- Event Listeners & Database Sync ---
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
 
-  // Added missing "click" argument here
-  document.querySelector("#addSong").addEventListener("click", async () => {
-    MS_maxSongOrder++
-    const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder++ });
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
 
-    // Keep local array in sync
-    MS_songsToAdd.push({ id: newSong.id, title: "New Song", order: MS_songsToAdd.length });
+// --- Event Listeners & Database Sync ---
 
-    createNewSongBtn("New Song", newSong.id);
+// Added missing "click" argument here
+document.querySelector("#addSong").addEventListener("click", async () => {
+  MS_maxSongOrder++
+  const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder++ });
+
+  // Keep local array in sync
+  MS_songsToAdd.push({ id: newSong.id, title: "New Song", order: MS_songsToAdd.length });
+
+  createNewSongBtn("New Song", newSong.id);
+});
+
+function updateSongOrder() {
+  const currentDOMItems = list.querySelectorAll('.sortable-item');
+  const changedItems = [];
+
+  currentDOMItems.forEach((item, index) => {
+    const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
+    const song = MS_songsToAdd.find(s => s.title === titleText);
+
+    if (song) {
+      if (song.order !== index) {
+        changedItems.push({
+          title: song.title,
+          oldOrder: song.order,
+          newOrder: index,
+          id: item.dataset.songId
+        });
+
+        song.order = index;
+      }
+    }
   });
 
-  function updateSongOrder() {
-    const currentDOMItems = list.querySelectorAll('.sortable-item');
-    const changedItems = [];
-
-    currentDOMItems.forEach((item, index) => {
-      const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
-      const song = MS_songsToAdd.find(s => s.title === titleText);
-
-      if (song) {
-        if (song.order !== index) {
-          changedItems.push({
-            title: song.title,
-            oldOrder: song.order,
-            newOrder: index,
-            id: item.dataset.songId
-          });
-
-          song.order = index;
-        }
-      }
+  if (changedItems.length > 0) {
+    console.log("These items changed position:", changedItems);
+    changedItems.forEach((val) => {
+      processChange(`songs/${val.id}`, { order: val.newOrder });
     });
-
-    if (changedItems.length > 0) {
-      console.log("These items changed position:", changedItems);
-      changedItems.forEach((val) => {
-        processChange(`songs/${val.id}`, { order: val.newOrder });
-      });
-    } else {
-      console.log("Item dropped, but the overall order remained the same.");
-    }
-
-    MS_songsToAdd.sort((a, b) => a.order - b.order);
+  } else {
+    console.log("Item dropped, but the overall order remained the same.");
   }
 
-  function processChange(path, newData) {
-    let index = currentSave.findIndex(obj => obj.path === path);
+  MS_songsToAdd.sort((a, b) => a.order - b.order);
+}
 
-    if (index === -1) {
-      // Keep data payload nested or separated so saveCurrent can parse it easily
-      currentSave.push({ path, data: newData });
-    } else {
-      currentSave[index].data = { ...currentSave[index].data, ...newData };
-    }
-    console.log(currentSave);
+function processChange(path, newData) {
+  let index = currentSave.findIndex(obj => obj.path === path);
+
+  if (index === -1) {
+    // Keep data payload nested or separated so saveCurrent can parse it easily
+    currentSave.push({ path, data: newData });
+  } else {
+    currentSave[index].data = { ...currentSave[index].data, ...newData };
   }
+  console.log(currentSave);
+}
 
-  async function saveCurrent() {
-    const promises = currentSave.map((change) => {
-      return FBUtils.updateDocument(change.path, change.data);
-    });
+async function saveCurrent() {
+  const promises = currentSave.map((change) => {
+    return FBUtils.updateDocument(change.path, change.data);
+  });
 
-    // Wait for all updates to finish completely
-    await Promise.all(promises);
+  // Wait for all updates to finish completely
+  await Promise.all(promises);
 
-    currentSave = [];
-    currentlySaved = true;
-  }
+  currentSave = [];
+  currentlySaved = true;
+}
 
-  async function loadSong(id) {
-    await saveCurrent();
-    const data = await FBUtils.getDocument(`songs/${id}`);
-    console.log("Loaded song data:", data);
-  }
+async function loadSong(id) {
+  await saveCurrent();
+  const data = await FBUtils.getDocument(`songs/${id}`);
+  console.log("Loaded song data:", data);
+}

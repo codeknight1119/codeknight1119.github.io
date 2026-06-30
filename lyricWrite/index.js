@@ -181,6 +181,7 @@ function processChange(path, newData) {
   console.log(currentSave);
 }
 
+
 async function saveCurrent() {
   const promises = currentSave.map((change) => {
     return FBUtils.updateDocument(change.path, change.data);
@@ -192,6 +193,12 @@ async function saveCurrent() {
   currentSave = [];
   currentlySaved = true;
 }
+
+document.addEventListener('keydown', (event) => {
+    if(event.key === "s"){
+      saveCurrent()
+    }
+});
 
 async function loadSong(id) {
   await saveCurrent();

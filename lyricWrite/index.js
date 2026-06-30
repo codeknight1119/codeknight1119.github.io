@@ -25,6 +25,8 @@ function createNewSongBtn(name, id) {
 
   newSongBtn.dataset.songId = id;
   newSongBtn.querySelector("#songTitle").innerText = name;
+  newSongBtn.dataset.lastSongName = name
+
 
   const loadBtn = newSongBtn.querySelector(".loadBtn");
   loadBtn.addEventListener("click", () => {
@@ -50,10 +52,12 @@ function createNewSongBtn(name, id) {
   // 2. Save Function
   function saveEdit() {
     // Only save if they didn't leave it completely blank
-    if (textInput.value.trim() !== '') {
+    if (textInput.value.trim() !== '' || textInput.value.trim() !== newSongBtn.dataset.lastSongName) {
       textDisplay.textContent = textInput.value;
+      newSongBtn.dataset.lastSongName = textInput.value
+      processChange(`songs/${id}`, { title: textDisplay.textContent })
     }
-    processChange(`songs/${id}`, {title: textDisplay.textContent})
+
     container.classList.remove('is-editing');
   }
 
@@ -63,7 +67,7 @@ function createNewSongBtn(name, id) {
   textInput.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
       saveEdit();
-      textInput.blur(); 
+      textInput.blur();
     }
   });
 

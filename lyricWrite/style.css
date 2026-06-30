@@ -1,100 +1,143 @@
 :root {
-    /* Existing variables from before */
-    --bg-body: #0a0a0e;          /* Added: Deep cyberpunk void for the main page */
-    --bg-list: rgba(18, 18, 24, 0.85);
-    --bg-item: rgba(45, 45, 58, 0.9);
-    --text-light: #ffffff;
-    --text-dark: #0d0d11;
-    
-    /* Neon Highlights */
-    --neon-teal: #00f2fe;
-    --neon-pink: #ff01ff;
-    --neon-yellow: #fff01f;
-    
-    /* Global Layout & Glows */
-    --radius-large: 10px;
-    --radius-small: 5px;
-    --shadow-list: 0 8px 25px rgba(0, 0, 0, 0.5);
-    --border-glow: 0 0 15px rgba(0, 242, 254, 0.15); /* Added: Soft teal ambient glow */
+  /* Existing variables from before */
+  --bg-body: #0a0a0e;
+  /* Added: Deep cyberpunk void for the main page */
+  --bg-list: rgba(18, 18, 24, 0.85);
+  --bg-item: rgba(45, 45, 58, 0.9);
+  --text-light: #ffffff;
+  --text-dark: #0d0d11;
+
+  /* Neon Highlights */
+  --neon-teal: #00f2fe;
+  --neon-pink: #ff01ff;
+  --neon-yellow: #fff01f;
+
+  /* Global Layout & Glows */
+  --radius-large: 10px;
+  --radius-small: 5px;
+  --shadow-list: 0 8px 25px rgba(0, 0, 0, 0.5);
+  --border-glow: 0 0 15px rgba(0, 242, 254, 0.15);
+  /* Added: Soft teal ambient glow */
 }
 
 .sortable-list {
-    list-style: none;
-    padding: 0;
-    width: 350px;
-    margin: auto;
-    background: var(--bg-list);
-    border-radius: var(--radius-large);
-    box-shadow: var(--shadow-list);
-    border: 1px solid rgba(255, 255, 255, 0.05); /* Soft border to define the edge in dark mode */
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  /* Fluid: stretches and shrinks automatically with the screen */
+  max-width: 650px;
+  /* Caps the list size so it doesn't get awkwardly long on desktop */
+  margin: 20px auto;
+  /* Keeps it centered inside the card component */
+  background: var(--bg-list);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-list);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .sortable-item {
-    padding: 15px 20px;
-    margin: 8px 0;
-    background: var(--bg-item);
-    border-radius: var(--radius-small);
-    font-size: 1.1em;
-    color: var(--text-light);
-    font-weight: bold;
-    cursor: grab;
-    box-shadow: var(--shadow-item);
-    transition: background 0.2s, transform 0.2s, color 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+  padding: 12px 18px;
+  margin: 8px 0;
+  background: var(--bg-item);
+  border-radius: var(--radius-small);
+  font-size: 1.1em;
+  color: var(--text-light);
+  font-weight: bold;
+  cursor: grab;
+  box-shadow: var(--shadow-item);
+  transition: background 0.2s, transform 0.2s, color 0.2s, box-shadow 0.2s;
+  display: flex;
 }
 
 button {
-    padding: 15px 20px;
-    margin: 8px 0;
-    background: var(--neon-teal);
-    border-radius: var(--radius-small);
-    font-size: 1.1em;
-    color: var(--text-dark);
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+  padding: 15px 20px;
+  margin: 8px 0;
+  background: var(--neon-teal);
+  border-radius: var(--radius-small);
+  font-size: 1.1em;
+  color: var(--text-dark);
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
 }
+
+.sortable-item>div {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  /* Pushes text to the left, button to the right */
+  align-items: center;
+  gap: 15px;
+  /* Stops the title and button from colliding on small mobile sizes */
+}
+
+/* Scales the inner button down cleanly so it doesn't overpower the item row */
+.sortable-item button {
+  padding: 8px 16px;
+  margin: 0;
+  font-size: 0.9em;
+  flex-shrink: 0;
+  /* Prevents the button from warping/crushing on tiny screens */
+}
+
+
+/* --- Desktop Media Query --- */
+@media (min-width: 768px) {
+  body {
+    margin: 50px auto;
+  }
+
+  .card {
+    padding: 45px;
+    /* Restores wide, premium spacing only when screens are large enough */
+  }
+}
+
 
 /* Hover & Dragging States */
 
 .sortable-item:hover {
-    background: rgba(55, 55, 73, 1);
-    color: var(--neon-yellow);
-    transform: scale(1.03);
-    box-shadow: 0 0 12px rgba(207, 255, 4, 0.4); /* Neon yellow glow */
+  background: rgba(55, 55, 73, 1);
+  color: var(--neon-yellow);
+  transform: scale(1.03);
+  box-shadow: 0 0 12px rgba(207, 255, 4, 0.4);
+  /* Neon yellow glow */
 }
 
 .dragging {
-    opacity: 0.7;
-    transform: rotate(-2deg);
+  opacity: 0.7;
+  transform: rotate(-2deg);
 }
 
 .over {
-    border: 2px dashed var(--neon-pink);
-    background: rgba(255, 0, 127, 0.15); /* Translucent electric pink tint */
+  border: 2px dashed var(--neon-pink);
+  background: rgba(255, 0, 127, 0.15);
+  /* Translucent electric pink tint */
 }
 
 
 body {
-    font-family: system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    margin: 40px auto;
-    max-width: 650px;
-    padding: 0 10px;
-    background-color: var(--bg-body);
-    color: var(--text-light);
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  margin: 20px auto;
+  max-width: 950px;
+  /* Increased from 650px so it can breathe on desktop */
+  width: 92%;
+  /* Adds a clean margin buffer near the screen edges on mobile */
+  padding: 0;
+  background-color: var(--bg-body);
+  color: var(--text-light);
 }
 
 .card {
-    background: var(--bg-list);
-    padding: 30px;
-    border-radius: var(--radius-large);
-    box-shadow: var(--shadow-list), var(--border-glow);
-    border: 1px solid rgba(0, 242, 254, 0.2); /* Subtle teal border border to make it pop */
-    backdrop-filter: blur(10px); /* Gives it a premium frosted glass effect against the dark bg */
+  background: var(--bg-list);
+  padding: 20px;
+  /* Tighter padding default optimized for mobile screens */
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-list), var(--border-glow);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 /* Keeps the text and input grouped together */
@@ -106,35 +149,37 @@ body {
 .editable-text {
   display: inline-block;
   cursor: pointer;
-  
+
   /* THE HITBOX TRICK: 
      Add padding to make it easy to tap on mobile, 
      then add negative margins of the exact same size 
      so it doesn't push your other layout elements around. */
-  padding: 12px 16px; 
+  padding: 12px 16px;
   margin: -12px -16px;
-  
+
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 /* Optional: Gives desktop users a subtle hint that it's clickable */
 .editable-text:hover {
-  background-color: #f5f5f5; 
+  background-color: #f5f5f5;
 }
 
 /* The Input Box */
 .editable-input {
-  display: none; /* Hidden by default */
+  display: none;
+  /* Hidden by default */
   font-size: inherit;
   font-family: inherit;
   font-weight: inherit;
-  
+
   /* Match the padding of the text so it doesn't jump when clicked */
   padding: 12px 16px;
   margin: -12px -16px;
-  
-  border: 1px solid #007BFF; /* Subtle highlight to show it's active */
+
+  border: 1px solid #007BFF;
+  /* Subtle highlight to show it's active */
   border-radius: 4px;
   outline: none;
   background: white;

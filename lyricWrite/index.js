@@ -100,7 +100,7 @@ function updateSongOrder() {
         changedItems.push({
           title: song.title,
           oldOrder: song.order,
-          newOrder: index
+          newOrder: index,
           id: item.dataset.songId
         });
 

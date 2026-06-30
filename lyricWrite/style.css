@@ -72,6 +72,7 @@ button {
   /* Stops the title and button from colliding on small mobile sizes */
 }
 
+
 /* Scales the inner button down cleanly so it doesn't overpower the item row */
 .sortable-item button {
   padding: 8px 16px;

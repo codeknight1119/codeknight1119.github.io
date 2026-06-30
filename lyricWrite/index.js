@@ -183,6 +183,7 @@ function processChange(path, newData) {
 
 
 async function saveCurrent() {
+  console.log("saving")
   try{
   const promises = currentSave.map((change) => {
     return FBUtils.updateDocument(change.path, change.data);

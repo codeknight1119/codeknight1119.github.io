@@ -250,7 +250,7 @@ function capitalizeFirstLetter(str) {
 }
 
 
-const addNewSongPartBtn = document.querySelector("#createSongPart")
+const addNewSongPartBtn = document.querySelector("#createSongPartBtn")
 const newSongPartDropdown = document.querySelector("#createSongPartDropdown")
 
 addNewSongPartBtn.addEventListener("click", ()=>{

@@ -313,3 +313,8 @@ addNewSongPartBtn.addEventListener("click", () => {
 document.getElementById("notesArea").addEventListener("focusout", (event)=>{
     processChange(`songsData/${currentSong}`, {notes: event.target.value}); 
 })
+
+document.getElementById("backToMainPage").addEventListener("click", ()=>{
+      mainPage.hidden = false;
+  editPage.hidden = true;
+})

@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { initializeFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, persistentLocalCache, persistentMultipleTabManager } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 const firebaseConfig = {
@@ -13,7 +13,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager()
+    })});
 const auth = getAuth(app);
 
 export const loginGoogle = async () => {
@@ -38,7 +41,7 @@ export const setDocument = async (path, data) => {
         // alert(JSON.stringify(result));
     }
     catch (e) {
-        alert(`set doc failed at ${path} ` + JSON.stringify(e));
+        console.error(`set doc failed at ${path} ` + JSON.stringify(e));
     }
 };
 

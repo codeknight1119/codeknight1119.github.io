@@ -318,3 +318,14 @@ document.getElementById("backToMainPage").addEventListener("click", ()=>{
       mainPage.hidden = false;
   editPage.hidden = true;
 })
+
+document.getElementById("copySong").addEventListener("click", ()=>{
+let copyText = `Notes:
+${document.getElementById("notesArea").value}
+`
+Array.from(document.getElementById("songPartsHolder").children).forEach((val)=>{
+    copyText +=`[${val.querySelector(".songPartTitle").value}]
+    ${val.querySelector(".writeLyrics").value}
+    `
+  })
+})

@@ -14,20 +14,21 @@ const saveEditsButton = document.getElementById("saveEditsButton")
 
 async function setUpMainPage() {
   MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
-
+if(MS_songsToAdd.length !== 0){
   MS_songsToAdd.forEach((val) => {
     createNewSongBtn(val.title, val.id);
     if (val.order > MS_maxSongOrder) {
       MS_maxSongOrder = val.order
     }
   });
+}
 
-  MS_ideas = await FBUtils.getDocument("/ideas", 50, {feild: "timestamp"})
-
-  MS_ideas.forEach((val)=>{
-    createNewIdea(val.text, val.id)
-  })
-
+  MS_ideas = await FBUtils.getDocuments("/ideas", 50, {feild: "timestamp"})
+  if(MS_ideas.length !== 0){
+    MS_ideas.forEach((val)=>{
+      createNewIdea(val.text, val.id)
+   })
+}
 
 }
 

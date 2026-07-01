@@ -6,6 +6,9 @@ let MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
 let MS_maxSongOrder = 0;
 const list = document.querySelector('.sortable-list');
 const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope
+let currentSong = null;
+let SE_verseCount = 1;
+let SE_maxSongOrder = 0;
 
 async function setUpMainPage() {
   MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
@@ -215,6 +218,8 @@ const editPage = document.querySelector("#songEdit")
 
 
 async function loadSong(id, name) {
+  currentSong = id;
+  SE_verseCount = 1;
   await saveCurrent();
   const data = await FBUtils.getDocument(`songsData/${id}`);
 
@@ -223,3 +228,49 @@ async function loadSong(id, name) {
   editPage.hidden = false;
 
 }
+const partTemplate = document.getElementById("templateSongPart")
+const partsHolder = document.getElementById("songEdit")
+
+function createSongPart(type, lyrics){
+  const newSongPart = partTemplate.content.cloneNode(true);
+  let name = capitalizeFirstLetter(type)
+  if(type === "verse"){
+    name += ` ${SE_verseCount}`
+    SE_verseCount ++
+  }
+  newSongPart.querySelector(".songPartTitle").innerText = name
+  newSongPart.querySelector(".writeLyrics").innerText = lyrics
+  partsHolder.appendChild(newSongPart)
+
+}
+
+function capitalizeFirstLetter(str) {
+  if (!str) return ""; // Handle empty strings safely
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
+const addNewSongPartBtn = document.querySelector("#createSongPart")
+const newSongPartDropdown = document.querySelector("#createSongPartDropdown")
+
+addNewSongPartBtn.addEventListener("click", ()=>{
+  const type = newSongPartDropdown.value;
+
+  // 1. Generate a unique ID for this part
+  const partId = `part_${Date.now()}`; 
+  const order = SE_verseCount; // Use current count as order
+
+  // 2. Render it on the UI
+  createSongPart(type, "", partId);
+
+  // 3. Save it using dot notation so Firestore doesn't overwrite other parts
+  const changeData = {};
+  changeData[`parts.${partId}`] = {
+      type: type,
+      name: type === "verse" ? `Verse ${SE_verseCount}` : capitalizeFirstLetter(type),
+      lyrics: "",
+      order: order
+  };
+
+  processChange(`songsData/${currentSong}`, changeData);
+})

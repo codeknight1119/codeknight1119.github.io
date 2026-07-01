@@ -49,9 +49,24 @@
             <template id="templateSongPart">
                 <div class="card">
                     <div class="songPartTitle"></div>
-
+                    <textarea id="writeLyrics"></textarea>
                 </div>
             </template>
+
+        </div>
+        <div id="createSongPart">
+            <label for="createSongPart">Choose Song Part Type</label>
+            <select name="createSongPart" id="createSongPartDropdown">
+                <option value="intro">Intro</option>
+                <option value="verse" selected>Verse</option>
+                <option value="pre-chorus">Pre-Chorus</option>
+                <option value="chorus">Chorus</option>
+                <option value="post-chorus">Post-Chorus</option>
+                <option value="bridge">Bridge</option>
+                <option value="instrumental">Instrumental</option>
+                <option value="outro">Outro</option>
+            </select>
+            <button id="createSongPart">Create</button>
         </div>
     </div>
 

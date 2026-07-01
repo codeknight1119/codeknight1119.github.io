@@ -248,28 +248,34 @@ async function loadSong(id, name) {
 const partTemplate = document.getElementById("templateSongPart")
 const partsHolder = document.getElementById("songEdit")
 
-function createSongPart(type, lyrics){
-  const newSongPart = partTemplate.content.cloneNode(true);
-  let name = capitalizeFirstLetter(type)
-  if(type === "verse"){
-    name += ` ${SE_verseCount}`
-    SE_verseCount ++
+// Add partId as an argument so it can accept existing IDs on load, or generate a new one if missing
+function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`) {
+  const newSongPartFragment = partTemplate.content.cloneNode(true);
+  const newSongPartElement = newSongPartFragment.firstElementChild; // Target actual DOM element
+  
+  let name = capitalizeFirstLetter(type);
+  if (type === "verse") {
+    name += ` ${SE_verseCount}`;
+    SE_verseCount++;
   }
-  const partID = `part_${Date.now()}`; 
-  newSongPart.dataset.id = partID
-  newSongPart.querySelector(".songPartTitle").innerText = name
-  const textArea =newSongPart.querySelector(".writeLyrics")
-  textArea.innerText = lyrics
+  
+  newSongPartElement.dataset.id = partID;
+  newSongPartElement.querySelector(".songPartTitle").innerText = name;
+  
+  const textArea = newSongPartElement.querySelector(".writeLyrics");
+  textArea.value = lyrics; // Use .value instead of .innerText for textareas
 
-  textArea.addEventListener("focusout", (event)=>{
-    const changeData = {}
-    changeData[`parts.${partId}`] = {
-      lyrics: event.target.value
-  };
-    processChange(`songData/${id}`, changeData)
-  })
-  partsHolder.appendChild(newSongPart)
+  textArea.addEventListener("focusout", (event) => {
+    const changeData = {};
+    // Use dot notation to strictly update the lyrics string for this specific part
+    changeData[`parts.${partID}.lyrics`] = event.target.value;
+    
+    // Fix: currentSong holds the active song ID
+    processChange(`songsData/${currentSong}`, changeData); 
+  });
 
+  partsHolder.appendChild(newSongPartFragment);
+  return partID; // Return the ID so the click handler can use it
 }
 
 function capitalizeFirstLetter(str) {
@@ -281,24 +287,21 @@ function capitalizeFirstLetter(str) {
 const addNewSongPartBtn = document.querySelector("#createSongPartBtn")
 const newSongPartDropdown = document.querySelector("#createSongPartDropdown")
 
-addNewSongPartBtn.addEventListener("click", ()=>{
+addNewSongPartBtn.addEventListener("click", () => {
   const type = newSongPartDropdown.value;
+  const order = SE_verseCount; 
 
+  // 1. Render on UI and catch the generated ID
+  const partId = createSongPart(type, "", undefined);
 
-  const partId = newSongPart.dataset.id
-  const order = SE_verseCount; // Use current count as order
-
-  // 2. Render it on the UI
-  createSongPart(type, "", partId);
-
-  // 3. Save it using dot notation so Firestore doesn't overwrite other parts
+  // 2. Save entire object block using dot notation for the new part
   const changeData = {};
   changeData[`parts.${partId}`] = {
       type: type,
-      name: type === "verse" ? `Verse ${SE_verseCount}` : capitalizeFirstLetter(type),
+      name: type === "verse" ? `Verse ${SE_verseCount - 1}` : capitalizeFirstLetter(type),
       lyrics: "",
       order: order
   };
 
   processChange(`songsData/${currentSong}`, changeData);
-})
+});

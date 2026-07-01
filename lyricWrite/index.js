@@ -327,8 +327,8 @@ coppyButton.addEventListener("click", async ()=>{
   `
 
   Array.from(document.getElementById("songPartsHolder").children).forEach((val)=>{
-    copyText +=`[${val.querySelector(".songPartTitle").value}]
-    ${val.querySelector(".writeLyrics").value}
+    copyText +=`[${val.querySelector(".songPartTitle").innerText}]
+    ${val.querySelector(".writeLyrics").innerText}
     `
   })
   

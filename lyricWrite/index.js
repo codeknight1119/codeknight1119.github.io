@@ -378,29 +378,36 @@ document.getElementById("backToMainPage").addEventListener("click", ()=>{
 })
 
 const coppyButton = document.getElementById("copySong")
-coppyButton.addEventListener("click", async ()=>{
-  let copyText = `Notes:
-  ${document.getElementById("notesArea").value}
-  `
+coppyButton.addEventListener("click", async () => {
+  // 1. Better formatting with \n so the text isn't weirdly indented
+  let copyText = `Notes:\n${document.getElementById("notesArea").value}\n\n`;
 
-  Array.from(document.getElementById("songPartsHolder").children).forEach((val)=>{
-    copyText +=`[${val.querySelector(".songPartTitle").innerText}]
-    ${val.querySelector(".writeLyrics").innerText}
-    `
-  })
+  // 2. Make sure this ID matches where your parts actually live
+  // Falling back to "songEdit" just in case based on your earlier code
+  const partsContainer = document.getElementById("songPartsHolder") || document.getElementById("songEdit");
+
+  Array.from(partsContainer.children).forEach((val) => {
+    const titleElement = val.querySelector(".songPartTitle");
+    const lyricsElement = val.querySelector(".writeLyrics");
+
+    // 3. Safety check: Only copy if this child element is actually a song part
+    if (titleElement && lyricsElement) {
+      // 4. FIX: Use .value here instead of .innerText!
+      copyText += `[${titleElement.innerText}]\n${lyricsElement.value}\n\n`;
+    }
+  });
   
   try {
-    await navigator.clipboard.writeText(copyText);
-    coppyButton.innerText = "Coppied!"
+    await navigator.clipboard.writeText(copyText.trim()); // trim() removes any trailing extra lines
+    coppyButton.innerText = "Copied!"; // Fixed minor typo here ('Coppied' -> 'Copied')
     setTimeout(() => {
-    coppyButton.innerText = "Copy"
+      coppyButton.innerText = "Copy";
     }, 500);
 
   } catch (err) {
     console.error('Failed to copy text: ', err);
   }
-
-})
+});
 
 
 document.getElementById("addIdea").addEventListener("click", async () => {

@@ -23,7 +23,8 @@ if(MS_songsToAdd.length !== 0){
   });
 }
 
-  MS_ideas = await FBUtils.getDocuments("/ideas", 50, {feild: "timestamp"})
+  // Change 'feild' to 'field'
+MS_ideas = await FBUtils.getDocuments("/ideas", 50, {field: "timestamp"});
   if(MS_ideas.length !== 0){
     MS_ideas.forEach((val)=>{
       createNewIdea(val.text, val.id)
@@ -90,47 +91,53 @@ function createNewSongBtn(name, id) {
 }
 
 function createNewIdea(text, id){
-  const newIdea =  document.getElementById("templateIdea").content.cloneNode(true);
-  const writeArea = newIdea.querySelector(".writeLyrics")
-  writeArea.innerText = text
+  // 1. Grab the fragment, THEN target the actual element
+  const newIdeaFragment = document.getElementById("templateIdea").content.cloneNode(true);
+  const newIdea = newIdeaFragment.firstElementChild; 
+  
+  const writeArea = newIdea.querySelector(".writeLyrics");
+  // Assuming writeLyrics is a textarea/input. Use .innerText if it's a div.
+  writeArea.value = text || ""; 
 
-  // 1. Enter Edit Mode
+  // Track the last saved text to prevent unnecessary database writes
+  newIdea.dataset.lastIdeaText = text || "";
+
+  // Enter Edit Mode
   writeArea.addEventListener('click', () => {
     newIdea.classList.add('is-editing');
-
-    // Focus the input and select the text for easy overriding
     writeArea.focus();
     writeArea.select();
   });
 
-  // 2. Save Function
+  // Save Function
   function saveEdit() {
-    const trimmedValue = textInput.value.trim();
+    const trimmedValue = writeArea.value.trim();
 
-    // Change || to && so BOTH conditions must be true to trigger a save
-    if (trimmedValue !== '' && trimmedValue !== newSongBtn.dataset.lastSongName) {
-      textDisplay.textContent = trimmedValue;
-      newSongBtn.dataset.lastSongName = trimmedValue;
-      processChange(`ideas/${id}`, { title: textDisplay.textContent });
+    // Check if it's not empty AND actually changed
+    if (trimmedValue !== '' && trimmedValue !== newIdea.dataset.lastIdeaText) {
+      newIdea.dataset.lastIdeaText = trimmedValue;
+      // Assuming ideas use the 'text' key based on setUpMainPage
+      processChange(`ideas/${id}`, { text: trimmedValue }); 
     }
 
-    container.classList.remove('is-editing');
+    newIdea.classList.remove('is-editing');
   }
-  // 3. Save when the user taps outside the input box (loses focus)
+
+  // Save when the user taps outside the input box (loses focus)
   writeArea.addEventListener('blur', saveEdit);
 
   writeArea.addEventListener('keypress', (event) => {
+    // If it's a textarea, you might want to use shift+enter for new lines, 
+    // but for now keeping your logic!
     if (event.key === 'Enter') {
       saveEdit();
       writeArea.blur();
     }
   });
 
-
-
-document.getElementById("existingIdeas").appendChild(newIdea)
+  // Append the fragment to the DOM
+  document.getElementById("existingIdeas").appendChild(newIdeaFragment);
 }
-
 // Initial load
 await setUpMainPage();
 
@@ -396,7 +403,18 @@ coppyButton.addEventListener("click", async ()=>{
 })
 
 
-document.getElementById("addIdea").addEventListener("click", async ()=>{
-  const newId =`idea${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
-  await FBUtils.addDocument("ideas", {id: newId})
-})
+document.getElementById("addIdea").addEventListener("click", async () => {
+  const newText = "New Idea"; // Or whatever default text you want
+  
+  // Add the default text and a timestamp so your query can sort it properly
+  const newDocData = { 
+    text: newText,
+    timestamp: Date.now() 
+  };
+  
+  const addedDoc = await FBUtils.addDocument("ideas", newDocData);
+  
+  // Update the UI immediately without needing a refresh!
+  // Note: Depending on your FBUtils, you might need to use addedDoc.id or generate your own ID.
+  createNewIdea(newText, addedDoc.id);
+});

@@ -319,7 +319,7 @@ async function loadSong(id, name) {
 
   editPage.querySelector(".pageTitle").innerText = name;
   const notesArea = editPage.querySelector("#notesArea")
-  if(data.notes === undefined){
+  if(!data.notes){
     notesArea.innerText = ""
   }else{
     notesArea.innerText = data.notes 

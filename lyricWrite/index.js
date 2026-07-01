@@ -4,6 +4,7 @@ let currentSave = [];
 let currentlySaved = true;
 let MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
 let MS_maxSongOrder = 0;
+let MS_ideas = []
 const list = document.querySelector('.sortable-list');
 const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope
 let currentSong = null;
@@ -20,6 +21,14 @@ async function setUpMainPage() {
       MS_maxSongOrder = val.order
     }
   });
+
+  MS_ideas = await FBUtils.getDocument("/ideas", 50, {feild: "timestamp"})
+
+  MS_ideas.forEach((val)=>{
+    createNewIdea(val.text, val.id)
+  })
+
+
 }
 
 function createNewSongBtn(name, id) {
@@ -79,7 +88,47 @@ function createNewSongBtn(name, id) {
   list.appendChild(newSongBtnFragment);
 }
 
+function createNewIdea(text, id){
+  const newIdea =  document.getElementById("templateIdea").content.cloneNode(true);
+  const writeArea = newIdea.querySelector(".writeLyrics")
+  writeArea.innerText = text
 
+  // 1. Enter Edit Mode
+  writeArea.addEventListener('click', () => {
+    newIdea.classList.add('is-editing');
+
+    // Focus the input and select the text for easy overriding
+    writeArea.focus();
+    writeArea.select();
+  });
+
+  // 2. Save Function
+  function saveEdit() {
+    const trimmedValue = textInput.value.trim();
+
+    // Change || to && so BOTH conditions must be true to trigger a save
+    if (trimmedValue !== '' && trimmedValue !== newSongBtn.dataset.lastSongName) {
+      textDisplay.textContent = trimmedValue;
+      newSongBtn.dataset.lastSongName = trimmedValue;
+      processChange(`ideas/${id}`, { title: textDisplay.textContent });
+    }
+
+    container.classList.remove('is-editing');
+  }
+  // 3. Save when the user taps outside the input box (loses focus)
+  writeArea.addEventListener('blur', saveEdit);
+
+  writeArea.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      saveEdit();
+      writeArea.blur();
+    }
+  });
+
+
+
+document.getElementById("existingIdeas").appendChild(newIdea)
+}
 
 // Initial load
 await setUpMainPage();
@@ -343,4 +392,10 @@ coppyButton.addEventListener("click", async ()=>{
     console.error('Failed to copy text: ', err);
   }
 
+})
+
+
+document.getElementById("addIdea").addEventListener("click", ()=>{
+  const newId =`idea${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+  await FBUtils.addDoc("ideas", {id: newId})
 })

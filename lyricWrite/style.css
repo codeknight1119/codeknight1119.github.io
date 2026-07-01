@@ -132,7 +132,7 @@ body {
   box-shadow: var(--shadow-list), var(--border-glow);
   border: 1px solid rgba(0, 242, 254, 0.2);
   backdrop-filter: blur(10px);
-  overflow-y: scroll;
+  /*overflow-y: scroll;*/
 }
 
 /* Keeps the text and input grouped together */
@@ -218,4 +218,10 @@ body {
 .textarea-container textarea:focus {
   border-color: var(--neon-pink);
   box-shadow: 0 0 15px rgba(255, 1, 255, 0.4);
+}
+
+#existingIdeas {
+  height: 25vh;
+  width: 100vh;
+  overflow-y:  scroll;
 }

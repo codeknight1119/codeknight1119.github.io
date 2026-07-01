@@ -222,7 +222,7 @@ async function loadSong(id, name) {
   SE_verseCount = 1;
   await saveCurrent();
   const data = await FBUtils.getDocument(`songsData/${id}`);
-
+console.log(data)
   editPage.querySelector(".pageTitle").innerText = name
   mainPage.hidden = true;
   editPage.hidden = false;

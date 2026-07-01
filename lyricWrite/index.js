@@ -204,7 +204,7 @@ async function saveCurrent() {
 
     currentSave = [];
     currentlySaved = true;
-            saveEditsButton.innerText = "Save (saved)"
+      saveEditsButton.innerText = "Save (saved)"
 
     console.log("saved")
   } catch (e) {
@@ -310,3 +310,6 @@ addNewSongPartBtn.addEventListener("click", () => {
 });
 
 
+document.getElementById("notesArea").addEventListener("focusout", (event)=>{
+    processChange(`songsData/${currentSong}`, {notes: event.target.value}); 
+})

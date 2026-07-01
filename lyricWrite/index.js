@@ -30,7 +30,7 @@ function createNewSongBtn(name, id) {
 
   const loadBtn = newSongBtn.querySelector(".loadBtn");
   loadBtn.addEventListener("click", () => {
-    loadSong(id);
+    loadSong(id, name);
   });
 
   const container = newSongBtn.querySelector('#titleContainer');
@@ -127,7 +127,7 @@ function getDragAfterElement(container, y) {
 // Added missing "click" argument here
 document.querySelector("#addSong").addEventListener("click", async () => {
   MS_maxSongOrder++
-  const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder++ });
+  const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder });
 
   // Keep local array in sync
   MS_songsToAdd.push({ id: newSong.id, title: "New Song", order: MS_songsToAdd.length });
@@ -143,6 +143,7 @@ function updateSongOrder() {
     const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
     const song = MS_songsToAdd.find(s => s.title === titleText);
 
+
     if (song) {
       if (song.order !== index) {
         changedItems.push({
@@ -156,6 +157,7 @@ function updateSongOrder() {
       }
     }
   });
+  MS_maxSongOrder = currentDOMItems.length > 0 ? currentDOMItems.length - 1 : 0;
 
   if (changedItems.length > 0) {
     console.log("These items changed position:", changedItems);
@@ -184,32 +186,38 @@ function processChange(path, newData) {
 
 async function saveCurrent() {
   console.log("saving")
-  try{
-  const promises = currentSave.map((change) => {
-    return FBUtils.updateDocument(change.path, change.data);
-  });
+  try {
+    const promises = currentSave.map((change) => {
+      return FBUtils.updateDocument(change.path, change.data);
+    });
 
-  // Wait for all updates to finish completely
-  await Promise.all(promises);
+    // Wait for all updates to finish completely
+    await Promise.all(promises);
 
-  currentSave = [];
-  currentlySaved = true;
-  console.log("saved")
-}catch(e){
-  console.error(e);
-  
-}
-  
+    currentSave = [];
+    currentlySaved = true;
+    console.log("saved")
+  } catch (e) {
+    console.error(e);
+
+  }
+
 }
 
 document.addEventListener('keydown', (event) => {
-    if(event.key === "s"){
-      saveCurrent()
-    }
+  if (event.key === "s") {
+    saveCurrent()
+  }
 });
 
-async function loadSong(id) {
+const mainPage = document.querySelector(".pageEnter")
+const editPage = document.querySelector("#songEdit")
+
+async function loadSong(id, name) {
   await saveCurrent();
-  const data = await FBUtils.getDocument(`songs/${id}`);
-  console.log("Loaded song data:", data);
+  const data = await FBUtils.getDocuments(`songs/${id}`);
+  editPage.querySelector(".pageTitle").innerText = name
+  mainPage.hidden = true;
+  editPage.hidden = false;
+
 }

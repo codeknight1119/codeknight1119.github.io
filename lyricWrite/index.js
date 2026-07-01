@@ -221,21 +221,30 @@ async function loadSong(id, name) {
   currentSong = id;
   SE_verseCount = 1;
   await saveCurrent();
+  
+  // Clear out old song parts from the UI if any exist from a previous view
+  partsHolder.querySelectorAll('.song-part-class-name').forEach(el => el.remove()); 
+
   const data = await FBUtils.getDocument(`songsData/${id}`);
-  if(data === undefined){
-    await FBUtils.setDocument(`songsData/${id}`, {})
-  }else{
-    const keysArr = [...data.parts.keys()]
-    keysArr.forEach((val)=>{
-      createSongPart(val.type, val.lyrics)
-    })
+  
+  if (data === undefined || !data.parts) {
+    await FBUtils.setDocument(`songsData/${id}`, { parts: {} });
+  } else {
+    // 1. Turn object values into an array and sort them by the 'order' field
+    const sortedParts = Object.entries(data.parts).sort((a, b) => a[1].order - b[1].order);
+
+    // 2. Loop through and build the UI
+    sortedParts.forEach(([partKey, partData]) => {
+      // Pass the existing partKey so it updates the exact record later
+      createSongPart(partData.type, partData.lyrics, partKey); 
+    });
   }
-console.log(data)
-  editPage.querySelector(".pageTitle").innerText = name
+
+  editPage.querySelector(".pageTitle").innerText = name;
   mainPage.hidden = true;
   editPage.hidden = false;
-
 }
+
 const partTemplate = document.getElementById("templateSongPart")
 const partsHolder = document.getElementById("songEdit")
 

@@ -222,6 +222,9 @@ async function loadSong(id, name) {
   SE_verseCount = 1;
   await saveCurrent();
   const data = await FBUtils.getDocument(`songsData/${id}`);
+  if(data === undefined){
+    await FBUtils.setDocument(`songsData/${id}`)
+  }
 console.log(data)
   editPage.querySelector(".pageTitle").innerText = name
   mainPage.hidden = true;
@@ -256,7 +259,7 @@ const newSongPartDropdown = document.querySelector("#createSongPartDropdown")
 addNewSongPartBtn.addEventListener("click", ()=>{
   const type = newSongPartDropdown.value;
 
-  // 1. Generate a unique ID for this part
+
   const partId = `part_${Date.now()}`; 
   const order = SE_verseCount; // Use current count as order
 

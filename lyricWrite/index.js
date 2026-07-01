@@ -138,13 +138,13 @@ document.querySelector("#addSong").addEventListener("click", async () => {
 });
 
 function updateSongOrder() {
-  const currentDOMItems = list.querySelectorAll('.sortable-item');
+const currentDOMItems = list.querySelectorAll('.sortable-item');
   const changedItems = [];
 
   currentDOMItems.forEach((item, index) => {
-    const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
+    // FIX: Changed from .title to #songTitle to match your template
+    const titleText = item.querySelector("#songTitle").innerText; 
     const song = MS_songsToAdd.find(s => s.title === titleText);
-
 
     if (song) {
       if (song.order !== index) {

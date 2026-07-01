@@ -216,9 +216,15 @@ const editPage = document.querySelector("#songEdit")
 async function loadSong(id, name) {
   await saveCurrent();
   const data = await FBUtils.getDocument(`songsData/${id}`);
-  
+  console.log(data)
   editPage.querySelector(".pageTitle").innerText = name
   mainPage.hidden = true;
   editPage.hidden = false;
 
 }
+
+document.getElementById("goBackToMainPage").addEventListener("click", async () => {
+  await saveCurrent();
+  mainPage.hidden = false;
+  editPage.hidden = true;
+})

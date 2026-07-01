@@ -12,6 +12,22 @@ let SE_verseCount = 0;
 let SE_maxSongOrder = 0;
 const saveEditsButton = document.getElementById("saveEditsButton")
 
+window.addEventListener("beforeunload", (event) => {
+    if (!currentlySaved) {
+        event.preventDefault();
+
+        // Required for Chrome/Edge
+        event.returnValue = "";
+    }
+});
+
+setInterval(() => {
+    if (!currentlySaved) {
+        saveCurrent();
+    }
+}, 5000);
+
+
 async function setUpMainPage() {
   MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
 if(MS_songsToAdd.length !== 0){
@@ -125,7 +141,7 @@ function createNewIdea(text, id){
 
   // Save when the user taps outside the input box (loses focus)
   writeArea.addEventListener('blur', saveEdit);
-
+/*
   writeArea.addEventListener('keypress', (event) => {
     // If it's a textarea, you might want to use shift+enter for new lines, 
     // but for now keeping your logic!
@@ -134,7 +150,7 @@ function createNewIdea(text, id){
       writeArea.blur();
     }
   });
-
+*/
   // Append the fragment to the DOM
   document.getElementById("existingIdeas").appendChild(newIdeaFragment);
 }
@@ -202,7 +218,7 @@ function updateSongOrder() {
   const changedItems = [];
 
   currentDOMItems.forEach((item, index) => {
-    const titleText = item.querySelector(".title").innerText; // Fixed: changed from #title to .title
+    const titleText = item.querySelector("#songTitle").innerText; // Fixed: changed from #title to .title
     const song = MS_songsToAdd.find(s => s.title === titleText);
 
 
@@ -249,6 +265,7 @@ function processChange(path, newData) {
 
 
 async function saveCurrent() {
+  
         saveEditsButton.innerText = "Saving..."
   console.log("saving")
   try {
@@ -283,7 +300,7 @@ async function loadSong(id, name) {
   await saveCurrent();
   
   // Clear out old song parts from the UI if any exist from a previous view
-  partsHolder.querySelectorAll('.song-part-class-name').forEach(el => el.remove()); 
+  partsHolder.querySelectorAll(".songPart").forEach(el => el.remove());
 
   const data = await FBUtils.getDocument(`songsData/${id}`);
   
@@ -372,7 +389,8 @@ document.getElementById("notesArea").addEventListener("focusout", (event)=>{
     processChange(`songsData/${currentSong}`, {notes: event.target.value}); 
 })
 
-document.getElementById("backToMainPage").addEventListener("click", ()=>{
+document.getElementById("backToMainPage").addEventListener("click", async ()=>{
+   await saveCurrent();
   mainPage.hidden = false;
   editPage.hidden = true;
 })

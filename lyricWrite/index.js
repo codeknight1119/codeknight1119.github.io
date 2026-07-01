@@ -223,7 +223,9 @@ async function loadSong(id, name) {
   await saveCurrent();
   const data = await FBUtils.getDocument(`songsData/${id}`);
   if(data === undefined){
-    await FBUtils.setDocument(`songsData/${id}`)
+    await FBUtils.setDocument(`songsData/${id}`, {
+      
+    })
   }
 console.log(data)
   editPage.querySelector(".pageTitle").innerText = name

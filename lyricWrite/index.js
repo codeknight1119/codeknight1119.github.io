@@ -377,7 +377,7 @@ document.getElementById("backToMainPage").addEventListener("click", ()=>{
   editPage.hidden = true;
 })
 
-const coppyButton = document.getElementById("copySong")
+const coppyButton = document.getElementById("copySong");
 coppyButton.addEventListener("click", async () => {
   // 1. Better formatting with \n so the text isn't weirdly indented
   let copyText = `Notes:\n${document.getElementById("notesArea").value}\n\n`;

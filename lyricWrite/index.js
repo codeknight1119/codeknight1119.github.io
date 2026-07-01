@@ -213,7 +213,7 @@ async function saveCurrent() {
 
 
 }
-saveEditsButton.addEventListener("click", saveCurrent())
+saveEditsButton.addEventListener("click", saveCurrent)
 
 const mainPage = document.querySelector(".pageEnter")
 const editPage = document.querySelector("#songEdit")

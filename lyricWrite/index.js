@@ -318,7 +318,13 @@ async function loadSong(id, name) {
   }
 
   editPage.querySelector(".pageTitle").innerText = name;
-  editPage.querySelector("#notesArea").innerText = data.notes || ""
+  const notesArea = editPage.querySelector("#notesArea")
+  if(data.notes === undefined){
+    notesArea.innerText = ""
+  }else{
+    notesArea.innerText = data.notes 
+  }
+
   mainPage.hidden = true;
   editPage.hidden = false;
 }

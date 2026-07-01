@@ -9,6 +9,7 @@ const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to 
 let currentSong = null;
 let SE_verseCount = 0;
 let SE_maxSongOrder = 0;
+const saveEditsButton = document.getElementById("saveEditsButton")
 
 async function setUpMainPage() {
   MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
@@ -77,6 +78,7 @@ function createNewSongBtn(name, id) {
 
   list.appendChild(newSongBtnFragment);
 }
+
 
 
 // Initial load
@@ -184,6 +186,8 @@ function processChange(path, newData) {
     currentSave[index].data = { ...currentSave[index].data, ...newData };
   }
   console.log(currentSave);
+  saveEditsButton.innerText = "Save (unsaved)"
+  currentlySaved = false;
 }
 
 
@@ -199,6 +203,7 @@ async function saveCurrent() {
 
     currentSave = [];
     currentlySaved = true;
+    saveEditsButton.innerText = "Save (saved)"
     console.log("saved")
   } catch (e) {
     console.error(e);
@@ -206,12 +211,7 @@ async function saveCurrent() {
   }
 
 }
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === "s") {
-    saveCurrent()
-  }
-});
+saveEditsButton.addEventListener("click", saveCurrent())
 
 const mainPage = document.querySelector(".pageEnter")
 const editPage = document.querySelector("#songEdit")
@@ -305,3 +305,5 @@ addNewSongPartBtn.addEventListener("click", () => {
 
   processChange(`songsData/${currentSong}`, changeData);
 });
+
+

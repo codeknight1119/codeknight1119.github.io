@@ -318,8 +318,8 @@ document.getElementById("backToMainPage").addEventListener("click", ()=>{
       mainPage.hidden = false;
   editPage.hidden = true;
 })
-
-document.getElementById("copySong").addEventListener("click", ()=>{
+const coppyButton = document.getElementById("copySong")
+coppyButton.addEventListener("click", ()=>{
 let copyText = `Notes:
 ${document.getElementById("notesArea").value}
 `
@@ -328,4 +328,8 @@ Array.from(document.getElementById("songPartsHolder").children).forEach((val)=>{
     ${val.querySelector(".writeLyrics").value}
     `
   })
+  coppyButton.innerText = "Coppied!"
+  setTimeout(() => {
+     coppyButton.innerText = "Copy"
+  }, 500);
 })

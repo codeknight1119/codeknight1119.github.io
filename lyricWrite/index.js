@@ -244,6 +244,7 @@ async function loadSong(id, name) {
   }
 
   editPage.querySelector(".pageTitle").innerText = name;
+  editPage.querySelector("#notesArea").innerText = data.notes
   mainPage.hidden = true;
   editPage.hidden = false;
 }

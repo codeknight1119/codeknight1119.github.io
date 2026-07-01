@@ -6,6 +6,8 @@ let MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
 let MS_maxSongOrder = 0;
 const list = document.querySelector('.sortable-list');
 const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope
+let currentSongId = null;
+let currentSongParts = [];
 
 async function setUpMainPage() {
   MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
@@ -214,13 +216,19 @@ const mainPage = document.querySelector(".pageEnter")
 const editPage = document.querySelector("#songEdit")
 
 async function loadSong(id, name) {
-  await saveCurrent();
+await saveCurrent();
+  currentSongId = id; // Store globally so adding/updating parts knows which song it belongs to
+  
   const data = await FBUtils.getDocument(`songsData/${id}`);
-  console.log(data)
-  editPage.querySelector(".pageTitle").innerText = name
+  
+  // Fallback to an empty array if the document or parts array doesn't exist yet
+  currentSongParts = (data && data.parts) ? data.parts : [];
+  
+  editPage.querySelector(".pageTitle").innerText = name;
+  renderAllParts(); // Draw the components onto the screen
+  
   mainPage.hidden = true;
   editPage.hidden = false;
-
 }
 
 document.getElementById("goBackToMainPage").addEventListener("click", async () => {
@@ -228,3 +236,53 @@ document.getElementById("goBackToMainPage").addEventListener("click", async () =
   mainPage.hidden = false;
   editPage.hidden = true;
 })
+
+// Renders all song parts from the currentSongParts array
+function renderAllParts() {
+  const holder = document.getElementById("songPartsHolder");
+  holder.innerHTML = ""; // Clear existing elements to prevent duplicates
+
+  currentSongParts.forEach((part, index) => {
+    const fragment = document.getElementById("templateSongPart").content.cloneNode(true);
+    const partEl = fragment.firstElementChild;
+    
+    const select = partEl.querySelector(".part-type-select");
+    const textarea = partEl.querySelector(".part-lyrics-textarea");
+    const deleteBtn = partEl.querySelector(".delete-part-btn");
+
+    // Populate saved data
+    select.value = part.type || "Verse";
+    textarea.value = part.text || "";
+
+    // Event: Update part type selection
+    select.addEventListener("change", () => {
+      currentSongParts[index].type = select.value;
+      processChange(`songsData/${currentSongId}`, { parts: currentSongParts });
+    });
+
+    // Event: Update lyric text input
+    textarea.addEventListener("input", () => {
+      currentSongParts[index].text = textarea.value;
+      processChange(`songsData/${currentSongId}`, { parts: currentSongParts });
+    });
+
+    // Event: Delete part
+    deleteBtn.addEventListener("click", () => {
+      currentSongParts.splice(index, 1); // Remove from tracking array
+      processChange(`songsData/${currentSongId}`, { parts: currentSongParts });
+      renderAllParts(); // Re-render to update array indexes in the DOM
+    });
+
+    holder.appendChild(fragment);
+  });
+}
+
+// Event listener for adding a new song part block
+document.getElementById("addPart").addEventListener("click", () => {
+  if (!currentSongId) return;
+
+  // Add a clean default part object
+  currentSongParts.push({ type: "Verse", text: "" });
+  processChange(`songsData/${currentSongId}`, { parts: currentSongParts });
+  renderAllParts();
+});

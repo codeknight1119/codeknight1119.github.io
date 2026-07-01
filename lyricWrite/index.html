@@ -20,9 +20,9 @@
         <div class="card">
             <div style="display: flex; flex-direction: row;">
                 <h2 id="sectionTitle">Songs</h2>
-                 <button id="addSong">Add Song</button>
+                <button id="addSong">Add Song</button>
             </div>
-            
+
             <ul class="sortable-list">
                 <template id="songBtnTemplate">
                     <li class="sortable-item" draggable="true">
@@ -37,24 +37,34 @@
                     </li>
                 </template>
             </ul>
-           
+
         </div>
     </div>
     <div id="songEdit" hidden>
         <div class="header">
-            <button id="goBackToMainPage">Back</button><h2 class="pageTitle"></h2>
+            <button id="goBackToMainPage">Back</button>
+            <h2 class="pageTitle"></h2>
             <hr>
         </div>
         <div id="songPartsHolder">
-<template id="templateSongPart">
-    <div class="card">
-        <div class="songPartTitle"></div>
-        
-    </div>
-</template>
+            <template id="templateSongPart">
+                <div class="card song-part">
+                    <div class="part-header"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <select class="part-type-select">
+                            <option value="Verse">Verse</option>
+                            <option value="Chorus">Chorus</option>
+                            <option value="Bridge">Bridge</option>
+                            <option value="Intro">Intro</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                        <button class="delete-part-btn">Delete</button>
+                    </div>
+                    <textarea class="part-lyrics-textarea" rows="5" placeholder="Type lyrics here..."></textarea>
+                </div>
+            </template>
         </div>
     </div>
-
 </body>
 
 </html>

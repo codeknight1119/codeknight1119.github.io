@@ -192,6 +192,7 @@ function processChange(path, newData) {
 
 
 async function saveCurrent() {
+        saveEditsButton.innerText = "Saving..."
   console.log("saving")
   try {
     const promises = currentSave.map((change) => {
@@ -203,12 +204,13 @@ async function saveCurrent() {
 
     currentSave = [];
     currentlySaved = true;
-    saveEditsButton.innerText = "Save (saved)"
+
     console.log("saved")
   } catch (e) {
     console.error(e);
 
   }
+
 
 }
 saveEditsButton.addEventListener("click", saveCurrent())

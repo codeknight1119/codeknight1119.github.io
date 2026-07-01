@@ -395,7 +395,7 @@ coppyButton.addEventListener("click", async ()=>{
 })
 
 
-document.getElementById("addIdea").addEventListener("click", ()=>{
+document.getElementById("addIdea").addEventListener("click", await ()=>{
   const newId =`idea${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
   await FBUtils.addDoc("ideas", {id: newId})
 })

@@ -204,6 +204,7 @@ async function saveCurrent() {
 
     currentSave = [];
     currentlySaved = true;
+            saveEditsButton.innerText = "Save (saved)"
 
     console.log("saved")
   } catch (e) {

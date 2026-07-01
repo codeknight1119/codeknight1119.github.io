@@ -1,23 +1,16 @@
 :root {
-  /* Existing variables from before */
-  --bg-body: #0a0a0e;
-  /* Added: Deep cyberpunk void for the main page */
+--bg-body: #0a0a0e;
   --bg-list: rgba(18, 18, 24, 0.85);
   --bg-item: rgba(45, 45, 58, 0.9);
   --text-light: #ffffff;
   --text-dark: #0d0d11;
-
-  /* Neon Highlights */
   --neon-teal: #00f2fe;
   --neon-pink: #ff01ff;
   --neon-yellow: #fff01f;
-
-  /* Global Layout & Glows */
   --radius-large: 10px;
   --radius-small: 5px;
   --shadow-list: 0 8px 25px rgba(0, 0, 0, 0.5);
   --border-glow: 0 0 15px rgba(0, 242, 254, 0.15);
-  /* Added: Soft teal ambient glow */
 }
 
 .sortable-list {
@@ -196,4 +189,33 @@ body {
 
 .is-editing .editable-input {
   display: inline-block;
+}
+
+
+.writeLyrics{
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box; /* Crucial: includes padding/border in the 100% size */
+  
+  /* Text Styling */
+  font-size: 1.25rem;     /* Makes the text bigger than default */
+  color: var(--text-light);
+  font-family: 'Courier New', Courier, monospace; /* Fits the cyber theme */
+  
+  /* Background & Borders */
+  background-color: var(--bg-item);
+  border: 1px solid var(--neon-teal);
+  border-radius: var(--radius-small);
+  box-shadow: var(--border-glow);
+  
+  /* Inner spacing and removal of default resize handles if desired */
+  padding: 12px;
+  resize: none;           /* Prevents the user from manually resizing it */
+  outline: none;          /* Removes the default browser focus outline */
+  transition: all 0.3s ease;
+}
+
+.textarea-container textarea:focus {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 15px rgba(255, 1, 255, 0.4);
 }

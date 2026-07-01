@@ -223,8 +223,11 @@ async function loadSong(id, name) {
   await saveCurrent();
   const data = await FBUtils.getDocument(`songsData/${id}`);
   if(data === undefined){
-    await FBUtils.setDocument(`songsData/${id}`, {
-
+    await FBUtils.setDocument(`songsData/${id}`, {})
+  }else{
+    const keysArr = [...data.parts.keys()]
+    keysArr.forEach((val)=>{
+      createSongPart(val.type, val.lyrics)
     })
   }
 console.log(data)

@@ -307,7 +307,7 @@ async function loadSong(id, name) {
 }
 
 const partTemplate = document.getElementById("templateSongPart")
-const partsHolder = document.getElementById("songEdit")
+const partsHolder = document.getElementById("songPartsHolder")
 
 // Add partId as an argument so it can accept existing IDs on load, or generate a new one if missing
 function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`) {

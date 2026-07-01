@@ -316,21 +316,31 @@ document.getElementById("notesArea").addEventListener("focusout", (event)=>{
 })
 
 document.getElementById("backToMainPage").addEventListener("click", ()=>{
-      mainPage.hidden = false;
+  mainPage.hidden = false;
   editPage.hidden = true;
 })
+
 const coppyButton = document.getElementById("copySong")
 coppyButton.addEventListener("click", ()=>{
-let copyText = `Notes:
-${document.getElementById("notesArea").value}
-`
-Array.from(document.getElementById("songPartsHolder").children).forEach((val)=>{
+  let copyText = `Notes:
+  ${document.getElementById("notesArea").value}
+  `
+
+  Array.from(document.getElementById("songPartsHolder").children).forEach((val)=>{
     copyText +=`[${val.querySelector(".songPartTitle").value}]
     ${val.querySelector(".writeLyrics").value}
     `
   })
-  coppyButton.innerText = "Coppied!"
-  setTimeout(() => {
-     coppyButton.innerText = "Copy"
-  }, 500);
+  
+  try {
+    await navigator.clipboard.writeText(copyText);
+    coppyButton.innerText = "Coppied!"
+    setTimeout(() => {
+    coppyButton.innerText = "Copy"
+    }, 500);
+
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+  }
+
 })

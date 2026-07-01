@@ -38,7 +38,6 @@ export const loginGoogle = async () => {
 export const setDocument = async (path, data) => {
     try {
         await firestoreSetDoc(doc(db, path), data);
-        // alert(JSON.stringify(result));
     }
     catch (e) {
         console.error(`set doc failed at ${path} ` + JSON.stringify(e));
@@ -49,20 +48,18 @@ export const addDocument = async (path, data) => {
     try {
        const docAdded =  await addDoc(collection(db, path), data);
        return docAdded;
-        // alert(JSON.stringify(result));
     }
     catch (e) {
-        alert(`set doc failed at ${path} ` + JSON.stringify(e));
+        console.error(`set doc failed at ${path} `, e);
     }
 };
 
 export const updateDocument = async (path, data) => {
     try {
         await updateDoc(doc(db, path), data);
-        // alert(JSON.stringify(result));
     }
     catch (e) {
-        alert(`update doc failed at ${path}` + JSON.stringify(e));
+        console.error(`update doc failed at ${path}`, e);
     }
 };
 
@@ -78,8 +75,7 @@ export const getDocument = async (path) => {
         }
     }
     catch (e) {
-        alert(`get doc from ${caller} failed at link ${path} | Error: ` +
-            JSON.stringify(e));
+        console.error(`get doc failed`, e);
     }
 };
 
@@ -129,7 +125,7 @@ export const isSignedIn = () => {
                 (error) => reject(error)
             );
         } catch (e) {
-            alert('error + ' + JSON.stringify(e));
+            console.error("isSignedIn", e);
             reject(e);
         }
     });
@@ -140,6 +136,6 @@ export const logout = () => {
         signOut(auth);
     }
     catch (e) {
-        alert('logout error: ' + JSON.stringify(e));
+        console.error('logout error: ' , e);
     }
 };

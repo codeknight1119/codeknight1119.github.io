@@ -321,7 +321,7 @@ document.getElementById("backToMainPage").addEventListener("click", ()=>{
 })
 
 const coppyButton = document.getElementById("copySong")
-coppyButton.addEventListener("click", ()=>{
+coppyButton.addEventListener("click", async ()=>{
   let copyText = `Notes:
   ${document.getElementById("notesArea").value}
   `

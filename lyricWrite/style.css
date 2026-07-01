@@ -185,6 +185,30 @@ body {
   background: white;
 }
 
+.ideaParent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 2. Make the textarea stretch to fill all available space inside the card */
+.ideaChild {
+  width: 100%;
+  flex-grow: 1; /* Forces the textarea to take up all remaining vertical space */
+  height: 100%; /* Fallback/explicit height assignment */
+  box-sizing: border-box; /* Critical: keeps padding from pushing it out of bounds */
+  
+  /* Optional: Reusing some of your beautiful neon styling from .writeLyrics */
+  background-color: var(--bg-item);
+  border: 1px solid var(--neon-teal);
+  border-radius: var(--radius-small);
+  color: var(--text-light);
+  padding: 12px;
+  resize: none; /* Stops users from dragging it out of the container bounds */
+  outline: none;
+}
+
 /* --- Toggling Logic --- */
 
 /* When the container has the 'is-editing' class, hide text and show input */
@@ -227,6 +251,6 @@ body {
 
 #existingIdeas {
   height: 25vh;
-  width: 100vh;
+  width: 100%;
   overflow-y:  scroll;
 }

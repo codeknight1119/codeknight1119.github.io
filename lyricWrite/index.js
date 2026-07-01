@@ -380,7 +380,7 @@ document.getElementById("backToMainPage").addEventListener("click", ()=>{
 const coppyButton = document.getElementById("copySong");
 coppyButton.addEventListener("click", async () => {
   // 1. Better formatting with \n so the text isn't weirdly indented
-  let copyText = `Notes:\n${document.getElementById("notesArea").value}\n\n`;
+  let copyText = `Title:${document.getElementById("editTitle").innerText}\nNotes:\n${document.getElementById("notesArea").value}\n\n`;
 
   // 2. Make sure this ID matches where your parts actually live
   // Falling back to "songEdit" just in case based on your earlier code

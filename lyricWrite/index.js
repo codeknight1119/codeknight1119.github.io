@@ -330,7 +330,7 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
 exitBTn.addEventListener("click",()=>{
   if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
    await FBUtils.updateDocument(`songData/${currentSong}`, {
-    [partID]: FBUtils.deleteField()
+    [`parts.${partID}`]: FBUtils.deleteField()
 });
     newSongPartElement.remove()
   }

@@ -322,7 +322,16 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
     processChange(`songsData/${currentSong}`, changeData); 
   });
 
+
   partsHolder.appendChild(newSongPartFragment);
+
+  const exitBTn = newSongPartElement.querySelector(".deleteSongPart")
+exitBTn.addEventListener("click",()=>{
+  if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
+    FBUtils.removeDocument(`songData/${currentSong}.${partID}`)
+    newSongPartElement.remove()
+  }
+})
   return partID; 
 }
 
@@ -331,13 +340,7 @@ function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const exitBTn = newSongPartElement.querySelector(".deleteSongPart")
-exitBTn.addEventListener("click",()=>{
-  if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
-    FBUtils.removeDocument(`songData/${currentSong}.${partID}`)
-    newSongPartElement.remove()
-  }
-})
+
 
 
 const addNewSongPartBtn = document.querySelector("#createSongPartBtn");

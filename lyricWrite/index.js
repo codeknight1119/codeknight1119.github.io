@@ -327,9 +327,9 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
   partsHolder.appendChild(newSongPartFragment);
 
   const exitBTn = newSongPartElement.querySelector(".deleteSongPart")
-  exitBTn.addEventListener("click",()=>{
+  exitBTn.addEventListener("click", async ()=>{
     if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
-     FBUtils.updateDocument(`songData/${currentSong}`, {
+     await FBUtils.updateDocument(`songData/${currentSong}`, {
       [`parts.${partID}`]: FBUtils.deleteField()
   });
       newSongPartElement.remove()

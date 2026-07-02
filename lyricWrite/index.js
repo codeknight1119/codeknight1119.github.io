@@ -299,6 +299,7 @@ async function loadSong(id, name) {
   SE_verseCount = 1;
   await saveCurrent();
   
+  
   // Clear out old song parts from the UI if any exist from a previous view
   partsHolder.querySelectorAll(".songPart").forEach(el => el.remove());
 

@@ -1,7 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { initializeFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, deleteField, orderBy, persistentLocalCache, persistentMultipleTabManager } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { initializeFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, persistentLocalCache, persistentMultipleTabManager } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-export {deleteField}
+
 const firebaseConfig = {
   apiKey: "AIzaSyCMzrQh5ceTsxZOlntTm1xFlYTZres-DqQ",
   authDomain: "lyricbase-35384.firebaseapp.com",
@@ -112,7 +112,6 @@ export const getDocuments = async (path, l, docParam) => {
         throw e
     }
 };
-
 
 export const isSignedIn = () => {
     return new Promise((resolve, reject) => {

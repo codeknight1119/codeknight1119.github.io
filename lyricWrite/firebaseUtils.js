@@ -114,6 +114,7 @@ export const getDocuments = async (path, l, docParam) => {
 };
 
 export const removeDocument = async function (path) {
+    console.log("delete path:", path)
   // 1. Create a reference to the specific document
   // Syntax: doc(db, "collectionName", "documentId")
   const docRef = doc(db, path);

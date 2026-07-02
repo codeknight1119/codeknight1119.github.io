@@ -2,21 +2,19 @@ import * as FBUtils from "./firebaseUtils.js";
 
 let currentSave = [];
 let currentlySaved = true;
-let MS_songsToAdd = []; // Moved to global scope so updateSongOrder can see it
+let MS_songsToAdd = []; 
 let MS_maxSongOrder = 0;
-let MS_ideas = []
+let MS_ideas = [];
 const list = document.querySelector('.sortable-list');
-const songBtnTemplate = document.getElementById("songBtnTemplate"); // Moved to global scope
+const songBtnTemplate = document.getElementById("songBtnTemplate"); 
 let currentSong = null;
 let SE_verseCount = 0;
 let SE_maxSongOrder = 0;
-const saveEditsButton = document.getElementById("saveEditsButton")
+const saveEditsButton = document.getElementById("saveEditsButton");
 
 window.addEventListener("beforeunload", (event) => {
     if (!currentlySaved) {
         event.preventDefault();
-
-        // Required for Chrome/Edge
         event.returnValue = "";
     }
 });
@@ -30,34 +28,31 @@ setInterval(() => {
 
 async function setUpMainPage() {
   MS_songsToAdd = await FBUtils.getDocuments("/songs", 50, { field: "order" });
-if(MS_songsToAdd.length !== 0){
-  MS_songsToAdd.forEach((val) => {
-    createNewSongBtn(val.title, val.id);
-    if (val.order > MS_maxSongOrder) {
-      MS_maxSongOrder = val.order
-    }
-  });
-}
+  if(MS_songsToAdd.length !== 0){
+    MS_songsToAdd.forEach((val) => {
+      createNewSongBtn(val.title, val.id);
+      if (val.order > MS_maxSongOrder) {
+        MS_maxSongOrder = val.order;
+      }
+    });
+  }
 
-  // Change 'feild' to 'field'
-MS_ideas = await FBUtils.getDocuments("/ideas", 50, {field: "timestamp"});
+  MS_ideas = await FBUtils.getDocuments("/ideas", 50, {field: "timestamp"});
   if(MS_ideas.length !== 0){
     MS_ideas.forEach((val)=>{
-      createNewIdea(val.text, val.id)
-   })
-}
-triggerInitialResize()
+      createNewIdea(val.text, val.id);
+   });
+  }
+  triggerInitialResize();
 }
 
 function createNewSongBtn(name, id) {
   const newSongBtnFragment = songBtnTemplate.content.cloneNode(true);
-  const newSongBtn = newSongBtnFragment.firstElementChild; // Target the actual element inside the fragment
-
+  const newSongBtn = newSongBtnFragment.firstElementChild; 
 
   newSongBtn.dataset.songId = id;
   newSongBtn.querySelector("#songTitle").innerText = name;
-  newSongBtn.dataset.lastSongName = name
-
+  newSongBtn.dataset.lastSongName = name;
 
   const loadBtn = newSongBtn.querySelector(".loadBtn");
   loadBtn.addEventListener("click", () => {
@@ -68,34 +63,24 @@ function createNewSongBtn(name, id) {
   const textDisplay = newSongBtn.querySelector('#songTitle');
   const textInput = newSongBtn.querySelector('#songInput');
 
-  // 1. Enter Edit Mode
   textDisplay.addEventListener('click', () => {
     container.classList.add('is-editing');
-
-    // Make sure input matches the current text
     textInput.value = textDisplay.textContent;
-
-    // Focus the input and select the text for easy overriding
     textInput.focus();
     textInput.select();
   });
 
-  // 2. Save Function
   function saveEdit() {
     const trimmedValue = textInput.value.trim();
-
-    // Change || to && so BOTH conditions must be true to trigger a save
     if (trimmedValue !== '' && trimmedValue !== newSongBtn.dataset.lastSongName) {
       textDisplay.textContent = trimmedValue;
       newSongBtn.dataset.lastSongName = trimmedValue;
       processChange(`songs/${id}`, { title: textDisplay.textContent });
     }
-
     container.classList.remove('is-editing');
   }
-  // 3. Save when the user taps outside the input box (loses focus)
-  textInput.addEventListener('blur', saveEdit);
 
+  textInput.addEventListener('blur', saveEdit);
   textInput.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
       saveEdit();
@@ -107,78 +92,56 @@ function createNewSongBtn(name, id) {
 }
 
 function createNewIdea(text, id){
-  // 1. Grab the fragment, THEN target the actual element
   const newIdeaFragment = document.getElementById("templateIdea").content.cloneNode(true);
   const newIdea = newIdeaFragment.firstElementChild; 
   
   const writeArea = newIdea.querySelector(".writeLyrics");
-  // Assuming writeLyrics is a textarea/input. Use .innerText if it's a div.
   writeArea.value = text || ""; 
-
-  // Track the last saved text to prevent unnecessary database writes
   newIdea.dataset.lastIdeaText = text || "";
 
-  // Enter Edit Mode
   writeArea.addEventListener('click', () => {
     newIdea.classList.add('is-editing');
     writeArea.focus();
     writeArea.select();
   });
 
-  // Save Function
   function saveEdit() {
     const trimmedValue = writeArea.value.trim();
-
-    // Check if it's not empty AND actually changed
     if (trimmedValue !== '' && trimmedValue !== newIdea.dataset.lastIdeaText) {
       newIdea.dataset.lastIdeaText = trimmedValue;
-      // Assuming ideas use the 'text' key based on setUpMainPage
       processChange(`ideas/${id}`, { text: trimmedValue }); 
     }
-
     newIdea.classList.remove('is-editing');
   }
 
-  // Save when the user taps outside the input box (loses focus)
   writeArea.addEventListener('blur', saveEdit);
-/*
-  writeArea.addEventListener('keypress', (event) => {
-    // If it's a textarea, you might want to use shift+enter for new lines, 
-    // but for now keeping your logic!
-    if (event.key === 'Enter') {
-      saveEdit();
-      writeArea.blur();
-    }
-  });
-*/
-  // Append the fragment to the DOM
   document.getElementById("existingIdeas").appendChild(newIdeaFragment);
 }
+
 // Initial load
 await setUpMainPage();
 
 // --- Drag and Drop Logic ---
-// --- Drag and Drop Logic ---
 let draggingItem = null;
 let currentList = null;
 
-// Apply listeners to both sortable lists (songs and song parts)
 document.querySelectorAll('.sortable-list').forEach(sortableList => {
   sortableList.addEventListener('dragstart', (e) => {
-    // Ensure we're only dragging actual list items
-    if (!e.target.classList || !e.target.classList.contains('sortable-item')) return;
-    draggingItem = e.target;
-    e.target.classList.add('dragging');
+    // FIX: Find the closest draggable item element, even if dragging by title or inner card content
+    const targetItem = e.target.closest('.sortable-item');
+    if (!targetItem) return;
+
+    draggingItem = targetItem;
+    draggingItem.classList.add('dragging');
     currentList = sortableList;
   });
 
   sortableList.addEventListener('dragend', (e) => {
     if (!draggingItem) return;
     
-    e.target.classList.remove('dragging');
+    draggingItem.classList.remove('dragging');
     document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
     
-    // Decide which update function to run based on the list's ID
     if (currentList.id === "songPartsHolder") {
         updateSongPartOrder();
     } else {
@@ -194,7 +157,6 @@ document.querySelectorAll('.sortable-list').forEach(sortableList => {
     if (!draggingItem) return;
 
     const draggingOverItem = getDragAfterElement(sortableList, e.clientY);
-
     sortableList.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
 
     if (draggingOverItem) {
@@ -222,16 +184,23 @@ function getDragAfterElement(container, y) {
 
 // --- Event Listeners & Database Sync ---
 
-// Added missing "click" argument here
 document.querySelector("#addSong").addEventListener("click", async () => {
-  MS_maxSongOrder++
+  MS_maxSongOrder++;
   const newSong = await FBUtils.addDocument("/songs", { title: "New Song", order: MS_maxSongOrder });
-
-  // Keep local array in sync
   MS_songsToAdd.push({ id: newSong.id, title: "New Song", order: MS_songsToAdd.length });
-
   createNewSongBtn("New Song", newSong.id);
 });
+
+function updateSongOrder() {
+  const currentDOMItems = list.querySelectorAll('.sortable-item');
+  const changeData = {};
+  currentDOMItems.forEach((item, index) => {
+    const songId = item.dataset.songId;
+    if (songId) {
+      processChange(`songs/${songId}`, { order: index });
+    }
+  });
+}
 
 function updateSongPartOrder() {
   const currentDOMItems = partsHolder.querySelectorAll('.sortable-item');
@@ -240,22 +209,19 @@ function updateSongPartOrder() {
 
   currentDOMItems.forEach((item, index) => {
     const partID = item.dataset.id;
-    const type = item.dataset.partType; // We will attach this in step 3
+    const type = item.dataset.partType; 
     let newName = item.querySelector(".songPartTitle").innerText;
 
-    // Automatically rename verses based on their new visual top-to-bottom order
     if (type === "verse") {
       newName = `Verse ${currentVerseCount}`;
       item.querySelector(".songPartTitle").innerText = newName;
       currentVerseCount++;
     }
 
-    // Update the database payload with new order index and potentially new name
     changeData[`parts.${partID}.order`] = index;
     changeData[`parts.${partID}.name`] = newName;
   });
 
-  // Keep global verse count accurate so new additions start at the right number
   SE_verseCount = currentVerseCount;
 
   if (Object.keys(changeData).length > 0) {
@@ -267,88 +233,72 @@ function processChange(path, newData) {
   let index = currentSave.findIndex(obj => obj.path === path);
 
   if (index === -1) {
-    // Keep data payload nested or separated so saveCurrent can parse it easily
     currentSave.push({ path, data: newData });
   } else {
     currentSave[index].data = { ...currentSave[index].data, ...newData };
   }
-  console.log(currentSave);
-  saveEditsButton.innerText = "Save (unsaved)"
+  saveEditsButton.innerText = "Save (unsaved)";
   currentlySaved = false;
 }
 
-
 async function saveCurrent() {
-  
-        saveEditsButton.innerText = "Saving..."
-  console.log("saving")
+  if (currentSave.length === 0) return;
+  saveEditsButton.innerText = "Saving...";
   try {
     const promises = currentSave.map((change) => {
       return FBUtils.updateDocument(change.path, change.data);
     });
 
-    // Wait for all updates to finish completely
     await Promise.all(promises);
-
     currentSave = [];
     currentlySaved = true;
-      saveEditsButton.innerText = "Save (saved)"
-
-    console.log("saved")
+    saveEditsButton.innerText = "Save (saved)";
   } catch (e) {
     console.error(e);
-
   }
-
-
 }
-saveEditsButton.addEventListener("click", saveCurrent)
 
-const mainPage = document.querySelector(".pageEnter")
-const editPage = document.querySelector("#songEdit")
+saveEditsButton.addEventListener("click", saveCurrent);
 
+const mainPage = document.querySelector(".pageEnter");
+const editPage = document.querySelector("#songEdit");
 
 async function loadSong(id, name) {
   currentSong = id;
   SE_verseCount = 1;
   await saveCurrent();
 
-  
-  // Clear out old song parts from the UI if any exist from a previous view
-  partsHolder.querySelectorAll(".songPart").forEach(el => el.remove());
+  // FIX: Completely empty the inner HTML of partsHolder container to clean out all remaining <li> structures
+  partsHolder.innerHTML = "";
 
   const data = await FBUtils.getDocument(`songsData/${id}`);
   
   if (data === undefined || !data.parts) {
     await FBUtils.setDocument(`songsData/${id}`, { parts: {} });
   } else {
-    // 1. Turn object values into an array and sort them by the 'order' field
     const sortedParts = Object.entries(data.parts).sort((a, b) => a[1].order - b[1].order);
-
-    // 2. Loop through and build the UI
     sortedParts.forEach(([partKey, partData]) => {
-      // Pass the existing partKey so it updates the exact record later
       createSongPart(partData.type, partData.lyrics, partKey); 
     });
   }
 
   editPage.querySelector(".pageTitle").innerText = name;
-  const notesArea = editPage.querySelector("#notesArea")
-  if(!data.notes){
-    notesArea.value = ""
+  const notesArea = editPage.querySelector("#notesArea");
+  if(!data || !data.notes){
+    notesArea.value = "";
   }else{
-    notesArea.value = data.notes 
+    notesArea.value = data.notes; 
   }
 
   mainPage.hidden = true;
   editPage.hidden = false;
-    autoExpandTextarea(notesArea)
+  autoExpandTextarea(notesArea);
+  triggerInitialResize();
 }
 
-const partTemplate = document.getElementById("templateSongPart")
-const partsHolder = document.getElementById("songPartsHolder")
+const partTemplate = document.getElementById("templateSongPart");
+const partsHolder = document.getElementById("songPartsHolder");
 
-// Add partId as an argument so it can accept existing IDs on load, or generate a new one if missing
 function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`) {
   const newSongPartFragment = partTemplate.content.cloneNode(true);
   const newSongPartElement = newSongPartFragment.firstElementChild; 
@@ -360,10 +310,7 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
   }
   
   newSongPartElement.dataset.id = partID;
-  
-  // ADD THIS LINE: Store the type so we know if it's a verse during drag-and-drop
   newSongPartElement.dataset.partType = type; 
-  
   newSongPartElement.querySelector(".songPartTitle").innerText = name;
   
   const textArea = newSongPartElement.querySelector(".writeLyrics");
@@ -380,18 +327,15 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
 }
 
 function capitalizeFirstLetter(str) {
-  if (!str) return ""; // Handle empty strings safely
+  if (!str) return ""; 
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-
-const addNewSongPartBtn = document.querySelector("#createSongPartBtn")
-const newSongPartDropdown = document.querySelector("#createSongPartDropdown")
+const addNewSongPartBtn = document.querySelector("#createSongPartBtn");
+const newSongPartDropdown = document.querySelector("#createSongPartDropdown");
 
 addNewSongPartBtn.addEventListener("click", () => {
   const type = newSongPartDropdown.value;
-  
-  // FIX: Calculate order based on total parts in the UI, ensuring it goes to the bottom
   const order = partsHolder.querySelectorAll('.sortable-item').length; 
 
   const partId = createSongPart(type, "", undefined);
@@ -405,80 +349,66 @@ addNewSongPartBtn.addEventListener("click", () => {
   };
 
   processChange(`songsData/${currentSong}`, changeData);
+  triggerInitialResize();
 });
-
 
 document.getElementById("notesArea").addEventListener("focusout", (event)=>{
     processChange(`songsData/${currentSong}`, {notes: event.target.value}); 
-})
+});
 
 document.getElementById("backToMainPage").addEventListener("click", async ()=>{
-   await saveCurrent();
+  await saveCurrent();
   mainPage.hidden = false;
   editPage.hidden = true;
-})
+});
 
 const coppyButton = document.getElementById("copySong");
 coppyButton.addEventListener("click", async () => {
-  // 1. Better formatting with \n so the text isn't weirdly indented
-  let copyText = `Title:${document.getElementById("editTitle").innerText}\nNotes:\n${document.getElementById("notesArea").value}\n\n`;
-
-  // 2. Make sure this ID matches where your parts actually live
-  // Falling back to "songEdit" just in case based on your earlier code
-  const partsContainer = document.getElementById("songPartsHolder") || document.getElementById("songEdit");
+  let copyText = `Title:${document.getElementById("pageTitle").innerText}\nNotes:\n${document.getElementById("notesArea").value}\n\n`;
+  const partsContainer = document.getElementById("songPartsHolder");
 
   Array.from(partsContainer.children).forEach((val) => {
     const titleElement = val.querySelector(".songPartTitle");
     const lyricsElement = val.querySelector(".writeLyrics");
 
-    // 3. Safety check: Only copy if this child element is actually a song part
     if (titleElement && lyricsElement) {
-      // 4. FIX: Use .value here instead of .innerText!
       copyText += `[${titleElement.innerText}]\n${lyricsElement.value}\n\n`;
     }
   });
   
   try {
-    await navigator.clipboard.writeText(copyText.trim()); // trim() removes any trailing extra lines
-    coppyButton.innerText = "Copied!"; // Fixed minor typo here ('Coppied' -> 'Copied')
+    await navigator.clipboard.writeText(copyText.trim());
+    coppyButton.innerText = "Copied!";
     setTimeout(() => {
       coppyButton.innerText = "Copy";
     }, 500);
-
   } catch (err) {
     console.error('Failed to copy text: ', err);
   }
 });
 
-
 document.getElementById("addIdea").addEventListener("click", async () => {
-  const newText = "New Idea"; // Or whatever default text you want
-  
-  // Add the default text and a timestamp so your query can sort it properly
+  const newText = "New Idea"; 
   const newDocData = { 
     text: newText,
     timestamp: Date.now() 
   };
-  
   const addedDoc = await FBUtils.addDocument("ideas", newDocData);
-  
-  // Update the UI immediately without needing a refresh!
-  // Note: Depending on your FBUtils, you might need to use addedDoc.id or generate your own ID.
   createNewIdea(newText, addedDoc.id);
+  triggerInitialResize();
 });
 
 function autoExpandTextarea(textarea) {
-    textarea.style.height = 'auto'; // Reset height
-    let height = 0
+    textarea.style.height = 'auto'; 
+    let height = 0;
     if(textarea.scrollHeight < 50){
-      height = 50
+      height = 50;
     }else{
-      height = textarea.scrollHeight
+      height = textarea.scrollHeight;
     }
-    textarea.style.height =  height + 'px'; // Set to match content
+    textarea.style.height =  height + 'px'; 
 }
 
-// 1. Listen for user typing in existing or new textareas
 document.body.addEventListener('input', function (e) {
     if (e.target.classList.contains('writeLyrics') || e.target.classList.contains('ideaChild')) {
         autoExpandTextarea(e.target);

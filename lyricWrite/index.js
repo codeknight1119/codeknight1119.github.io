@@ -324,9 +324,10 @@ async function loadSong(id, name) {
   }else{
     notesArea.innerText = data.notes 
   }
-triggerInitialResize()
+
   mainPage.hidden = true;
   editPage.hidden = false;
+    autoExpandTextarea(notesArea)
 }
 
 const partTemplate = document.getElementById("templateSongPart")

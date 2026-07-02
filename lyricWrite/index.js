@@ -309,6 +309,7 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
     SE_verseCount++;
   }
   
+  
   newSongPartElement.dataset.id = partID;
   newSongPartElement.dataset.partType = type; 
   newSongPartElement.querySelector(".songPartTitle").innerText = name;

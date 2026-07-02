@@ -320,9 +320,9 @@ async function loadSong(id, name) {
   editPage.querySelector(".pageTitle").innerText = name;
   const notesArea = editPage.querySelector("#notesArea")
   if(!data.notes){
-    notesArea.innerText = ""
+    notesArea.value = ""
   }else{
-    notesArea.innerText = data.notes 
+    notesArea.value = data.notes 
   }
 
   mainPage.hidden = true;

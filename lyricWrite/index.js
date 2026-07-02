@@ -452,7 +452,13 @@ document.getElementById("addIdea").addEventListener("click", async () => {
 
 function autoExpandTextarea(textarea) {
     textarea.style.height = 'auto'; // Reset height
-    textarea.style.height = textarea.scrollHeight + 'px'; // Set to match content
+    let height = 0
+    if(textarea.scrollHeight < 50){
+      height = 50
+    }else{
+      height = textarea.scrollHeight
+    }
+    textarea.style.height =  height + 'px'; // Set to match content
 }
 
 // 1. Listen for user typing in existing or new textareas

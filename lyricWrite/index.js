@@ -327,14 +327,14 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
   partsHolder.appendChild(newSongPartFragment);
 
   const exitBTn = newSongPartElement.querySelector(".deleteSongPart")
-exitBTn.addEventListener("click",()=>{
-  if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
-   await FBUtils.updateDocument(`songData/${currentSong}`, {
-    [`parts.${partID}`]: FBUtils.deleteField()
-});
-    newSongPartElement.remove()
-  }
-})
+  exitBTn.addEventListener("click",()=>{
+    if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
+     FBUtils.updateDocument(`songData/${currentSong}`, {
+      [`parts.${partID}`]: FBUtils.deleteField()
+  });
+      newSongPartElement.remove()
+    }
+  })
   return partID; 
 }
 

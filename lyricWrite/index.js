@@ -158,32 +158,52 @@ function createNewIdea(text, id){
 await setUpMainPage();
 
 // --- Drag and Drop Logic ---
+// --- Drag and Drop Logic ---
 let draggingItem = null;
+let currentList = null;
 
-list.addEventListener('dragstart', (e) => {
-  draggingItem = e.target;
-  e.target.classList.add('dragging');
-});
+// Apply listeners to both sortable lists (songs and song parts)
+document.querySelectorAll('.sortable-list').forEach(sortableList => {
+  sortableList.addEventListener('dragstart', (e) => {
+    // Ensure we're only dragging actual list items
+    if (!e.target.classList || !e.target.classList.contains('sortable-item')) return;
+    draggingItem = e.target;
+    e.target.classList.add('dragging');
+    currentList = sortableList;
+  });
 
-list.addEventListener('dragend', (e) => {
-  e.target.classList.remove('dragging');
-  document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
-  draggingItem = null;
-  updateSongOrder();
-});
+  sortableList.addEventListener('dragend', (e) => {
+    if (!draggingItem) return;
+    
+    e.target.classList.remove('dragging');
+    document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+    
+    // Decide which update function to run based on the list's ID
+    if (currentList.id === "songPartsHolder") {
+        updateSongPartOrder();
+    } else {
+        updateSongOrder();
+    }
+    
+    draggingItem = null;
+    currentList = null;
+  });
 
-list.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  const draggingOverItem = getDragAfterElement(list, e.clientY);
+  sortableList.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (!draggingItem) return;
 
-  document.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+    const draggingOverItem = getDragAfterElement(sortableList, e.clientY);
 
-  if (draggingOverItem) {
-    draggingOverItem.classList.add('over');
-    list.insertBefore(draggingItem, draggingOverItem);
-  } else {
-    list.appendChild(draggingItem);
-  }
+    sortableList.querySelectorAll('.sortable-item').forEach(item => item.classList.remove('over'));
+
+    if (draggingOverItem) {
+      draggingOverItem.classList.add('over');
+      sortableList.insertBefore(draggingItem, draggingOverItem);
+    } else {
+      sortableList.appendChild(draggingItem);
+    }
+  });
 });
 
 function getDragAfterElement(container, y) {
@@ -213,40 +233,34 @@ document.querySelector("#addSong").addEventListener("click", async () => {
   createNewSongBtn("New Song", newSong.id);
 });
 
-function updateSongOrder() {
-  const currentDOMItems = list.querySelectorAll('.sortable-item');
-  const changedItems = [];
+function updateSongPartOrder() {
+  const currentDOMItems = partsHolder.querySelectorAll('.sortable-item');
+  const changeData = {};
+  let currentVerseCount = 1;
 
   currentDOMItems.forEach((item, index) => {
-    const titleText = item.querySelector("#songTitle").innerText; // Fixed: changed from #title to .title
-    const song = MS_songsToAdd.find(s => s.title === titleText);
+    const partID = item.dataset.id;
+    const type = item.dataset.partType; // We will attach this in step 3
+    let newName = item.querySelector(".songPartTitle").innerText;
 
-
-    if (song) {
-      if (song.order !== index) {
-        changedItems.push({
-          title: song.title,
-          oldOrder: song.order,
-          newOrder: index,
-          id: item.dataset.songId
-        });
-
-        song.order = index;
-      }
+    // Automatically rename verses based on their new visual top-to-bottom order
+    if (type === "verse") {
+      newName = `Verse ${currentVerseCount}`;
+      item.querySelector(".songPartTitle").innerText = newName;
+      currentVerseCount++;
     }
+
+    // Update the database payload with new order index and potentially new name
+    changeData[`parts.${partID}.order`] = index;
+    changeData[`parts.${partID}.name`] = newName;
   });
-  MS_maxSongOrder = currentDOMItems.length > 0 ? currentDOMItems.length - 1 : 0;
 
-  if (changedItems.length > 0) {
-    console.log("These items changed position:", changedItems);
-    changedItems.forEach((val) => {
-      processChange(`songs/${val.id}`, { order: val.newOrder });
-    });
-  } else {
-    console.log("Item dropped, but the overall order remained the same.");
+  // Keep global verse count accurate so new additions start at the right number
+  SE_verseCount = currentVerseCount;
+
+  if (Object.keys(changeData).length > 0) {
+    processChange(`songsData/${currentSong}`, changeData);
   }
-
-  MS_songsToAdd.sort((a, b) => a.order - b.order);
 }
 
 function processChange(path, newData) {
@@ -298,7 +312,7 @@ async function loadSong(id, name) {
   currentSong = id;
   SE_verseCount = 1;
   await saveCurrent();
-  
+
   
   // Clear out old song parts from the UI if any exist from a previous view
   partsHolder.querySelectorAll(".songPart").forEach(el => el.remove());
@@ -337,7 +351,7 @@ const partsHolder = document.getElementById("songPartsHolder")
 // Add partId as an argument so it can accept existing IDs on load, or generate a new one if missing
 function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`) {
   const newSongPartFragment = partTemplate.content.cloneNode(true);
-  const newSongPartElement = newSongPartFragment.firstElementChild; // Target actual DOM element
+  const newSongPartElement = newSongPartFragment.firstElementChild; 
   
   let name = capitalizeFirstLetter(type);
   if (type === "verse") {
@@ -346,22 +360,23 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
   }
   
   newSongPartElement.dataset.id = partID;
+  
+  // ADD THIS LINE: Store the type so we know if it's a verse during drag-and-drop
+  newSongPartElement.dataset.partType = type; 
+  
   newSongPartElement.querySelector(".songPartTitle").innerText = name;
   
   const textArea = newSongPartElement.querySelector(".writeLyrics");
-  textArea.value = lyrics; // Use .value instead of .innerText for textareas
+  textArea.value = lyrics; 
 
   textArea.addEventListener("focusout", (event) => {
     const changeData = {};
-    // Use dot notation to strictly update the lyrics string for this specific part
     changeData[`parts.${partID}.lyrics`] = event.target.value;
-    
-    // Fix: currentSong holds the active song ID
     processChange(`songsData/${currentSong}`, changeData); 
   });
 
   partsHolder.appendChild(newSongPartFragment);
-  return partID; // Return the ID so the click handler can use it
+  return partID; 
 }
 
 function capitalizeFirstLetter(str) {
@@ -375,12 +390,12 @@ const newSongPartDropdown = document.querySelector("#createSongPartDropdown")
 
 addNewSongPartBtn.addEventListener("click", () => {
   const type = newSongPartDropdown.value;
-  const order = SE_verseCount; 
+  
+  // FIX: Calculate order based on total parts in the UI, ensuring it goes to the bottom
+  const order = partsHolder.querySelectorAll('.sortable-item').length; 
 
-  // 1. Render on UI and catch the generated ID
   const partId = createSongPart(type, "", undefined);
 
-  // 2. Save entire object block using dot notation for the new part
   const changeData = {};
   changeData[`parts.${partId}`] = {
       type: type,

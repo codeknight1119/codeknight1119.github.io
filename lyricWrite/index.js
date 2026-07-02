@@ -335,6 +335,7 @@ const exitBTn = newSongPartElement.querySelector(".deleteSongPart")
 exitBTn.addEventListener("click",()=>{
   if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
     FBUtils.removeDocument(`songData/${currentSong}.${partID}`)
+    newSongPartElement.remove()
   }
 })
 

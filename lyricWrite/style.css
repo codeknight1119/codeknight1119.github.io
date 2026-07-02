@@ -60,6 +60,7 @@ button {
   flex-direction: column;   /* Stacks the title on top and textarea on the bottom */
   align-items: flex-start;  /* Aligns title and textarea to the left edge */
   gap: 8px;                 /* Adds clean vertical spacing between title and textarea */
+  width: 100%;
 }
 
 /* Ensure the title doesn't wrap awkwardly and looks like a clean header */

@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { initializeFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, persistentLocalCache, persistentMultipleTabManager } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { initializeFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, deleteDoc, orderBy, persistentLocalCache, persistentMultipleTabManager } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 
 const firebaseConfig = {
@@ -112,6 +112,20 @@ export const getDocuments = async (path, l, docParam) => {
         throw e
     }
 };
+
+export const removeDocument = async function (path) {
+  // 1. Create a reference to the specific document
+  // Syntax: doc(db, "collectionName", "documentId")
+  const docRef = doc(db, path);
+
+  try {
+    // 2. Delete the document using the reference
+    await deleteDoc(docRef);
+    console.log("Document successfully deleted!");
+  } catch (error) {
+    console.error("Error removing document: ", error);
+  }
+}
 
 export const isSignedIn = () => {
     return new Promise((resolve, reject) => {

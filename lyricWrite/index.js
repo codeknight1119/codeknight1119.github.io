@@ -308,7 +308,7 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
     name += ` ${SE_verseCount}`;
     SE_verseCount++;
   }
-  
+
   
   newSongPartElement.dataset.id = partID;
   newSongPartElement.dataset.partType = type; 
@@ -329,7 +329,9 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
   const exitBTn = newSongPartElement.querySelector(".deleteSongPart")
 exitBTn.addEventListener("click",()=>{
   if(confirm(`Do you want to delete ${name}? \n This cannot be undone`)){
-    FBUtils.removeDocument(`songData/${currentSong}.${partID}`)
+   await FBUtils.updateDocument(`songData/${currentSong}`, {
+    [partID]: FBUtils.deleteField()
+});
     newSongPartElement.remove()
   }
 })

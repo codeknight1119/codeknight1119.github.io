@@ -46,7 +46,7 @@ MS_ideas = await FBUtils.getDocuments("/ideas", 50, {field: "timestamp"});
       createNewIdea(val.text, val.id)
    })
 }
-
+triggerInitialResize()
 }
 
 function createNewSongBtn(name, id) {
@@ -324,7 +324,7 @@ async function loadSong(id, name) {
   }else{
     notesArea.innerText = data.notes 
   }
-
+triggerInitialResize()
   mainPage.hidden = true;
   editPage.hidden = false;
 }
@@ -449,3 +449,21 @@ document.getElementById("addIdea").addEventListener("click", async () => {
   // Note: Depending on your FBUtils, you might need to use addedDoc.id or generate your own ID.
   createNewIdea(newText, addedDoc.id);
 });
+
+function autoExpandTextarea(textarea) {
+    textarea.style.height = 'auto'; // Reset height
+    textarea.style.height = textarea.scrollHeight + 'px'; // Set to match content
+}
+
+// 1. Listen for user typing in existing or new textareas
+document.body.addEventListener('input', function (e) {
+    if (e.target.classList.contains('writeLyrics') || e.target.classList.contains('ideaChild')) {
+        autoExpandTextarea(e.target);
+    }
+});
+
+function triggerInitialResize() {
+    document.querySelectorAll('.writeLyrics, .ideaChild').forEach(textarea => {
+        autoExpandTextarea(textarea);
+    });
+}

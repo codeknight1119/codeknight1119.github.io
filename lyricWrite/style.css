@@ -196,7 +196,7 @@ body {
 .ideaChild {
   width: 100%;
   flex-grow: 1; /* Forces the textarea to take up all remaining vertical space */
-  height: 10%; /* Fallback/explicit height assignment */
+  height: auto; /* Fallback/explicit height assignment */
   box-sizing: border-box; /* Critical: keeps padding from pushing it out of bounds */
   
   /* Optional: Reusing some of your beautiful neon styling from .writeLyrics */
@@ -223,7 +223,7 @@ body {
 
 .writeLyrics{
   width: 100%;
-  height: 100%;
+  height: auto;
   box-sizing: border-box; /* Crucial: includes padding/border in the 100% size */
   
   /* Text Styling */

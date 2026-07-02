@@ -90,16 +90,18 @@
         <br>
         <hr>
         <br>
-        <div id="songPartsHolder">
+        <ul id="songPartsHolder" class="sortable-list">
 
-        </div>
+        </ul>
 
     </div>
     <template id="templateSongPart">
-        <div class="card songPart">
-            <div class="songPartTitle"></div>
-            <textarea class="writeLyrics"></textarea>
-        </div>
+         <li class="sortable-item" draggable="true">
+            <div class="card songPart">
+                <div class="songPartTitle"></div>
+                <textarea class="writeLyrics"></textarea>
+            </div>
+        </li>
     </template>
 
 </body>

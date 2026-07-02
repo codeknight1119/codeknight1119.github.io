@@ -55,26 +55,19 @@ button {
   box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
 }
 
-.sortable-item > div {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  /* Pushes text to the left, button to the right */
-  align-items: center;
-  gap: 15px;
-  /* Stops the title and button from colliding on small mobile sizes */
+/* Override the side-by-side flexbox rule just for song parts */
+.sortable-item > div.songPart {
+  flex-direction: column;   /* Stacks the title on top and textarea on the bottom */
+  align-items: flex-start;  /* Aligns title and textarea to the left edge */
+  gap: 8px;                 /* Adds clean vertical spacing between title and textarea */
 }
 
-
-/* Scales the inner button down cleanly so it doesn't overpower the item row */
-.sortable-item button {
-  padding: 8px 16px;
-  margin: 0;
-  font-size: 0.9em;
-  flex-shrink: 0;
-  /* Prevents the button from warping/crushing on tiny screens */
+/* Ensure the title doesn't wrap awkwardly and looks like a clean header */
+.songPart .songPartTitle {
+  font-size: 1.1em;
+  color: var(--neon-yellow); /* Optional: changes text to yellow like your hovers */
+  margin-bottom: 2px;
 }
-
 
 /* --- Desktop Media Query --- */
 @media (min-width: 768px) {

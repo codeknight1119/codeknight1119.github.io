@@ -338,6 +338,7 @@ function createSongPart(type, lyrics, partID = `part_${Date.now()}_${Math.random
   return partID; 
 }
 
+
 function capitalizeFirstLetter(str) {
   if (!str) return ""; 
   return str.charAt(0).toUpperCase() + str.slice(1);

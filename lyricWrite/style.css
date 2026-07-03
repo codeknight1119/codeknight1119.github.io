@@ -40,6 +40,11 @@
   box-shadow: var(--shadow-item);
   transition: background 0.2s, transform 0.2s, color 0.2s, box-shadow 0.2s;
   display: flex;
+  align-items: center;
+}
+
+.loadButton{
+  margin-left: auto;
 }
 
 button {

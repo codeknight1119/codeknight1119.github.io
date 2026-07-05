@@ -109,7 +109,7 @@
         console.log(playback);
     }
 
-    document.getElementById("login").addEventListener(async () => {
+    document.getElementById("login").addEventListener("click", async () => {
         const codeVerifier = generateRandomString(64);
 
         sessionStorage.setItem("code_verifier", codeVerifier);

@@ -1,9 +1,186 @@
 <!DOCTYPE html>
+
 <head>
     <title>Light Show</title>
 </head>
+
 <body>
-    <p>:P</p>
-    <br>
-    <p>yeah idk yet</p>
+    <button id="login">Login With Spoify</button>
 </body>
+
+<script>
+    let token = null;
+
+    const saved =
+        localStorage.getItem("spotify_token");
+
+
+
+    const CLIENT_ID = "464165c812254a8b92210b46a9c55282";
+
+    const REDIRECT_URI =
+        "https://codeknight1119.github.io/lightShow/";
+
+    const SCOPES = [
+        "user-read-playback-state"
+    ].join(" ");
+
+    function generateRandomString(length) {
+        const chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        let result = "";
+
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(
+                Math.floor(Math.random() * chars.length)
+            );
+        }
+
+        return result;
+    }
+
+
+
+    async function sha256(plain) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(plain);
+
+        return await crypto.subtle.digest("SHA-256", data);
+    }
+
+    function base64url(buffer) {
+        return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+    }
+
+
+    async function fetchWebApi(endpoint, method = "GET", body = null) {
+
+        const options = {
+            method,
+            headers: {
+                Authorization: `Bearer ${token.access_token}`
+            }
+        };
+
+        if (body !== null) {
+            options.headers["Content-Type"] = "application/json";
+            options.body = JSON.stringify(body);
+        }
+
+        const res = await fetch(
+            `https://api.spotify.com/${endpoint}`,
+            options
+        );
+
+
+        if (res.status === 204) {
+            return null;
+        }
+
+        if (res.status === 401) {
+            console.log("Token expired");
+            return
+        }
+
+        if (!res.ok) {
+            const error = await res.json();
+            console.error(error);
+            throw new Error(error.error?.message || `HTTP ${res.status}`);
+        }
+
+        return await res.json();
+    }
+
+    async function getCurrentPlayback() {
+
+        return (await fetchWebApi(
+            `v1/me/player`
+        ))
+    }
+
+    if (saved) {
+        token = JSON.parse(saved);
+        document.getElementById("login").style.display = "none";
+        const playback = await getCurrentPlayback();
+        console.log(playback);
+    }
+
+    document.getElementById("login").addEventListener(async () => {
+        const codeVerifier = generateRandomString(64);
+
+        sessionStorage.setItem("code_verifier", codeVerifier);
+        const hashed = await sha256(codeVerifier);
+
+        const codeChallenge = base64url(hashed);
+
+        const params = new URLSearchParams({
+            client_id: CLIENT_ID,
+            response_type: "code",
+            redirect_uri: REDIRECT_URI,
+            code_challenge_method: "S256",
+            code_challenge: codeChallenge,
+            scope: SCOPES
+        });
+
+        window.location =
+            "https://accounts.spotify.com/authorize?" +
+            params.toString();
+    })
+
+    const code =
+        new URLSearchParams(window.location.search)
+            .get("code");
+
+
+    if (code) {
+        const verifier =
+            sessionStorage.getItem("code_verifier");
+
+        sessionStorage.removeItem("code_verifier");
+
+        const body = new URLSearchParams({
+            client_id: CLIENT_ID,
+            grant_type: "authorization_code",
+            code,
+            redirect_uri: REDIRECT_URI,
+            code_verifier: verifier
+        });
+
+        const response = await fetch(
+            "https://accounts.spotify.com/api/token",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+                body
+            }
+        );
+
+        if (!response.ok) {
+            console.error(await response.json());
+            return;
+        }
+
+        token = await response.json();
+        document.getElementById("login").style.display = "none";
+
+        console.log(token);
+
+        localStorage.setItem(
+            "spotify_token",
+            JSON.stringify(token)
+        );
+        window.history.replaceState({}, document.title, REDIRECT_URI);
+
+        const currentPlayback = await getCurrentPlayback()
+
+        console.log(currentPlayback)
+
+    }
+</script>

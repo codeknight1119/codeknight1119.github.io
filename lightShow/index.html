@@ -6,6 +6,10 @@
 
 <body>
     <button id="login">Login With Spoify</button>
+
+    <img id="albumArt" />
+    <div id="title"></div>
+    <div id="artist"></div>
 </body>
 
 <script type="module">
@@ -101,12 +105,33 @@
             `v1/me/player`
         ))
     }
+    function updateUI(playback) {
+        const track = playback.item;
+
+        document.getElementById("title").textContent = track.name;
+        document.getElementById("artist").textContent =
+            track.artists.map(a => a.name).join(", ");
+
+        document.getElementById("albumArt").src =
+            track.album.images[0].url;
+    }
 
     if (saved) {
         token = JSON.parse(saved);
         document.getElementById("login").style.display = "none";
         const playback = await getCurrentPlayback();
         console.log(playback);
+        let lastTrackId = null;
+
+        setInterval(async () => {
+            const playback = await getCurrentPlayback();
+            if (!playback?.item) return;
+
+            if (playback.item.id !== lastTrackId) {
+                lastTrackId = playback.item.id;
+                updateUI(playback);
+            }
+        }, 2000);
     }
 
     document.getElementById("login").addEventListener("click", async () => {

@@ -164,7 +164,6 @@
 
         if (!response.ok) {
             console.error(await response.json());
-            return;
         }
 
         token = await response.json();

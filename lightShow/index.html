@@ -16,7 +16,7 @@
     <button id="login">Login With Spoify</button>
 
 
-    
+
     <img id="albumArt" crossorigin="anonymous" />
     <div id="title"></div>
     <div id="artist"></div>
@@ -28,7 +28,7 @@
     </template>
 </body>
 <script type="module">
- import Vibrant from 'https://esm.sh/node-vibrant@4.0.4';
+    import { Vibrant } from 'https://esm.sh/node-vibrant@4.0.4/browser';
     let token = null;
 
     const saved =
@@ -139,30 +139,28 @@
         const coverImg = document.getElementById("albumArt");
         const objectUrl = URL.createObjectURL(blob);
 
-        img.addEventListener('load', () => {
-            Vibrant.from(img).getPalette()
-                .then((palette) => {
-                    container.innerHTML = ''; // Clear previous swatches
+img.addEventListener('load', () => {
+      // Use the named Vibrant class directly
+      Vibrant.from(img).getPalette()
+        .then((palette) => {
+          container.innerHTML = ''; // Clear container
 
-                    // Loop through the 6 generated color swatches
-                    for (const name in palette) {
-                        const swatch = palette[name];
-
-                        if (swatch) {
-                            const div = document.createElement('div');
-                            div.className = 'swatch';
-                            div.style.backgroundColor = swatch.hex;
-                            div.style.color = swatch.bodyTextColor; // Built-in legible text color
-                            div.innerText = name;
-
-                            container.appendChild(div);
-                        }
-                    }
-                })
-                .catch((err) => console.error("Error extracting colors:", err));
-
-            coverImg.src = objectUrl;
+          for (const name in palette) {
+            const swatch = palette[name];
+            
+            if (swatch) {
+              const div = document.createElement('div');
+              div.className = 'swatch';
+              div.style.backgroundColor = swatch.hex;
+              div.style.color = swatch.bodyTextColor; // Built-in legible contrast text
+              div.innerHTML = `${name}<br><small>${swatch.hex}</small>`;
+              
+              container.appendChild(div);
+            }
+          }
         })
+        .catch((err) => console.error("Extraction error:", err));
+    });
     }
 
     async function refreshAccessToken() {

@@ -170,8 +170,8 @@
             URL.revokeObjectURL(objectUrl);
 
 
-             const GAS_URL = "https://script.google.com/macros/s/AKfycbyYPZnTqn66u35VwaOt6aeD3CLvXniLp-84-yqeb8FEGBbKktc0UJwtwH-1FcRPjMei/exec"
-            await(GAS_URL, {
+             const GAS_URL = "https://script.google.com/macros/s/AKfycbxg5qoFIIH8FNKCh6VXcs0Xvb0YemLNtmVX4AAnlANIJPh4YON_EcKDHDpQM7D3mOPe/exec"
+            await fetch(GAS_URL, {
                 method: "POST",
                 body: JSON.stringify({
                     colors: coverColors

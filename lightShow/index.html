@@ -142,9 +142,10 @@
             const colorTemplate = document.getElementById("colorTemplate")
             palette.forEach((val) => {
                 const newColorEl = colorTemplate.cloneNode(true)
-                newColorEl.querySelector("#colorSwatch").style.backgroundColor = val.hex
+
                 console.log(val)
                 colorHolder.appendChild(newColorEl)
+                newColorEl.querySelector("#colorSwatch").style.backgroundColor = val.hex
             })
         });
         coverImg.src = track.album.images[0].url;

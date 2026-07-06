@@ -141,7 +141,8 @@ console.log(VibrantLib)
         const objectUrl = URL.createObjectURL(blob);
 
 coverImg.onload = () => {
-    const palette = VibrantLib.from(coverImg).getPalette();
+    const vib = new VibrantLib.Vibrant(coverImg)
+    const palette = vib.swatches()
     console.log(palette);
 };
 

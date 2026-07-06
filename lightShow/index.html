@@ -2,6 +2,13 @@
 
 <head>
     <title>Light Show</title>
+    <style>
+        #colorsHolder{
+            display: flex;
+            justify-content: space-evenly;
+            gap: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -10,9 +17,15 @@
     <img id="albumArt" />
     <div id="title"></div>
     <div id="artist"></div>
+    <div id="colorsHolder">
+
+    </div>
+    <template id="colorTemplate"><div id="colorSwatch" style="width: 100px; height: 100px;"></div></template>
 </body>
 
 <script type="module">
+    import { getPaletteSync } from 'colorthief';
+
     let token = null;
 
     const saved =
@@ -86,7 +99,7 @@
         }
 
         if (res.status === 401) {
-            console.log("Token expired");
+            await refreshAccessToken()
             return
         }
 
@@ -105,19 +118,84 @@
             `v1/me/player`
         ))
     }
+    let lastTrack = null
     function updateUI(playback) {
-        const track = playback.item;
+        if(lastTrack == playback.item) return
+        lastTrack = playback.item;
 
         document.getElementById("title").textContent = track.name;
         document.getElementById("artist").textContent =
             track.artists.map(a => a.name).join(", ");
 
-        document.getElementById("albumArt").src =
-            track.album.images[0].url;
+            const coverImg = track.album.images[0].url
+        document.getElementById("albumArt").src =coverImg;
+
+        const colorHolder = document.getElementById("colorsHolder")
+        colorHolder.children.forEach((val)=>{
+            val.remove()
+        })
+        const palette = getPaletteSync(coverImg, { colorCount: 8 })
+        const colorTemplate = document.getElementById("colorTemplate")
+        palette.forEach((val)=>{
+            const newColorEl = colorTemplate.cloneNode(true)
+            newColorEl.querySelector("#colorSwatch").style.backgroundColor = val.hex
+            console.log(val)
+            colorHolder.appendChild(newColorEl)
+        })
+        
     }
 
-    if (saved) {
-        token = JSON.parse(saved);
+    async function refreshAccessToken() {
+        const saved = JSON.parse(localStorage.getItem("spotify_token"));
+
+        if (!saved?.refresh_token) {
+            console.log("No refresh token available");
+            return null;
+        }
+
+        const body = new URLSearchParams({
+            grant_type: "refresh_token",
+            refresh_token: saved.refresh_token,
+            client_id: CLIENT_ID
+        });
+
+        const res = await fetch(
+            "https://accounts.spotify.com/api/token",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.error("Refresh failed:", data);
+            return null;
+        }
+
+        // Spotify may or may not return a new refresh token
+        const newToken = {
+            ...saved,
+            access_token: data.access_token,
+            expires_in: data.expires_in,
+            token_type: data.token_type,
+            scope: data.scope
+        };
+
+        localStorage.setItem("spotify_token", JSON.stringify(newToken));
+
+        token = newToken;
+
+        console.log("Token refreshed");
+        return newToken;
+    }
+
+
+    async function processToken() {
         document.getElementById("login").style.display = "none";
         const playback = await getCurrentPlayback();
         console.log(playback);
@@ -132,7 +210,23 @@
                 updateUI(playback);
             }
         }, 2000);
+
+        setInterval(async () => {
+
+            const timeLeft = expiresAt - Date.now();
+
+            if (timeLeft < 60_000) {
+              token =  await refreshAccessToken();
+            }
+        }, 30_000);
     }
+
+    if (saved) {
+        token = JSON.parse(saved);
+        await processToken()
+    }
+
+
 
     document.getElementById("login").addEventListener("click", async () => {
         const codeVerifier = generateRandomString(64);
@@ -192,19 +286,17 @@
         }
 
         token = await response.json();
-        document.getElementById("login").style.display = "none";
-
-        console.log(token);
-
         localStorage.setItem(
             "spotify_token",
             JSON.stringify(token)
         );
         window.history.replaceState({}, document.title, REDIRECT_URI);
+        await processToken()
 
-        const currentPlayback = await getCurrentPlayback()
 
-        console.log(currentPlayback)
+
 
     }
+
+
 </script>

@@ -28,6 +28,7 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/node-vibrant@3.2.1/dist/vibrant.min.js"></script>
 <script type="module">
+    const Vibrant = window.Vibrant;
     let token = null;
 
     const saved =
@@ -137,16 +138,16 @@
 
 
         const coverImg = document.getElementById("albumArt");
+        const objectUrl = URL.createObjectURL(blob);
 
         coverImg.onload = async () => {
             const palette = await Vibrant.from(coverImg).getPalette();
-
             console.log(palette);
 
+            URL.revokeObjectURL(objectUrl);
         };
 
-
-        coverImg.src = URL.createObjectURL(blob);
+        coverImg.src = objectUrl;
     }
 
     async function refreshAccessToken() {

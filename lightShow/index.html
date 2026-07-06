@@ -3,7 +3,7 @@
 <head>
     <title>Light Show</title>
     <style>
-        #colorsHolder{
+        #colorsHolder {
             display: flex;
             justify-content: space-evenly;
             gap: 10px;
@@ -14,14 +14,16 @@
 <body>
     <button id="login">Login With Spoify</button>
 
-    
+
     <img id="albumArt" crossorigin="anonymous" />
     <div id="title"></div>
     <div id="artist"></div>
     <div id="colorsHolder">
 
     </div>
-    <template id="colorTemplate"><div id="colorSwatch" style="width: 100px; height: 100px;"></div></template>
+    <template id="colorTemplate">
+        <div id="colorSwatch" style="width: 100px; height: 100px;"></div>
+    </template>
 </body>
 
 <script type="module">
@@ -121,7 +123,7 @@
     }
     let lastTrack = null
     function updateUI(playback) {
-        if(lastTrack == playback.item) return
+        if (lastTrack == playback.item) return
         lastTrack = playback.item;
         const track = lastTrack
 
@@ -130,22 +132,24 @@
             track.artists.map(a => a.name).join(", ");
 
         const coverImg = document.getElementById("albumArt")
-            
-        coverImg.src =track.album.images[0].url;
+        coverImg.addEventListener('load', () => {
 
-        const colorHolder = document.getElementById("colorsHolder")
-        Array.from(colorHolder.children).forEach((val)=>{
-            val.remove()
-        })
-        const palette = getPaletteSync(coverImg, { colorCount: 8 })
-        const colorTemplate = document.getElementById("colorTemplate")
-        palette.forEach((val)=>{
-            const newColorEl = colorTemplate.cloneNode(true)
-            newColorEl.querySelector("#colorSwatch").style.backgroundColor = val.hex
-            console.log(val)
-            colorHolder.appendChild(newColorEl)
-        })
-        
+            const colorHolder = document.getElementById("colorsHolder")
+            Array.from(colorHolder.children).forEach((val) => {
+                val.remove()
+            })
+            const palette = getPaletteSync(coverImg, { colorCount: 8 })
+            const colorTemplate = document.getElementById("colorTemplate")
+            palette.forEach((val) => {
+                const newColorEl = colorTemplate.cloneNode(true)
+                newColorEl.querySelector("#colorSwatch").style.backgroundColor = val.hex
+                console.log(val)
+                colorHolder.appendChild(newColorEl)
+            })
+        });
+        coverImg.src = track.album.images[0].url;
+
+
     }
 
     async function refreshAccessToken() {
@@ -219,7 +223,7 @@
             const timeLeft = expiresAt - Date.now();
 
             if (timeLeft < 60_000) {
-              token =  await refreshAccessToken();
+                token = await refreshAccessToken();
             }
         }, 30_000);
     }

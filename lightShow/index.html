@@ -132,7 +132,7 @@ if (!track?.album?.images?.length) return;
     document.getElementById("title").textContent = track.name;
     document.getElementById("artist").textContent =
         track.artists.map(a => a.name).join(", ");
-
+console.log(getPaletteSync)
     const coverImg = document.getElementById("albumArt");
     
     coverImg.addEventListener('load', () => {
@@ -157,7 +157,7 @@ if (!track?.album?.images?.length) return;
             colorHolder.appendChild(newColorEl);
         });
     }, { once: true }); // Good practice to prevent adding infinite listeners on every track change
-console.log( track.album.images[0].url)
+
     coverImg.src = track.album.images[0].url;
 }
 

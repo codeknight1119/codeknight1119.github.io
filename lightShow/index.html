@@ -125,6 +125,7 @@ let lastTrack = null
 
 
 async function updateUI(playback) {
+    
     const track = playback.item;
     if (!track?.album?.images?.length) return;
 

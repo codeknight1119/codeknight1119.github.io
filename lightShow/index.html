@@ -139,9 +139,9 @@ async function updateUI(playback) {
     const colorsHolder = document.getElementById("colorsHolder");
 
     const objectUrl = URL.createObjectURL(blob);
-
+let coverColors = []
     coverImg.onload = async () => {
-        const palette = await Vibrant.from(coverImg).getPalette();
+         const palette = await Vibrant.from(coverImg).getPalette();
 
         colorsHolder.innerHTML = '';
 
@@ -162,6 +162,7 @@ async function updateUI(playback) {
                 div.innerText = name;
 
                 colorsHolder.appendChild(div);
+                coverColors.push(swatch.hex)
             }
         }
 
@@ -169,6 +170,14 @@ async function updateUI(playback) {
     };
 
     coverImg.src = objectUrl;
+
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxJUzftFSQpIli37-OfwdneOLA2C6QO-jt2d7gC6FR5K0boY_TucXahFWs4QJcizAs/exec"
+    fetch({ method: "POST",
+        body: JSON.stringify({
+            coverColors
+        })
+
+    })
 }
 
     async function refreshAccessToken() {

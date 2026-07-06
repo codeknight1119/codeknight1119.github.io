@@ -21,9 +21,9 @@
     <div id="colorsHolder">
 
     </div>
-    <template id="colorTemplate">
-        <div id="colorSwatch" style="width: 100px; height: 100px;"></div>
-    </template>
+<template id="colorTemplate">
+    <div class="color-swatch" style="width: 100px; height: 100px;"></div>
+</template>
 </body>
 
 <script type="module">
@@ -122,36 +122,42 @@
         ))
     }
     let lastTrack = null
-    function updateUI(playback) {
-        if (lastTrack == playback.item) return
-        lastTrack = playback.item;
-        const track = lastTrack
+function updateUI(playback) {
+    if (lastTrack == playback.item) return;
+    lastTrack = playback.item;
+    const track = lastTrack;
 
-        document.getElementById("title").textContent = track.name;
-        document.getElementById("artist").textContent =
-            track.artists.map(a => a.name).join(", ");
+    document.getElementById("title").textContent = track.name;
+    document.getElementById("artist").textContent =
+        track.artists.map(a => a.name).join(", ");
 
-        const coverImg = document.getElementById("albumArt")
-        coverImg.addEventListener('load', () => {
+    const coverImg = document.getElementById("albumArt");
+    
+    coverImg.addEventListener('load', () => {
+        const colorHolder = document.getElementById("colorsHolder");
+        
+        // Clear previous colors safely
+        colorHolder.innerHTML = '';
 
-            const colorHolder = document.getElementById("colorsHolder")
-            Array.from(colorHolder.children).forEach((val) => {
-                val.remove()
-            })
-            const palette = getPaletteSync(coverImg, { colorCount: 8 })
-            const colorTemplate = document.getElementById("colorTemplate")
-            palette.forEach((val) => {
-                const newColorEl = colorTemplate.cloneNode(true)
+        const palette = getPaletteSync(coverImg, { colorCount: 8 });
+        const colorTemplate = document.getElementById("colorTemplate");
 
-                console.log(val)
-                colorHolder.appendChild(newColorEl)
-                newColorEl.querySelector("#colorSwatch").style.backgroundColor = val.hex
-            })
+        palette.forEach((val) => {
+            // Fix: Clone the .content of the template
+            const newColorEl = colorTemplate.content.cloneNode(true);
+
+            // Fix: Target by class instead of duplicate ID
+            const swatch = newColorEl.querySelector(".color-swatch");
+            if (swatch) {
+                swatch.style.backgroundColor = val.hex;
+            }
+
+            colorHolder.appendChild(newColorEl);
         });
-        coverImg.src = track.album.images[0].url;
+    }, { once: true }); // Good practice to prevent adding infinite listeners on every track change
 
-
-    }
+    coverImg.src = track.album.images[0].url;
+}
 
     async function refreshAccessToken() {
         const saved = JSON.parse(localStorage.getItem("spotify_token"));

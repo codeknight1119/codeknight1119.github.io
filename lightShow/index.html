@@ -139,9 +139,9 @@
         const coverImg = document.getElementById("albumArt");
         const objectUrl = URL.createObjectURL(blob);
 
-img.addEventListener('load', () => {
+coverImg.addEventListener('load', () => {
       // Use the named Vibrant class directly
-      Vibrant.from(img).getPalette()
+      Vibrant.from(coverImg).getPalette()
         .then((palette) => {
           container.innerHTML = ''; // Clear container
 
@@ -155,7 +155,7 @@ img.addEventListener('load', () => {
               div.style.color = swatch.bodyTextColor; // Built-in legible contrast text
               div.innerHTML = `${name}<br><small>${swatch.hex}</small>`;
               
-              container.appendChild(div);
+              colorsHolder.appendChild(div);
             }
           }
         })

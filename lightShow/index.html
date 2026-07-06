@@ -132,7 +132,7 @@
         document.getElementById("albumArt").src =coverImg;
 
         const colorHolder = document.getElementById("colorsHolder")
-        colorHolder.children.forEach((val)=>{
+        Array.from(colorHolder.children).forEach((val)=>{
             val.remove()
         })
         const palette = getPaletteSync(coverImg, { colorCount: 8 })

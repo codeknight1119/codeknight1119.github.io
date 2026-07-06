@@ -122,6 +122,7 @@
     function updateUI(playback) {
         if(lastTrack == playback.item) return
         lastTrack = playback.item;
+        const track = lastTrack
 
         document.getElementById("title").textContent = track.name;
         document.getElementById("artist").textContent =

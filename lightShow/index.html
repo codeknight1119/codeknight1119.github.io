@@ -30,6 +30,7 @@
     import { getPaletteSync } from 'https://cdn.jsdelivr.net/npm/colorthief@3.4.0/+esm';
 
     let token = null;
+    let expiresAt = null;
 
     const saved =
         localStorage.getItem("spotify_token");
@@ -122,8 +123,9 @@
         ))
     }
     let lastTrack = null
+
 function updateUI(playback) {
-    
+
     if (lastTrack == playback.item) return;
     lastTrack = playback.item;
     const track = lastTrack;
@@ -150,7 +152,7 @@ function updateUI(playback) {
             // Fix: Target by class instead of duplicate ID
             const swatch = newColorEl.querySelector(".color-swatch");
             if (swatch) {
-                swatch.style.backgroundColor = val.hex;
+                swatch.style.backgroundColor = `rgb(${val[0]}, ${val[1]}, ${val[2]})`;
             }
 
             colorHolder.appendChild(newColorEl);

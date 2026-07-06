@@ -28,8 +28,8 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/node-vibrant@3.2.1/dist/vibrant.min.js"></script>
 <script type="module">
-
-    const Vibrant = window.Vibrant;
+const VibrantLib = window.Vibrant || window.Vibrant.default;
+console.log(VibrantLib)
     let token = null;
 
     const saved =
@@ -140,12 +140,10 @@
         const coverImg = document.getElementById("albumArt");
         const objectUrl = URL.createObjectURL(blob);
 
-        coverImg.onload = () => {
-            const palette =  Vibrant.from(coverImg).getPalette();
-            console.log(palette);
-
-            URL.revokeObjectURL(objectUrl);
-        };
+coverImg.onload = () => {
+    const palette = VibrantLib.from(coverImg).getPalette();
+    console.log(palette);
+};
 
         coverImg.src = objectUrl;
     }

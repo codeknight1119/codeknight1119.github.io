@@ -123,6 +123,7 @@ async function getCurrentPlayback() {
 }
 let lastTrack = null
 
+
 async function updateUI(playback) {
     const track = playback.item;
     if (!track?.album?.images?.length) return;
@@ -133,6 +134,8 @@ async function updateUI(playback) {
 
     const response = await fetch(track.album.images[0].url);
     const blob = await response.blob();
+    console.log(blob.type);
+console.log(blob.size);
 
     const coverImg = document.getElementById("albumArt");
 

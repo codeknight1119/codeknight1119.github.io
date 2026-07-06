@@ -27,7 +27,7 @@
     </template>
 </body>
 <script type="module">
-    import nodeVibrant from 'https://cdn.jsdelivr.net/npm/node-vibrant@4.0.4/+esm'; console.log(VibrantLib)
+ import Vibrant from 'https://esm.sh/node-vibrant@4.0.4';
     let token = null;
 
     const saved =
@@ -139,7 +139,7 @@
         const objectUrl = URL.createObjectURL(blob);
 
         img.addEventListener('load', () => {
-            nodeVibrant.from(img).getPalette()
+            Vibrant.from(img).getPalette()
                 .then((palette) => {
                     container.innerHTML = ''; // Clear previous swatches
 

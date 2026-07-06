@@ -27,8 +27,7 @@
 </body>
 
 <script type="module">
-    import { Vibrant } from "https://cdn.jsdelivr.net/npm/node-vibrant@4/+esm";
-
+import { Vibrant } from "https://cdn.jsdelivr.net/npm/node-vibrant@4/dist/esm/browser.js";
     let token = null;
 
     const saved =
@@ -145,7 +144,7 @@
             console.log(palette);
 
         };
-        
+
 
         coverImg.src = URL.createObjectURL(blob);
     }

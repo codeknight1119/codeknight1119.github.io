@@ -124,44 +124,52 @@
     let lastTrack = null
 
 
-    async function updateUI(playback) {
-        const track = playback.item;
-        if (!track?.album?.images?.length) return;
-        document.getElementById("title").textContent = track.name;
-        document.getElementById("artist").textContent =
-            track.artists.map(a => a.name).join(", ");
+async function updateUI(playback) {
+    const track = playback.item;
+    if (!track?.album?.images?.length) return;
 
-        const response = await fetch(track.album.images[0].url);
-        const blob = await response.blob();
+    document.getElementById("title").textContent = track.name;
+    document.getElementById("artist").textContent =
+        track.artists.map(a => a.name).join(", ");
 
+    const response = await fetch(track.album.images[0].url);
+    const blob = await response.blob();
 
+    const coverImg = document.getElementById("albumArt");
+    const colorsHolder = document.getElementById("colorsHolder");
 
-        const coverImg = document.getElementById("albumArt");
-        const objectUrl = URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
 
-coverImg.addEventListener('load', () => {
-      // Use the named Vibrant class directly
-      Vibrant.from(coverImg).getPalette()
-        .then((palette) => {
-          container.innerHTML = ''; // Clear container
+    coverImg.onload = async () => {
+        const palette = await Vibrant.from(coverImg).getPalette();
 
-          for (const name in palette) {
+        colorsHolder.innerHTML = '';
+
+        for (const name in palette) {
             const swatch = palette[name];
-            
+
             if (swatch) {
-              const div = document.createElement('div');
-              div.className = 'swatch';
-              div.style.backgroundColor = swatch.hex;
-              div.style.color = swatch.bodyTextColor; // Built-in legible contrast text
-              div.innerHTML = `${name}<br><small>${swatch.hex}</small>`;
-              
-              colorsHolder.appendChild(div);
+                const div = document.createElement('div');
+                div.style.width = '100px';
+                div.style.height = '100px';
+                div.style.backgroundColor = swatch.hex;
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.justifyContent = 'center';
+                div.style.fontSize = '10px';
+                div.style.color = '#fff';
+
+                div.innerText = name;
+
+                colorsHolder.appendChild(div);
             }
-          }
-        })
-        .catch((err) => console.error("Extraction error:", err));
-    });
-    }
+        }
+
+        URL.revokeObjectURL(objectUrl);
+    };
+
+    coverImg.src = objectUrl;
+}
 
     async function refreshAccessToken() {
                 const saved = JSON.parse(localStorage.getItem("spotify_token"));

@@ -128,8 +128,9 @@
         document.getElementById("artist").textContent =
             track.artists.map(a => a.name).join(", ");
 
-            const coverImg = track.album.images[0].url
-        document.getElementById("albumArt").src =coverImg;
+        const coverImg = document.getElementById("albumArt")
+            
+        coverImg.src =track.album.images[0].url;
 
         const colorHolder = document.getElementById("colorsHolder")
         Array.from(colorHolder.children).forEach((val)=>{

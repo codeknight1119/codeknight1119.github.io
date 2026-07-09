@@ -1,5 +1,4 @@
-    // FIX 1: Safely access the utility functions from the global window object.
-    // We expect these to be populated by base85_utils.js
+
     const decodeBase85ToImageURL = window.decodeBase85ToImageURL;
     const encodeImageToBase85 = window.encodeImageToBase85;
 

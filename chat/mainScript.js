@@ -1,0 +1,793 @@
+    // FIX 1: Safely access the utility functions from the global window object.
+    // We expect these to be populated by base85_utils.js
+    const decodeBase85ToImageURL = window.decodeBase85ToImageURL;
+    const encodeImageToBase85 = window.encodeImageToBase85;
+
+    // Firebase modular imports (rest of imports omitted for brevity but remain the same)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      getDoc,
+      getDocs,
+      addDoc,
+      query,
+      orderBy,
+      onSnapshot,
+      doc,
+      setDoc,
+      where,
+      updateDoc,
+      arrayUnion,
+      limit,
+      startAfter,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+      import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js";
+
+
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // IMPORTANT: Use the global __firebase_config if available, otherwise use your hardcoded one.
+    let firebaseConfig;
+    if (typeof __firebase_config !== 'undefined') {
+      try {
+        firebaseConfig = JSON.parse(__firebase_config);
+      } catch (e) {
+        console.error("Failed to parse __firebase_config, falling back to hardcoded config.");
+        firebaseConfig = {
+          apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+          authDomain: "chatroom4friends-522bd.firebaseapp.com",
+          projectId: "chatroom4friends-522bd",
+          storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+          messagingSenderId: "26805339142",
+          appId: "1:26805339142:web:86ff21490be804a16eaf87",
+          measurementId: "G-EXFX8QFGGF"
+        };
+      }
+    } else {
+      firebaseConfig = {
+        apiKey: "AIzaSyBuOdufK2UCl9m6iZa35SUQSRF-9HZHcD8",
+        authDomain: "chatroom4friends-522bd.firebaseapp.com",
+        projectId: "chatroom4friends-522bd",
+        storageBucket: "chatroom4friends-522bd.firebasestorage.app",
+        messagingSenderId: "26805339142",
+        appId: "1:26805339142:web:86ff21490be804a16eaf87",
+        measurementId: "G-EXFX8QFGGF"
+      };
+    }
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const messaging = getMessaging(app);
+
+    let myName = "";
+    let currentConvId = null;
+    let currentConvUnsubscribe = null;
+    let newMessagesUnsubscribe = null; // separate listener for new messages
+    let unreadCount = 0;
+    let sendImage = false;
+    let imageToSend = null; // Holds the string: "IMG:{mimeType}:{base85String}"
+    const originalTitle = document.title;
+
+    // Pagination state per loaded conversation
+    const PAGE_SIZE = 20;
+    let lastLoadedDoc = null; // document snapshot used for startAfter pagination (oldest currently loaded)
+    let newestLoadedTimestamp = null; // timestamp of newest message currently shown
+
+    let myColor;
+
+    // Initially hide UI until authenticated
+    document.getElementById("messageSend").style.display = "none";
+    document.getElementById("messages").style.display = "none";
+
+    // Visibility handling for unread count
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        unreadCount = 0;
+        document.title = originalTitle;
+        changeFavicon("resources/normalC.png");
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById("messageSend").style.display = "flex";
+        document.getElementById("messages").style.display = "flex";
+        myName = (await getUsername(user.uid)) || "Anonymous";
+        document.getElementById("name").value = myName;
+
+        // Listen for conversations that include the current user
+        const convRef = collection(db, "conversations");
+        const convQuery = query(convRef, where("participants", "array-contains", user.uid));
+
+
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const data = userDocSnap.data();
+          if (data.color) {
+            myColor = data.color;
+            document.getElementById("messageSend").style.color = myColor;
+          } else {
+            // Assign a random neon color and store it for next time
+            myColor = randomNeonColor();
+            await setDoc(userDocRef, { color: myColor }, { merge: true }); // Use setDoc with merge to update color
+          }
+        }
+
+        // Show conversations and keep listener active
+        onSnapshot(convQuery, (snapshot) => {
+          const divChat = document.getElementById("chatsSelect");
+          divChat.innerHTML = "";
+
+          snapshot.forEach((docSnap) => {
+            const conv = docSnap.data();
+            const div = document.createElement("div");
+            div.textContent = conv.name || "Unnamed Chat";
+            div.className = "chatItem";
+            div.dataset.id = docSnap.id;
+
+            div.onclick = () => loadConversation(docSnap.id, conv);
+            divChat.appendChild(div);
+          });
+
+          if (snapshot.empty) {
+            document.getElementById("messages").innerHTML =
+              `<p style="text-align:center; color: #888;">Click "New Chat" to start a conversation.</p>`;
+          } else if (!currentConvId) {
+            document.getElementById("messages").innerHTML =
+              `<p style="text-align:center; color: #888;">Select a chat on the left to see messages.</p>`;
+          }
+        });
+
+        // FIX: Correctly parse JSON from localStorage
+        const storedConv = localStorage.getItem("loadConv");
+        if (storedConv) {
+          try {
+            const data = JSON.parse(storedConv);
+            // Assuming data contains { id: '...', data: { ... } }
+            loadConversation(data.id, data.data);
+          } catch (e) {
+            console.error("Error parsing stored conversation data:", e);
+            localStorage.removeItem("loadConv"); // Clear corrupted data
+          }
+        }
+      } else {
+        // Not signed in: hide UI, remove listeners, redirect to index
+        document.getElementById("messageSend").style.display = "none";
+        document.getElementById("messages").style.display = "none";
+
+        if (currentConvUnsubscribe) {
+          try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
+          currentConvUnsubscribe = null;
+        }
+        if (newMessagesUnsubscribe) {
+          try { newMessagesUnsubscribe(); } catch (e) { /* ignore */ }
+          newMessagesUnsubscribe = null;
+        }
+
+        // NOTE: Keeping the original redirect logic, but Firebase Auth should handle this better.
+        // window.location.href = "index.html";
+      }
+    });
+
+    async function getUsername(uid) {
+      try {
+        const docSnap = await getDoc(doc(db, "users", uid));
+        if (docSnap.exists()) {
+          return docSnap.data().username;
+        }
+        return undefined;
+      } catch (err) {
+        console.error("getUsername error:", err);
+        return undefined;
+      }
+    }
+
+    // Send message handler (uses serverTimestamp)
+    async function sendMessage() {
+      const name = document.getElementById("name").value || "Anonymous";
+      let text = document.getElementById("messageInput").value;
+      myName = name;
+
+      if (!currentConvId) {
+        // Use a modal or in-page message instead of alert
+        console.log("Please choose a conversation");
+        return;
+      }
+
+      const messageSendRef = collection(db, "conversations", currentConvId, "messages");
+
+      if (sendImage && imageToSend) {
+        // Image message: send the encoded string as the 'text' property
+        try {
+          await addDoc(messageSendRef, {
+            name,
+            text: imageToSend, // "IMG:{mimeType}:{base85String}"
+            isImage: true,
+            uid: auth.currentUser.uid,
+            timestamp: serverTimestamp()
+          });
+          text = ''; // Clear text input
+
+        } catch (err) {
+          console.error("sendMessage image error:", err);
+          console.log("Failed to send image.");
+        }
+        sendImage = false;
+        imageToSend = null;
+        // clear file input
+        const fi = document.getElementById('attachFile');
+        if (fi) fi.value = '';
+        // Clear message input visual text
+        document.getElementById("messageInput").value = "";
+
+
+      } else if (text && text.trim()) {
+        // Regular text message
+        try {
+          await addDoc(messageSendRef, {
+            name,
+            text,
+            isImage: false,
+            uid: auth.currentUser.uid,
+            timestamp: serverTimestamp()
+          });
+          text = ''; // Clear text input
+        } catch (err) {
+          console.error("sendMessage text error:", err);
+          console.log("Failed to send message.");
+        }
+      }
+
+      document.getElementById("messageInput").value = "";
+    }
+
+    // Attach UI handlers
+    document.getElementById("sendBtn").addEventListener("click", sendMessage);
+    // Only attach Enter -> send on the input itself (preventDefault to avoid duplicate behavior)
+    document.getElementById("messageInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        // Use a modal or in-page message instead of alert
+        console.log("User signed out");
+      }).catch(err => {
+        console.error("Sign out error:", err);
+      });
+    });
+
+    document.getElementById("newConv").addEventListener("click", async () => {
+      // NOTE: Using window.prompt/alert as in original code, but generally discouraged in iframes.
+      const talkto = prompt("New Chat with who?");
+      if (!talkto || talkto.trim() === "") return;
+
+      if (talkto.trim().toLowerCase() === myName.toLowerCase()) {
+        alert("You can't start a chat with yourself!");
+        return;
+      }
+
+      const startName = prompt("Enter a name for this conversation. \nThis can be changed later.") || "";
+
+      try {
+        const q = query(collection(db, "users"), where("username", "==", talkto.trim()));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          alert("User not found.");
+          return;
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const talktoUID = userDoc.id;
+        const currentUserUID = auth.currentUser.uid;
+        const newChatName = [currentUserUID, talktoUID].sort().join("_");
+
+        await setDoc(doc(db, "conversations", newChatName), {
+          name: startName,
+          participants: [currentUserUID, talktoUID],
+          createdAt: Date.now()
+        }, { merge: true });
+
+        const currentUserRef = doc(db, "users", currentUserUID);
+        const otherUserRef = doc(db, "users", talktoUID);
+
+        await updateDoc(currentUserRef, {
+          conversations: arrayUnion(newChatName)
+        });
+
+        await updateDoc(otherUserRef, {
+          conversations: arrayUnion(newChatName)
+        });
+      } catch (err) {
+        console.error("newConv error:", err);
+        alert(err.message || err);
+      }
+    });
+
+
+
+    function changeFavicon(src) {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
+      link.href = src;
+    }
+
+    // Helper to convert Firestore Timestamp to Date
+    function tsToDate(ts) {
+      if (!ts) return new Date(0);
+      if (typeof ts.toDate === "function") return ts.toDate();
+      // If it's a number (legacy), convert
+      if (typeof ts === "number") return new Date(ts);
+      return new Date(0);
+    }
+
+    // Load a conversation with pagination and live updates
+    async function loadConversation(id, data) {
+      // FIX: Correctly stringify the object before storing in localStorage
+      localStorage.setItem("loadConv", JSON.stringify({ id: id, data: data }));
+
+      // Unsubscribe previous listeners
+      if (currentConvUnsubscribe) {
+        try { currentConvUnsubscribe(); } catch (e) { /* ignore */ }
+        currentConvUnsubscribe = null;
+      }
+      if (newMessagesUnsubscribe) {
+        try { newMessagesUnsubscribe(); } catch (e) { /* ignore */ }
+        newMessagesUnsubscribe = null;
+      }
+
+      currentConvId = id;
+      lastLoadedDoc = null;
+      newestLoadedTimestamp = null;
+
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+
+      // Highlight selected chat
+      document.querySelectorAll(".chatItem").forEach(div => {
+        div.classList.remove("selected");
+      });
+      const selectedDiv = document.querySelector(`[data-id="${id}"]`);
+      if (selectedDiv) selectedDiv.classList.add("selected");
+
+      const msgRef = collection(db, "conversations", id, "messages");
+
+      // Helper to render a single message element
+      async function renderMessageElement(msg) {
+        const div = document.createElement("div");
+        const msgDate = tsToDate(msg.timestamp);
+        const today = new Date();
+        let timeString;
+        const sameDay = msgDate.getFullYear() === today.getFullYear() &&
+          msgDate.getMonth() === today.getMonth() &&
+          msgDate.getDate() === today.getDate();
+
+        if (sameDay) {
+          timeString = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+          timeString = msgDate.toLocaleString([], { month: "short", day: "numeric", hour: '2-digit', minute: '2-digit' });
+        }
+
+        let msgColor = "#CCCCCC"; // Default fallback color
+        const isMine = msg.uid === (auth.currentUser && auth.currentUser.uid);
+
+        let displayText = msg.text || "";
+        let baseMessageText = displayText;
+
+        if (isMine) {
+          div.className = "messageMine";
+          msgColor = myColor;
+          baseMessageText = `You: ${baseMessageText}`;
+
+        } else {
+          div.className = "messageOther";
+          baseMessageText = `${msg.name || "Unknown"}: ${baseMessageText}`;
+
+          // Get other user's color
+          const userDocRef = doc(db, "users", msg.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            msgColor = userDocSnap.data().color || msgColor;
+          } else {
+            console.log(`color fail: User document not found for UID: ${msg.uid}`);
+          }
+        }
+
+        // Check for image format: IMG:{mimeType}:{base85String}
+        if (displayText.startsWith("IMG:")) {
+          // Parse the components
+          const parts = displayText.split(':');
+
+          // Debugging Check: Ensure structure is correct
+          if (parts.length < 3) {
+            console.error("Image message format is incorrect:", displayText);
+            div.textContent = `${timeString} | ${baseMessageText} (Corrupted Image Data)`;
+            return div;
+          }
+
+          const mimeType = parts[1];
+          // Join remaining parts to handle case where base85 data itself might contain ':'
+          const base85String = parts.slice(2).join(':');
+
+          // Check if the decoder function is available
+          if (typeof decodeBase85ToImageURL !== 'function') {
+            console.error("Base85 decoding function (decodeBase85ToImageURL) is not loaded or available.");
+            div.textContent = `${timeString} | ${baseMessageText} (Decoder Not Available)`;
+            return div;
+          }
+
+          try {
+            // Decode the Base85 string into a Data URL
+            const dataUrl = decodeBase85ToImageURL(base85String, mimeType);
+
+            // Create the image element
+            const img = document.createElement("img");
+            img.src = dataUrl;
+            img.alt = "Attached Image";
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '300px';
+            img.style.borderRadius = '8px';
+            img.style.border = `1px solid ${msgColor}`;
+
+            // Create a wrapper for the image and timestamp/name
+            const contentWrapper = document.createElement('div');
+            // Show sender name and timestamp
+            contentWrapper.innerHTML = `<span class="message-info" style="color:${msgColor};">${timeString} | ${isMine ? 'You' : msg.name || 'Unknown'}: (Image Attachment)</span>`;
+            contentWrapper.appendChild(img);
+
+            div.appendChild(contentWrapper);
+
+          } catch (error) {
+            // FIX 3: Log the specific error from the Base85 decoder
+            console.error("Base85 Decoding Error for message:", msg.id, error);
+            div.textContent = `${timeString} | ${isMine ? 'You' : msg.name || 'Unknown'}: (Base85 Decoding Failed: See Console)`;
+          }
+
+        } else {
+          // Regular text message
+          div.textContent = `${timeString} | ${baseMessageText}`;
+        }
+
+        // Apply colors and styling (applied regardless of whether image loading failed or succeeded)
+        div.style.color = msgColor;
+        div.style.background = darkenHex(msgColor);
+        div.style.border = `1px solid ${msgColor}66`;
+        div.style.textShadow = `0 0 3px ${msgColor}55`;
+
+        return div; // Returns the actual DOM element
+      }
+
+      // Load most recent PAGE_SIZE messages (descending), then display oldest->newest
+      try {
+        const initialQ = query(msgRef, orderBy("timestamp", "desc"), limit(PAGE_SIZE));
+        const snap = await getDocs(initialQ);
+
+        if (snap.empty) {
+          messagesDiv.innerHTML = `<p style="text-align:center; color: #888;">No messages yet in this conversation.</p>`;
+          // still set up listener for new messages
+        } else {
+          // docs are newest -> oldest; reverse so we append oldest first
+          const docs = snap.docs.slice();
+          docs.reverse();
+
+          // FIX: Await all message elements before appending
+          const messagePromises = docs.map(d => renderMessageElement(d.data()));
+          const messageElements = await Promise.all(messagePromises);
+
+          // append messages
+          messageElements.forEach((el, index) => {
+            messagesDiv.appendChild(el);
+
+            // track newest timestamp (use original docs for snapshot data)
+            const msg = docs[index].data();
+            const ts = msg.timestamp;
+            const tsDate = tsToDate(ts);
+            if (!newestLoadedTimestamp || tsDate > newestLoadedTimestamp) {
+              newestLoadedTimestamp = tsDate;
+            }
+          });
+
+          // For pagination: lastLoadedDoc should be the oldest loaded doc in the descending query
+          lastLoadedDoc = snap.docs[snap.docs.length - 1];
+
+          // If we have PAGE_SIZE results, show 'Load more'
+          const existingLoadMore = document.getElementById("loadMoreBtn");
+          if (snap.size === PAGE_SIZE) {
+            if (!existingLoadMore) {
+              const wrapper = document.createElement("div");
+              wrapper.className = "load-more";
+              const btn = document.createElement("button");
+              btn.id = "loadMoreBtn";
+              btn.textContent = "Load more messages";
+              btn.addEventListener("click", loadMore);
+              wrapper.appendChild(btn);
+              messagesDiv.insertBefore(wrapper, messagesDiv.firstChild);
+            }
+          }
+        }
+
+        // Scroll to bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      } catch (err) {
+        console.error("Error loading messages:", err);
+      }
+
+      // Set up listener for new messages (timestamp > newestLoadedTimestamp)
+      try {
+        // If newestLoadedTimestamp is null (no messages yet), listen to all new messages
+        let newMsgQuery;
+        if (newestLoadedTimestamp) {
+          // Use a JS Date for the comparison value; Firestore will accept Date for timestamp inequality
+          newMsgQuery = query(msgRef, where("timestamp", ">", newestLoadedTimestamp), orderBy("timestamp"));
+        } else {
+          // no messages loaded yet: listen for any messages (but only forward)
+          newMsgQuery = query(msgRef, orderBy("timestamp"));
+        }
+
+        // FIX: Added 'async' to onSnapshot callback and used 'await' inside a for...of loop
+        newMessagesUnsubscribe = onSnapshot(newMsgQuery, async (snapshot) => {
+          // snapshot may contain multiple new docs; append them in order
+          for (const docSnap of snapshot.docs) {
+            const msg = docSnap.data();
+
+            // Skip messages that we already showed (defensive)
+            const msgDate = tsToDate(msg.timestamp);
+            if (newestLoadedTimestamp && msgDate <= newestLoadedTimestamp) continue;
+
+            const el = await renderMessageElement(msg); // FIX: AWAIT the element
+            messagesDiv.appendChild(el);
+
+            // update newestLoadedTimestamp
+            if (!newestLoadedTimestamp || msgDate > newestLoadedTimestamp) newestLoadedTimestamp = msgDate;
+
+            // favicon/unread handling
+            if (document.hidden) {
+              unreadCount++;
+              changeFavicon('resources/notifC.png');
+              document.title = `(${unreadCount}) ${originalTitle}`;
+              if (urlParams.get('notifs') === true) {
+                notifyNewMessage(msg, currentConvId, (data && data.name) || "Chat");
+              }
+            }
+          }
+
+          // keep scroll at bottom when new messages arrive
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, (err) => {
+          console.error("New messages listener error:", err);
+        });
+      } catch (err) {
+        console.error("Failed to set new message listener:", err);
+      }
+
+      // loadMore: loads earlier messages than currently shown
+      async function loadMore() {
+        const btn = document.getElementById("loadMoreBtn");
+        if (!lastLoadedDoc) {
+          // nothing to load
+          if (btn) btn.remove();
+          return;
+        }
+        try {
+          const moreQ = query(msgRef, orderBy("timestamp", "desc"), startAfter(lastLoadedDoc), limit(PAGE_SIZE));
+          const snap = await getDocs(moreQ);
+          if (snap.empty) {
+            if (btn) btn.remove();
+            return;
+          }
+          // snap.docs are newest->oldest for this page; reverse to prepend oldest-first
+          const docs = snap.docs.slice();
+          docs.reverse();
+
+          // FIX: Await all message elements before prepending
+          const messagePromises = docs.map(d => renderMessageElement(d.data()));
+          const messageElements = await Promise.all(messagePromises);
+
+          // insert after the load-more wrapper if present; otherwise insert at top
+          const loadWrapper = document.querySelector(".load-more");
+          let insertBeforeNode = loadWrapper ? loadWrapper.nextSibling : messagesDiv.firstChild;
+
+          messageElements.forEach((el, index) => {
+            messagesDiv.insertBefore(el, insertBeforeNode);
+            // update newestLoadedTimestamp defensively (these are older messages so unlikely)
+            const msg = docs[index].data();
+            const ts = tsToDate(msg.timestamp);
+            if (!newestLoadedTimestamp || ts > newestLoadedTimestamp) newestLoadedTimestamp = ts;
+          });
+
+          // update lastLoadedDoc: the last doc in this descending page is the oldest in this fetched set
+          lastLoadedDoc = snap.docs[snap.docs.length - 1];
+
+          // If fewer than PAGE_SIZE were returned, remove the load more button
+          if (snap.size < PAGE_SIZE) {
+            if (btn) btn.remove();
+          }
+        } catch (err) {
+          console.error("Error loading more messages:", err);
+        }
+      } // end loadMore
+    }
+
+    function darkenHex(hex, factor = 0.15) {
+      // Remove # if present
+      hex = hex.replace(/^#/, "");
+
+      // Convert to RGB
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+
+      // Scale toward black
+      const newR = Math.floor(r * factor);
+      const newG = Math.floor(g * factor);
+      const newB = Math.floor(b * factor);
+
+      // Convert back to hex
+      return "#" +
+        newR.toString(16).padStart(2, "0") +
+        newG.toString(16).padStart(2, "0") +
+        newB.toString(16).padStart(2, "0");
+    }
+
+    function randomNeonColor() {
+      const channels = [0, 0, 0];
+
+      // Pick one channel to max out (full neon brightness)
+      const maxIndex = Math.floor(Math.random() * 3);
+      channels[maxIndex] = 255;
+
+      // Fill others with 100–255 to keep it vivid
+      for (let i = 0; i < 3; i++) {
+        if (i !== maxIndex) channels[i] = 100 + Math.floor(Math.random() * 155);
+      }
+
+      // Convert to hex
+      return "#" + channels.map(c => c.toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+
+    document.getElementById('attachFile').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+
+      if (!file) {
+        alert("No file selected.");
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        alert("Please select a valid image file.");
+        return;
+      }
+      // Check for presence of the encoding function
+      if (typeof encodeImageToBase85 !== 'function') {
+        // alert("Base85 encoding function not found. Make sure base85_utils.js loaded correctly.");
+        console.error("Global function encodeImageToBase85 is missing.");
+        return;
+      }
+
+      try {
+        // 1. ENCODE: Get the Base85 string and MIME type
+        const { base85String, mimeType } = await encodeImageToBase85(file);
+
+        if (!base85String) {
+          alert("Encoding failed: Base85 string is empty.");
+          return;
+        }
+
+
+
+
+        sendImage = true;
+        // Store the MIME type along with the base85 string
+        imageToSend = `IMG:${mimeType}:${base85String}`;
+
+        // Update the message input placeholder/text to show that a file is ready to send
+        const msgInput = document.getElementById('messageInput');
+        if (msgInput) {
+          msgInput.value = `[Image Ready: ${file.name} - Press Send]`;
+        }
+
+        // Use console.log instead of alert for success
+        console.log(`File (${file.name}, ${file.size} bytes) encoded to Base85. Ready to send.`);
+
+      } catch (error) {
+        //  alert("Error encoding file: " + error.message);
+        console.error("Encoding error:", error);
+      }
+    });
+
+    // Simple notification manager limiting to 5 concurrent notifications per chat
+    const notificationCounts = {}; // { conversationId: count }
+
+    function notifyNewMessage(msg, conversationId, conversationName) {
+      // Notification count logic
+      if (!notificationCounts[conversationId]) notificationCounts[conversationId] = 0;
+      notificationCounts[conversationId] += 1;
+      // If more than 5, replace old ones (by keeping tag and using renotify)
+      let notifTag = `${conversationId}`;
+      if (notificationCounts[conversationId] > 5) {
+        // You could add a /retry/sequence postfix, but 'tag' with renotify will update the existing
+        notificationCounts[conversationId] = 5; // lock at max 5
+      }
+
+      // Notification content
+      const sender = msg.name || "Someone";
+      let preview;
+      if (msg.isImage) {
+        preview = "[Image Attachment]";
+      } else if (msg.text && msg.text.length > 60) {
+        preview = msg.text.slice(0, 57) + "...";
+      } else {
+        preview = msg.text || "";
+      }
+
+      const notifTitle = `${sender} in ${conversationName || 'a conversation'}`;
+      const notifBody = preview;
+
+      const options = {
+        body: notifBody,
+        icon: 'resources/notifC.png',
+        tag: notifTag,          // Tag so notifications for this convo replace each other
+        renotify: true,         // Trigger if already open
+        silent: false           // User will get sound/vibration (if their device does)
+      };
+
+      if (Notification.permission === "default" || Notification.permission === "denied") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            const notification = new Notification(notifTitle, options);
+            notification.onclick = function () {
+              window.focus();
+              // Load conversation (optional: add more if needed to select/highlight UI)
+              if (typeof loadConversation === 'function' && conversationId && conversationName) {
+                loadConversation(conversationId, { name: conversationName });
+              }
+              notification.close();
+            };
+            // Clean up (optionally after some time)
+            setTimeout(() => {
+              try { notification.close(); } catch (e) { }
+              notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
+            }, 10000); // Auto-close after 10 seconds, can change
+          }
+        }
+        )
+      };
+    if (Notification.permission === "granted") {
+
+      const notification = new Notification(notifTitle, options);
+      notification.onclick = function () {
+        window.focus();
+        // Load conversation (optional: add more if needed to select/highlight UI)
+        if (typeof loadConversation === 'function' && conversationId && conversationName) {
+          loadConversation(conversationId, { name: conversationName });
+        }
+        notification.close();
+      };
+      // Clean up (optionally after some time)
+      setTimeout(() => {
+        try { notification.close(); } catch (e) { }
+        notificationCounts[conversationId] = Math.max(0, notificationCounts[conversationId] - 1);
+      }, 10000); // Auto-close after 10 seconds, can change
+    }
+  }
+  
+
+
+

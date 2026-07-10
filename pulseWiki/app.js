@@ -2,7 +2,7 @@ import * as FirebaseUtils from "./firebaseUtils.js"
 import { Editor, Node, mergeAttributes, nodeInputRule, InputRule } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
 import * as TiptapAddons from "./tiptapAddons.js"
-
+import {Placeholder} from "https://esm.sh/@tiptap/extension-placeholder"
 
 // 1. GLOBALS
 let sitePages = {};
@@ -66,15 +66,13 @@ window.renderPage = async function (pageKey) {
     sectionWrapper.className = "line-container section-editor-wrapper";
     mainContainer.appendChild(sectionWrapper);
 
-    function checkEmpty (editor){
-        if (editor.isEmpty) {
-            editor.commands.setContent(`<p>Start writing</P>`)
-        }
-    }
+
 
     const sectionEditor = new Editor({
         element: sectionWrapper,
-        extensions: [StarterKit, TiptapAddons.SortableItem, TiptapAddons.WikiLink, TiptapAddons.SortableList],
+        extensions: [StarterKit, TiptapAddons.SortableItem, TiptapAddons.WikiLink, TiptapAddons.SortableList, Placeholder.configure({
+  placeholder: 'Start writing…',
+})],
         //   content: marked.parse(processWikiLinks(content)),
         editable: isAdmin, // Only editable if admin
         editorProps: {
@@ -85,7 +83,6 @@ window.renderPage = async function (pageKey) {
         },
         onBlur({ event, editor }) {
             saveData(event.target)
-            checkEmpty(editor)
         }
     });
 
@@ -155,7 +152,6 @@ window.renderPage = async function (pageKey) {
         combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
     }
     sectionEditor.commands.setContent(combinedHtml);
-    checkEmpty(sectionEditor)
 
 
     // Update URL

@@ -372,3 +372,4 @@ button#back-btn:hover {
     pointer-events: none;
     /* Safely prevents text modification without destroying the DOM */
 }
+

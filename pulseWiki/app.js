@@ -88,7 +88,7 @@ window.renderPage = async function (pageKey) {
             needSave = true;
         },
         onBlur({ event, editor }) {
-            saveData(event.target)
+            saveData(editor)
         }
     });
 

@@ -373,3 +373,11 @@ button#back-btn:hover {
     /* Safely prevents text modification without destroying the DOM */
 }
 
+/* Display the placeholder using pseudo-elements */
+.wiki-editor-styles p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}

@@ -2,7 +2,7 @@ import * as FirebaseUtils from "./firebaseUtils.js"
 import { Editor, Node, mergeAttributes, nodeInputRule, InputRule } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
 import * as TiptapAddons from "./tiptapAddons.js"
-import {Placeholder} from "https://esm.sh/@tiptap/extension-placeholder"
+import { Placeholder } from "https://esm.sh/@tiptap/extension-placeholder"
 
 // 1. GLOBALS
 let sitePages = {};
@@ -71,8 +71,14 @@ window.renderPage = async function (pageKey) {
     const sectionEditor = new Editor({
         element: sectionWrapper,
         extensions: [StarterKit, TiptapAddons.SortableItem, TiptapAddons.WikiLink, TiptapAddons.SortableList, Placeholder.configure({
-  placeholder: 'Start writing…',
-})],
+            // This targets individual nodes instead of the global document root
+            placeholder: ({ node }) => {
+                if (node.type.name === 'paragraph') {
+                    return 'Start writing…';
+                }
+                return '';
+            },
+        })],
         //   content: marked.parse(processWikiLinks(content)),
         editable: isAdmin, // Only editable if admin
         editorProps: {
@@ -133,7 +139,7 @@ window.renderPage = async function (pageKey) {
                 });
             } else {
                 // console.log("Array is 0, displaying placeholder")
-                combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
+                combinedHtml = "";
             }
 
         }
@@ -149,7 +155,7 @@ window.renderPage = async function (pageKey) {
         }
     } else {
         titleElement.textContent = pageKey;
-        combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
+        combinedHtml = "";
     }
     sectionEditor.commands.setContent(combinedHtml);
 

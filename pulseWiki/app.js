@@ -106,7 +106,7 @@ window.renderPage = async function (pageKey) {
                     if (section.visibility && section.visibility !== "all") {
                         if (!user || user.campaign !== section.visibility) return;
                     }
-
+console.log(content)
                     const firstPass = processWikiLinks(content);
                     const finalHtml = marked.parse(firstPass);
 

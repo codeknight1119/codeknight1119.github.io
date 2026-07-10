@@ -124,6 +124,26 @@ export const getDocuments = async (path, l, docParam, arrayFilter) => {
     }
 };
 
+export const getDocumentFeildIncludes(path, feild, text){
+    try{
+const q = query(
+  collection(db, path), 
+  where(feild, ">=", text), 
+  where(feild, "<=", text + "\uf8ff")
+);
+const doc = await getDoc(q)
+const documents = doc.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+    }));
+    
+        return documents
+    }catch(e){
+        console.log(e)
+        throw e
+    }
+}
+
 export const isSignedIn = () => {
     return new Promise((resolve, reject) => {
         try {

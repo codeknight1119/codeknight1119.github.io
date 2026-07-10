@@ -76,8 +76,11 @@ window.renderPage = async function (pageKey) {
         onFocus({ event }) {
             needSave = true;
         },
-        onBlur({ event }) {
+        onBlur({ event, editor}) {
             saveData(event.target)
+            if(editor.innerHtml === `<p><br class="ProseMirror-trailingBreak"></p>`){
+                editor.commands.setContent(`<p>Start writing</P>`)
+            }
         }
     });
 

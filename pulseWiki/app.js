@@ -71,9 +71,9 @@ window.renderPage = async function (pageKey) {
     const sectionEditor = new Editor({
         element: sectionWrapper,
         extensions: [StarterKit, TiptapAddons.SortableItem, TiptapAddons.WikiLink, TiptapAddons.SortableList, Placeholder.configure({
-    placeholder: "Start writing…",
-    showOnlyCurrent: true,
-})],
+            placeholder: "Start writing…",
+            showOnlyCurrent: true,
+        })],
         //   content: marked.parse(processWikiLinks(content)),
         editable: isAdmin, // Only editable if admin
         editorProps: {

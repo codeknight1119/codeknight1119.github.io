@@ -67,7 +67,7 @@ window.renderPage = async function (pageKey) {
     mainContainer.appendChild(sectionWrapper);
 
     function checkEmpty (editor){
-        if (editor.innerHtml === `<p><br class="ProseMirror-trailingBreak"></p>`) {
+        if (editor.isEmpty) {
             editor.commands.setContent(`<p>Start writing</P>`)
         }
     }

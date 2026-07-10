@@ -65,6 +65,13 @@ window.renderPage = async function (pageKey) {
     const sectionWrapper = document.createElement("div");
     sectionWrapper.className = "line-container section-editor-wrapper";
     mainContainer.appendChild(sectionWrapper);
+
+    function checkEmpty = (editor){
+        if (editor.innerHtml === `<p><br class="ProseMirror-trailingBreak"></p>`) {
+            editor.commands.setContent(`<p>Start writing</P>`)
+        }
+    }
+
     const sectionEditor = new Editor({
         element: sectionWrapper,
         extensions: [StarterKit, TiptapAddons.SortableItem, TiptapAddons.WikiLink, TiptapAddons.SortableList],
@@ -76,11 +83,9 @@ window.renderPage = async function (pageKey) {
         onFocus({ event }) {
             needSave = true;
         },
-        onBlur({ event, editor}) {
+        onBlur({ event, editor }) {
             saveData(event.target)
-            if(editor.innerHtml === `<p><br class="ProseMirror-trailingBreak"></p>`){
-                editor.commands.setContent(`<p>Start writing</P>`)
-            }
+            checkEmpty(editor)
         }
     });
 
@@ -150,17 +155,14 @@ window.renderPage = async function (pageKey) {
         combinedHtml = `<div class="line-container"><p>No content yet.</p></div>`;
     }
     sectionEditor.commands.setContent(combinedHtml);
-
-
-
-
+    checkEmpty(sectionEditor)
 
 
     // Update URL
     try {
         history.pushState({ pageKey }, "", `?page=${encodeURIComponent(pageKey)}`);
     } catch (e) { }
-};
+}
 
 // 4. NAVIGATION
 window.backPage = function () {

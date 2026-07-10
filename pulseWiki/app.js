@@ -97,6 +97,7 @@ window.renderPage = async function (pageKey) {
 
             if (pageBody.length !== 0) {
                 pageBody.forEach((section) => {
+                    console.log(section)
                     // Handle if section is a string or an object with .content
                     const content = typeof section === 'string' ? section : section.content;
 
@@ -106,7 +107,6 @@ window.renderPage = async function (pageKey) {
                     if (section.visibility && section.visibility !== "all") {
                         if (!user || user.campaign !== section.visibility) return;
                     }
-console.log(content)
                     const firstPass = processWikiLinks(content);
                     const finalHtml = marked.parse(firstPass);
 

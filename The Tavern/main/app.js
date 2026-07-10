@@ -279,18 +279,17 @@ document.getElementById("sendBtn").addEventListener("click", handleChatMesage)
 
 
 const searchUserDropdown = document.getElementById("filterDropdown")
-const searchTerm = document.getElementById("searchTermIn")
+const searchTermInput = document.getElementById("searchTermIn")
 
 searchUserDropdown.addEventListener("change", (event)=>{
     const selectedValue = event.target.value;
     if(selectedValue === "searchName"){
-    searchTerm.hidden = false
+    searchTermInput.hidden = false
     }else{
-        searchTerm.hidden = true
+        searchTermInput.hidden = true
     }
 })
 
-const searchTermInput = document.getElementById("test")
 document.getElementById("userSearchBttn").addEventListener("click", ()=>{
     switch(searchUserDropdown.value){
         case("searchName"):

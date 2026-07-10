@@ -124,7 +124,7 @@ export const getDocuments = async (path, l, docParam, arrayFilter) => {
     }
 };
 
-export const getDocumentFeildIncludes = (path, feild, text) =>{
+export const getDocumentFeildIncludes = async (path, feild, text) =>{
     try{
 const q = query(
   collection(db, path), 

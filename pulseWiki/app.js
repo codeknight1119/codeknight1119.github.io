@@ -229,7 +229,7 @@ async function getUserData() {
 
 async function saveData(element) {
     const path = `/lore/${currentPageKey}`
-    const bodytext = element.getJSON()
+    const bodytext = element.getHTML()
     const response = await FirebaseUtils.updateDocument(path, { body: bodytext })
     if (!response) {
         FirebaseUtils.setDocument(path, {

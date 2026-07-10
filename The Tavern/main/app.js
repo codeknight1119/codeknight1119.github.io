@@ -282,20 +282,19 @@ const searchUserDropdown = document.getElementById("filterDropdown")
 const searchTerm = document.getElementById("filterDropdown")
 
 searchUserDropdown.addEventListener("change", (event)=>{
-    const selectedValue = event.target.value
+    const selectedValue = event.target.value;
     if(selectedValue === "searchName"){
     searchTerm.hidden = false
     }else{
         searchTerm.hidden = true
     }
-
 })
 
-const searchTermInput = document.getElementById("")
+const searchTermInput = document.getElementById("test")
 document.getElementById("userSearchBttn").addEventListener("click", ()=>{
     switch(searchUserDropdown.value){
         case("searchName"):
-        FirebaseUtils.getDocumentFeildIncludes("/users", )
+        FirebaseUtils.getDocumentFeildIncludes("/users", searchTermInput.value)
         break
     }
 })

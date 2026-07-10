@@ -97,7 +97,10 @@ header h4 {
 .line-container strong,
 .line-container code,
 .line-container a {
-    color: #0099ff;
+    color: #e6f5ff;
+    .clickable{
+        color: #0099ff;
+    }
 }
 
 /* Images inside lines: keep them tidy and responsive */

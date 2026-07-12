@@ -80,7 +80,7 @@ async function checkUser() {
         user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
         user.uid = userCheck.uid
 
-        const tokens =  await userCheck.currentUser.getIdTokenResult(true);
+        const tokens =  await userCheck.getIdTokenResult(true);
         console.log(tokens.claims)
         await getMyFeatures()
     }

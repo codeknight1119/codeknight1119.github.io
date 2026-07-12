@@ -153,6 +153,7 @@ export const isSignedIn = () => {
                     unsubscribe();
                     if (user) {
                         const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
+                        
 
                         resolve(user);
                     } else {

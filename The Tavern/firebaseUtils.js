@@ -131,7 +131,7 @@ const q = query(
   where(feild, ">=", text), 
   where(feild, "<=", text + "\uf8ff")
 );
-const doc = await getDoc(q)
+const doc = await getDocs(q)
 const documents = doc.docs.map(doc => ({
     id: doc.id,
     ...doc.data()

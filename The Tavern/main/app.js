@@ -290,10 +290,15 @@ searchUserDropdown.addEventListener("change", (event)=>{
     }
 })
 
-document.getElementById("userSearchBttn").addEventListener("click", ()=>{
+document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
     switch(searchUserDropdown.value){
         case("searchName"):
-        FirebaseUtils.getDocumentFeildIncludes("/users", searchTermInput.value)
+        if(searchTermInput.value === undefined){
+            alert("No search term provided")
+            return
+        }
+        const doc = await FirebaseUtils.getDocumentFeildIncludes("/users", searchTermInput.value)
+        console.log(doc)
         break
     }
 })

@@ -284,7 +284,7 @@ const searchTermInput = document.getElementById("searchTermIn")
 searchUserDropdown.addEventListener("change", (event)=>{
     const selectedValue = event.target.value;
     if(selectedValue === "searchName"){
-    searchTermInput.hidden = false
+        searchTermInput.hidden = false
     }else{
         searchTermInput.hidden = true
     }
@@ -293,7 +293,7 @@ searchUserDropdown.addEventListener("change", (event)=>{
 document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
     switch(searchUserDropdown.value){
         case("searchName"):
-        if(searchTermInput.value === undefined){
+        if(searchTermInput.value === undefined || searchTermInput.value.trim() === ""){
             alert("No search term provided")
             return
         }

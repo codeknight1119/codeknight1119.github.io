@@ -10,6 +10,7 @@ import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
+let permissions = null;
 let myFeatures = null;
 let currentSelectedSidebar = null
 const chatUI = document.getElementById("chatTools")
@@ -82,6 +83,15 @@ async function checkUser() {
 
         const tokens =  await userCheck.getIdTokenResult(true);
         console.log(tokens.claims)
+        const firebaseNoise = ["name","picture","iss","aud","auth_time","user_id","sub","iat","exp","email","email_verified","firebase"]
+
+        permissions = Object.keys(allClaims)
+            .filter(key => !firebaseNoise.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = allClaims[key];
+                return obj;
+            }, {});
+
         await getMyFeatures()
     }
 }
@@ -97,9 +107,9 @@ function hideFeatureHTML(){
 
 async function getMyFeatures() {
     if (user !== null) {
-        let permsArray = user.permissions.slice()
-        permsArray.push("all")
-        myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permsArray })
+        
+        permissions.push("all")
+        myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permissions })
         const template = document.getElementById("sidebarTemplate")
         const parentSidebar = document.getElementById("everySidebarParent")
 

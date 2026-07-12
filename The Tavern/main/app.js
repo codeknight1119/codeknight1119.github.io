@@ -299,6 +299,25 @@ document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
         }
         const doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name",searchTermInput.value)
         console.log(doc)
+        mainContentArea.replaceChildren()
+        if(doc.length === 0){
+            const newP = document.createElement("p")
+            newP.innerText = "No Person Found with name " + searchTermInput.value "."
+            return
+        }
+        const searchedTemplate = document.getElementById("userSearchTemplate")
+        doc.forEach((val)=>{
+            const seachedRes = searchedTemplate.cloneNode(true)
+            seachedRes.querySelector(".searched:Name").innerText = val["Real Name"]
+            const permsHolder = seachedRes.querySelector(".searched:roles")
+            val.permissions.forEach((role)=>{
+                const newRoletext = document.createElement("p")
+                newRoletext.innerText = role;
+                permsHolder.appendChild(newRoletext)
+            })
+            mainContentArea.appendChild(seachedRes)
+            
+        })
         break
     }
 })

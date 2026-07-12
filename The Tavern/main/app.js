@@ -302,7 +302,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
         mainContentArea.replaceChildren()
         if(doc.length === 0){
             const newP = document.createElement("p")
-            newP.innerText = "No Person Found with name " + searchTermInput.value "."
+            newP.innerText = "No Person Found with name " + searchTermInput.value + "."
             return
         }
         const searchedTemplate = document.getElementById("userSearchTemplate")
@@ -316,7 +316,6 @@ document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
                 permsHolder.appendChild(newRoletext)
             })
             mainContentArea.appendChild(seachedRes)
-            
         })
         break
     }

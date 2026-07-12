@@ -297,7 +297,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
             alert("No search term provided")
             return
         }
-        const doc = await FirebaseUtils.getDocumentFeildIncludes("/users", searchTermInput.value)
+        const doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name",searchTermInput.value)
         console.log(doc)
         break
     }

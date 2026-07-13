@@ -92,6 +92,7 @@ async function checkUser() {
                 return obj;
             }, {});
         permissions = Object.keys(cleanPerms)
+        console.log(permissions)
 
         await getMyFeatures()
     }

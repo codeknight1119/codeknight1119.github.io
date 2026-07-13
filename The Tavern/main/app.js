@@ -191,6 +191,7 @@ const mainContentArea = document.getElementById("mainContentArea")
 async function renderTool(id) {
     chatUI.hidden = true;
     const toolData = getFeatureById(id)
+    console.log(toolData.toolType)
 
     const BOARD_COUNT = 15
 
@@ -203,7 +204,7 @@ async function renderTool(id) {
             }else{
                                 console.log("not officer")
             }
-            
+
             if (ss_TOOLS.get(id)) {
                 boards = ss_TOOLS.get(id)
             } else {

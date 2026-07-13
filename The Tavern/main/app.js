@@ -85,12 +85,13 @@ async function checkUser() {
         const noisePerms = tokens.claims
         const firebaseNoise = ["name","picture","iss","aud","auth_time","user_id","sub","iat","exp","email","email_verified","firebase"]
 
-        permissions = Object.keys(noisePerms)
+        const cleanPerms = Object.keys(noisePerms)
             .filter(key => !firebaseNoise.includes(key))
             .reduce((obj, key) => {
                 obj[key] = noisePerms[key];
                 return obj;
             }, {});
+        permissions = Object.keys(cleanPerms)
 
         await getMyFeatures()
     }

@@ -190,7 +190,7 @@ function getFeatureById(id) {
 
 const mainContentArea = document.getElementById("mainContentArea")
 
-function newBoard(title, body){
+async function newBoard(title, body){
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
     const titleText = newBoard.querySelector(".board-title")
     const bodyText = newBoard.querySelector(".board-body")
@@ -223,7 +223,7 @@ function newBoard(title, body){
     mainContentArea.prepend(newBoard)
 }
 
-document.getElementById("board:new").addEventListener("click", ()=>{newBoard()})
+document.getElementById("board:new").addEventListener("click", async ()=>{await newBoard()})
 
 async function renderTool(id) {
     chatUI.hidden = true;
@@ -254,7 +254,7 @@ async function renderTool(id) {
             let finalHTMLText = "";
             boards.forEach((board) => {
                 const parsedBody = marked.parse(board.body)
-                newBoard(board.title, parsedBody)
+               await  newBoard(board.title, parsedBody)
             })
 
             break

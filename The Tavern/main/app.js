@@ -190,8 +190,11 @@ const mainContentArea = document.getElementById("mainContentArea")
 
 function newBoard(title, body){
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
-    newBoard.querySelector(".board-title").innerText = title || "Title"
-    newBoard.querySelector(".board-body").innerText = body || "Type announcement"
+    const titleText = newBoard.querySelector(".board-title")
+    const bodyText = newBoard.querySelector(".board-body")
+    titleText.contenteditable = bodyText.contenteditable = permissions.includes("officer")
+    titleText.innerText = title || "Title"
+    newBoard.innerText = body || "Type announcement"
     mainContentArea.prepend(newBoard)
 
 }

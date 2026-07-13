@@ -188,6 +188,15 @@ function getFeatureById(id) {
 
 const mainContentArea = document.getElementById("mainContentArea")
 
+function newBoard(title, body){
+    const newBoard = document.getElementById("board:template").cloneNode(true)
+    newBoard.querySelector(".board-title").innerText = title || "Title"
+    newBoard.querySelector(".board-body").innerText = body || "Type announcement"
+    mainContentArea.prepend(newBoard)
+}
+
+document.getElementById("board:new").addEventListener("click", newBoard)
+
 async function renderTool(id) {
     chatUI.hidden = true;
     const toolData = getFeatureById(id)
@@ -218,12 +227,7 @@ async function renderTool(id) {
             let finalHTMLText = "";
             boards.forEach((board) => {
                 const parsedBody = marked.parse(board.body)
-                const newBoard = document.getElementById("board:template").cloneNode(true)
-                newBoard.querySelector(".board-title").innerText = board.title
-                newBoard.querySelector(".board-body").innerText = parsedBody
-
-                mainContentArea.prepend(newBoard)
-            
+                newBoard(board.title, parsedBody)
             })
 
             break

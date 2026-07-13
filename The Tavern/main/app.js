@@ -191,8 +191,7 @@ function newBoard(title, body){
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
     const titleText = newBoard.querySelector(".board-title")
     const bodyText = newBoard.querySelector(".board-body")
-    console.log(permissions.includes("officer"))
-    titleText.contenteditable = bodyText.contenteditable = permissions.includes("officer")
+    titleText.contentEditable = bodyText.contentEditable = permissions.includes("officer")
     titleText.innerText = title || "Title"
     newBoard.innerText = body || "Type announcement"
     mainContentArea.prepend(newBoard)

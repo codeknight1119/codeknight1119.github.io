@@ -217,9 +217,13 @@ async function renderTool(id) {
             }
             let finalHTMLText = "";
             boards.forEach((board) => {
+                const parsedBody = marked.parse(board.body)
                 const newBoard = document.getElementById("board:template").cloneNode(true)
                 newBoard.querySelector(".board-title").innerText = board.title
                 newBoard.querySelector(".board-body").innerText = parsedBody
+
+                mainContentArea.prepend(newBoard)
+            
             })
 
             break

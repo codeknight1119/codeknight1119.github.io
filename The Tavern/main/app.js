@@ -17,6 +17,8 @@ const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
 let ss_CHATS = new Map()
 let activeChat = null;
+let activeFeature = null;
+
 
 const chatArea = document.getElementById("sendBar")
 
@@ -131,7 +133,7 @@ async function getMyFeatures() {
             a.addEventListener("click", handleSidebarClick)
 
             if (index === (reversedFeatures.length - 1)) {
-                currentSelectedSidebar = li
+                currentSelectedSidebar = currentSelectedSidebar
                 li.classList.add("active")
                 loadSidebar(val)
             }
@@ -173,6 +175,7 @@ function loadSidebar(data) {
     switch (data.type) {
         case "tool":
             renderTool(data.id)
+            activeFeature = data.id
             break;
 
         case "chat":
@@ -191,11 +194,33 @@ function newBoard(title, body){
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
     const titleText = newBoard.querySelector(".board-title")
     const bodyText = newBoard.querySelector(".board-body")
-    titleText.contentEditable = bodyText.contentEditable = permissions.includes("officer")
+    const delBtn = newBoard.querySelector(".board-delete")
+    const isOfficer = permissions.includes("officer")
+    titleText.contentEditable = bodyText.contentEditable = isOfficer
+    delBtn.hidden = !isOfficer
+    const id = await FirebaseUtils.addDoc(`/features/${activeFeature}/boards`)
+    const path = /features/${activeFeature}/boards/${id}
+    delBtn.addEventListener("click", ()=>{
+        await Firebase.deleteDoc(path)
+    })
+    if(isOfficer){
+        title.addEventListener("blur", (event)=>{
+            const payload = {
+                title : event.target.textContent
+            }
+            await FirebaseUtils.updateDocument(path, payload)
+        })
+
+        bodyText.addEventListener("blur", (event)=>{
+        const payload = {
+            body : event.target.textContent
+        }
+        await FirebaseUtils.updateDocument(path, payload)
+        })
+    } 
     titleText.innerText = title || "Title"
     bodyText.innerText = body || "Type announcement"
     mainContentArea.prepend(newBoard)
-
 }
 
 document.getElementById("board:new").addEventListener("click", ()=>{newBoard()})

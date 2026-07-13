@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, where } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, where, deleteDoc} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js';
 
@@ -140,6 +140,17 @@ const documents = doc.docs.map(doc => ({
         return documents
     }catch(e){
         console.log(e)
+        throw e
+    }
+}
+
+export const deleteDocument = asyc (path) =>{
+    try{
+        const ref = doc(db, path)
+        const data = await deleteDoc(ref)
+        return data
+    }catch(e){
+        console.error(e)
         throw e
     }
 }

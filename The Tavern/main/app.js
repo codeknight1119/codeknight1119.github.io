@@ -122,7 +122,7 @@ async function getMyFeatures() {
             const li = fragment.querySelector('li')
             const a = fragment.querySelector('.nav-btn')
             const text = fragment.querySelector('.sidebarText')
-            const icon = fragment.querySelector(".game-icon")
+            const icon = fragment.querySelector(".ra")
 
             text.innerText = val.name
             icon.classList.add(val.icon.trim())

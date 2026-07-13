@@ -219,6 +219,9 @@ async function renderTool(id) {
             })
             finalHTMLText = "<div>" + finalHTMLText + "</div>"
             mainContentArea.innerHTML = finalHTMLText
+            if(permissions.includes("officer")){
+                document.getElementById("boardCreation").hidden = false;
+            }
             break
     case("userPermissions"):
         const ui = document.getElementById("userPermsUI")

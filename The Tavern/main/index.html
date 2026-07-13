@@ -33,13 +33,13 @@
                 </li>
             </template>
 
-                        <li>
+            <li>
                 <button class="dropdown-btn">
                     <i class="ra ra-2x ra-beer"></i>
                     <span>Everyone</span>
                     <i class="ra ra-broadhead-arrow"></i>
                 </button>
-                <div class="sub-menu" >
+                <div class="sub-menu">
                     <ul id="everySidebarParent">
                     </ul>
                 </div>
@@ -77,7 +77,8 @@
             <div id="mainBody"></div>
         </div>
         <div id="userPermsUI" hidden class="featureHTML">
-            <p id="helpTextUserPerms"><strong>Select a filter or enter a search and press the find button to begin</strong></p>
+            <p id="helpTextUserPerms"><strong>Select a filter or enter a search and press the find button to
+                    begin</strong></p>
             <div id="userSearchFilters">
                 <label for="filterDropdown">Choose a filter</label>
                 <select name="filterDropdown" id="filterDropdown">
@@ -87,13 +88,25 @@
 
             </div>
             <button id="userSearchBttn">Find Users</button>
-            <input type="text" id="searchTermIn"/>
+            <input type="text" id="searchTermIn" />
             <template id="userSearchTemplate">
                 <div style="display: inline-block;">
-                    <span>Name</span><p class="searched-Name"></p><p>|</p><span>Roles</span></spam><div class="searched-roles"></div>
+                    <span>Name</span>
+                    <p class="searched-Name"></p>
+                    <p>|</p><span>Roles</span></spam>
+                    <div class="searched-roles"></div>
                 </div>
             </template>
         </div>
+        <template id="board:template">
+            <div>
+                <section class='boardMessage'>
+                    <h3 class="cinzel-title board-title">${board.title}</h3>
+                    <p class="board-body"></p>
+                </section>
+            </div>
+        </template>
+        <button id="board:new">Create a new board.</button>
 
     </main>
 </body>

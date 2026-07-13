@@ -198,11 +198,11 @@ async function renderTool(id) {
     switch (toolData.toolType) {
         case ("board"):
             let boards;
+            let canEdit = false;
 
             if(permissions.includes("officer")){
-                document.getElementById("boardCreation").hidden = false;
-            }else{
-                                console.log("not officer")
+               canEdit = true;
+               document.getElementById("board:new").hidden = false;
             }
 
             if (ss_TOOLS.get(id)) {
@@ -217,17 +217,10 @@ async function renderTool(id) {
             }
             let finalHTMLText = "";
             boards.forEach((board) => {
-                const parsedBody = marked.parse(board.body)
-                const htmlText = `
-                    <section class='boardMessage'>
-                    <h3 class="cinzel-title">${board.title}</h3>
-                    <p>${parsedBody}</p>
-                    </section>
-                    `
-                finalHTMLText += htmlText
+                const newBoard = document.getElementById("board:template").cloneNode(true)
+                newBoard.querySelector(".board-title").innerText = board.title
+                newBoard.querySelector(".board-body").innerText = parsedBody
             })
-            finalHTMLText = "<div>" + finalHTMLText + "</div>"
-            mainContentArea.innerHTML = finalHTMLText
 
             break
     case("userPermissions"):

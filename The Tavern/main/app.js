@@ -196,7 +196,7 @@ function newBoard(title, body){
 
 }
 
-document.getElementById("board:new").addEventListener("click", newBoard)
+document.getElementById("board:new").addEventListener("click", ()=>{newBoard()})
 
 async function renderTool(id) {
     chatUI.hidden = true;

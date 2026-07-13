@@ -92,7 +92,6 @@ async function checkUser() {
                 return obj;
             }, {});
         permissions = Object.keys(cleanPerms)
-        console.log(permissions)
 
         await getMyFeatures()
     }
@@ -192,6 +191,7 @@ function newBoard(title, body){
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
     const titleText = newBoard.querySelector(".board-title")
     const bodyText = newBoard.querySelector(".board-body")
+    console.log(permissions.includes("officer"))
     titleText.contenteditable = bodyText.contenteditable = permissions.includes("officer")
     titleText.innerText = title || "Title"
     newBoard.innerText = body || "Type announcement"
@@ -204,7 +204,6 @@ document.getElementById("board:new").addEventListener("click", ()=>{newBoard()})
 async function renderTool(id) {
     chatUI.hidden = true;
     const toolData = getFeatureById(id)
-    console.log(toolData.toolType)
 
     const BOARD_COUNT = 15
 
@@ -328,7 +327,6 @@ document.getElementById("userSearchBttn").addEventListener("click", async ()=>{
             return
         }
         const doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name",searchTermInput.value)
-        console.log(doc)
         mainContentArea.replaceChildren()
         if(doc.length === 0){
             const newP = document.createElement("p")

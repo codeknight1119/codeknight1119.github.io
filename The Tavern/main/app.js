@@ -193,7 +193,7 @@ function newBoard(title, body){
     const bodyText = newBoard.querySelector(".board-body")
     titleText.contentEditable = bodyText.contentEditable = permissions.includes("officer")
     titleText.innerText = title || "Title"
-    newBoard.innerText = body || "Type announcement"
+    bodyText.innerText = body || "Type announcement"
     mainContentArea.prepend(newBoard)
 
 }

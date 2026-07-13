@@ -197,6 +197,13 @@ async function renderTool(id) {
     switch (toolData.toolType) {
         case ("board"):
             let boards;
+
+            if(permissions.includes("officer")){
+                document.getElementById("boardCreation").hidden = false;
+            }else{
+                                console.log("not officer")
+            }
+            
             if (ss_TOOLS.get(id)) {
                 boards = ss_TOOLS.get(id)
             } else {
@@ -220,9 +227,7 @@ async function renderTool(id) {
             })
             finalHTMLText = "<div>" + finalHTMLText + "</div>"
             mainContentArea.innerHTML = finalHTMLText
-            if(permissions.includes("officer")){
-                document.getElementById("boardCreation").hidden = false;
-            }
+
             break
     case("userPermissions"):
         const ui = document.getElementById("userPermsUI")

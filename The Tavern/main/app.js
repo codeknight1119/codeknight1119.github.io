@@ -198,7 +198,7 @@ async function newBoard(title, body){
     const isOfficer = permissions.includes("officer")
     titleText.contentEditable = bodyText.contentEditable = isOfficer
     delBtn.hidden = !isOfficer
-    const id = await FirebaseUtils.addDoc(`/features/${activeFeature}/boards`)
+    const id = await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`)
     const path =   `/features/${activeFeature}/boards/${id}`
     delBtn.addEventListener("click", async ()=>{
         await Firebase.deleteDoc(path)

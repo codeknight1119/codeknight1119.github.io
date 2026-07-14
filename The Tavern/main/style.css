@@ -271,3 +271,17 @@ dropdown-btn i {
     outline: none !important;
     box-shadow: none !important;
 }
+
+/* Ensure contenteditable boxes remain clickable when entirely empty */
+[contenteditable="true"] {
+    min-height: 1.5em; /* Gives you a line of space to click into */
+    min-width: 100px;  /* Ensures it doesn't shrink horizontally */
+    display: inline-block; /* Helps maintain structural dimensions */
+}
+
+/* Optional: Show a subtle hint text when the officer deletes everything */
+[contenteditable="true"]:empty::before {
+    content: "Type announcement...";
+    color: #888;
+    font-style: italic;
+}

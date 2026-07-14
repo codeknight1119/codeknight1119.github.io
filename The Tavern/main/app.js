@@ -201,9 +201,7 @@ async function newBoard(title, body){
     delBtn.hidden = !isOfficer
     const id = await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {title: title || "Title", body: body || "Type announcement"})
     const path =   `/features/${activeFeature}/boards/${id}`
-    delBtn.addEventListener("click", async ()=>{
-        await Firebase.deleteDoc(path)
-    })
+
     if(isOfficer){
         titleText.addEventListener("blur", async (event)=>{
             const payload = {
@@ -217,6 +215,9 @@ async function newBoard(title, body){
                 body : event.target.textContent
             }
             await FirebaseUtils.updateDocument(path, payload)
+        })
+        delBtn.addEventListener("click", async ()=>{
+            await FirebaseUtils.deleteDoc(path)
         })
     } 
     titleText.innerText = title || "Title"

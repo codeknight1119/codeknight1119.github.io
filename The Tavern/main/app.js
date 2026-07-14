@@ -191,7 +191,6 @@ function getFeatureById(id) {
 const mainContentArea = document.getElementById("mainContentArea")
 
 async function newBoard(title, body){
-    
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
     const titleText = newBoard.querySelector(".board-title")
     const bodyText = newBoard.querySelector(".board-body")
@@ -201,7 +200,7 @@ async function newBoard(title, body){
     delBtn.hidden = !isOfficer
     const newDocData =  await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {title: title || "Title", body: body || "Type announcement"})
     const id = newDocData.id
-    console.log(newDocData)
+    console.log(id)
     const path =   `/features/${activeFeature}/boards/${id}`
 
     if(isOfficer){

@@ -252,9 +252,9 @@ async function renderTool(id) {
                 return
             }
             let finalHTMLText = "";
-            boards.forEach((board) => {
+            boards.forEach(async (board) => {
                 const parsedBody = marked.parse(board.body)
-               await  newBoard(board.title, parsedBody)
+               await newBoard(board.title, parsedBody)
             })
 
             break

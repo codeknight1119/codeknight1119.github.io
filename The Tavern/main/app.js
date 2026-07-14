@@ -199,7 +199,9 @@ async function newBoard(title, body){
     const isOfficer = permissions.includes("officer")
     titleText.contentEditable = bodyText.contentEditable = isOfficer
     delBtn.hidden = !isOfficer
-    const id = await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {title: title || "Title", body: body || "Type announcement"})
+    const newDocData =  await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {title: title || "Title", body: body || "Type announcement"})
+    const id = newDocData.id
+    console.log(newDocData)
     const path =   `/features/${activeFeature}/boards/${id}`
 
     if(isOfficer){

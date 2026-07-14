@@ -204,14 +204,14 @@ async function newBoard(title, body){
         await Firebase.deleteDoc(path)
     })
     if(isOfficer){
-        title.addEventListener("blur", (event)=>{
+        title.addEventListener("blur", async (event)=>{
             const payload = {
                 title : event.target.textContent
             }
             await FirebaseUtils.updateDocument(path, payload)
         })
 
-        bodyText.addEventListener("blur", (event)=>{
+        bodyText.addEventListener("blur", async (event)=>{
         const payload = {
             body : event.target.textContent
         }

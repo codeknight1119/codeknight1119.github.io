@@ -238,7 +238,7 @@ async function newBoard(title, body, id = null) {
     }
 
     titleText.innerText = title || "Title";
-    bodyText.innerText = body || "Type announcement";
+    bodyText.innerHTML = body || "Type announcement";
 
     // Prepend the finished fragment to your page
     mainContentArea.prepend(fragment);

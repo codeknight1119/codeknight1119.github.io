@@ -219,7 +219,7 @@ async function newBoard(title, body){
             await FirebaseUtils.updateDocument(path, payload)
         })
         delBtn.addEventListener("click", async ()=>{
-            await FirebaseUtils.deleteDoc(path)
+            await FirebaseUtils.deleteDocument(path)
         })
     } 
     titleText.innerText = title || "Title"

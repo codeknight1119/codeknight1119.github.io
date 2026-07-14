@@ -190,41 +190,58 @@ function getFeatureById(id) {
 
 const mainContentArea = document.getElementById("mainContentArea")
 
-async function newBoard(title, body){
-    const newBoard = document.getElementById("board:template").content.cloneNode(true)
-    const titleText = newBoard.querySelector(".board-title")
-    const bodyText = newBoard.querySelector(".board-body")
-    const delBtn = newBoard.querySelector(".board-delete")
-    const isOfficer = permissions.includes("officer")
-    titleText.contentEditable = bodyText.contentEditable = isOfficer
-    delBtn.hidden = !isOfficer
-    const newDocData =  await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {title: title || "Title", body: body || "Type announcement"})
-    const id = newDocData.id
-    console.log(id)
-    const path =   `/features/${activeFeature}/boards/${id}`
+// Add 'id' as an optional third parameter
+async function newBoard(title, body, id = null) {
+    const fragment = document.getElementById("board:template").content.cloneNode(true);
+    
+    // 1. Grab a direct reference to the root container element right away
+    const boardRoot = fragment.firstElementChild; 
+    
+    const titleText = fragment.querySelector(".board-title");
+    const bodyText = fragment.querySelector(".board-body");
+    const delBtn = fragment.querySelector(".board-delete");
+    const isOfficer = permissions.includes("officer");
+    
+    titleText.contentEditable = bodyText.contentEditable = isOfficer;
+    delBtn.hidden = !isOfficer;
 
-    if(isOfficer){
-        titleText.addEventListener("blur", async (event)=>{
-            const payload = {
-                title : event.target.innerText
-            }
-            await FirebaseUtils.updateDocument(path, payload)
-        })
+    let finalId = id;
+    
+    // 2. ONLY add a new document to Firebase if we didn't pass an existing ID
+    if (!finalId) {
+        const newDocData = await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {
+            title: title || "Title", 
+            body: body || "Type announcement"
+        });
+        finalId = newDocData.id;
+    }
+    
+    console.log(finalId);
+    const path = `/features/${activeFeature}/boards/${finalId}`;
 
-        bodyText.addEventListener("blur", async (event)=>{
-            const payload = {
-                body : event.target.innerText
-            }
-            await FirebaseUtils.updateDocument(path, payload)
-        })
-        delBtn.addEventListener("click", async ()=>{
-            await FirebaseUtils.deleteDocument(path)
-            newBoard.querySelector(".board:parent").remove()
-        })
+    if (isOfficer) {
+        titleText.addEventListener("blur", async (event) => {
+            const payload = { title: event.target.innerText };
+            await FirebaseUtils.updateDocument(path, payload);
+        });
+
+        bodyText.addEventListener("blur", async (event) => {
+            const payload = { body: event.target.innerText };
+            await FirebaseUtils.updateDocument(path, payload);
+        });
+
+        delBtn.addEventListener("click", async () => {
+            await FirebaseUtils.deleteDocument(path);
+            // 3. Use the direct reference we saved earlier to delete it from the UI
+            boardRoot.remove(); 
+        });
     } 
-    titleText.innerText = title || "Title"
-    bodyText.innerText = body || "Type announcement"
-    mainContentArea.prepend(newBoard)
+    
+    titleText.innerText = title || "Title";
+    bodyText.innerText = body || "Type announcement";
+    
+    // Prepend the finished fragment to your page
+    mainContentArea.prepend(fragment);
 }
 
 document.getElementById("board:new").addEventListener("click", async ()=>{await newBoard()})

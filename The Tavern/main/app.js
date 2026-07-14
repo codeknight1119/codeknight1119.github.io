@@ -207,14 +207,14 @@ async function newBoard(title, body){
     if(isOfficer){
         titleText.addEventListener("blur", async (event)=>{
             const payload = {
-                title : event.target.textContent
+                title : event.target.innerText
             }
             await FirebaseUtils.updateDocument(path, payload)
         })
 
         bodyText.addEventListener("blur", async (event)=>{
             const payload = {
-                body : event.target.textContent
+                body : event.target.innerText
             }
             await FirebaseUtils.updateDocument(path, payload)
         })

@@ -203,8 +203,11 @@ async function newBoard(title, body){
     const id = newDocData.id
     console.log(newDocData)
     const path =   `/features/${activeFeature}/boards/${id}`
+    titleText.innerText = title || "Title"
+    bodyText.innerText = body || "Type announcement"
+    mainContentArea.prepend(newBoard)
 
-    if(isOfficer){
+        if(isOfficer){
         titleText.addEventListener("blur", async (event)=>{
             const payload = {
                 title : event.target.innerText
@@ -223,9 +226,6 @@ async function newBoard(title, body){
             newBoard.remove()
         })
     } 
-    titleText.innerText = title || "Title"
-    bodyText.innerText = body || "Type announcement"
-    mainContentArea.prepend(newBoard)
 }
 
 document.getElementById("board:new").addEventListener("click", async ()=>{await newBoard()})

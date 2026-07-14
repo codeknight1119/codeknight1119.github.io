@@ -272,10 +272,10 @@ async function renderTool(id) {
                 mainContentArea.innerHTML = `<h3>No Messages</h3>`
                 return
             }
-            let finalHTMLText = "";
+          
             boards.forEach(async (board) => {
                 const parsedBody = marked.parse(board.body)
-               await newBoard(board.title, parsedBody)
+               await newBoard(board.title, parsedBody, board.id)
             })
 
             break

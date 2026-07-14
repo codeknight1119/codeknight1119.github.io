@@ -212,7 +212,7 @@ async function newBoard(title, body, id = null) {
         finalId = newDocData.id;
 
         if (ss_TOOLS.get(activeFeature)) {
-            ss_TOOLS.get(activeFeature).unshift({ id: finalId, ...boardPayload });
+            ss_TOOLS.get(activeFeature).unshift({ id: finalId, ...newDocData });
         }
     }
 

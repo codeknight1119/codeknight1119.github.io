@@ -144,7 +144,7 @@ const documents = doc.docs.map(doc => ({
     }
 }
 
-export const deleteDocument = asyc (path) =>{
+export const deleteDocument = async  (path) =>{
     try{
         const ref = doc(db, path)
         const data = await deleteDoc(ref)

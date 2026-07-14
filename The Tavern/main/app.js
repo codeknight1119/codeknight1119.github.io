@@ -191,6 +191,7 @@ function getFeatureById(id) {
 const mainContentArea = document.getElementById("mainContentArea")
 
 async function newBoard(title, body){
+    
     const newBoard = document.getElementById("board:template").content.cloneNode(true)
     const titleText = newBoard.querySelector(".board-title")
     const bodyText = newBoard.querySelector(".board-body")
@@ -198,7 +199,7 @@ async function newBoard(title, body){
     const isOfficer = permissions.includes("officer")
     titleText.contentEditable = bodyText.contentEditable = isOfficer
     delBtn.hidden = !isOfficer
-    const id = await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`)
+    const id = await FirebaseUtils.addDocument(`/features/${activeFeature}/boards`, {title: title || "Title", body: body || "Type announcement"})
     const path =   `/features/${activeFeature}/boards/${id}`
     delBtn.addEventListener("click", async ()=>{
         await Firebase.deleteDoc(path)

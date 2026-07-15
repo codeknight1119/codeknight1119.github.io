@@ -378,8 +378,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
             }
             doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
-        case(""):
-        break
+        case (""):
+            break
     }
 
     mainContentArea.replaceChildren()
@@ -392,13 +392,17 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     doc.forEach((val) => {
         const seachedRes = searchedTemplate.content.cloneNode(true)
         seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
-       
+
         const rolesText = ""
-        console.log(val)
-        val.permissions.forEach((role) => {
-           rolesText += role + ",";
-        })
-        rolesText[rolesText.length -1] = "."
+        if (val.permissions) {
+            val.permissions.forEach((role) => {
+                rolesText += role + ",";
+            })
+            rolesText[rolesText.length - 1] = "."
+        } else {
+            rolesText = "None."
+        }
+
         seachedRes.querySelector(".searched-roles").innerText = rolesText
         mainContentArea.appendChild(seachedRes)
     })

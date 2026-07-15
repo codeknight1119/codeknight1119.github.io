@@ -393,7 +393,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         const seachedRes = searchedTemplate.content.cloneNode(true)
         seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
 
-        const rolesText = ""
+        let rolesText = ""
         if (val.permissions) {
             val.permissions.forEach((role) => {
                 rolesText += role + ",";

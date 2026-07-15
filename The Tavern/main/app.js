@@ -390,8 +390,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     }
     const searchedTemplate = document.getElementById("userSearchTemplate")
     doc.forEach((val) => {
-        const seachedRes = searchedTemplate.content.cloneNode(true)
-        seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
+        const searchedRes = searchedTemplate.content.cloneNode(true)
+        searchedRes.querySelector(".searched-Name").innerText = val["Real Name"]
 
         let rolesText = ""
         if (val.permissions) {
@@ -403,8 +403,10 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
             rolesText = "None."
         }
 
-        seachedRes.querySelector(".searched-roles").innerText = rolesText
-        mainContentArea.appendChild(seachedRes)
+        searchedRes.querySelector(".searched-roles").innerText = rolesText
+
+        searchedRes.querySelector("searched-allowed").value = String(val.allowed)
+        mainContentArea.appendChild(searchedRes)
     })
 })
 

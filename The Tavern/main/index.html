@@ -87,10 +87,14 @@
             <input type="text" id="searchTermIn" />
             <template id="userSearchTemplate">
                 <div style="display: flex;">
-                    <span><strong>Name</strong></span>
+                    <p><strong>Name</strong></p>
                     <p class="searched-Name"></p>
-                    <p> | </p><span><strong>Roles:  </strong></span></spam>
+                    <p> | </p>
+                    <p><strong> Allowed:  </strong></p>
+                    <p> | </p> <select class="searched-allowed"><option value="false">False</option><option value="true">True</option></select>
+                    <p><strong>Roles:  </strong></p>
                     <p class="searched-roles"></p><p> | </p>
+
                 </div>
             </template>
         </div>

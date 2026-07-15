@@ -376,6 +376,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
                 alert("No search term provided")
                 return
             }
+            currentSearchUpdates = {}
             doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
         case (""):
@@ -392,6 +393,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     doc.forEach((val) => {
         const searchedRes = searchedTemplate.content.cloneNode(true)
         searchedRes.querySelector(".searched-Name").innerText = val["Real Name"]
+        console.log(val)
+        const currentSearchUpdates = val.uid
 
         let rolesText = ""
         if (val.permissions) {
@@ -407,10 +410,36 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         const allowedEl = searchedRes.querySelector(".searched-allowed")
         allowedEl.value = String(val.allowed)
 
-        searchedRes.querySelector(".searched-save").addEventListener("click", async ()=>{
-            const payload = {
-                "allowed": allowedEl.value
+        allowedEl.addEventListener("change", (event)=>{
+          const value = event.target.value;
+          currentSearchUpdates[userUID].allowed = Boolean(value)
+        })
+
+        function checkPermsArr(){
+            if(!currentSearchUpdates[userUID].permissions){
+                currentSearchUpdates[userUID].permissions = []
             }
+        }
+        const selectNewPerms = searchedRes.querySelector(".searched-addRole-val")
+        searchedRes.querySelector(".searched-revokeRole-btn").addEventListener("click", ()=>{
+            checkPermsArr()
+            const removeVal = selectNewPerms.value
+            if(currentSearchUpdates[userUID].permissions.includes(removeVal)){
+                currentSearchUpdates[userUID].permissions = currentSearchUpdates[userUID].permissions.filter(val=> val !== removeVal)
+            }
+        })
+
+        searchedRes.querySelector(".searched-addRole-val", ()=>{
+            checkPermsArr()
+            const addVal = selectNewPerms.value
+            if(!currentSearchUpdates[userUID].permissions.includes(addVal)){
+                currentSearchUpdates[userUID].permissions.push(addVal)
+            }
+        })
+
+        searchedRes.querySelector(".searched-save").addEventListener("click", async ()=>{
+            FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[currentSearchUpdates])
+            delete currentSearchUpdates[userUID]
         })
         mainContentArea.appendChild(searchedRes)
     })

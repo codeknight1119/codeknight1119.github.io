@@ -394,6 +394,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
        
         const rolesText = ""
+        console.log(val)
         val.permissions.forEach((role) => {
            rolesText += role + ",";
         })

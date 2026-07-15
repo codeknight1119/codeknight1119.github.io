@@ -188,7 +188,7 @@ const mainContentArea = document.getElementById("mainContentArea")
 
 // Add 'id' as an optional third parameter
 async function newBoard(title, body, id = null) {
-    const fragment = document.getElementById("board:template").content.cloneNode(true);
+    const fragment = document.getElementById("board-template").content.cloneNode(true);
 
     // 1. Grab a direct reference to the root container element right away
     const boardRoot = fragment.firstElementChild;
@@ -244,13 +244,13 @@ async function newBoard(title, body, id = null) {
     mainContentArea.prepend(fragment);
 }
 
-document.getElementById("board:new").addEventListener("click", async () => { await newBoard() })
+document.getElementById("board-new").addEventListener("click", async () => { await newBoard() })
 
 async function renderTool(id) {
     chatUI.hidden = true;
 
     // FIXED: Reset visibility states so buttons don't bleed across different tool pages
-    document.getElementById("board:new").hidden = true;
+    document.getElementById("board-new").hidden = true;
     document.getElementById("userPermsUI").hidden = true;
 
     const toolData = getFeatureById(id)
@@ -260,7 +260,7 @@ async function renderTool(id) {
         case ("board"):
             let boards;
             if (permissions.includes("officer")) {
-                document.getElementById("board:new").hidden = false;
+                document.getElementById("board-new").hidden = false;
             }
 
             if (ss_TOOLS.get(id)) {
@@ -369,33 +369,37 @@ searchUserDropdown.addEventListener("change", (event) => {
 })
 
 document.getElementById("userSearchBttn").addEventListener("click", async () => {
+    let doc = null;
     switch (searchUserDropdown.value) {
         case ("searchName"):
             if (searchTermInput.value === undefined || searchTermInput.value.trim() === "") {
                 alert("No search term provided")
                 return
             }
-            const doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
-            mainContentArea.replaceChildren()
-            if (doc.length === 0) {
-                const newP = document.createElement("p")
-                newP.innerText = "No Person Found with name " + searchTermInput.value + "."
-                return
-            }
-            const searchedTemplate = document.getElementById("userSearchTemplate")
-            doc.forEach((val) => {
-                const seachedRes = searchedTemplate.cloneNode(true)
-                seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
-                const permsHolder = seachedRes.querySelector(".searched-roles")
-                val.permissions.forEach((role) => {
-                    const newRoletext = document.createElement("p")
-                    newRoletext.innerText = role;
-                    permsHolder.appendChild(newRoletext)
-                })
-                mainContentArea.appendChild(seachedRes)
-            })
+            doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
+        case(""):
+        break
     }
+
+    mainContentArea.replaceChildren()
+    if (doc.length === 0) {
+        const newP = document.createElement("p")
+        newP.innerText = "No Person Found with name " + searchTermInput.value + "."
+        return
+    }
+    const searchedTemplate = document.getElementById("userSearchTemplate")
+    doc.forEach((val) => {
+        const seachedRes = searchedTemplate.cloneNode(true)
+        seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
+        const permsHolder = seachedRes.querySelector(".searched-roles")
+        val.permissions.forEach((role) => {
+            const newRoletext = document.createElement("p")
+            newRoletext.innerText = role;
+            permsHolder.appendChild(newRoletext)
+        })
+        mainContentArea.appendChild(seachedRes)
+    })
 })
 
 

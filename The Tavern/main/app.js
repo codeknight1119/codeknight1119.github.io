@@ -404,8 +404,14 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         }
 
         searchedRes.querySelector(".searched-roles").innerText = rolesText
+        const allowedEl = searchedRes.querySelector(".searched-allowed")
+        allowedEl.value = String(val.allowed)
 
-        searchedRes.querySelector(".searched-allowed").value = String(val.allowed)
+        searchedRes.querySelector(".searched-save").addEventListener("click", async ()=>{
+            const payload = {
+                "allowed": allowedEl.value
+            }
+        })
         mainContentArea.appendChild(searchedRes)
     })
 })

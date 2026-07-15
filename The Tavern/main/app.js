@@ -393,11 +393,14 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         const seachedRes = searchedTemplate.content.cloneNode(true)
         seachedRes.querySelector(".searched-Name").innerText = val["Real Name"]
         const permsHolder = seachedRes.querySelector(".searched-roles")
-        val.permissions.forEach((role) => {
-            const newRoletext = document.createElement("p")
-            newRoletext.innerText = role;
-            permsHolder.appendChild(newRoletext)
+        const rolesText = ""
+        val.permissions.forEach((role, index) => {
+           rolesText += role;
+           if(index !== val.permissions.length -1){
+            rolesText +=","
+           }
         })
+        seachedRes.querySelector(".searched-roles").innerText = rolesText
         mainContentArea.appendChild(seachedRes)
     })
 })

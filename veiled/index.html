@@ -13,6 +13,21 @@
             color: white;
             font-size: 30px;
         }
+
+        .box {
+            background: black;
+            color: white;
+            width: 300px;
+            text-align: center;
+            min-height: 100px;
+            border-radius: 10px;
+            
+        }
+
+        #countdown {
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -76,7 +91,7 @@
             await dailyUpdate(days)
         }
     }
-    await updateTime()
+    updateTime()
     var x = setInterval(updateTime, 1000);
     async function showLink() {
         document.getElementById("countdown").hidden = true;

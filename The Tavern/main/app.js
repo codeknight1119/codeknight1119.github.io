@@ -405,7 +405,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
 
         searchedRes.querySelector(".searched-roles").innerText = rolesText
 
-        searchedRes.querySelector("searched-allowed").value = String(val.allowed)
+        searchedRes.querySelector(".searched-allowed").value = String(val.allowed)
         mainContentArea.appendChild(searchedRes)
     })
 })

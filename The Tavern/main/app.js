@@ -358,7 +358,7 @@ document.getElementById("sendBtn").addEventListener("click", handleChatMesage)
 
 const searchUserDropdown = document.getElementById("filterDropdown")
 const searchTermInput = document.getElementById("searchTermIn")
-
+let currentSearchUpdates = {}
 searchUserDropdown.addEventListener("change", (event) => {
     const selectedValue = event.target.value;
     if (selectedValue === "searchName") {

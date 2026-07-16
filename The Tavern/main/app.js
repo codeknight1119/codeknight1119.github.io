@@ -395,6 +395,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         searchedRes.querySelector(".searched-Name").innerText = val["Real Name"]
         console.log(val)
        const userUID = val.uid
+       console.log(userUID)
+       console.log(val)
        currentSearchUpdates[userUID] = {}
 
         let rolesText = ""

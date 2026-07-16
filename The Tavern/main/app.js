@@ -376,7 +376,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
                 alert("No search term provided")
                 return
             }
-            currentSearchUpdates = {}
+           
             doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
         case (""):
@@ -394,7 +394,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         const searchedRes = searchedTemplate.content.cloneNode(true)
         searchedRes.querySelector(".searched-Name").innerText = val["Real Name"]
         console.log(val)
-        const currentSearchUpdates = val.uid
+       const userUID = val.uid
+       currentSearchUpdates[userUID] = {}
 
         let rolesText = ""
         if (val.permissions) {

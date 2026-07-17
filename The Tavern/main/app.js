@@ -146,6 +146,7 @@ async function getMyFeatures() {
         })
         if (user.campaigns) {
             user.campaigns.forEach(async (campaignId) => {
+                console.log(campaignId)
                 const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaignId}`)
                 console.log(campaignInfo)
                     ss_CAMPAIGNS.set(campaignId, campaignInfo)

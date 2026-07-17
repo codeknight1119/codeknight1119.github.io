@@ -110,8 +110,8 @@ function hideFeatureHTML() {
 }
 
 function newFeatureButton(val) {
+    const template = document.getElementById("sidebarTemplate")
     let fragment = template.content.cloneNode(true)
-    const li = fragment.querySelector('li')
     const a = fragment.querySelector('.nav-btn')
     const text = fragment.querySelector('.sidebarText')
     const icon = fragment.querySelector(".ra")
@@ -130,7 +130,7 @@ async function getMyFeatures() {
     if (user !== null) {
         permissions.push("all")
         myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permissions })
-        const template = document.getElementById("sidebarTemplate")
+       
         const parentSidebar = document.getElementById("everySidebarParent")
         const reversedFeatures = myFeatures.toReversed()
 

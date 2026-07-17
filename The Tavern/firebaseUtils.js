@@ -188,6 +188,6 @@ export const logout = () => {
     }
 };
 
-export const ALog = (name, data) => {
-    logEvent(analytics, name, data)
+export const ALog = async (eventName, data) => {
+   await logEvent(analytics, event, data)
 }

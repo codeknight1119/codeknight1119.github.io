@@ -441,6 +441,13 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
             console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
            currentSearchUpdates[userUID] = {}
+           const time = new Date()
+           FirebaseUtils.Alog("Change Permissions", {
+            officer: user.uid,
+            updated_user: userUID,
+            data: currentSearchUpdates[userUID],
+            time: time.toLocaleString()
+           })
         })
         mainContentArea.appendChild(searchedRes)
     })

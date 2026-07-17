@@ -147,6 +147,7 @@ async function getMyFeatures() {
         if (user.campaigns) {
             user.campaigns.forEach(async (campaignId) => {
                 const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaignId}`)
+                console.log(campaignInfo)
                     ss_CAMPAIGNS.set(campaignId, campaignInfo)
                 const fragment = newFeatureButton(campaignInfo)
                 document.getElementById("personal-menu").prepend(fragment)

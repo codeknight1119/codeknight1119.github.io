@@ -439,8 +439,9 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         })
 
         searchedRes.querySelector(".searched-save").addEventListener("click", async ()=>{
+            console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
-            delete currentSearchUpdates[userUID]
+           currentSearchUpdates[userUID] = {}
         })
         mainContentArea.appendChild(searchedRes)
     })

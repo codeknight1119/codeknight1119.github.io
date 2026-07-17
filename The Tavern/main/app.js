@@ -393,7 +393,6 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     doc.forEach((val) => {
         const searchedRes = searchedTemplate.content.cloneNode(true)
         searchedRes.querySelector(".searched-Name").innerText = val["Real Name"]
-        console.log(val)
        const userUID = val.id
        currentSearchUpdates[userUID] = {}
 
@@ -413,7 +412,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
 
         allowedEl.addEventListener("change", (event)=>{
           const value = event.target.value;
-          currentSearchUpdates[userUID].allowed = Boolean(value)
+          currentSearchUpdates[userUID].allowed = value.toLowerCase() === "true";
         })
 
         function checkPermsArr(){

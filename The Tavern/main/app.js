@@ -145,11 +145,10 @@ async function getMyFeatures() {
             parentSidebar.prepend(fragment)
         })
         if (user.campaigns) {
-            user.campaigns.forEach(async (campaignId) => {
-                console.log(campaignId)
-                const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaignId}`)
+            user.campaigns.forEach(async (campaign) => {
+                const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaign.id}`)
                 console.log(campaignInfo)
-                    ss_CAMPAIGNS.set(campaignId, campaignInfo)
+                    ss_CAMPAIGNS.set(campaign.id, campaignInfo)
                 const fragment = newFeatureButton(campaignInfo)
                 document.getElementById("personal-menu").prepend(fragment)
             })

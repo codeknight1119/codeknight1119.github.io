@@ -445,7 +445,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
            FirebaseUtils.ALog("Change Permissions", {
             officer: user.uid,
             updated_user: userUID,
-            data: currentSearchUpdates[userUID],
+            data: JSON.stringify(currentSearchUpdates[userUID]),
             time: time.toLocaleString()
            })
         })

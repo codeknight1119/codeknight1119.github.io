@@ -130,7 +130,6 @@ async function getMyFeatures() {
     if (user !== null) {
         permissions.push("all")
         myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permissions })
-        console.log(myFeatures)
        
         const parentSidebar = document.getElementById("everySidebarParent")
         const reversedFeatures = myFeatures.toReversed()
@@ -149,7 +148,6 @@ async function getMyFeatures() {
             user.campaigns.forEach(async (campaign) => {
                 const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaign.id}`)
                 myFeatures.push(campaignInfo)
-                console.log(myFeatures)
                 ss_CAMPAIGNS.set(campaign.id, campaignInfo)
                 const fragment = newFeatureButton(campaignInfo)
                 document.getElementById("personal-menu").prepend(fragment)

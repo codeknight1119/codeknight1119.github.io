@@ -442,7 +442,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
            currentSearchUpdates[userUID] = {}
            const time = new Date()
-           FirebaseUtils.Alog("Change Permissions", {
+           FirebaseUtils.ALog("Change Permissions", {
             officer: user.uid,
             updated_user: userUID,
             data: currentSearchUpdates[userUID],

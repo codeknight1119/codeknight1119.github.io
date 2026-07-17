@@ -108,6 +108,23 @@ function hideFeatureHTML() {
     Array.from(document.getElementsByClassName("featureHTML")).forEach((val) => { val.hidden = true })
 }
 
+function newFeatureButton(val) {
+    let fragment = template.content.cloneNode(true)
+    const li = fragment.querySelector('li')
+    const a = fragment.querySelector('.nav-btn')
+    const text = fragment.querySelector('.sidebarText')
+    const icon = fragment.querySelector(".ra")
+
+    text.innerText = val.name
+    if(!val.icon || val.icon.trim() !== ""){
+    icon.classList.add(val.icon.trim())
+    }
+    a.dataset.id = val.id
+    a.addEventListener("click", handleSidebarClick)
+
+    return fragment
+}
+
 async function getMyFeatures() {
     if (user !== null) {
         permissions.push("all")
@@ -117,29 +134,23 @@ async function getMyFeatures() {
         const reversedFeatures = myFeatures.toReversed()
 
         reversedFeatures.forEach((val, index) => {
-            let fragment = template.content.cloneNode(true)
-            const li = fragment.querySelector('li')
-            const a = fragment.querySelector('.nav-btn')
-            const text = fragment.querySelector('.sidebarText')
-            const icon = fragment.querySelector(".ra")
-
-            text.innerText = val.name
-            icon.classList.add(val.icon.trim())
-            a.dataset.id = val.id
-            a.addEventListener("click", handleSidebarClick)
-
+            const fragment = newFeatureButton(val)
             if (index === (reversedFeatures.length - 1)) {
-                currentSelectedSidebar = li; // FIXED: Correctly assign the active element reference
+                const li = fragment.querySelector('li')
+                currentSelectedSidebar = li;
                 li.classList.add("active")
                 loadSidebar(val)
             }
             parentSidebar.prepend(fragment)
         })
+        if (user.campaigns) {
+            user.campaigns.forEach(async (val) => {
+                const fragment = newFeatureButton(val)
+                document.getElementById("personal-menu").prepend(fragment)
+            })
+        }
     }
 }
-
-
-
 
 
 function handleSidebarClick(event) {
@@ -376,7 +387,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
                 alert("No search term provided")
                 return
             }
-           
+
             doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
         case (""):
@@ -393,8 +404,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     doc.forEach((val) => {
         const searchedRes = searchedTemplate.content.cloneNode(true)
         searchedRes.querySelector(".searched-Name").innerText = val["Real Name"]
-       const userUID = val.id
-       currentSearchUpdates[userUID] = {}
+        const userUID = val.id
+        currentSearchUpdates[userUID] = {}
 
         let rolesText = ""
         if (val.permissions) {
@@ -410,44 +421,44 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         const allowedEl = searchedRes.querySelector(".searched-allowed")
         allowedEl.value = String(val.allowed)
 
-        allowedEl.addEventListener("change", (event)=>{
-          const value = event.target.value;
-          currentSearchUpdates[userUID].allowed = value.toLowerCase() === "true";
+        allowedEl.addEventListener("change", (event) => {
+            const value = event.target.value;
+            currentSearchUpdates[userUID].allowed = value.toLowerCase() === "true";
         })
 
-        function checkPermsArr(){
-            if(!currentSearchUpdates[userUID].permissions){
+        function checkPermsArr() {
+            if (!currentSearchUpdates[userUID].permissions) {
                 currentSearchUpdates[userUID].permissions = []
             }
         }
         const selectNewPerms = searchedRes.querySelector(".searched-addRole-val")
-        searchedRes.querySelector(".searched-revokeRole-btn").addEventListener("click", ()=>{
+        searchedRes.querySelector(".searched-revokeRole-btn").addEventListener("click", () => {
             checkPermsArr()
             const removeVal = selectNewPerms.value
-            if(currentSearchUpdates[userUID].permissions.includes(removeVal)){
-                currentSearchUpdates[userUID].permissions = currentSearchUpdates[userUID].permissions.filter(val=> val !== removeVal)
+            if (currentSearchUpdates[userUID].permissions.includes(removeVal)) {
+                currentSearchUpdates[userUID].permissions = currentSearchUpdates[userUID].permissions.filter(val => val !== removeVal)
             }
         })
 
-        searchedRes.querySelector(".searched-addRole-val", ()=>{
+        searchedRes.querySelector(".searched-addRole-val", () => {
             checkPermsArr()
             const addVal = selectNewPerms.value
-            if(!currentSearchUpdates[userUID].permissions.includes(addVal)){
+            if (!currentSearchUpdates[userUID].permissions.includes(addVal)) {
                 currentSearchUpdates[userUID].permissions.push(addVal)
             }
         })
 
-        searchedRes.querySelector(".searched-save").addEventListener("click", async ()=>{
+        searchedRes.querySelector(".searched-save").addEventListener("click", async () => {
             console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
-           currentSearchUpdates[userUID] = {}
-           const time = new Date()
-           FirebaseUtils.ALog("Change Permissions", {
-            officer: user.uid,
-            updated_user: userUID,
-            data: JSON.stringify(currentSearchUpdates[userUID]),
-            time: time.toLocaleString()
-           })
+            currentSearchUpdates[userUID] = {}
+            const time = new Date()
+            FirebaseUtils.ALog("Change Permissions", {
+                officer: user.uid,
+                updated_user: userUID,
+                data: JSON.stringify(currentSearchUpdates[userUID]),
+                time: time.toLocaleString()
+            })
         })
         mainContentArea.appendChild(searchedRes)
     })

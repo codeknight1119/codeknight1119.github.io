@@ -16,6 +16,7 @@ let currentSelectedSidebar = null
 const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
 let ss_CHATS = new Map()
+let ss_CAMPAIGNS = new Map()
 let activeChat = null;
 let activeFeature = null;
 
@@ -144,8 +145,10 @@ async function getMyFeatures() {
             parentSidebar.prepend(fragment)
         })
         if (user.campaigns) {
-            user.campaigns.forEach(async (val) => {
-                const fragment = newFeatureButton(val)
+            user.campaigns.forEach(async (campaignId) => {
+                const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaignId}`)
+                    ss_CAMPAIGNS.set(campaignId, campaignInfo)
+                const fragment = newFeatureButton(campaignInfo)
                 document.getElementById("personal-menu").prepend(fragment)
             })
         }

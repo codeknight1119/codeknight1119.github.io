@@ -1,7 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
 import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, where, deleteDoc} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js';
+import { initializeAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -18,7 +18,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 const auth = getAuth(app);
-const analytics = getAnalytics(app, {config: { 'debug_mode': true }})
+const analytics = initializeAnalytics(app, {
+    config: { 'debug_mode': true }
+});
 
 export const loginGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -188,6 +190,10 @@ export const logout = () => {
     }
 };
 
-export const ALog = async (eventName, data) => {
-   await logEvent(analytics, event, data)
-}
+export const ALog = (eventName, data) => {
+    try {
+        logEvent(analytics, eventName, data);
+    } catch (e) {
+        console.error("Analytics logging failed:", e);
+    }
+};

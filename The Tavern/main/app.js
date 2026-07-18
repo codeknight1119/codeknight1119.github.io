@@ -398,7 +398,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
 
             doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
-        case (""):
+        case ("notAllowed"):
+            doc = await FirebaseUtils.getDocuments("/users", 15, {field: "allowed"})
             break
     }
 
@@ -416,7 +417,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         currentSearchUpdates[userUID] = {}
 
         let rolesText = ""
-        if (val.permissions) {
+        if (val.permissions && val.permissions.length > 0) {
             val.permissions.forEach((role) => {
                 rolesText += role + ",";
             })

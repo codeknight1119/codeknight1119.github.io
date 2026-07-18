@@ -121,6 +121,8 @@ function newFeatureButton(val) {
     icon.classList.add(val.icon.trim())
     }
     a.dataset.id = val.id
+    console.log(val)
+    console.log(val.id)
     a.addEventListener("click", handleSidebarClick)
 
     return fragment

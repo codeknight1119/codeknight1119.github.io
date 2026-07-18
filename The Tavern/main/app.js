@@ -192,6 +192,9 @@ function loadSidebar(data) {
         case "chat":
             renderChat(data.id)
             break;
+        case "campaign":
+            console.log("Loading campaign", data)
+            break
     }
 }
 

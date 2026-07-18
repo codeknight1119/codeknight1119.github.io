@@ -121,8 +121,6 @@ function newFeatureButton(val) {
     icon.classList.add(val.icon.trim())
     }
     a.dataset.id = val.id
-    console.log(val)
-    console.log(val.id)
     a.addEventListener("click", handleSidebarClick)
 
     return fragment
@@ -149,6 +147,7 @@ async function getMyFeatures() {
         if (user.campaigns) {
             user.campaigns.forEach(async (campaign) => {
                 const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaign.id}`)
+                campaignInfo.id = campaign.id
                 myFeatures.push(campaignInfo)
                 ss_CAMPAIGNS.set(campaign.id, campaignInfo)
                 const fragment = newFeatureButton(campaignInfo)

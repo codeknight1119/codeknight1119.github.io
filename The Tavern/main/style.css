@@ -290,18 +290,31 @@ dropdown-btn i {
 }
 
 #campaignUI {
+    position: relative; /* CRITICAL: Caps the absolute children to this box */
     overflow: hidden;
     height: 100%;
+    width: 100%; /* Ensure it fills its limited container */
     margin: 0;
     padding: 0;
 }
 
 #campaign-left {
-    width: 100%;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
+    right: 100%; /* Default state: takes up 100% because right side is hidden */
+}
+
+#campaign-splitScreenDivide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: black;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 10;
 }
 
 #campaign-right {
@@ -309,19 +322,4 @@ dropdown-btn i {
     top: 0;
     bottom: 0;
     right: 0;
-}
-
-
-#campaign-splitScreenDivide {
-    background-color: black;
-    width: 4px;
-    height: 100%;
-    cursor: col-resize;
-    position: absolute;
-    top: 0;
-    left: 200px;
-    /* width of left col */
-    bottom: 0;
-    /* Prevents text selection while dragging */
-    user-select: none;
 }

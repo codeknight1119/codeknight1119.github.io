@@ -482,61 +482,62 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     })
 })
 
-  const campaign_divider = document.getElementById("campaign-splitScreenDivide")
-  const campaign_rightSide = document.getElementById("campaign-right")
-  const campaign_leftSide = document.getElementById("campaign-left")
+const campaign_divider = document.getElementById("campaign-splitScreenDivide");
+const campaign_rightSide = document.getElementById("campaign-right");
+const campaign_leftSide = document.getElementById("campaign-left");
+const campaign_UI = document.getElementById("campaignUI");
 
-document.getElementById("campaign-enterSplitscreen").addEventListener("click", ()=>{
-
-  const newBool = !campaign_divider.hidden
-  campaign_divider.hidden = campaign_rightSide.hidden = newBool
-  if(newBool){
-    campaign_rightSide.style.left = "204px"
-    campaign_leftSide.style.right ="200px"
-  }else{
-    campaign_leftSide.style.right ="100%"
+document.getElementById("campaign-enterSplitscreen").addEventListener("click", () => {
+  const isOpening = campaign_divider.hidden; // True if we are turning split screen ON
+  
+  campaign_divider.hidden = campaign_rightSide.hidden = !isOpening;
+  
+  if (isOpening) {
+    // Open to a default split (e.g., 200px wide left side)
+    campaign_leftSide.style.right = "calc(100% - 200px)";
+    campaign_divider.style.left = "200px";
+    campaign_rightSide.style.left = "204px";
+  } else {
+    // Reset left side to take up the full container
+    campaign_leftSide.style.right = "0px";
   }
-})
+});
 
-let leftWidth = 200; 
 let startX = 0;
+let startLeftWidth = 0;
+let maxContainerWidth = 0;
 
-// When user presses mouse down on the resizer
 campaign_divider.addEventListener('mousedown', function(event) {
     startX = event.clientX;
-    leftWidth = leftCol.getBoundingClientRect().width;
+    startLeftWidth = campaign_leftSide.getBoundingClientRect().width;
+    
+    // Dynamically grab the parent's current width so we don't drag out of bounds
+    maxContainerWidth = campaign_UI.getBoundingClientRect().width;
 
-    // Attach listeners to document so dragging doesn't glitch if mouse moves too fast
     document.addEventListener('mousemove', startResizing);
     document.addEventListener('mouseup', stopResizing);
     
-    // Prevent text highlighting during drag
     event.preventDefault(); 
 });
 
-// Handles the movement calculations
 function startResizing(event) {
-    // Calculate how far the mouse has moved
     const deltaX = event.clientX - startX;
-    let newWidth = leftWidth + deltaX;
+    let newWidth = startLeftWidth + deltaX;
 
-    // Prevent the left pane from shrinking past 0
-    if (newWidth < 0) {
-        newWidth = 0;
-    }
+    // Boundary constraints: Keep the divider inside the parent container
+    if (newWidth < 50) newWidth = 50; // Minimum left panel size
+    if (newWidth > maxContainerWidth - 50) newWidth = maxContainerWidth - 50; // Minimum right panel size
 
-    // Update the styles
-    campaign_leftSide.style.width = newWidth + 'px';
+    // Apply synchronized positioning updates
+    campaign_leftSide.style.right = (maxContainerWidth - newWidth) + 'px';
     campaign_divider.style.left = newWidth + 'px';
-    campaign_rightSide.style.left = (newWidth + 4) + 'px';
+    campaign_rightSide.style.left = (newWidth + 4) + 'px'; 
 }
 
-// Cleans up the listeners when mouse is released
 function stopResizing() {
     document.removeEventListener('mousemove', startResizing);
     document.removeEventListener('mouseup', stopResizing);
 }
-
 
 /*
 console.log(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣶⣶⣶⣶⣶⣶⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

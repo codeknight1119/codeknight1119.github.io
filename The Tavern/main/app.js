@@ -179,7 +179,7 @@ function handleSidebarClick(event) {
     loadSidebar(pageData)
 }
 
-const campaignUI = 
+const campaignUI = document.getElementById("campaignUI")
 function hideFeatureHTML() {
     Array.from(document.getElementsByClassName("featureHTML")).forEach((val) => { val.hidden = true })
     if(activeFeatureType === "campaign"){

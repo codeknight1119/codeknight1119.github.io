@@ -487,18 +487,38 @@ const campaign_rightSide = document.getElementById("campaign-right");
 const campaign_leftSide = document.getElementById("campaign-left");
 const campaign_UI = document.getElementById("campaignUI");
 
+
+// Function to center the divider perfectly
+function centerSplitScreen() {
+    // Only center it if the split screen is actually visible
+    if (!campaign_divider.hidden) {
+        const parentWidth = campaign_UI.getBoundingClientRect().width;
+        const middle = parentWidth / 2;
+
+        // Position the elements exactly in the center
+        campaign_leftSide.style.right = (parentWidth - middle) + 'px';
+        campaign_divider.style.left = middle + 'px';
+        campaign_rightSide.style.left = (middle + 4) + 'px'; // 4px accounts for divider width
+    }
+}
+
+// Run the centering logic when the page first loads
+document.addEventListener("DOMContentLoaded", () => {
+    // If your split screen starts out HIDDEN, you don't need to center it yet.
+    // But if it starts out VISIBLE, call the function right away:
+    centerSplitScreen();
+});
+
+
 document.getElementById("campaign-enterSplitscreen").addEventListener("click", () => {
-  const isOpening = campaign_divider.hidden; // True if we are turning split screen ON
+  const isOpening = campaign_divider.hidden;
   
   campaign_divider.hidden = campaign_rightSide.hidden = !isOpening;
   
   if (isOpening) {
-    // Open to a default split (e.g., 200px wide left side)
-    campaign_leftSide.style.right = "calc(100% - 200px)";
-    campaign_divider.style.left = "200px";
-    campaign_rightSide.style.left = "204px";
+    // Instead of hardcoding 200px, dynamically center it!
+    centerSplitScreen();
   } else {
-    // Reset left side to take up the full container
     campaign_leftSide.style.right = "0px";
   }
 });
@@ -519,6 +539,8 @@ campaign_divider.addEventListener('mousedown', function(event) {
     
     event.preventDefault(); 
 });
+
+
 
 function startResizing(event) {
     const deltaX = event.clientX - startX;

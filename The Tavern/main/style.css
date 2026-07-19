@@ -303,7 +303,7 @@ dropdown-btn i {
     top: 0;
     bottom: 0;
     left: 0;
-    right: 100%; /* Default state: takes up 100% because right side is hidden */
+    right: 50%; /* Default layout to roughly half width */
 }
 
 #campaign-splitScreenDivide {
@@ -315,6 +315,7 @@ dropdown-btn i {
     cursor: col-resize;
     user-select: none;
     z-index: 10;
+    /* Remove the hardcoded left: 200px; */
 }
 
 #campaign-right {

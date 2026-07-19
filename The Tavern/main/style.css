@@ -274,9 +274,12 @@ dropdown-btn i {
 
 /* Ensure contenteditable boxes remain clickable when entirely empty */
 [contenteditable="true"] {
-    min-height: 1.5em; /* Gives you a line of space to click into */
-    min-width: 100px;  /* Ensures it doesn't shrink horizontally */
-    display: inline-block; /* Helps maintain structural dimensions */
+    min-height: 1.5em;
+    /* Gives you a line of space to click into */
+    min-width: 100px;
+    /* Ensures it doesn't shrink horizontally */
+    display: inline-block;
+    /* Helps maintain structural dimensions */
 }
 
 /* Optional: Show a subtle hint text when the officer deletes everything */
@@ -284,4 +287,41 @@ dropdown-btn i {
     content: "Type announcement...";
     color: #888;
     font-style: italic;
+}
+
+#campaignUI {
+    overflow: hidden;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#campaign-left {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+}
+
+#campaign-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+
+#campaign-splitScreenDivide {
+    background-color: black;
+    width: 4px;
+    height: 100%;
+    cursor: col-resize;
+    position: absolute;
+    top: 0;
+    left: 200px;
+    /* width of left col */
+    bottom: 0;
+    /* Prevents text selection while dragging */
+    user-select: none;
 }

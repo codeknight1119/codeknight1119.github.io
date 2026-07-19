@@ -473,6 +473,19 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     })
 })
 
+document.getElementById("campaign-enterSplitscreen").addEventListener("click", ()=>{
+  const divider = document.getElementById("campaign-splitScreenDivide")
+  const rightSide = document.getElementById("campaign-right")
+  const leftSide = document.getElementById("campaign-left")
+  const newBool = !divider.hidden
+  divider.hidden = rightSide.hidden = newBool
+  if(newBool){
+rightSide.style.left = "204px"
+leftSide.style.right ="200px"
+  }else{
+    leftSide.style.right ="100%"
+  }
+})
 
 /*
 console.log(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣶⣶⣶⣶⣶⣶⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

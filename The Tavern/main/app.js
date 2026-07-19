@@ -482,19 +482,61 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
     })
 })
 
+  const campaign_divider = document.getElementById("campaign-splitScreenDivide")
+  const campaign_rightSide = document.getElementById("campaign-right")
+  const campaign_leftSide = document.getElementById("campaign-left")
+
 document.getElementById("campaign-enterSplitscreen").addEventListener("click", ()=>{
-  const divider = document.getElementById("campaign-splitScreenDivide")
-  const rightSide = document.getElementById("campaign-right")
-  const leftSide = document.getElementById("campaign-left")
-  const newBool = !divider.hidden
-  divider.hidden = rightSide.hidden = newBool
+
+  const newBool = !campaign_divider.hidden
+  campaign_divider.hidden = campaign_rightSide.hidden = newBool
   if(newBool){
-rightSide.style.left = "204px"
-leftSide.style.right ="200px"
+    campaign_rightSide.style.left = "204px"
+    campaign_leftSide.style.right ="200px"
   }else{
-    leftSide.style.right ="100%"
+    campaign_leftSide.style.right ="100%"
   }
 })
+
+let leftWidth = 200; 
+let startX = 0;
+
+// When user presses mouse down on the resizer
+campaign_divider.addEventListener('mousedown', function(event) {
+    startX = event.clientX;
+    leftWidth = leftCol.getBoundingClientRect().width;
+
+    // Attach listeners to document so dragging doesn't glitch if mouse moves too fast
+    document.addEventListener('mousemove', startResizing);
+    document.addEventListener('mouseup', stopResizing);
+    
+    // Prevent text highlighting during drag
+    event.preventDefault(); 
+});
+
+// Handles the movement calculations
+function startResizing(event) {
+    // Calculate how far the mouse has moved
+    const deltaX = event.clientX - startX;
+    let newWidth = leftWidth + deltaX;
+
+    // Prevent the left pane from shrinking past 0
+    if (newWidth < 0) {
+        newWidth = 0;
+    }
+
+    // Update the styles
+    campaign_leftSide.style.width = newWidth + 'px';
+    campaign_divider.style.left = newWidth + 'px';
+    campaign_rightSide.style.left = (newWidth + 4) + 'px';
+}
+
+// Cleans up the listeners when mouse is released
+function stopResizing() {
+    document.removeEventListener('mousemove', startResizing);
+    document.removeEventListener('mouseup', stopResizing);
+}
+
 
 /*
 console.log(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣶⣶⣶⣶⣶⣶⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

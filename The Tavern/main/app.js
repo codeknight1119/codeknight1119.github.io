@@ -19,7 +19,7 @@ let ss_CHATS = new Map()
 let ss_CAMPAIGNS = new Map()
 let activeChat = null;
 let activeFeature = null;
-
+let activeFeatureType = null;
 
 const chatArea = document.getElementById("sendBar")
 
@@ -105,9 +105,6 @@ checkUser()
 /////////////////////////PAGE RENDERING///////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-function hideFeatureHTML() {
-    Array.from(document.getElementsByClassName("featureHTML")).forEach((val) => { val.hidden = true })
-}
 
 function newFeatureButton(val) {
     const template = document.getElementById("sidebarTemplate")
@@ -182,8 +179,18 @@ function handleSidebarClick(event) {
     loadSidebar(pageData)
 }
 
+const campaignUI = 
+function hideFeatureHTML() {
+    Array.from(document.getElementsByClassName("featureHTML")).forEach((val) => { val.hidden = true })
+    if(activeFeatureType === "campaign"){
+        document.querySelector("main").appendChild(campaignUI)
+        campaignUI.hiden = true
+    }
+}
+
 function loadSidebar(data) {
     hideFeatureHTML()
+    activeFeatureType = data.type;
     switch (data.type) {
         case "tool":
             activeFeature = data.id; // FIXED: Set the active ID BEFORE rendering the tool logic
@@ -194,7 +201,9 @@ function loadSidebar(data) {
             renderChat(data.id)
             break;
         case "campaign":
-            console.log("Loading campaign", data)
+           // console.log("Loading campaign", data)
+           mainContentArea.appendChild(campaignUI)
+           campaignUI.hidden = false;
             break
     }
 }

@@ -10,6 +10,7 @@ import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
+let getToken = null
 let permissions = null;
 let myFeatures = null;
 let currentSelectedSidebar = null
@@ -78,26 +79,7 @@ dropdowns.forEach((val) => {
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
 
-    const token = await userCheck.getIdToken();
-        console.log(token)
-        const link = "https://unmixed-handed-cardboard.ngrok-free.dev/hello?name=Batman";
-
-        const data = await fetch(link, {
-            headers: {
-                // This header bypasses the ngrok warning page
-                "ngrok-skip-browser-warning": "true",
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        // Always check if the HTTP response status is OK (200-299)
-        if (!data.ok) {
-            throw new Error(`HTTP error! Status: ${data.status}`);
-        }
-
-        const jsData = await data.json();
-        console.log(jsData);
-
+    getToken = await userCheck.getIdToken;
 
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
@@ -581,6 +563,36 @@ function startResizing(event) {
 function stopResizing() {
     document.removeEventListener('mousemove', startResizing);
     document.removeEventListener('mouseup', stopResizing);
+}
+
+
+async function fetchServer(enpoint, postData) {
+const token = await getToken()
+    const link = `https://unmixed-handed-cardboard.ngrok-free.dev/${endpoint}`;
+
+    let body =  {
+        headers: {
+            // This header bypasses the ngrok warning page
+            "ngrok-skip-browser-warning": "true",
+            Authorization: `Bearer ${token}`
+        }
+    }
+    if(postData){
+        body.method = "POST",
+        body.body = JSON.stringify(postData)
+    }
+
+    const data = await fetch(link, body);
+
+    // Always check if the HTTP response status is OK (200-299)
+    if (!data.ok) {
+        throw new Error(`HTTP error! Status: ${data.status}`);
+    }
+
+    const jsData = await data.json();
+    console.log(jsData);
+
+
 }
 
 /*

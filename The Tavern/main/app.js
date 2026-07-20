@@ -77,6 +77,28 @@ dropdowns.forEach((val) => {
 //////////////////////////////////////////////////////////////////////
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
+
+    const token = await auth.currentUser.getIdToken();
+        console.log(token)
+        const link = "https://unmixed-handed-cardboard.ngrok-free.dev/hello?name=Batman";
+
+        const data = await fetch(link, {
+            headers: {
+                // This header bypasses the ngrok warning page
+                "ngrok-skip-browser-warning": "true",
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        // Always check if the HTTP response status is OK (200-299)
+        if (!data.ok) {
+            throw new Error(`HTTP error! Status: ${data.status}`);
+        }
+
+        const jsData = await data.json();
+        console.log(jsData);
+
+
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
@@ -97,26 +119,6 @@ async function checkUser() {
         permissions = Object.keys(cleanPerms)
 
         await getMyFeatures()
-
-        const token = user.getIdToken();
-        console.log(token)
-        const link = "https://unmixed-handed-cardboard.ngrok-free.dev/hello?name=Batman";
-
-        const data = await fetch(link, {
-            headers: {
-                // This header bypasses the ngrok warning page
-                "ngrok-skip-browser-warning": "true",
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        // Always check if the HTTP response status is OK (200-299)
-        if (!data.ok) {
-            throw new Error(`HTTP error! Status: ${data.status}`);
-        }
-
-        const jsData = await data.json();
-        console.log(jsData);
     }
 }
 checkUser()

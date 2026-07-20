@@ -97,6 +97,26 @@ async function checkUser() {
         permissions = Object.keys(cleanPerms)
 
         await getMyFeatures()
+
+        const token = user.getIdToken();
+        console.log(token)
+        const link = "https://unmixed-handed-cardboard.ngrok-free.dev/hello?name=Batman";
+
+        const data = await fetch(link, {
+            headers: {
+                // This header bypasses the ngrok warning page
+                "ngrok-skip-browser-warning": "true",
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        // Always check if the HTTP response status is OK (200-299)
+        if (!data.ok) {
+            throw new Error(`HTTP error! Status: ${data.status}`);
+        }
+
+        const jsData = await data.json();
+        console.log(jsData);
     }
 }
 checkUser()
@@ -114,8 +134,8 @@ function newFeatureButton(val) {
     const icon = fragment.querySelector(".ra")
 
     text.innerText = val.name
-    if(!val.icon || val.icon.trim() !== ""){
-    icon.classList.add(val.icon.trim())
+    if (!val.icon || val.icon.trim() !== "") {
+        icon.classList.add(val.icon.trim())
     }
     a.dataset.id = val.id
     a.addEventListener("click", handleSidebarClick)
@@ -127,7 +147,7 @@ async function getMyFeatures() {
     if (user !== null) {
         permissions.push("all")
         myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permissions })
-       
+
         const parentSidebar = document.getElementById("everySidebarParent")
         const reversedFeatures = myFeatures.toReversed()
 
@@ -143,7 +163,7 @@ async function getMyFeatures() {
         })
         if (user.campaigns) {
             user.campaigns.forEach(async (campaign) => {
-                const campaignInfo = await  FirebaseUtils.getDocument(`/features/${campaign.id}`)
+                const campaignInfo = await FirebaseUtils.getDocument(`/features/${campaign.id}`)
                 campaignInfo.id = campaign.id
                 myFeatures.push(campaignInfo)
                 ss_CAMPAIGNS.set(campaign.id, campaignInfo)
@@ -182,7 +202,7 @@ function handleSidebarClick(event) {
 const campaignUI = document.getElementById("campaignUI")
 function hideFeatureHTML() {
     Array.from(document.getElementsByClassName("featureHTML")).forEach((val) => { val.hidden = true })
-    if(activeFeatureType === "campaign"){
+    if (activeFeatureType === "campaign") {
         document.querySelector("main").appendChild(campaignUI)
         campaignUI.hiden = true
     }
@@ -201,9 +221,9 @@ function loadSidebar(data) {
             renderChat(data.id)
             break;
         case "campaign":
-           // console.log("Loading campaign", data)
-           mainContentArea.appendChild(campaignUI)
-           campaignUI.hidden = false;
+            // console.log("Loading campaign", data)
+            mainContentArea.appendChild(campaignUI)
+            campaignUI.hidden = false;
             break
     }
 }
@@ -408,7 +428,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
             doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
             break
         case ("notAllowed"):
-            doc = await FirebaseUtils.getDocuments("/users", 15, {field: "allowed"})
+            doc = await FirebaseUtils.getDocuments("/users", 15, { field: "allowed" })
             break
     }
 
@@ -511,33 +531,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 document.getElementById("campaign-enterSplitscreen").addEventListener("click", () => {
-  const isOpening = campaign_divider.hidden;
-  
-  campaign_divider.hidden = campaign_rightSide.hidden = !isOpening;
-  
-  if (isOpening) {
-    // Instead of hardcoding 200px, dynamically center it!
-    centerSplitScreen();
-  } else {
-    campaign_leftSide.style.right = "0px";
-  }
+    const isOpening = campaign_divider.hidden;
+
+    campaign_divider.hidden = campaign_rightSide.hidden = !isOpening;
+
+    if (isOpening) {
+        // Instead of hardcoding 200px, dynamically center it!
+        centerSplitScreen();
+    } else {
+        campaign_leftSide.style.right = "0px";
+    }
 });
 
 let startX = 0;
 let startLeftWidth = 0;
 let maxContainerWidth = 0;
 
-campaign_divider.addEventListener('mousedown', function(event) {
+campaign_divider.addEventListener('mousedown', function (event) {
     startX = event.clientX;
     startLeftWidth = campaign_leftSide.getBoundingClientRect().width;
-    
+
     // Dynamically grab the parent's current width so we don't drag out of bounds
     maxContainerWidth = campaign_UI.getBoundingClientRect().width;
 
     document.addEventListener('mousemove', startResizing);
     document.addEventListener('mouseup', stopResizing);
-    
-    event.preventDefault(); 
+
+    event.preventDefault();
 });
 
 
@@ -553,7 +573,7 @@ function startResizing(event) {
     // Apply synchronized positioning updates
     campaign_leftSide.style.right = (maxContainerWidth - newWidth) + 'px';
     campaign_divider.style.left = newWidth + 'px';
-    campaign_rightSide.style.left = (newWidth + 4) + 'px'; 
+    campaign_rightSide.style.left = (newWidth + 4) + 'px';
 }
 
 function stopResizing() {

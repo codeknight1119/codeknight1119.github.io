@@ -473,6 +473,10 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         searchedRes.querySelector(".searched-save").addEventListener("click", async () => {
             console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
+
+            currentSearchUpdatesp[userUID].permissions.forEach( async (val)=>{
+                await fetchServer(`permsUpdate?user=${userUID}&perm=${val}`)
+            })
             currentSearchUpdates[userUID] = {}
             const time = new Date()
             FirebaseUtils.ALog("Change Permissions", {
@@ -481,6 +485,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
                 data: JSON.stringify(currentSearchUpdates[userUID]),
                 time: time.toLocaleString()
             })
+
+
         })
         mainContentArea.appendChild(searchedRes)
     })

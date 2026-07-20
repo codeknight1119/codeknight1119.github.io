@@ -77,7 +77,7 @@ dropdowns.forEach((val) => {
 //////////////////////////////////////////////////////////////////////
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
-
+console.log(userCheck)
     const token = await userCheck.currentUser.getIdToken();
         console.log(token)
         const link = "https://unmixed-handed-cardboard.ngrok-free.dev/hello?name=Batman";

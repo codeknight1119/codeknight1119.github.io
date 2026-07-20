@@ -474,7 +474,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
             console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
 
-            currentSearchUpdatesp[userUID].permissions.forEach( async (val)=>{
+            currentSearchUpdates[userUID].permissions.forEach( async (val)=>{
                 await fetchServer(`permsUpdate?user=${userUID}&perm=${val}`)
             })
             currentSearchUpdates[userUID] = {}

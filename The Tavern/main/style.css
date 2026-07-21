@@ -115,6 +115,7 @@ main {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 300ms ease-in-out;
+    padding-left: 2em;
 }
 
 
@@ -139,9 +140,6 @@ dropdown-btn i {
     rotate: -180deg;
 }
 
-#sidebar .sub-menu {
-    padding-left: 2em;
-}
 
 #toggle-btn {
     margin-left: auto;

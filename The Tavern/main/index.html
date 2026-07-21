@@ -51,7 +51,7 @@
                     <span>Your Stuff</span>
                     <i class="ra ra-broadhead-arrow"></i>
                 </button>
-                <div class="sub-menu"></div>
+                <div class="sub-menu">
                     <ul id="personal-menu">
                     </ul>
                 </div>
@@ -87,10 +87,19 @@
                     <p class="searched-Name"></p>
                     <pre> | </pre>
                     <pre><strong> Allowed:  </strong></pre>
-                    <select class="searched-allowed"><option value="false">False</option><option value="true">True</option></select> <pre> | </pre> 
+                    <select class="searched-allowed">
+                        <option value="false">False</option>
+                        <option value="true">True</option>
+                    </select>
+                    <pre> | </pre>
                     <pre><strong>Roles:  </strong></pre>
-                    <p class="searched-roles"></p><p> | </p>
-                    <button class="searched-addRole-btn">Add Role</button><button class="searched-revokeRole-btn">Revoke Role</button> <select class="searched-addRole-val"><option value="dm">DM</option><option value="officer">Officer</option></select>
+                    <p class="searched-roles"></p>
+                    <p> | </p>
+                    <button class="searched-addRole-btn">Add Role</button><button class="searched-revokeRole-btn">Revoke
+                        Role</button> <select class="searched-addRole-val">
+                        <option value="dm">DM</option>
+                        <option value="officer">Officer</option>
+                    </select>
                     <p> | </p> <button class="searched-save">Save Changes</button>
                 </div>
             </template>
@@ -104,10 +113,10 @@
                 </section>
             </div>
         </template>
-       <div style="display: flex; justify-content: center;">
-         <button id="board-new" hidden>Create a new board.</button>
-       </div>
-       <div id="campaignUI" hidden>
+        <div style="display: flex; justify-content: center;">
+            <button id="board-new" hidden>Create a new board.</button>
+        </div>
+        <div id="campaignUI" hidden>
             <div id="campaign-left">
                 <p>Main text</p>
                 <button id="campaign-enterSplitscreen">Toggle split screen</button>

@@ -169,14 +169,20 @@ async function getMyFeatures() {
         }
     }
 }
-
+const findFriends_popup = document.getElementById("findFriends-popup")
 friendFriendsBtn.addEventListener("click", ()=>{
-    document.getElementById("findFriends-popup").hidden = false;
+    findFriends_popup.hidden = false;
+})
+
+document.getElementById("findFriends-close").addEventListener("click", ()=>{
+    findFriends_popup.hidden = false;
 })
 
 async function findFriends_search() {
-    const key = document.getElementById("findFriends-searchByDropdown").value
     const searchTerm = document.getElementById("findFriends-input").value
+if(searchTerm.trim() === "") return 
+
+    const key = document.getElementById("findFriends-searchByDropdown").value
 
     if(userManifest === null){
         const rawData = await getDocument("/users/userManifest")
@@ -191,6 +197,11 @@ async function findFriends_search() {
   });
   console.log(filteredResults)
 }
+
+document.getElementById("findFriends-searchByDropdown").addEventListener("change", findFriends_search)
+document.getElementById("findFriends-input").addEventListener("change", findFriends_search)
+
+
 
 function handleSidebarClick(event) {
     event.preventDefault()

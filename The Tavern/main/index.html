@@ -15,8 +15,17 @@
 </head>
 
 <body>
-    <div id="findFriends-popup">
+    <div id="findFriends-popup" hidden>
         <h2>Find your friends</h2>
+        <br><br>
+        <div style="display: flex;">
+            <pre>Search by: </pre>
+            <select id="findFriends-searchByDropdown">
+                <option val="UN" selected>User Name</option>
+                <option val="RN" selected>Real Name</option>
+            </select>
+        </div>
+        <div id="findFriends-selectedFriends"> </div>
     </div>
     <nav id="sidebar">
         <ul>

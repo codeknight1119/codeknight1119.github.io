@@ -525,13 +525,13 @@ function centerSplitScreen() {
         campaign_rightSide.style.left = (middle + 4) + 'px'; // 4px accounts for divider width
     }
 }
-
+/*
 // Run the centering logic when the page first loads
 document.addEventListener("DOMContentLoaded", () => {
     // If your split screen starts out HIDDEN, you don't need to center it yet.
     // But if it starts out VISIBLE, call the function right away:
     centerSplitScreen();
-});
+});*///Future gabe test to see if commenting this breaks anything love you mean it - past gabe 
 
 
 document.getElementById("campaign-enterSplitscreen").addEventListener("click", () => {

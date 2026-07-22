@@ -332,4 +332,6 @@ dropdown-btn i {
     height: 50%;
     position: fixed;
     place-self: center;
+    z-index: 10;
+    text-align: center;
 }

@@ -21,6 +21,7 @@ let ss_CAMPAIGNS = new Map()
 let activeChat = null;
 let activeFeature = null;
 let activeFeatureType = null;
+let userManifest = null;
 
 const chatArea = document.getElementById("sendBar")
 
@@ -172,6 +173,24 @@ async function getMyFeatures() {
 friendFriendsBtn.addEventListener("click", ()=>{
     document.getElementById("findFriends-popup").hidden = false;
 })
+
+async function findFriends_search() {
+    const key = document.getElementById("findFriends-searchByDropdown").value
+    const searchTerm = document.getElementById("findFriends-input").value
+
+    if(userManifest === null){
+        const rawData = await getDocument("/users/userManifest")
+        userManifest = rawData.manifest
+        console.log(userManifest)
+        console.log(typeof userManifest)
+    }
+
+    const filteredResults = userManifest.filter(item => {
+        const itemValue = String(item[key]).toLowerCase();
+        return itemValue.includes(searchTerm);
+  });
+  console.log(filteredResults)
+}
 
 function handleSidebarClick(event) {
     event.preventDefault()

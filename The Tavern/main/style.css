@@ -322,3 +322,13 @@ dropdown-btn i {
     bottom: 0;
     right: 0;
 }
+
+
+#findFriends-popup {
+    background-color: var(--base-clr);
+    outline: var(--line-clr);
+    border-radius: 5px;
+    width: 75%;
+    height: 50%;
+    position: fixed;
+}

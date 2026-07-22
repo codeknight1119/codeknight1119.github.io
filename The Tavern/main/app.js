@@ -127,6 +127,7 @@ function newFeatureButton(val) {
     return fragment
 }
 
+const friendFriendsBtn = document.getElementById("findFriends-btn")
 async function getMyFeatures() {
     if (user !== null) {
         permissions.push("all")
@@ -155,9 +156,22 @@ async function getMyFeatures() {
                 document.getElementById("personal-menu").prepend(fragment)
             })
         }
+        if(user.directMessages) {
+            user.directMessages.forEach(async (conv) => {
+                const convInfo = await FirebaseUtils.getDocument(`/features/${conv.id}`)
+                convInfo.id = conv.id
+                myFeatures.push(convInfo)
+                ss_CAMPAIGNS.set(conv.id, convInfo)
+                const fragment = newFeatureButton(convInfo)
+                friendFriendsBtn.after(fragment)
+            })
+        }
     }
 }
 
+friendFriendsBtn.addEventListener("click", ()=>{
+    document.getElementById("findFriends-popup").hidden = false;
+})
 
 function handleSidebarClick(event) {
     event.preventDefault()

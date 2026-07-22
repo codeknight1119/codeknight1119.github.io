@@ -326,9 +326,10 @@ dropdown-btn i {
 
 #findFriends-popup {
     background-color: var(--base-clr);
-    outline: var(--line-clr);
+    outline: 2px solid var(--line-clr);
     border-radius: 5px;
     width: 75%;
     height: 50%;
     position: fixed;
+    place-self: center;
 }

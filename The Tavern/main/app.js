@@ -254,7 +254,7 @@ findFriends_keyDropdown.addEventListener("change", search);
 document.getElementById("findFriends-createConv").addEventListener("click", ()=>{
     let chatIds = []
    Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val)=>{
-    chatIds.push(val.id)
+    chatIds.push(val.dataset.id)
    })
    console.log(chatIds)
    /*

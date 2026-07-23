@@ -179,58 +179,69 @@ document.getElementById("findFriends-close").addEventListener("click", () => {
 })
 
 
-async function searchUserSetUp(textIn, keyDropdown, searchButton, outTemplate, templateSchem, outTemplateParent) {
-    async function search() {
-        const searchTerm = textIn.value.trim().toLowerCase();
-        if (searchTerm === "") return;
 
-        const key = keyDropdown.value;
 
-        if (userManifest === null) {
-            const rawData = await FirebaseUtils.getDocument("/users/userManifest");
-            userManifest = rawData.manifest;
-        }
 
-        const filteredResults = userManifest.filter(item => {
-            const itemValue = String(item[key] || "").toLowerCase();
-            return itemValue.includes(searchTerm);
-        });
+const findFriends_keyDropdown = document.getElementById("findFriends-searchByDropdown")
+const findFriends_outTemplateParent = document.getElementById("findFriends-foundFriends")
+async function search() {
+    const searchTerm = document.getElementById("findFriends-input").value.trim().toLowerCase();
+    if (searchTerm === "") return;
 
-        // Clear previous search results cleanly
-        outTemplateParent.replaceChildren();
+    const key = findFriends_keyDropdown.value;
 
-        // Render matching results
-        filteredResults.forEach((result) => {
-            const clone = outTemplate.content.cloneNode(true);
-
-            // Iterate over each class -> property pair in the schema
-            Object.entries(templateSchem).forEach(([className, dataProp]) => {
-                const targetElement = clone.querySelector(`.${className}`);
-                if (targetElement && result[dataProp] !== undefined) {
-                    targetElement.innerText = result[dataProp];
-                }
-            });
-
-            // Append the populated clone to the DOM container
-            outTemplateParent.appendChild(clone);
-        });
+    if (userManifest === null) {
+        const rawData = await FirebaseUtils.getDocument("/users/userManifest");
+        userManifest = rawData.manifest;
     }
 
-    searchButton.addEventListener("click", search);
-    keyDropdown.addEventListener("change", search);
+    const filteredResults = userManifest.filter(item => {
+        const itemValue = String(item[key] || "").toLowerCase();
+        return itemValue.includes(searchTerm);
+    });
+
+    // Clear previous search results cleanly
+    findFriends_outTemplateParent.replaceChildren();
+
+    // Render matching results
+    filteredResults.forEach((result) => {
+        console.log(result.id)
+        const clone = document.getElementById("findFriends-foundFriends_template").content.cloneNode(true);
+
+        // Iterate over each class -> property pair in the schema
+        Object.entries(templateSchem).forEach(([className, dataProp]) => {
+            const targetElement = clone.querySelector(`.${className}`);
+            if (targetElement && result[dataProp] !== undefined) {
+                targetElement.innerText = result[dataProp];
+            }
+        });
+
+        clone.querySelector(".searched-save").addEventListener("click", ()=>{
+            const newEl = document.createElement("div")
+            const newEl_HTML = `
+            <p>${result.name} (${result["Real Name"]}</p>
+            <button class="findFriends_remove">Remove from conversation.</button>
+            <br>`
+            newEl.innerHTML = newEl_HTML
+            newEl.style.display= "flex"
+            newEl.dataset.id = result.id
+
+            newEl.querySelector(".findFriends_remove").addEventListener("click", ()=>{
+                clone.remove()
+            })
+
+            document.getElementById("findFriends-foundFriends").appendChild(newEl)
+        })
+
+        // Append the populated clone to the DOM container
+        findFriends_outTemplateParent.appendChild(clone);
+    });
 }
 
+document.getElementById("findFriends-searchBtn").addEventListener("click", search);
+findFriends_keyDropdown.addEventListener("change", search);
 
-searchUserSetUp(document.getElementById("findFriends-input"),
-    document.getElementById("findFriends-searchByDropdown"),
-    document.getElementById("findFriends-searchBtn"),
-    document.getElementById("findFriends-foundFriends_template"),
-    {
-        "findFriends-template_name": "name",
-        "findFriends-template_real_name": "Real Name"
-    },
-    document.getElementById("findFriends-foundFriends"),
-)
+
 
 
 function handleSidebarClick(event) {

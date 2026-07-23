@@ -125,7 +125,7 @@ function newFeatureButton(val, clickFunction=handleSidebarClick) {
     a.dataset.id = val.id
     a.dataset.personalMessage = true
 
-        a.addEventListener("click", clickFunction)
+    a.addEventListener("click", clickFunction)
 
 
     return fragment
@@ -269,7 +269,7 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
     const convData = await FirebaseUtils.addDocument("/conversations", convObj)
 
     const frag = newFeatureButton(convData.id, ()=>{
-        renderChat(id, true)
+        renderChat(convData.id, true)
     })
 
     friendFriendsBtn.after(frag)

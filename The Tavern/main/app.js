@@ -178,10 +178,6 @@ document.getElementById("findFriends-close").addEventListener("click", () => {
     findFriends_popup.style.display = "none";
 })
 
-
-
-
-
 const findFriends_keyDropdown = document.getElementById("findFriends-searchByDropdown")
 const findFriends_outTemplateParent = document.getElementById("findFriends-foundFriends")
 async function search() {
@@ -258,13 +254,16 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
    })
    chatIds.push(user.uid)
    console.log(chatIds)
-   
-   const convData = await FirebaseUtils.addDocument("/conversations", {
+   let convObj = {
     name: document.getElementById("findFriends-convName").value,
-    users: chatIds
-   })
-    console.log(convData)
-    console.log(convData.id)
+    users: chatIds,
+    type: "chat",
+   }
+   const convData = await FirebaseUtils.addDocument("/conversations", convObj)
+   convObj["id"] = convData.id
+   const frag = newFeatureButton(convObj)
+   friendFriendsBtn.after(frag)
+   
 })
 
 

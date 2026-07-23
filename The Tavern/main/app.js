@@ -172,7 +172,10 @@ async function getMyFeatures() {
         }
         const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, {field: "users", value: user.uid})
         myPersonalMessages.forEach((val)=>{
-            
+            const frag = newFeatureButton(val.id, ()=>{
+                renderChat(val.id, true)
+            })
+            friendFriendsBtn.after(frag)
         })
     }
 }

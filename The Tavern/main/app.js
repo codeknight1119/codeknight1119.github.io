@@ -185,7 +185,7 @@ if(searchTerm.trim() === "") return
     const key = document.getElementById("findFriends-searchByDropdown").value
 
     if(userManifest === null){
-        const rawData = await getDocument("/users/userManifest")
+        const rawData = await FirebaseUtils.getDocument("/users/userManifest")
         userManifest = rawData.manifest
         console.log(userManifest)
         console.log(typeof userManifest)

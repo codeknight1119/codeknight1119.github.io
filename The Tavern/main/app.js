@@ -257,12 +257,13 @@ document.getElementById("findFriends-createConv").addEventListener("click", ()=>
     chatIds.push(val.dataset.id)
    })
    console.log(chatIds)
-   /*
-   const convId = await FirebaseUtils.addDocument("/conversations", {
+   
+   const convData = await FirebaseUtils.addDocument("/conversations", {
     name: document.getElementById("findFriends-convName").value,
     users: chatIds
    })
-    */
+    console.log(convData)
+    console.log(convData.id)
 })
 
 

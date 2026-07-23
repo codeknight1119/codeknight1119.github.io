@@ -32,7 +32,17 @@
             <button id="findFriends-searchBtn">Search</button>
         </div>
     </div>
-    <div id="findFriends-foundFriends"> </div>
+      <template id="findFriends-foundFriends_template">
+            <div style="display: flex;">
+                <pre><strong>Name: </strong></pre>
+                <p class="findFriends-template_real_name"></p>
+                <pre> | </pre>
+                <pre><strong>Username: </strong></pre>
+                <p class="findFriends-template_name"></p>
+                <p> | </p> <button class="searched-save">Add to Conversation</button>
+            </div>
+        </template>
+    <div id="findFriends-foundFriends" style="overflow-y: scroll; height: 50px;"> </div>
     <div id="findFriends-selectedFriends"> </div>
 
     <nav id="sidebar">

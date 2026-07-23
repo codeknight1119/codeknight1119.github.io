@@ -171,40 +171,66 @@ async function getMyFeatures() {
 }
 const findFriends_popup = document.getElementById("findFriends-popup")
 friendFriendsBtn.addEventListener("click", () => {
-    findFriends_popup.hidden = false;
+    findFriends_popup.style.display = "flex";
 })
 
 document.getElementById("findFriends-close").addEventListener("click", () => {
-    findFriends_popup.hidden = false;
+    findFriends_popup.style.display = "none";
 })
 
 
-async function searchUserSetUp(textIn, keyDropdown,searchButton, outTemplate, outTemplateParent) {
+async function searchUserSetUp(textIn, keyDropdown, searchButton, outTemplate, templateSchem, outTemplateParent) {
     async function search() {
         const searchTerm = textIn.value.trim().toLowerCase();
-        if (searchTerm === "") return
+        if (searchTerm === "") return;
 
-        const key = keyDropdown.value
+        const key = keyDropdown.value;
 
         if (userManifest === null) {
-            const rawData = await FirebaseUtils.getDocument("/users/userManifest")
-            userManifest = rawData.manifest
-            console.log(userManifest)
-            console.log(typeof userManifest)
+            const rawData = await FirebaseUtils.getDocument("/users/userManifest");
+            userManifest = rawData.manifest;
         }
 
         const filteredResults = userManifest.filter(item => {
-            const itemValue = String(item[key]).toLowerCase();
+            const itemValue = String(item[key] || "").toLowerCase();
             return itemValue.includes(searchTerm);
         });
-         console.log(filteredResults)
+
+        // Clear previous search results cleanly
+        outTemplateParent.replaceChildren();
+
+        // Render matching results
+        filteredResults.forEach((result) => {
+            const clone = outTemplate.content.cloneNode(true);
+
+            // Iterate over each class -> property pair in the schema
+            Object.entries(templateSchem).forEach(([className, dataProp]) => {
+                const targetElement = clone.querySelector(`.${className}`);
+                if (targetElement && result[dataProp] !== undefined) {
+                    targetElement.innerText = result[dataProp];
+                }
+            });
+
+            // Append the populated clone to the DOM container
+            outTemplateParent.appendChild(clone);
+        });
     }
-    searchButton.addEventListener("click", search)
-    keyDropdown.addEventListener("change", search)
+
+    searchButton.addEventListener("click", search);
+    keyDropdown.addEventListener("change", search);
 }
 
 
-searchUserSetUp(document.getElementById("findFriends-input"), document.getElementById("findFriends-searchByDropdown"), document.getElementById("findFriends-searchBtn"), null, null)
+searchUserSetUp(document.getElementById("findFriends-input"),
+    document.getElementById("findFriends-searchByDropdown"),
+    document.getElementById("findFriends-searchBtn"),
+    document.getElementById("findFriends-foundFriends_template"),
+    {
+        "findFriends-template_name": "name",
+        "findFriends-template_real_name": "Real Name"
+    },
+    document.getElementById("findFriends-foundFriends"),
+)
 
 
 function handleSidebarClick(event) {

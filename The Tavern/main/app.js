@@ -179,7 +179,7 @@ document.getElementById("findFriends-close").addEventListener("click", ()=>{
 })
 
 async function findFriends_search() {
-    const searchTerm = document.getElementById("findFriends-input").trim().toLowerCase();
+    const searchTerm = document.getElementById("findFriends-input").value.trim().toLowerCase();
 if(searchTerm === "") return 
 
     const key = document.getElementById("findFriends-searchByDropdown").value

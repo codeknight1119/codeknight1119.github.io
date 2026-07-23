@@ -111,7 +111,7 @@ checkUser()
 //////////////////////////////////////////////////////////////////////
 
 
-function newFeatureButton(val) {
+function newFeatureButton(val, setClickFunction = true) {
     const template = document.getElementById("sidebarTemplate")
     let fragment = template.content.cloneNode(true)
     const a = fragment.querySelector('.nav-btn')
@@ -123,7 +123,10 @@ function newFeatureButton(val) {
         icon.classList.add(val.icon.trim())
     }
     a.dataset.id = val.id
-    a.addEventListener("click", handleSidebarClick)
+    a.dataset.personalMessage = true
+    if (setClickFunction) {
+        a.addEventListener("click", handleSidebarClick)
+    }
 
     return fragment
 }
@@ -237,7 +240,7 @@ async function search() {
             findFriends_outTemplateParent.appendChild(clone);
         });
 
-    }else{
+    } else {
         const notFound = document.createElement("p")
         notFound.innerText = `Could not find "${searchTerm}"`
         findFriends_outTemplateParent.appendChild(notFound)
@@ -247,23 +250,26 @@ async function search() {
 document.getElementById("findFriends-searchBtn").addEventListener("click", search);
 findFriends_keyDropdown.addEventListener("change", search);
 
-document.getElementById("findFriends-createConv").addEventListener("click", async ()=>{
+document.getElementById("findFriends-createConv").addEventListener("click", async () => {
     let chatIds = []
-   Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val)=>{
-    chatIds.push(val.dataset.id)
-   })
-   chatIds.push(user.uid)
-   console.log(chatIds)
-   let convObj = {
-    name: document.getElementById("findFriends-convName").value,
-    users: chatIds,
-    type: "chat",
-   }
-   const convData = await FirebaseUtils.addDocument("/conversations", convObj)
-   convObj["id"] = convData.id
-   const frag = newFeatureButton(convObj)
-   friendFriendsBtn.after(frag)
-   
+    Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val) => {
+        chatIds.push(val.dataset.id)
+    })
+    chatIds.push(user.uid)
+    console.log(chatIds)
+    let convObj = {
+        name: document.getElementById("findFriends-convName").value,
+        users: chatIds,
+        type: "chat",
+    }
+    const convData = await FirebaseUtils.addDocument("/conversations", convObj)
+    convObj["id"] = convData.id
+    const frag = newFeatureButton(convObj, false)
+    frag.addEventListener("click", ()=>{
+        renderChat()
+    })
+    friendFriendsBtn.after(frag)
+
 })
 
 
@@ -434,10 +440,12 @@ async function renderTool(id) {
     }
 }
 
-async function renderChat(id) {
+async function renderChat(id, conversation = false) {
     chatUI.hidden = false;
     activeChat = id;
-    const messages = await FirebaseUtils.getDocuments(`features/${id}/messages`, 50, { field: "timestamp" })
+    const dir = conversation ? "conversation" : "features"
+    const messages = await FirebaseUtils.getDocuments(`${dir}/${id}/messages`, 50, { field: "timestamp" })
+    activeChat = id
 
     if (messages.length === 0) {
         mainContentArea.innerHTML = `<h3>No Messages</h3>`

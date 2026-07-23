@@ -270,7 +270,7 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
         users: chatIds,
         type: "chat",
     }
-    const convData = await FirebaseUtils.addDocument("/conversations", convObj)
+    const convData = await FirebaseUtils.addDocument("conversations", convObj)
 
     const frag = newFeatureButton(convData, ()=>{
         renderChat(convData.id, true)

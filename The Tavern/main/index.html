@@ -15,36 +15,35 @@
 </head>
 
 <body>
-    <div id="findFriends-popup">
-        <button id="findFriends-close" style="top:0; left:0">&times;</button>
-        <h2>Find your friends</h2>
-        <br><br>
-        <div style="display: flex;">
-            <pre>   Search by: </pre>
-            <select id="findFriends-searchByDropdown">
-                <option value="name" selected>User Name</option>
-                <option value="Real Name" selected>Real Name</option>
-            </select>
-            <pre>   </pre>
-        </div>
-        <div style="display: flex;">
-            <input type="text" id="findFriends-input" placeholder="Type a name..." />
-            <button id="findFriends-searchBtn">Search</button>
-        </div>
-        <div id="findFriends-selectedFriends"> </div>
-        <div id="findFriends-foundFriends" style="overflow-y: scroll; height: 50px;"> </div>
-
+<div id="findFriends-popup">
+    <button id="findFriends-close">&times;</button>
+    
+    <h2>Find your friends</h2>
+    
+    <div class="findFriends-search-row">
+        <label for="findFriends-searchByDropdown">Search by:</label>
+        <select id="findFriends-searchByDropdown">
+            <option value="name">User Name</option>
+            <option value="Real Name" selected>Real Name</option>
+        </select>
+        
+        <input type="text" id="findFriends-input" placeholder="Type a name..." />
+        <button id="findFriends-searchBtn">Search</button>
     </div>
-    <template id="findFriends-foundFriends_template">
-        <div style="display: flex;">
-            <pre><strong>Name: </strong></pre>
-            <p class="findFriends-template_real_name"></p>
-            <pre> | </pre>
-            <pre><strong>Username: </strong></pre>
-            <p class="findFriends-template_name"></p>
-            <pre> | </pre> <button class="searched-save">Add to Conversation</button>
-        </div>
-    </template>
+
+    <div id="findFriends-selectedFriends"></div>
+    <div id="findFriends-foundFriends"></div>
+</div>
+
+<template id="findFriends-foundFriends_template">
+    <div class="findFriends-template-row">
+        <span><strong>Name: </strong><span class="findFriends-template_real_name"></span></span>
+        <span class="divider">|</span>
+        <span><strong>Username: </strong><span class="findFriends-template_name"></span></span>
+        <span class="divider">|</span>
+        <button class="searched-save">Add to Conversation</button>
+    </div>
+</template>
 
 
     <nav id="sidebar">

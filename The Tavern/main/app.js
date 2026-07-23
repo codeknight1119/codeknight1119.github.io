@@ -208,13 +208,8 @@ async function search() {
         console.log(result.id)
         const clone = document.getElementById("findFriends-foundFriends_template").content.cloneNode(true);
 
-        // Iterate over each class -> property pair in the schema
-        Object.entries(templateSchem).forEach(([className, dataProp]) => {
-            const targetElement = clone.querySelector(`.${className}`);
-            if (targetElement && result[dataProp] !== undefined) {
-                targetElement.innerText = result[dataProp];
-            }
-        });
+        clone.querySelector(".findFriends-template_real_name").inenrText = result["Real Name"]
+        clone.querySelector(".findFriends-template_name").innerText = result.name
 
         clone.querySelector(".searched-save").addEventListener("click", ()=>{
             const newEl = document.createElement("div")

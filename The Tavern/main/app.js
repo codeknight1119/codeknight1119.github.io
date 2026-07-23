@@ -173,7 +173,7 @@ async function getMyFeatures() {
         const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, {field: "users", value: user.uid})
         myPersonalMessages.forEach((val)=>{
             console.log(val)
-            const frag = newFeatureButton(val.id, ()=>{
+            const frag = newFeatureButton(val, ()=>{
                 renderChat(val.id, true)
             })
             friendFriendsBtn.after(frag)
@@ -272,7 +272,7 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
     }
     const convData = await FirebaseUtils.addDocument("/conversations", convObj)
 
-    const frag = newFeatureButton(convData.id, ()=>{
+    const frag = newFeatureButton(convData, ()=>{
         renderChat(convData.id, true)
     })
 

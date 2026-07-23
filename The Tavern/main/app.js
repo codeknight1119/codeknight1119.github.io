@@ -256,6 +256,7 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
    Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val)=>{
     chatIds.push(val.dataset.id)
    })
+   chatIds.push(user.uid)
    console.log(chatIds)
    
    const convData = await FirebaseUtils.addDocument("/conversations", {

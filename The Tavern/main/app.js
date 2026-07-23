@@ -185,7 +185,8 @@ document.getElementById("findFriends-close").addEventListener("click", () => {
 const findFriends_keyDropdown = document.getElementById("findFriends-searchByDropdown")
 const findFriends_outTemplateParent = document.getElementById("findFriends-foundFriends")
 async function search() {
-    const searchTerm = document.getElementById("findFriends-input").value.trim().toLowerCase();
+    const findFriends_textIn = document.getElementById("findFriends-input")
+    const searchTerm = findFriends_textIn.value.trim().toLowerCase();
     if (searchTerm === "") return;
 
     const key = findFriends_keyDropdown.value;
@@ -208,13 +209,15 @@ async function search() {
         console.log(result.id)
         const clone = document.getElementById("findFriends-foundFriends_template").content.cloneNode(true);
 
-        clone.querySelector(".findFriends-template_real_name").inenrText = result["Real Name"]
+        const card = clone.firstElementChild
+
+        clone.querySelector(".findFriends-template_real_name").innerText = result["Real Name"]
         clone.querySelector(".findFriends-template_name").innerText = result.name
 
-        clone.querySelector(".searched-save").addEventListener("click", ()=>{
+        clone.querySelector(".findFriends-searched-save").addEventListener("click", ()=>{
             const newEl = document.createElement("div")
             const newEl_HTML = `
-            <p>${result.name} (${result["Real Name"]}</p>
+            <p>${result.name} (${result["Real Name"]})</p>
             <button class="findFriends_remove">Remove from conversation.</button>
             <br>`
             newEl.innerHTML = newEl_HTML
@@ -222,11 +225,16 @@ async function search() {
             newEl.dataset.id = result.id
 
             newEl.querySelector(".findFriends_remove").addEventListener("click", ()=>{
-                clone.remove()
+                newEl.remove();
             })
 
-            document.getElementById("findFriends-foundFriends").appendChild(newEl)
+            findFriends_textIn.value = "";
+
+            card.remove()
+            
+            document.getElementById("findFriends-selectedFriends").appendChild(newEl)
         })
+
 
         // Append the populated clone to the DOM container
         findFriends_outTemplateParent.appendChild(clone);

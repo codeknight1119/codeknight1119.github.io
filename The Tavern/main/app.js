@@ -251,6 +251,19 @@ async function search() {
 document.getElementById("findFriends-searchBtn").addEventListener("click", search);
 findFriends_keyDropdown.addEventListener("change", search);
 
+document.getElementById("findFriends-createConv").addEventListener("click", ()=>{
+    let chatIds = []
+   Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val)=>{
+    chatIds.push(val.id)
+   })
+   console.log(chatIds)
+   /*
+   const convId = await FirebaseUtils.addDocument("/conversations", {
+    name: document.getElementById("findFriends-convName").value,
+    users: chatIds
+   })
+    */
+})
 
 
 

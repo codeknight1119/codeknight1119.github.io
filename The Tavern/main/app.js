@@ -111,7 +111,7 @@ checkUser()
 //////////////////////////////////////////////////////////////////////
 
 
-function newFeatureButton(val, setClickFunction = true) {
+function newFeatureButton(val, clickFunction=handleSidebarClick) {
     const template = document.getElementById("sidebarTemplate")
     let fragment = template.content.cloneNode(true)
     const a = fragment.querySelector('.nav-btn')
@@ -124,9 +124,9 @@ function newFeatureButton(val, setClickFunction = true) {
     }
     a.dataset.id = val.id
     a.dataset.personalMessage = true
-    if (setClickFunction) {
-        a.addEventListener("click", handleSidebarClick)
-    }
+
+        a.addEventListener("click", clickFunction)
+
 
     return fragment
 }
@@ -170,6 +170,10 @@ async function getMyFeatures() {
                 friendFriendsBtn.after(fragment)
             })
         }
+        const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, {field: "users", value: user.uid})
+        myPersonalMessages.forEach((val)=>{
+            
+        })
     }
 }
 const findFriends_popup = document.getElementById("findFriends-popup")
@@ -263,11 +267,11 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
         type: "chat",
     }
     const convData = await FirebaseUtils.addDocument("/conversations", convObj)
-    convObj["id"] = convData.id
-    const frag = newFeatureButton(convObj, false)
-    frag.addEventListener("click", ()=>{
-        renderChat()
+
+    const frag = newFeatureButton(convData.id, ()=>{
+        renderChat(id, true)
     })
+
     friendFriendsBtn.after(frag)
 
 })

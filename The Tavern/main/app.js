@@ -119,7 +119,7 @@ function newFeatureButton(val) {
     const icon = fragment.querySelector(".ra")
 
     text.innerText = val.name
-    if (!val.icon || val.icon.trim() !== "") {
+    if (val.icon || val.icon.trim() !== "") {
         icon.classList.add(val.icon.trim())
     }
     a.dataset.id = val.id

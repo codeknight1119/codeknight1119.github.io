@@ -251,7 +251,7 @@ async function search() {
 document.getElementById("findFriends-searchBtn").addEventListener("click", search);
 findFriends_keyDropdown.addEventListener("change", search);
 
-document.getElementById("findFriends-createConv").addEventListener("click", ()=>{
+document.getElementById("findFriends-createConv").addEventListener("click", async ()=>{
     let chatIds = []
    Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val)=>{
     chatIds.push(val.dataset.id)

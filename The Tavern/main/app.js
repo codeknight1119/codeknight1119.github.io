@@ -179,8 +179,8 @@ document.getElementById("findFriends-close").addEventListener("click", ()=>{
 })
 
 async function findFriends_search() {
-    const searchTerm = document.getElementById("findFriends-input").value
-if(searchTerm.trim() === "") return 
+    const searchTerm = document.getElementById("findFriends-input").trim().toLowerCase();
+if(searchTerm === "") return 
 
     const key = document.getElementById("findFriends-searchByDropdown").value
 
@@ -199,7 +199,7 @@ if(searchTerm.trim() === "") return
 }
 
 document.getElementById("findFriends-searchByDropdown").addEventListener("change", findFriends_search)
-document.getElementById("findFriends-input").addEventListener("change", findFriends_search)
+document.getElementById("findFriends-input").addEventListener("input", findFriends_search)
 
 
 

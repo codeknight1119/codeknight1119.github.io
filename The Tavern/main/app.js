@@ -451,7 +451,7 @@ async function renderTool(id) {
 async function renderChat(id, conversation = false) {
     chatUI.hidden = false;
     activeChat = id;
-    const dir = conversation ? "conversation" : "features"
+    const dir = conversation ? "conversations" : "features"
     const messages = await FirebaseUtils.getDocuments(`${dir}/${id}/messages`, 50, { field: "timestamp" })
     activeChat = id
 

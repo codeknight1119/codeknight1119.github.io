@@ -204,41 +204,48 @@ async function search() {
     // Clear previous search results cleanly
     findFriends_outTemplateParent.replaceChildren();
 
-    // Render matching results
-    filteredResults.forEach((result) => {
-        console.log(result.id)
-        const clone = document.getElementById("findFriends-foundFriends_template").content.cloneNode(true);
+    // Render matching result
+    if (filteredResults.length > 1 || (filteredResults.length === 1 && filteredResults[0].id !== user.uid)) {
+        filteredResults.forEach((result) => {
+            if (result.id === user.uid) return
+            const clone = document.getElementById("findFriends-foundFriends_template").content.cloneNode(true);
 
-        const card = clone.firstElementChild
+            const card = clone.firstElementChild
 
-        clone.querySelector(".findFriends-template_real_name").innerText = result["Real Name"]
-        clone.querySelector(".findFriends-template_name").innerText = result.name
+            clone.querySelector(".findFriends-template_real_name").innerText = result["Real Name"]
+            clone.querySelector(".findFriends-template_name").innerText = result.name
 
-        clone.querySelector(".findFriends-searched-save").addEventListener("click", ()=>{
-            const newEl = document.createElement("div")
-            const newEl_HTML = `
+            clone.querySelector(".findFriends-searched-save").addEventListener("click", () => {
+                const newEl = document.createElement("div")
+                const newEl_HTML = `
             <p>${result.name} (${result["Real Name"]})</p>
             <button class="findFriends_remove">Remove from conversation.</button>
             <br>`
-            newEl.innerHTML = newEl_HTML
-            newEl.style.display= "flex"
-            newEl.dataset.id = result.id
+                newEl.innerHTML = newEl_HTML
+                newEl.style.display = "flex"
+                newEl.dataset.id = result.id
 
-            newEl.querySelector(".findFriends_remove").addEventListener("click", ()=>{
-                newEl.remove();
+                newEl.querySelector(".findFriends_remove").addEventListener("click", () => {
+                    newEl.remove();
+                })
+
+                findFriends_textIn.value = "";
+
+                card.remove()
+
+                document.getElementById("findFriends-selectedFriends").appendChild(newEl)
             })
 
-            findFriends_textIn.value = "";
 
-            card.remove()
-            
-            document.getElementById("findFriends-selectedFriends").appendChild(newEl)
-        })
+            // Append the populated clone to the DOM container
+            findFriends_outTemplateParent.appendChild(clone);
+        });
 
-
-        // Append the populated clone to the DOM container
-        findFriends_outTemplateParent.appendChild(clone);
-    });
+    }else{
+        const notFound = document.createElement("p")
+        notFound.innerText = `Could not find "${searchTerm}"`
+        findFriends_outTemplateParent.appendChild(notFound)
+    }
 }
 
 document.getElementById("findFriends-searchBtn").addEventListener("click", search);

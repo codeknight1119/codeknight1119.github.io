@@ -15,35 +15,41 @@
 </head>
 
 <body>
-<div id="findFriends-popup">
-    <button id="findFriends-close">&times;</button>
-    
-    <h2>Find your friends</h2>
-    
-    <div class="findFriends-search-row">
-        <label for="findFriends-searchByDropdown">Search by:</label>
-        <select id="findFriends-searchByDropdown">
-            <option value="name">User Name</option>
-            <option value="Real Name" selected>Real Name</option>
-        </select>
-        
-        <input type="text" id="findFriends-input" placeholder="Type a name..." />
-        <button id="findFriends-searchBtn">Search</button>
-    </div>
-    <div id="findFriends-foundFriends"></div>
-    <div id="findFriends-selectedFriends"></div>
+    <div id="findFriends-popup">
+        <button id="findFriends-close">&times;</button>
 
-</div>
+        <h2>Find your friends</h2>
 
-<template id="findFriends-foundFriends_template">
-    <div class="findFriends-template-row">
-        <span><strong>Name: </strong><span class="findFriends-template_real_name"></span></span>
-        <span class="divider">|</span>
-        <span><strong>Username: </strong><span class="findFriends-template_name"></span></span>
-        <span class="divider">|</span>
-        <button class="findFriends-searched-save">Add to Conversation</button>
+        <div class="findFriends-search-row">
+            <label for="findFriends-searchByDropdown">Search by:</label>
+            <select id="findFriends-searchByDropdown">
+                <option value="name">User Name</option>
+                <option value="Real Name" selected>Real Name</option>
+            </select>
+
+            <input type="text" id="findFriends-input" placeholder="Type a name..." />
+            <button id="findFriends-searchBtn">Search</button>
+        </div>
+        <div id="findFriends-foundFriends"></div>
+        <div id="findFriends-selectedFriends"></div>
+        <br>
+        <div class="findFriends-search-row">
+            <label for="findFriends-convName">Name Chat (This can be changed later):</label>
+            <input type="text" id="findFriends-convName" placeholder="Type a name..." />
+            <button id="findFriends-createConv">Create Conversation</button>
+        </div>
+
     </div>
-</template>
+
+    <template id="findFriends-foundFriends_template">
+        <div class="findFriends-template-row">
+            <span><strong>Name: </strong><span class="findFriends-template_real_name"></span></span>
+            <span class="divider">|</span>
+            <span><strong>Username: </strong><span class="findFriends-template_name"></span></span>
+            <span class="divider">|</span>
+            <button class="findFriends-searched-save">Add to Conversation</button>
+        </div>
+    </template>
 
 
     <nav id="sidebar">

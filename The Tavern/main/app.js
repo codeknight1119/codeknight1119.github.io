@@ -157,7 +157,7 @@ async function getMyFeatures() {
                 document.getElementById("personal-menu").prepend(fragment)
             })
         }
-        if(user.directMessages) {
+        if (user.directMessages) {
             user.directMessages.forEach(async (conv) => {
                 const convInfo = await FirebaseUtils.getDocument(`/features/${conv.id}`)
                 convInfo.id = conv.id
@@ -170,37 +170,41 @@ async function getMyFeatures() {
     }
 }
 const findFriends_popup = document.getElementById("findFriends-popup")
-friendFriendsBtn.addEventListener("click", ()=>{
+friendFriendsBtn.addEventListener("click", () => {
     findFriends_popup.hidden = false;
 })
 
-document.getElementById("findFriends-close").addEventListener("click", ()=>{
+document.getElementById("findFriends-close").addEventListener("click", () => {
     findFriends_popup.hidden = false;
 })
 
-async function findFriends_search() {
-    const searchTerm = document.getElementById("findFriends-input").value.trim().toLowerCase();
-if(searchTerm === "") return 
 
-    const key = document.getElementById("findFriends-searchByDropdown").value
+async function searchUserSetUp(textIn, keyDropdown,searchButton, outTemplate, outTemplateParent) {
+    async function search() {
+        const searchTerm = textIn.value.trim().toLowerCase();
+        if (searchTerm === "") return
 
-    if(userManifest === null){
-        const rawData = await FirebaseUtils.getDocument("/users/userManifest")
-        userManifest = rawData.manifest
-        console.log(userManifest)
-        console.log(typeof userManifest)
+        const key = keyDropdown.value
+
+        if (userManifest === null) {
+            const rawData = await FirebaseUtils.getDocument("/users/userManifest")
+            userManifest = rawData.manifest
+            console.log(userManifest)
+            console.log(typeof userManifest)
+        }
+
+        const filteredResults = userManifest.filter(item => {
+            const itemValue = String(item[key]).toLowerCase();
+            return itemValue.includes(searchTerm);
+        });
+         console.log(filteredResults)
     }
-
-    const filteredResults = userManifest.filter(item => {
-        const itemValue = String(item[key]).toLowerCase();
-        return itemValue.includes(searchTerm);
-  });
-  console.log(filteredResults)
+    searchButton.addEventListener("click", search)
+    keyDropdown.addEventListener("change", search)
 }
 
-document.getElementById("findFriends-searchByDropdown").addEventListener("change", findFriends_search)
-document.getElementById("findFriends-input").addEventListener("input", findFriends_search)
 
+searchUserSetUp(document.getElementById("findFriends-input"), document.getElementById("findFriends-searchByDropdown"), document.getElementById("findFriends-searchBtn"), null, null)
 
 
 function handleSidebarClick(event) {
@@ -517,8 +521,8 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         searchedRes.querySelector(".searched-save").addEventListener("click", async () => {
             console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
-console.log(currentSearchUpdates[userUID].permissions)
-            currentSearchUpdates[userUID].permissions.forEach( async (val)=>{
+            console.log(currentSearchUpdates[userUID].permissions)
+            currentSearchUpdates[userUID].permissions.forEach(async (val) => {
                 await fetchServer(`permsUpdate?user=${userUID}&perm=${val}`)
             })
             currentSearchUpdates[userUID] = {}
@@ -617,19 +621,19 @@ function stopResizing() {
 
 
 async function fetchServer(enpoint, postData) {
-const token = await getToken()
+    const token = await getToken()
     const link = `https://unmixed-handed-cardboard.ngrok-free.dev/${endpoint}`;
 
-    let body =  {
+    let body = {
         headers: {
             // This header bypasses the ngrok warning page
             "ngrok-skip-browser-warning": "true",
             Authorization: `Bearer ${token}`
         }
     }
-    if(postData){
+    if (postData) {
         body.method = "POST",
-        body.body = JSON.stringify(postData)
+            body.body = JSON.stringify(postData)
     }
 
     const data = await fetch(link, body);

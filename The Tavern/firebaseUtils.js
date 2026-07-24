@@ -147,13 +147,14 @@ export const getDocumentFeildIncludes = async (path, feild, text) => {
 
 export const listenForNewDocInCollection = async (path) => {
     const doc = collection(db, path)
-    const unsubscribe = onSnapshot(doc, (snapshot) => {
-        snapshot.docChanges().forEach(change => {
+    const unsubscribe = onSnapshot(doc, (snap) => {
+        snap.docChanges().forEach(change => {
             if (change.type === "added") {
                 console.log(`${path} new doc:`, change.doc.data());
             }
         });
     })
+    return unsubscribe
 }
 
 

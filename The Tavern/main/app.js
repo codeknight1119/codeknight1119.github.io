@@ -168,6 +168,7 @@ async function getMyFeatures() {
             })
             friendFriendsBtn.after(frag)
             myFeatures.push(val)
+            FirebaseUtils.listenForNewDocInCollection(`/conversations/${id}`)
         })
     }
 }

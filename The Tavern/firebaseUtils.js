@@ -1,7 +1,8 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
-import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, where, deleteDoc} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+import { getFirestore, getDoc, doc, setDoc as firestoreSetDoc, updateDoc, getDocs, collection, limit, query, addDoc, orderBy, where, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getAdditionalUserInfo, } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 import { initializeAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js';
+import { snapshot } from 'node:test';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -124,33 +125,44 @@ export const getDocuments = async (path, l, docParam, arrayFilter) => {
     }
 };
 
-export const getDocumentFeildIncludes = async (path, feild, text) =>{
-    try{
-const q = query(
-  collection(db, path), 
-  where(feild, ">=", text), 
-  where(feild, "<=", text + "\uf8ff")
-);
-const doc = await getDocs(q)
-const documents = doc.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-    }));
-    
+export const getDocumentFeildIncludes = async (path, feild, text) => {
+    try {
+        const q = query(
+            collection(db, path),
+            where(feild, ">=", text),
+            where(feild, "<=", text + "\uf8ff")
+        );
+        const doc = await getDocs(q)
+        const documents = doc.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
         return documents
-    }catch(e){
+    } catch (e) {
         console.log(e)
         throw e
     }
 }
 
+export const listenForNewDocInCollection = async (path) => {
+    const doc = collection(db, path)
+    const unsubscribe = onSnapshot(doc, (snapshot) => {
+        snapshot.docChanges().forEach(change => {
+            if (change.type === "added") {
+                console.log(`${path} new doc:`, change.doc.data());
+            }
+        });
+    })
+}
 
-export const deleteDocument = async  (path) =>{
-    try{
+
+export const deleteDocument = async (path) => {
+    try {
         const ref = doc(db, path)
         const data = await deleteDoc(ref)
         return data
-    }catch(e){
+    } catch (e) {
         console.error(e)
         throw e
     }

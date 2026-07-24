@@ -145,19 +145,18 @@ export const getDocumentFeildIncludes = async (path, feild, text) => {
     }
 }
 
-export const listenForNewDocInCollection = async (path) => {
+export const listenForNewDocInCollection = (path, callback) => {
     const doc = query(
         collection(db, path),
         where("timestamp", ">", Date.now())
     )
-    const unsubscribe = onSnapshot(doc, (snap) => {
+   return onSnapshot(doc, (snap) => {
         snap.docChanges().forEach(change => {
             if (change.type === "added") {
-                console.log(`${path} new doc:`, change.doc.data());
+                callback(change.doc.data())
             }
         });
     })
-    return unsubscribe
 }
 
 

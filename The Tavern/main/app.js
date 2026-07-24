@@ -267,13 +267,11 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
     let convObj = {
         name: document.getElementById("findFriends-convName").value,
         users: chatIds,
-        type: "chat",
+        type: "conversation",
     }
     const convData = await FirebaseUtils.addDocument("conversations", convObj)
 
-    const frag = newFeatureButton(convData, () => {
-        renderChat(convData.id, true)
-    })
+    const frag = newFeatureButton(convData)
 
     friendFriendsBtn.after(frag)
 
@@ -331,6 +329,9 @@ function loadSidebar(data) {
             mainContentArea.appendChild(campaignUI)
             campaignUI.hidden = false;
             break
+        case "conversation": 
+        renderChat(data.id, true)
+        break
     }
 }
 

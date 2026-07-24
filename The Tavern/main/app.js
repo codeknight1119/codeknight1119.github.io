@@ -172,7 +172,6 @@ async function getMyFeatures() {
         }
         const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, {field: "users", value: user.uid})
         myPersonalMessages.forEach((val)=>{
-            console.log(val)
             const frag = newFeatureButton(val, ()=>{
                 renderChat(val.id, true)
             })
@@ -452,7 +451,8 @@ async function renderChat(id, conversation = false) {
     chatUI.hidden = false;
     activeChat = id;
     const dir = conversation ? "conversations" : "features"
-    const messages = await FirebaseUtils.getDocuments(`${dir}/${id}/messages`, 50, { field: "timestamp" })
+    console.log(`/${dir}/${id}/messages`)
+    const messages = await FirebaseUtils.getDocuments(`/${dir}/${id}/messages`, 50)
     activeChat = id
 
     if (messages.length === 0) {

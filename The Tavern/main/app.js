@@ -111,7 +111,7 @@ checkUser()
 //////////////////////////////////////////////////////////////////////
 
 
-function newFeatureButton(val, clickFunction=handleSidebarClick) {
+function newFeatureButton(val, clickFunction = handleSidebarClick) {
     const template = document.getElementById("sidebarTemplate")
     let fragment = template.content.cloneNode(true)
     const a = fragment.querySelector('.nav-btn')
@@ -170,9 +170,9 @@ async function getMyFeatures() {
                 friendFriendsBtn.after(fragment)
             })
         }
-        const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, {field: "users", value: user.uid})
-        myPersonalMessages.forEach((val)=>{
-            const frag = newFeatureButton(val, ()=>{
+        const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, { field: "users", value: user.uid })
+        myPersonalMessages.forEach((val) => {
+            const frag = newFeatureButton(val, () => {
                 renderChat(val.id, true)
             })
             friendFriendsBtn.after(frag)
@@ -271,7 +271,7 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
     }
     const convData = await FirebaseUtils.addDocument("conversations", convObj)
 
-    const frag = newFeatureButton(convData, ()=>{
+    const frag = newFeatureButton(convData, () => {
         renderChat(convData.id, true)
     })
 
@@ -451,6 +451,9 @@ async function renderChat(id, conversation = false) {
     chatUI.hidden = false;
     activeChat = id;
     const dir = conversation ? "conversations" : "features"
+    if (conversation) {
+        activeFeature = "conversation"
+    }
     console.log(`/${dir}/${id}/messages`)
     const messages = await FirebaseUtils.getDocuments(`/${dir}/${id}/messages`, 50)
     activeChat = id
@@ -505,8 +508,8 @@ async function handleChatMesage() {
         ss_CHATS.get(activeChat).push(sendData)
     }
     renderMessage(sendData)
-
-    await FirebaseUtils.addDocument(`features/${activeChat}/messages`, sendData)
+    const dir = activeFeature === "conversation" ? "conversations" : "features"
+    await FirebaseUtils.addDocument(`${dir}/${activeChat}/messages`, sendData)
 
 }
 

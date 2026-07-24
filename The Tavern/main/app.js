@@ -111,7 +111,7 @@ checkUser()
 //////////////////////////////////////////////////////////////////////
 
 
-function newFeatureButton(val, clickFunction = handleSidebarClick) {
+function newFeatureButton(val) {
     const template = document.getElementById("sidebarTemplate")
     let fragment = template.content.cloneNode(true)
     const a = fragment.querySelector('.nav-btn')
@@ -125,7 +125,7 @@ function newFeatureButton(val, clickFunction = handleSidebarClick) {
     a.dataset.id = val.id
     a.dataset.personalMessage = true
 
-    a.addEventListener("click", clickFunction)
+    a.addEventListener("click", handleSidebarClick)
 
 
     return fragment
@@ -158,16 +158,7 @@ async function getMyFeatures() {
                 ss_CAMPAIGNS.set(campaign.id, campaignInfo)
                 const fragment = newFeatureButton(campaignInfo)
                 document.getElementById("personal-menu").prepend(fragment)
-            })
-        }
-        if (user.directMessages) {
-            user.directMessages.forEach(async (conv) => {
-                const convInfo = await FirebaseUtils.getDocument(`/features/${conv.id}`)
-                convInfo.id = conv.id
-                myFeatures.push(convInfo)
-                ss_CAMPAIGNS.set(conv.id, convInfo)
-                const fragment = newFeatureButton(convInfo)
-                friendFriendsBtn.after(fragment)
+                myFeatures.push(campaign)
             })
         }
         const myPersonalMessages = await FirebaseUtils.getDocuments("/conversations", 10, null, { field: "users", value: user.uid })
@@ -176,6 +167,7 @@ async function getMyFeatures() {
                 renderChat(val.id, true)
             })
             friendFriendsBtn.after(frag)
+            myFeatures.push(val)
         })
     }
 }

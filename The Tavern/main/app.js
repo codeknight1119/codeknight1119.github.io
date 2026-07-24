@@ -168,7 +168,10 @@ async function getMyFeatures() {
             })
             friendFriendsBtn.after(frag)
             myFeatures.push(val)
-            FirebaseUtils.listenForNewDocInCollection(`/conversations/${val.id}/messages`, renderMessage)
+            FirebaseUtils.listenForNewDocInCollection(`/conversations/${val.id}/messages`, (data)=>{
+                if(data.uid === user.uid) return
+                renderMessage(data)
+            })
         })
     }
 }

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worldbuilding Timeline</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rpg-awesome@1.1.0/css/rpg-awesome.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #111319;
+      --card-bg: #1c202b;
+      --accent-color: #d4a359;
+      --text-main: #e0e6ed;
+      --text-muted: #8b9bb4;
+      --border-color: #2a3142;
+      --pixels-per-year: 4px; /* Base zoom factor */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Cinzel', 'Georgia', serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      overflow-x: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Controls Bar */
+    header {
+      padding: 1rem 2rem;
+      background: #161922;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .nav-btn, search-input {
+      background: #222736;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover { border-color: var(--accent-color); }
+    input[type="text"] {
+      background: #222736;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+    }
+
+    /* Timeline Workspace */
+    .timeline-container {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      position: relative;
+      padding: 40px 0;
+      white-space: nowrap;
+    }
+
+    .timeline-track-wrapper {
+      position: relative;
+      display: inline-block;
+      min-height: 400px;
+    }
+
+    /* Eras Canvas */
+    .era-bar-container {
+      display: flex;
+      height: 30px;
+      border-bottom: 2px solid var(--accent-color);
+    }
+
+    .era-segment {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      border-right: 2px dashed rgba(255,255,255,0.3);
+    }
+
+    /* Story Track & Event Track */
+    .lane {
+      position: relative;
+      height: 120px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .story-card {
+      position: absolute;
+      top: 25px;
+      height: 70px;
+      background: var(--card-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .story-card:hover, .story-card.selected {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(212, 163, 89, 0.3);
+      border-color: #fff;
+    }
+
+    .minor-event-marker {
+      position: absolute;
+      top: 40px;
+      transform: translateX(-50%);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .minor-event-marker i {
+      font-size: 1.5rem;
+      color: var(--accent-color);
+      background: #161922;
+      padding: 8px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+    }
+
+    .minor-event-marker:hover i, .minor-event-marker.selected i {
+      color: #fff;
+      border-color: var(--accent-color);
+    }
+
+    /* Sliding Drawer */
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -40%;
+      width: 38%;
+      height: 100%;
+      background: #161923;
+      border-left: 2px solid var(--accent-color);
+      box-shadow: -5px 0 25px rgba(0,0,0,0.8);
+      transition: right 0.3s ease-in-out;
+      z-index: 100;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .drawer.open { right: 0; }
+    .close-btn {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="era-nav">
+      <button class="nav-btn" onclick="scrollToEra('ET')">ET Era</button>
+      <button class="nav-btn" onclick="scrollToEra('CR')">CR Era</button>
+      <button class="nav-btn" onclick="scrollToEra('NET')">NET Era</button>
+    </div>
+    <input type="text" id="searchInput" placeholder="Search event or year..." onkeyup="handleSearch()">
+  </header>
+
+  <div class="timeline-container" id="timelineContainer">
+    <div class="timeline-track-wrapper" id="trackWrapper">
+      <div class="era-bar-container" id="eraBar"></div>
+      <div class="lane" id="storyLane"></div>
+      <div class="lane" id="eventLane"></div>
+    </div>
+  </div>
+
+  <div class="drawer" id="detailDrawer">
+    <button class="close-btn" onclick="closeDrawer()">&times;</button>
+    <div id="drawerContent"></div>
+  </div>
+
+  <script>
+    // 1. CONFIGURATION DATA
+    const ERAS = {
+      ET:  { name: "Edenic Times",     start: 0, end: 300,  color: "#2a4d38" },
+      CR:  { name: "Chaotic Rule",     start: 0, end: 2000, color: "#5c2828" },
+      NET: { name: "New Edenic Times", start: 0, end: 300,  color: "#244063" }
+    };
+
+    const ZOOM_PX_PER_YEAR = 3; // Base scale ratio
+
+    const STORIES = [
+      {
+        id: "s1",
+        title: "Dawn of the First Sanctuary",
+        era: "ET",
+        startYear: 20,
+        endYear: 140,
+        description: "## Summary\nCreation of the first magic enclave in **Edenic Times**.\n\n* Key figures gathered.\n* The veil was formed.",
+      },
+      {
+        id: "s2",
+        title: "The Shattered Crown",
+        era: "CR",
+        startYear: 400,
+        endYear: 850,
+        description: "## The Dark Age\nA centuries-long war that fractured the realms during the **Chaotic Rule**.",
+      }
+    ];
+
+    const EVENTS = [
+      {
+        id: "e1",
+        title: "Fall of the Elder Tree",
+        era: "ET",
+        year: 300,
+        icon: "ra-tree",
+        description: "Marks the catastrophic transition from ET to CR."
+      },
+      {
+        id: "e2",
+        title: "Rise of the Warlord",
+        era: "CR",
+        year: 120,
+        icon: "ra-crossed-swords",
+        description: "First uprising in the Chaotic Rule era."
+      }
+    ];
+
+    // 2. HELPER FUNCTIONS
+    function getAbsoluteYearOffset(era, year) {
+      let offset = 0;
+      if (era === "ET") {
+        offset = year;
+      } else if (era === "CR") {
+        offset = ERAS.ET.end + year;
+      } else if (era === "NET") {
+        offset = ERAS.ET.end + ERAS.CR.end + year;
+      }
+      return offset * ZOOM_PX_PER_YEAR;
+    }
+
+    // 3. RENDER TIMELINE
+    function renderTimeline() {
+      const eraBar = document.getElementById("eraBar");
+      const storyLane = document.getElementById("storyLane");
+      const eventLane = document.getElementById("eventLane");
+
+      // Render Era Headers
+      Object.keys(ERAS).forEach(key => {
+        const era = ERAS[key];
+        const width = (era.end - era.start) * ZOOM_PX_PER_YEAR;
+        
+        const seg = document.createElement("div");
+        seg.className = "era-segment";
+        seg.style.width = `${width}px`;
+        seg.style.backgroundColor = era.color;
+        seg.innerText = `${era.name} (${key})`;
+        seg.id = `era-block-${key}`;
+        eraBar.appendChild(seg);
+      });
+
+      // Render Story Tracks
+      STORIES.forEach(story => {
+        const startPx = getAbsoluteYearOffset(story.era, story.startYear);
+        const duration = Math.max(story.endYear - story.startYear, 10); // Minimum visual width
+        const widthPx = duration * ZOOM_PX_PER_YEAR;
+
+        const card = document.createElement("div");
+        card.className = "story-card";
+        card.style.left = `${startPx}px`;
+        card.style.width = `${widthPx}px`;
+        card.innerHTML = `<strong>${story.title}</strong><br><small>${story.era} ${story.startYear} - ${story.endYear}</small>`;
+        card.onclick = () => openDrawer(story);
+        storyLane.appendChild(card);
+      });
+
+      // Render Minor Event Markers
+      EVENTS.forEach(event => {
+        const posPx = getAbsoluteYearOffset(event.era, event.year);
+
+        const marker = document.createElement("div");
+        marker.className = "minor-event-marker";
+        marker.style.left = `${posPx}px`;
+        marker.innerHTML = `<i class="ra ${event.icon}"></i><div><small>${event.title}</small></div>`;
+        marker.onclick = () => openDrawer(event);
+        eventLane.appendChild(marker);
+      });
+    }
+
+    // 4. INTERACTION & DRAWER CONTROL
+    function openDrawer(item) {
+      const drawer = document.getElementById("detailDrawer");
+      const content = document.getElementById("drawerContent");
+      
+      const markdownBody = item.description ? marked.parse(item.description) : "No details provided.";
+      
+      content.innerHTML = `
+        <h2>${item.title}</h2>
+        <p style="color: var(--accent-color); margin-bottom: 1rem;">
+          ${item.era} ${item.startYear !== undefined ? `${item.startYear} – ${item.endYear}` : `Year ${item.year}`}
+        </p>
+        <hr style="border-color: var(--border-color); margin-bottom: 1rem;">
+        <div>${markdownBody}</div>
+      `;
+      
+      drawer.classList.add("open");
+    }
+
+    function closeDrawer() {
+      document.getElementById("detailDrawer").classList.remove("open");
+    }
+
+    function scrollToEra(eraKey) {
+      const eraElement = document.getElementById(`era-block-${eraKey}`);
+      if (eraElement) {
+        eraElement.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+      }
+    }
+
+    // Initialize
+    window.onload = renderTimeline;
+  </script>
+</body>
+</html>

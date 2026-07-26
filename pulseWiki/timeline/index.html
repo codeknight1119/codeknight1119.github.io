@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Worldbuilding Timeline</title>
+  <title>Worldbuilding Timeline V2</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rpg-awesome@1.1.0/css/rpg-awesome.min.css">
@@ -17,7 +17,6 @@
       --text-main: #e0e6ed;
       --text-muted: #8b9bb4;
       --border-color: #2a3142;
-      --pixels-per-year: 4px; /* Base zoom factor */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,6 +28,7 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
+      user-select: none; /* Prevents text highlighting while dragging */
     }
 
     /* Controls Bar */
@@ -40,9 +40,10 @@
       gap: 1.5rem;
       align-items: center;
       z-index: 10;
+      flex-wrap: wrap;
     }
 
-    .nav-btn, search-input {
+    .nav-btn {
       background: #222736;
       border: 1px solid var(--border-color);
       color: var(--text-main);
@@ -52,12 +53,12 @@
     }
 
     .nav-btn:hover { border-color: var(--accent-color); }
-    input[type="text"] {
-      background: #222736;
-      border: 1px solid var(--border-color);
-      color: #fff;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
+    
+    .zoom-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
     }
 
     /* Timeline Workspace */
@@ -66,80 +67,139 @@
       overflow-x: auto;
       overflow-y: hidden;
       position: relative;
-      padding: 40px 0;
+      cursor: grab;
       white-space: nowrap;
     }
+    
+    .timeline-container:active {
+      cursor: grabbing;
+    }
 
+    /* Track Wrapper - Anchor for absolute positioning */
     .timeline-track-wrapper {
       position: relative;
       display: inline-block;
-      min-height: 400px;
+      height: 100%;
+      min-width: 100%;
+      min-height: 500px;
     }
 
-    /* Eras Canvas */
-    .era-bar-container {
+    /* Bottom Axis (Years & Eras) */
+    .axis-container {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      height: 40px;
       display: flex;
-      height: 30px;
-      border-bottom: 2px solid var(--accent-color);
+      border-top: 2px solid var(--accent-color);
     }
 
     .era-segment {
+      position: relative;
+      height: 100%;
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 5px;
+      padding-left: 10px;
       font-weight: bold;
       font-size: 0.85rem;
       letter-spacing: 1px;
-      border-right: 2px dashed rgba(255,255,255,0.3);
+      border-right: 2px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
     }
 
-    /* Story Track & Event Track */
-    .lane {
-      position: relative;
-      height: 120px;
-      border-bottom: 1px dashed var(--border-color);
+    .year-tick {
+      position: absolute;
+      bottom: 40px;
+      width: 1px;
+      height: 10px;
+      background: var(--border-color);
     }
 
+    .year-label {
+      position: absolute;
+      bottom: 55px;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: sans-serif;
+    }
+
+    /* Events Layer */
+    .minor-event-marker {
+      position: absolute;
+      bottom: 80px; /* Sits just above the axis labels */
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      z-index: 5;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .minor-event-marker i { color: var(--accent-color); }
+
+    /* The Downward Triangle Pointer */
+    .minor-event-marker::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -6px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: var(--card-bg) transparent transparent transparent;
+    }
+
+    /* To create the border effect on the triangle */
+    .minor-event-marker::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -7px;
+      border-width: 7px;
+      border-style: solid;
+      border-color: var(--border-color) transparent transparent transparent;
+      z-index: -1;
+    }
+
+    .minor-event-marker:hover, .minor-event-marker.selected {
+      border-color: var(--accent-color);
+      transform: translateX(-50%) translateY(-3px);
+      z-index: 20;
+    }
+    .minor-event-marker:hover::before, .minor-event-marker.selected::before {
+      border-color: var(--accent-color) transparent transparent transparent;
+    }
+
+    /* Stories Layer */
     .story-card {
       position: absolute;
-      top: 25px;
-      height: 70px;
-      background: var(--card-bg);
+      bottom: 140px; /* Floats above the events */
+      height: 80px;
+      background: rgba(28, 32, 43, 0.9);
       border: 1px solid var(--accent-color);
       border-radius: 6px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       overflow: hidden;
-      text-overflow: ellipsis;
+      z-index: 10;
+      backdrop-filter: blur(4px);
     }
 
-    .story-card:hover, .story-card.selected {
+    .story-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 4px 15px rgba(212, 163, 89, 0.3);
       border-color: #fff;
-    }
-
-    .minor-event-marker {
-      position: absolute;
-      top: 40px;
-      transform: translateX(-50%);
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .minor-event-marker i {
-      font-size: 1.5rem;
-      color: var(--accent-color);
-      background: #161922;
-      padding: 8px;
-      border-radius: 50%;
-      border: 1px solid var(--border-color);
-    }
-
-    .minor-event-marker:hover i, .minor-event-marker.selected i {
-      color: #fff;
-      border-color: var(--accent-color);
+      z-index: 25;
     }
 
     /* Sliding Drawer */
@@ -173,19 +233,20 @@
 
   <header>
     <div class="era-nav">
-      <button class="nav-btn" onclick="scrollToEra('ET')">ET Era</button>
-      <button class="nav-btn" onclick="scrollToEra('CR')">CR Era</button>
-      <button class="nav-btn" onclick="scrollToEra('NET')">NET Era</button>
+      <button class="nav-btn" onclick="scrollToEra('ET')">ET</button>
+      <button class="nav-btn" onclick="scrollToEra('CR')">CR</button>
+      <button class="nav-btn" onclick="scrollToEra('NET')">NET</button>
     </div>
-    <input type="text" id="searchInput" placeholder="Search event or year..." onkeyup="handleSearch()">
+    
+    <div class="zoom-control">
+      <label for="zoomSlider"><i class="fa-solid fa-magnifying-glass"></i> Zoom:</label>
+      <input type="range" id="zoomSlider" min="1" max="20" value="4" oninput="handleZoom(this.value)">
+    </div>
   </header>
 
   <div class="timeline-container" id="timelineContainer">
     <div class="timeline-track-wrapper" id="trackWrapper">
-      <div class="era-bar-container" id="eraBar"></div>
-      <div class="lane" id="storyLane"></div>
-      <div class="lane" id="eventLane"></div>
-    </div>
+      </div>
   </div>
 
   <div class="drawer" id="detailDrawer">
@@ -194,120 +255,119 @@
   </div>
 
   <script>
-    // 1. CONFIGURATION DATA
+    // 1. CONFIGURATION & DATA
     const ERAS = {
       ET:  { name: "Edenic Times",     start: 0, end: 300,  color: "#2a4d38" },
       CR:  { name: "Chaotic Rule",     start: 0, end: 2000, color: "#5c2828" },
       NET: { name: "New Edenic Times", start: 0, end: 300,  color: "#244063" }
     };
 
-    const ZOOM_PX_PER_YEAR = 3; // Base scale ratio
+    let ZOOM_PX_PER_YEAR = 4; // Controlled by slider
 
     const STORIES = [
-      {
-        id: "s1",
-        title: "Dawn of the First Sanctuary",
-        era: "ET",
-        startYear: 20,
-        endYear: 140,
-        description: "## Summary\nCreation of the first magic enclave in **Edenic Times**.\n\n* Key figures gathered.\n* The veil was formed.",
-      },
-      {
-        id: "s2",
-        title: "The Shattered Crown",
-        era: "CR",
-        startYear: 400,
-        endYear: 850,
-        description: "## The Dark Age\nA centuries-long war that fractured the realms during the **Chaotic Rule**.",
-      }
+      { id: "s1", title: "Dawn of the First Sanctuary", era: "ET", startYear: 20, endYear: 140, description: "Creation of the first magic enclave." },
+      { id: "s2", title: "The Shattered Crown", era: "CR", startYear: 400, endYear: 850, description: "A centuries-long war." },
+      { id: "s3", title: "Rebirth of the Core", era: "NET", startYear: 10, endYear: 50, description: "The rebuilding phase." }
     ];
 
     const EVENTS = [
-      {
-        id: "e1",
-        title: "Fall of the Elder Tree",
-        era: "ET",
-        year: 300,
-        icon: "ra-tree",
-        description: "Marks the catastrophic transition from ET to CR."
-      },
-      {
-        id: "e2",
-        title: "Rise of the Warlord",
-        era: "CR",
-        year: 120,
-        icon: "ra-crossed-swords",
-        description: "First uprising in the Chaotic Rule era."
-      }
+      { id: "e1", title: "Fall of the Elder Tree", era: "ET", year: 300, icon: "ra-tree", description: "Marks the end of ET." },
+      { id: "e2", title: "Rise of the Warlord", era: "CR", year: 120, icon: "ra-crossed-swords", description: "First uprising." },
+      { id: "e3", title: "Treaty of Ash", era: "CR", year: 850, icon: "ra-scroll", description: "The war officially ends." }
     ];
 
     // 2. HELPER FUNCTIONS
-    function getAbsoluteYearOffset(era, year) {
+    function getAbsoluteYearOffset(eraKey, year) {
       let offset = 0;
-      if (era === "ET") {
-        offset = year;
-      } else if (era === "CR") {
-        offset = ERAS.ET.end + year;
-      } else if (era === "NET") {
-        offset = ERAS.ET.end + ERAS.CR.end + year;
-      }
-      return offset * ZOOM_PX_PER_YEAR;
+      if (eraKey === "CR") offset = ERAS.ET.end;
+      if (eraKey === "NET") offset = ERAS.ET.end + ERAS.CR.end;
+      return (offset + year) * ZOOM_PX_PER_YEAR;
     }
 
-    // 3. RENDER TIMELINE
+    // 3. RENDER ENGINE
     function renderTimeline() {
-      const eraBar = document.getElementById("eraBar");
-      const storyLane = document.getElementById("storyLane");
-      const eventLane = document.getElementById("eventLane");
+      const wrapper = document.getElementById("trackWrapper");
+      wrapper.innerHTML = ""; // Clear existing
 
-      // Render Era Headers
+      // Create Axis Container
+      const axisContainer = document.createElement("div");
+      axisContainer.className = "axis-container";
+      
+      // Determine tick intervals based on zoom (prevent clutter)
+      let tickInterval = 10;
+      if (ZOOM_PX_PER_YEAR < 2) tickInterval = 100;
+      else if (ZOOM_PX_PER_YEAR < 5) tickInterval = 50;
+
+      // Render Eras and Ticks
       Object.keys(ERAS).forEach(key => {
         const era = ERAS[key];
-        const width = (era.end - era.start) * ZOOM_PX_PER_YEAR;
+        const widthPx = (era.end - era.start) * ZOOM_PX_PER_YEAR;
         
+        // Era Background Segment
         const seg = document.createElement("div");
         seg.className = "era-segment";
-        seg.style.width = `${width}px`;
+        seg.style.width = `${widthPx}px`;
         seg.style.backgroundColor = era.color;
         seg.innerText = `${era.name} (${key})`;
         seg.id = `era-block-${key}`;
-        eraBar.appendChild(seg);
+        axisContainer.appendChild(seg);
+
+        // Generate Ticks for this Era
+        for(let y = 0; y <= era.end; y += tickInterval) {
+          const absPx = getAbsoluteYearOffset(key, y);
+          
+          const tick = document.createElement("div");
+          tick.className = "year-tick";
+          tick.style.left = `${absPx}px`;
+          wrapper.appendChild(tick);
+
+          const label = document.createElement("div");
+          label.className = "year-label";
+          label.style.left = `${absPx}px`;
+          label.innerText = `${y} ${key}`;
+          wrapper.appendChild(label);
+        }
+      });
+      wrapper.appendChild(axisContainer);
+
+      // Render Minor Events (Bottom Layer)
+      EVENTS.forEach(event => {
+        const posPx = getAbsoluteYearOffset(event.era, event.year);
+        const marker = document.createElement("div");
+        marker.className = "minor-event-marker";
+        marker.style.left = `${posPx}px`;
+        marker.innerHTML = `<i class="ra ${event.icon}"></i> <span>${event.title}</span>`;
+        marker.onclick = () => openDrawer(event);
+        wrapper.appendChild(marker);
       });
 
-      // Render Story Tracks
+      // Render Stories (Top Layer)
       STORIES.forEach(story => {
         const startPx = getAbsoluteYearOffset(story.era, story.startYear);
-        const duration = Math.max(story.endYear - story.startYear, 10); // Minimum visual width
+        const duration = Math.max(story.endYear - story.startYear, 2); 
         const widthPx = duration * ZOOM_PX_PER_YEAR;
 
         const card = document.createElement("div");
         card.className = "story-card";
         card.style.left = `${startPx}px`;
-        card.style.width = `${widthPx}px`;
-        card.innerHTML = `<strong>${story.title}</strong><br><small>${story.era} ${story.startYear} - ${story.endYear}</small>`;
+        // Ensure card doesn't shrink smaller than its text easily
+        card.style.width = `${Math.max(widthPx, 150)}px`; 
+        card.innerHTML = `<strong>${story.title}</strong><br><small style="color: var(--text-muted)">${story.era} ${story.startYear} - ${story.endYear}</small>`;
         card.onclick = () => openDrawer(story);
-        storyLane.appendChild(card);
-      });
-
-      // Render Minor Event Markers
-      EVENTS.forEach(event => {
-        const posPx = getAbsoluteYearOffset(event.era, event.year);
-
-        const marker = document.createElement("div");
-        marker.className = "minor-event-marker";
-        marker.style.left = `${posPx}px`;
-        marker.innerHTML = `<i class="ra ${event.icon}"></i><div><small>${event.title}</small></div>`;
-        marker.onclick = () => openDrawer(event);
-        eventLane.appendChild(marker);
+        wrapper.appendChild(card);
       });
     }
 
-    // 4. INTERACTION & DRAWER CONTROL
+    // 4. INTERACTIONS
+    function handleZoom(value) {
+      ZOOM_PX_PER_YEAR = parseFloat(value);
+      renderTimeline();
+    }
+
     function openDrawer(item) {
       const drawer = document.getElementById("detailDrawer");
       const content = document.getElementById("drawerContent");
-      
-      const markdownBody = item.description ? marked.parse(item.description) : "No details provided.";
+      const markdownBody = item.description ? marked.parse(item.description) : "";
       
       content.innerHTML = `
         <h2>${item.title}</h2>
@@ -317,20 +377,40 @@
         <hr style="border-color: var(--border-color); margin-bottom: 1rem;">
         <div>${markdownBody}</div>
       `;
-      
       drawer.classList.add("open");
     }
 
-    function closeDrawer() {
-      document.getElementById("detailDrawer").classList.remove("open");
-    }
+    function closeDrawer() { document.getElementById("detailDrawer").classList.remove("open"); }
 
     function scrollToEra(eraKey) {
       const eraElement = document.getElementById(`era-block-${eraKey}`);
       if (eraElement) {
-        eraElement.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+        // Find offset relative to scroll container
+        const container = document.getElementById("timelineContainer");
+        container.scrollTo({ left: eraElement.offsetLeft, behavior: 'smooth' });
       }
     }
+
+    // Drag to scroll logic
+    const slider = document.getElementById('timelineContainer');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+      isDown = true;
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; });
+    slider.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 1.5; // Scroll speed multiplier
+      slider.scrollLeft = scrollLeft - walk;
+    });
 
     // Initialize
     window.onload = renderTimeline;

@@ -122,6 +122,9 @@ function newFeatureButton(val) {
     if (val.icon && val.icon.trim() !== "") {
         icon.classList.add(val.icon.trim())
     }
+    if(val.tooltip){
+        a.title = val.tooltip
+    }
     a.dataset.id = val.id
     a.dataset.personalMessage = true
 
@@ -255,8 +258,10 @@ findFriends_keyDropdown.addEventListener("change", search);
 
 document.getElementById("findFriends-createConv").addEventListener("click", async () => {
     let chatIds = []
+    let chatNames = []
     Array.from(document.getElementById("findFriends-selectedFriends").children).forEach((val) => {
         chatIds.push(val.dataset.id)
+        chatNames.push(val.innerText)
     })
     chatIds.push(user.uid)
     console.log(chatIds)
@@ -264,8 +269,10 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
         name: document.getElementById("findFriends-convName").value,
         users: chatIds,
         type: "conversation",
+        tooltip: `Conversation with ${chatNames.join(", ")}.`
     }
-    const convData = await FirebaseUtils.addDocument("conversations", convObj)
+    const convData = await FirebaseUtils.addDocument("/conversations", convObj)
+
 
     const frag = newFeatureButton(convData)
 
@@ -490,6 +497,7 @@ async function handleChatMesage() {
     if (activeChat === null) return
 
     const markdownContent = messageInput.getMarkdown();
+    if(markdownContent.trim() === "") return
 
     const sendData = {
         content: markdownContent ?? messageInput.getText(),

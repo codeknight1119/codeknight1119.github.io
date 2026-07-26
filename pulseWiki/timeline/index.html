@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Worldbuilding Timeline V2</title>
+  <title>Worldbuilding Timeline V3</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rpg-awesome@1.1.0/css/rpg-awesome.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@1.2.0/css/rpg-awesome.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
@@ -28,7 +28,7 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      user-select: none; /* Prevents text highlighting while dragging */
+      user-select: none;
     }
 
     /* Controls Bar */
@@ -68,14 +68,14 @@
       overflow-y: hidden;
       position: relative;
       cursor: grab;
-      white-space: nowrap;
+      white-space: nowrap; /* Keeps items flowing horizontally */
+      padding-bottom: 20px; /* Extra padding for scrollbar clearance */
     }
     
     .timeline-container:active {
       cursor: grabbing;
     }
 
-    /* Track Wrapper - Anchor for absolute positioning */
     .timeline-track-wrapper {
       position: relative;
       display: inline-block;
@@ -84,10 +84,10 @@
       min-height: 500px;
     }
 
-    /* Bottom Axis (Years & Eras) */
+    /* Bottom Axis (Shifted Up) */
     .axis-container {
       position: absolute;
-      bottom: 20px;
+      bottom: 50px; /* Shifted up from 20px */
       left: 0;
       height: 40px;
       display: flex;
@@ -98,19 +98,13 @@
       position: relative;
       height: 100%;
       display: inline-flex;
-      align-items: flex-end;
-      padding-bottom: 5px;
-      padding-left: 10px;
-      font-weight: bold;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
       border-right: 2px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.4);
+      /* Text removed to prevent overlap, just keeping the background color blocks */
     }
 
     .year-tick {
       position: absolute;
-      bottom: 40px;
+      bottom: 50px; /* Aligned with axis-container */
       width: 1px;
       height: 10px;
       background: var(--border-color);
@@ -118,9 +112,9 @@
 
     .year-label {
       position: absolute;
-      bottom: 55px;
+      bottom: 65px;
       transform: translateX(-50%);
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       font-family: sans-serif;
     }
@@ -128,13 +122,13 @@
     /* Events Layer */
     .minor-event-marker {
       position: absolute;
-      bottom: 80px; /* Sits just above the axis labels */
+      bottom: 100px; /* Shifted up to clear labels */
       transform: translateX(-50%);
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       padding: 6px 12px;
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       cursor: pointer;
       z-index: 5;
       transition: all 0.2s;
@@ -143,9 +137,12 @@
       gap: 8px;
     }
 
-    .minor-event-marker i { color: var(--accent-color); }
+    .minor-event-marker i { 
+      color: var(--accent-color);
+      font-size: 1.2rem; /* Force icon sizing in case CDN defaults fail */
+    }
 
-    /* The Downward Triangle Pointer */
+    /* Triangle Pointer */
     .minor-event-marker::after {
       content: '';
       position: absolute;
@@ -157,7 +154,6 @@
       border-color: var(--card-bg) transparent transparent transparent;
     }
 
-    /* To create the border effect on the triangle */
     .minor-event-marker::before {
       content: '';
       position: absolute;
@@ -182,17 +178,21 @@
     /* Stories Layer */
     .story-card {
       position: absolute;
-      bottom: 140px; /* Floats above the events */
-      height: 80px;
+      bottom: 160px; /* Shifted up to float above events */
+      height: auto; /* Changed to auto for wrapping */
+      min-height: 80px;
       background: rgba(28, 32, 43, 0.9);
       border: 1px solid var(--accent-color);
       border-radius: 6px;
       padding: 10px 14px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
-      overflow: hidden;
       z-index: 10;
       backdrop-filter: blur(4px);
+      
+      /* Force text wrapping */
+      white-space: normal; 
+      word-wrap: break-word;
     }
 
     .story-card:hover {
@@ -262,18 +262,18 @@
       NET: { name: "New Edenic Times", start: 0, end: 300,  color: "#244063" }
     };
 
-    let ZOOM_PX_PER_YEAR = 4; // Controlled by slider
+    let ZOOM_PX_PER_YEAR = 4;
 
     const STORIES = [
       { id: "s1", title: "Dawn of the First Sanctuary", era: "ET", startYear: 20, endYear: 140, description: "Creation of the first magic enclave." },
-      { id: "s2", title: "The Shattered Crown", era: "CR", startYear: 400, endYear: 850, description: "A centuries-long war." },
+      { id: "s2", title: "The Shattered Crown which triggered the long dark era of mankind", era: "CR", startYear: 400, endYear: 850, description: "A centuries-long war. Notice how this long title now wraps properly within the card." },
       { id: "s3", title: "Rebirth of the Core", era: "NET", startYear: 10, endYear: 50, description: "The rebuilding phase." }
     ];
 
     const EVENTS = [
       { id: "e1", title: "Fall of the Elder Tree", era: "ET", year: 300, icon: "ra-tree", description: "Marks the end of ET." },
       { id: "e2", title: "Rise of the Warlord", era: "CR", year: 120, icon: "ra-crossed-swords", description: "First uprising." },
-      { id: "e3", title: "Treaty of Ash", era: "CR", year: 850, icon: "ra-scroll", description: "The war officially ends." }
+      { id: "e3", title: "Treaty of Ash", era: "CR", year: 850, icon: "ra-scroll-unfurled", description: "The war officially ends." }
     ];
 
     // 2. HELPER FUNCTIONS
@@ -287,32 +287,26 @@
     // 3. RENDER ENGINE
     function renderTimeline() {
       const wrapper = document.getElementById("trackWrapper");
-      wrapper.innerHTML = ""; // Clear existing
+      wrapper.innerHTML = ""; 
 
-      // Create Axis Container
       const axisContainer = document.createElement("div");
       axisContainer.className = "axis-container";
       
-      // Determine tick intervals based on zoom (prevent clutter)
       let tickInterval = 10;
       if (ZOOM_PX_PER_YEAR < 2) tickInterval = 100;
       else if (ZOOM_PX_PER_YEAR < 5) tickInterval = 50;
 
-      // Render Eras and Ticks
       Object.keys(ERAS).forEach(key => {
         const era = ERAS[key];
         const widthPx = (era.end - era.start) * ZOOM_PX_PER_YEAR;
         
-        // Era Background Segment
         const seg = document.createElement("div");
         seg.className = "era-segment";
         seg.style.width = `${widthPx}px`;
         seg.style.backgroundColor = era.color;
-        seg.innerText = `${era.name} (${key})`;
         seg.id = `era-block-${key}`;
         axisContainer.appendChild(seg);
 
-        // Generate Ticks for this Era
         for(let y = 0; y <= era.end; y += tickInterval) {
           const absPx = getAbsoluteYearOffset(key, y);
           
@@ -330,7 +324,6 @@
       });
       wrapper.appendChild(axisContainer);
 
-      // Render Minor Events (Bottom Layer)
       EVENTS.forEach(event => {
         const posPx = getAbsoluteYearOffset(event.era, event.year);
         const marker = document.createElement("div");
@@ -341,7 +334,6 @@
         wrapper.appendChild(marker);
       });
 
-      // Render Stories (Top Layer)
       STORIES.forEach(story => {
         const startPx = getAbsoluteYearOffset(story.era, story.startYear);
         const duration = Math.max(story.endYear - story.startYear, 2); 
@@ -350,9 +342,8 @@
         const card = document.createElement("div");
         card.className = "story-card";
         card.style.left = `${startPx}px`;
-        // Ensure card doesn't shrink smaller than its text easily
-        card.style.width = `${Math.max(widthPx, 150)}px`; 
-        card.innerHTML = `<strong>${story.title}</strong><br><small style="color: var(--text-muted)">${story.era} ${story.startYear} - ${story.endYear}</small>`;
+        card.style.width = `${Math.max(widthPx, 200)}px`; // Bumped minimum width to accommodate wrapping cleanly
+        card.innerHTML = `<strong style="display:block; margin-bottom: 4px;">${story.title}</strong><small style="color: var(--text-muted)">${story.era} ${story.startYear} - ${story.endYear}</small>`;
         card.onclick = () => openDrawer(story);
         wrapper.appendChild(card);
       });
@@ -385,7 +376,6 @@
     function scrollToEra(eraKey) {
       const eraElement = document.getElementById(`era-block-${eraKey}`);
       if (eraElement) {
-        // Find offset relative to scroll container
         const container = document.getElementById("timelineContainer");
         container.scrollTo({ left: eraElement.offsetLeft, behavior: 'smooth' });
       }
@@ -408,11 +398,10 @@
       if (!isDown) return;
       e.preventDefault();
       const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 1.5; // Scroll speed multiplier
+      const walk = (x - startX) * 1.5; 
       slider.scrollLeft = scrollLeft - walk;
     });
 
-    // Initialize
     window.onload = renderTimeline;
   </script>
 </body>

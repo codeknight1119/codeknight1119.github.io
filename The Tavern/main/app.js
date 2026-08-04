@@ -157,7 +157,9 @@ async function getMyFeatures() {
         }
 
         setUpFeatures("all","everySidebarParent", true)
-        setUpFeatures(permissions, "personal-menu", false)
+        if(permissions.length !== 0){
+            setUpFeatures(permissions, "personal-menu", false)
+        }
 
         if (user.campaigns) {
             user.campaigns.forEach(async (campaign) => {

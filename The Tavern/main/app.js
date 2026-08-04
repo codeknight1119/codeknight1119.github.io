@@ -180,8 +180,7 @@ async function getMyFeatures() {
             friendFriendsBtn.after(frag)
             myFeatures.push(val)
             FirebaseUtils.listenForNewDocInCollection(`/conversations/${val.id}/messages`, (data)=>{
-                console.log(data)
-                if(data.uid === user.uid) return
+                if(data.uid === user.uid || val.id !== activeChat) return
                 renderMessage(data)
             })
         })
@@ -342,6 +341,7 @@ function loadSidebar(data) {
             campaignUI.hidden = false;
             break
         case "conversation": 
+        activeChat = data.id
         renderChat(data.id, true)
         break
     }

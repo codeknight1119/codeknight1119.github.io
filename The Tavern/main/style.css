@@ -288,10 +288,12 @@ dropdown-btn i {
 }
 
 #campaignUI {
-    position: relative; /* CRITICAL: Caps the absolute children to this box */
+    position: relative;
+    /* CRITICAL: Caps the absolute children to this box */
     overflow: hidden;
     height: 100%;
-    width: 100%; /* Ensure it fills its limited container */
+    width: 100%;
+    /* Ensure it fills its limited container */
     margin: 0;
     padding: 0;
 }
@@ -301,7 +303,8 @@ dropdown-btn i {
     top: 0;
     bottom: 0;
     left: 0;
-    right: 50%; /* Default layout to roughly half width */
+    right: 50%;
+    /* Default layout to roughly half width */
 }
 
 #campaign-splitScreenDivide {
@@ -336,8 +339,8 @@ dropdown-btn i {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    
-    display: none; 
+
+    display: none;
     flex-direction: column;
     align-items: center;
     padding: 20px;
@@ -386,4 +389,10 @@ dropdown-btn i {
     justify-content: center;
     gap: 8px;
     margin-bottom: 8px;
+}
+
+
+#userPermsUI {
+    padding-bottom: 30px;
+    padding-left: 15px;
 }

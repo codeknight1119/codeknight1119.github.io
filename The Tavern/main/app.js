@@ -138,6 +138,7 @@ const friendFriendsBtn = document.getElementById("findFriends-btn")
 async function getMyFeatures() {
     if (user !== null) {
         async function setUpFeatures(params, parent, setActive){
+            console.log(params)
         myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: params })
 
         const parentSidebar = document.getElementById(parent)
@@ -155,8 +156,8 @@ async function getMyFeatures() {
         })
         }
 
-        setUpFeatures(["all"],"everySidebarParent", true)
-        permissions.push(permissions, "personal-menu", false)
+        setUpFeatures("all","everySidebarParent", true)
+        setUpFeatures(permissions, "personal-menu", false)
 
         if (user.campaigns) {
             user.campaigns.forEach(async (campaign) => {

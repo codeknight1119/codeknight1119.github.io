@@ -146,10 +146,10 @@ async function getMyFeatures() {
 
         reversedFeatures.forEach((val, index) => {
             const fragment = newFeatureButton(val)
-            if (index === (reversedFeatures.length - 1)) {
+            if (index === (reversedFeatures.length - 1) && setActive) {
                 const li = fragment.querySelector('li')
                 currentSelectedSidebar = li;
-                if(setActive){ li.classList.add("active") } 
+                li.classList.add("active")
                 loadSidebar(val)
             }
             parentSidebar.prepend(fragment)

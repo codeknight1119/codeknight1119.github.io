@@ -137,8 +137,8 @@ function newFeatureButton(val) {
 const friendFriendsBtn = document.getElementById("findFriends-btn")
 async function getMyFeatures() {
     if (user !== null) {
-        function setUpFeatures(params, parent, setActive){
-            myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permissions })
+        async function setUpFeatures(params, parent, setActive){
+        myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: permissions })
 
         const parentSidebar = document.getElementById()
         const reversedFeatures = myFeatures.toReversed()
@@ -157,7 +157,7 @@ async function getMyFeatures() {
 
         setUpFeatures(["all"],"everySidebarParent", true)
         permissions.push(permissions, "personal-menu", false)
-        
+
         if (user.campaigns) {
             user.campaigns.forEach(async (campaign) => {
                 const campaignInfo = await FirebaseUtils.getDocument(`/features/${campaign.id}`)

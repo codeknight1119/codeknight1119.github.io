@@ -566,6 +566,33 @@ button {
   font-size: 0.88rem;
 }
 
+.schedule-calendar__cell--selected {
+  border-color: rgba(72, 246, 255, 0.4);
+  box-shadow: 0 10px 30px rgba(72, 246, 255, 0.12);
+}
+
+.schedule-calendar__event-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.schedule-calendar__event-item {
+  font-size: 0.78rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 6px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schedule-calendar__event-more {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .schedule-week-view {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));

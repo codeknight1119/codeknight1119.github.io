@@ -604,18 +604,43 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
       cells.push(new Date(monthStart.getFullYear(), monthStart.getMonth(), day));
     }
 
-    cells.forEach((date, index) => {
+    cells.forEach((date) => {
       const cell = document.createElement('button');
       cell.className = 'schedule-calendar__cell';
       cell.type = 'button';
       if (!date) {
         cell.classList.add('schedule-calendar__cell--empty');
       } else {
-        const dayCount = state.occurrences.filter((occ) => isSameDay(occ.start, date)).length;
+        const eventsForDay = state.occurrences.filter((occ) => isSameDay(occ.start, date));
+        const dayCount = eventsForDay.length;
+        const selected = isSameDay(date, state.focusedDate);
+        if (selected) {
+          cell.classList.add('schedule-calendar__cell--selected');
+        }
+
         cell.innerHTML = `
           <div class="schedule-calendar__day">${date.getDate()}</div>
           <div class="schedule-calendar__count">${dayCount} block${dayCount === 1 ? '' : 's'}</div>
         `;
+
+        if (dayCount > 0) {
+          const eventsList = document.createElement('div');
+          eventsList.className = 'schedule-calendar__event-list';
+          eventsForDay.slice(0, 3).forEach((occurrence) => {
+            const eventItem = document.createElement('div');
+            eventItem.className = 'schedule-calendar__event-item';
+            eventItem.textContent = `${formatTime(occurrence.start, state.locale)} ${occurrence.title}`;
+            eventsList.appendChild(eventItem);
+          });
+          if (dayCount > 3) {
+            const more = document.createElement('div');
+            more.className = 'schedule-calendar__event-more';
+            more.textContent = `+${dayCount - 3} more`;
+            eventsList.appendChild(more);
+          }
+          cell.appendChild(eventsList);
+        }
+
         cell.addEventListener('click', () => {
           state.focusedDate = date;
           state.view = VIEW_TYPES.day;

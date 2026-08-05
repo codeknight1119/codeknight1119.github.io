@@ -180,6 +180,9 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
       state.view = option.view;
       updateViewToggles(state);
       loadScheduleData();
+    });
+    viewControls.appendChild(button);
+  });
   header.appendChild(headerText);
   header.appendChild(viewControls);
 

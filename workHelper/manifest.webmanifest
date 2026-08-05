@@ -1,0 +1,23 @@
+{
+  "name": "WorkHelper Planner",
+  "short_name": "WorkHelper",
+  "description": "A synthwave-themed responsive planner shell with mobile-first navigation and offline support.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b021f",
+  "theme_color": "#ff5ce6",
+  "icons": [
+    {
+      "src": "./icons/app-icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "./icons/app-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "orientation": "portrait-primary"
+}

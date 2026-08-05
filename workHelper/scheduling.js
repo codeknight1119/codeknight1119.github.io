@@ -1,6 +1,6 @@
 import { SchedulingService } from './schedulingService.js';
 
-const schedulingService = new SchedulingService();
+let schedulingService = null;
 const VIEW_TYPES = {
   calendar: 'calendar',
   week: 'week',
@@ -141,6 +141,7 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
     dragState: null,
     userId,
     locale,
+    loadError: null,
   };
 
   const page = document.createElement('section');
@@ -183,6 +184,7 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
 
   async function loadScheduleData() {
     state.isLoading = true;
+    state.loadError = null;
     render();
     if (!state.userId) {
       state.isLoading = false;
@@ -190,11 +192,23 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
     }
 
     const windowBounds = getWindowBounds(state.view, state.focusedDate);
-    await schedulingService.expandRecurringOccurrences(state.userId, windowBounds.start, windowBounds.end);
-    const occurrences = await schedulingService.getOccurrences(state.userId, windowBounds.start, windowBounds.end);
-    const templates = await schedulingService.getTemplates(state.userId);
-    state.occurrences = normalizeOccurrences(occurrences);
-    state.templates = templates;
+    if (!schedulingService) {
+      schedulingService = new SchedulingService();
+    }
+
+    try {
+      await schedulingService.expandRecurringOccurrences(state.userId, windowBounds.start, windowBounds.end);
+      const occurrences = await schedulingService.getOccurrences(state.userId, windowBounds.start, windowBounds.end);
+      const templates = await schedulingService.getTemplates(state.userId);
+      state.occurrences = normalizeOccurrences(occurrences);
+      state.templates = templates;
+      state.loadError = null;
+    } catch (error) {
+      state.loadError = error.message || 'Failed to load schedule. Initialize Firebase first.';
+      state.occurrences = [];
+      state.templates = [];
+    }
+
     state.isLoading = false;
     render();
   }
@@ -498,6 +512,17 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
 
     if (state.isLoading) {
       content.appendChild(createLoadingState());
+      return;
+    }
+
+    if (state.loadError) {
+      const errorMessage = document.createElement('div');
+      errorMessage.className = 'schedule-load-error';
+      errorMessage.innerHTML = `
+        <p>Failed to load scheduling data:</p>
+        <pre>${state.loadError}</pre>
+      `;
+      content.appendChild(errorMessage);
       return;
     }
 

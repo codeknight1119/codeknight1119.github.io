@@ -641,11 +641,19 @@ button {
 }
 
 .schedule-missing-config,
-.schedule-loading {
+.schedule-loading,
+.schedule-load-error {
   padding: 28px;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-muted);
+}
+
+.schedule-load-error pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 12px;
+  color: rgba(255, 92, 230, 0.85);
 }
 
 @media (max-width: 980px) {

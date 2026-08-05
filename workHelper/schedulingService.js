@@ -169,12 +169,19 @@ function normalizeOccurrenceInstance(instance, template) {
 
 export class SchedulingService {
   constructor(firestoreService) {
-    this.firestore = firestoreService || new FirestoreService();
+    this.firestore = firestoreService || null;
+  }
+
+  getFirestore() {
+    if (!this.firestore) {
+      this.firestore = new FirestoreService();
+    }
+    return this.firestore;
   }
 
   async getTemplates(uid) {
     if (!uid) throw new Error('SchedulingService.getTemplates requires a uid.');
-    return this.firestore.getDocuments(TEMPLATES_PATH(uid), {
+    return this.getFirestore().getDocuments(TEMPLATES_PATH(uid), {
       orderBy: { field: 'createdAt', direction: 'asc' },
     });
   }
@@ -184,7 +191,7 @@ export class SchedulingService {
     const filters = [];
     if (windowStart) filters.push({ field: 'start', operator: '>=', value: windowStart });
     if (windowEnd) filters.push({ field: 'start', operator: '<=', value: windowEnd });
-    return this.firestore.getDocuments(OCCURRENCES_PATH(uid), {
+    return this.getFirestore().getDocuments(OCCURRENCES_PATH(uid), {
       filters,
       orderBy: { field: 'start', direction: 'asc' },
     });
@@ -200,7 +207,7 @@ export class SchedulingService {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const result = await this.firestore.addDocument(TEMPLATES_PATH(uid), template);
+    const result = await this.getFirestore().addDocument(TEMPLATES_PATH(uid), template);
     return { ...template, id: result.id };
   }
 
@@ -210,19 +217,19 @@ export class SchedulingService {
       ...updates,
       updatedAt: new Date(),
     };
-    await this.firestore.updateDocument(`${TEMPLATES_PATH(uid)}/${templateId}`, payload);
+    await this.getFirestore().updateDocument(`${TEMPLATES_PATH(uid)}/${templateId}`, payload);
     return true;
   }
 
   async deleteTemplate(uid, templateId) {
     if (!uid) throw new Error('SchedulingService.deleteTemplate requires a uid.');
-    const occurrences = await this.firestore.getDocuments(OCCURRENCES_PATH(uid), {
+    const occurrences = await this.getFirestore().getDocuments(OCCURRENCES_PATH(uid), {
       filters: [{ field: 'templateId', operator: '==', value: templateId }],
     });
     await Promise.all(
-      occurrences.map((occ) => this.firestore.deleteDocument(`${OCCURRENCES_PATH(uid)}/${occ.id}`))
+      occurrences.map((occ) => this.getFirestore().deleteDocument(`${OCCURRENCES_PATH(uid)}/${occ.id}`))
     );
-    await this.firestore.deleteDocument(`${TEMPLATES_PATH(uid)}/${templateId}`);
+    await this.getFirestore().deleteDocument(`${TEMPLATES_PATH(uid)}/${templateId}`);
     return true;
   }
 
@@ -244,7 +251,7 @@ export class SchedulingService {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const result = await this.firestore.addDocument(OCCURRENCES_PATH(uid), payload);
+    const result = await this.getFirestore().addDocument(OCCURRENCES_PATH(uid), payload);
     return { ...payload, id: result.id };
   }
 
@@ -254,13 +261,13 @@ export class SchedulingService {
       ...changes,
       updatedAt: new Date(),
     };
-    await this.firestore.updateDocument(`${OCCURRENCES_PATH(uid)}/${occurrenceId}`, payload);
+    await this.getFirestore().updateDocument(`${OCCURRENCES_PATH(uid)}/${occurrenceId}`, payload);
     return true;
   }
 
   async deleteOccurrence(uid, occurrenceId) {
     if (!uid) throw new Error('SchedulingService.deleteOccurrence requires a uid.');
-    await this.firestore.deleteDocument(`${OCCURRENCES_PATH(uid)}/${occurrenceId}`);
+    await this.getFirestore().deleteDocument(`${OCCURRENCES_PATH(uid)}/${occurrenceId}`);
     return true;
   }
 
@@ -284,7 +291,7 @@ export class SchedulingService {
         const key = `${template.id}:${instance.start.toISOString()}`;
         if (!existingKeys.has(key)) {
           const occurrence = normalizeOccurrenceInstance(instance, template);
-          creations.push(this.firestore.addDocument(OCCURRENCES_PATH(uid), occurrence));
+          creations.push(this.getFirestore().addDocument(OCCURRENCES_PATH(uid), occurrence));
         }
       });
     });

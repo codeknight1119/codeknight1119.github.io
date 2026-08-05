@@ -1,6 +1,15 @@
+import { createBackend } from './index.js';
 import { createSchedulePage } from './scheduling.js';
 
+let authService = null;
+let currentUser = null;
+
 const ROUTES = {
+  login: {
+    label: 'Login',
+    icon: '🔐',
+    render: renderLoginPage,
+  },
   calendar: {
     label: 'Calendar',
     icon: '📅',
@@ -38,7 +47,23 @@ const STORAGE_KEY = 'workhelper-theme-mode';
 
 function getCurrentRoute() {
   const hash = window.location.hash.replace('#', '').trim().toLowerCase();
-  return ROUTES[hash] ? hash : 'calendar';
+  if (hash && ROUTES[hash]) {
+    return hash;
+  }
+  return 'calendar';
+}
+
+function shouldRequireAuth(routeKey) {
+  if (routeKey === 'login') return false;
+  return true;
+}
+
+function getEffectiveRoute() {
+  const routeKey = getCurrentRoute();
+  if (!currentUser && shouldRequireAuth(routeKey)) {
+    return 'login';
+  }
+  return routeKey;
 }
 
 function createNavLink(routeKey) {
@@ -125,6 +150,40 @@ function buildShell() {
   appRoot.appendChild(bottomNav);
 }
 
+function renderLoginPage() {
+  const card = document.createElement('section');
+  card.className = 'page-card';
+  card.innerHTML = `
+    <div class="app-shell__header">
+      <div>
+        <h1 class="page-card__title">Sign in to WorkHelper</h1>
+        <p class="page-card__subtitle">Use your Google account to unlock scheduling and Firebase-backed persistence.</p>
+      </div>
+    </div>
+    <div class="empty-state">
+      <p class="empty-state__note">You must be authenticated before you can access the scheduler.</p>
+      <button class="empty-state__button" type="button">Sign in with Google</button>
+    </div>
+  `;
+
+  const signInButton = card.querySelector('.empty-state__button');
+  signInButton.addEventListener('click', async () => {
+    if (!authService || typeof authService.signInWithGoogle !== 'function') {
+      alert('Authentication service is not initialized yet. Reload the page.');
+      return;
+    }
+
+    try {
+      await authService.signInWithGoogle();
+      window.location.hash = '#calendar';
+    } catch (error) {
+      alert(error.message || 'Google sign-in failed.');
+    }
+  });
+
+  return card;
+}
+
 function renderEmptyState(title, message) {
   const card = document.createElement('section');
   card.className = 'page-card';
@@ -156,10 +215,11 @@ function updateActiveLinks(routeKey) {
 
 function renderRoute(routeKey) {
   const main = document.querySelector('#content');
-  const route = ROUTES[routeKey] || ROUTES.calendar;
+  const effectiveRoute = getEffectiveRoute();
+  const route = ROUTES[effectiveRoute] || ROUTES.calendar;
   main.innerHTML = '';
   main.appendChild(route.render());
-  updateActiveLinks(routeKey);
+  updateActiveLinks(effectiveRoute);
   main.focus({ preventScroll: true });
 }
 
@@ -196,7 +256,25 @@ function registerServiceWorker() {
   }
 }
 
-function hydrateApp() {
+async function hydrateApp() {
+  try {
+    const backend = await createBackend();
+    authService = backend.authService;
+    authService.onAuthStateChanged((user) => {
+      currentUser = user;
+      if (user) {
+        window.__workHelperUserId = user.uid;
+        localStorage.setItem('workhelper-user-uid', user.uid);
+      } else {
+        window.__workHelperUserId = null;
+        localStorage.removeItem('workhelper-user-uid');
+      }
+      renderRoute(getCurrentRoute());
+    });
+  } catch (error) {
+    console.error('Failed to initialize backend:', error);
+  }
+
   buildShell();
   setInitialTheme();
   initRouting();

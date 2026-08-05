@@ -3,6 +3,8 @@ import { FirestoreService } from './firestoreService.js';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
@@ -33,6 +35,20 @@ export class AuthService {
       return user;
     } catch (error) {
       console.error('AuthService.createEmailAccount failed', error);
+      throw error;
+    }
+  }
+
+  async signInWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const userCredential = await signInWithPopup(this.auth, provider);
+      const user = userCredential.user;
+      await this._ensureAuthorizedUser(user, { createIfMissing: true });
+      return user;
+    } catch (error) {
+      console.error('AuthService.signInWithGoogle failed', error);
       throw error;
     }
   }

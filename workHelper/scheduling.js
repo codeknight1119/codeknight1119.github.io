@@ -128,6 +128,16 @@ function buildViewButton(label, viewType, currentView) {
   return button;
 }
 
+function updateViewToggles(state) {
+  document.querySelectorAll('.schedule-view-toggle').forEach((button) => {
+    if (button.dataset.view === state.view) {
+      button.classList.add('schedule-view-toggle--active');
+    } else {
+      button.classList.remove('schedule-view-toggle--active');
+    }
+  });
+}
+
 function createSchedulePage(initialView = VIEW_TYPES.calendar) {
   const userId = resolveUserId();
   const locale = navigator.language || 'en-US';
@@ -168,11 +178,8 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
     const button = buildViewButton(option.label, option.view, state.view);
     button.addEventListener('click', () => {
       state.view = option.view;
-      render();
-    });
-    viewControls.appendChild(button);
-  });
-
+      updateViewToggles(state);
+      loadScheduleData();
   header.appendChild(headerText);
   header.appendChild(viewControls);
 
@@ -365,7 +372,7 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
       const end = form.querySelector('input[name="end"]').value;
       const dateValue = form.querySelector('input[name="date"]').value;
       const recurrence = form.querySelector('select[name="recurrence"]').value;
-      const selectedDays = Array.from(form.querySelector('select[name="daysOfWeek"] option:checked')).map((option) => Number(option.value));
+      const selectedDays = Array.from(form.querySelectorAll('select[name="daysOfWeek"] option:checked')).map((option) => Number(option.value));
       const color = form.querySelector('input[name="color"]').value;
       const monthDaysText = form.querySelector('input[name="monthDays"]').value;
       const monthDays = monthDaysText
@@ -547,6 +554,7 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
     grid.appendChild(side);
     content.appendChild(topPanel);
     content.appendChild(grid);
+    updateViewToggles(state);
   }
 
   function createLoadingState() {

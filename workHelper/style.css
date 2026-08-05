@@ -471,6 +471,22 @@ button {
   padding: 12px 14px;
 }
 
+.schedule-form__fields input[type="color"] {
+  display: block;
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
+  padding: 6px 10px;
+  border-radius: 14px;
+}
+
+.schedule-form__fields input[type="color"] {
+  padding: 4px;
+  height: 46px;
+  min-height: 46px;
+  cursor: pointer;
+}
+
 .schedule-form__actions {
   display: flex;
   justify-content: flex-end;

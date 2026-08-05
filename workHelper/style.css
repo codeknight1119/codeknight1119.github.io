@@ -472,6 +472,11 @@ button {
 }
 
 .schedule-form__fields input[type="color"] {
+  padding: 8px 10px;
+  height: 44px;
+}
+
+.schedule-form__fields input[type="color"] {
   display: block;
   width: 100%;
   height: 46px;

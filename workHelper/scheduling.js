@@ -369,13 +369,21 @@ function createSchedulePage(initialView = VIEW_TYPES.calendar) {
 
     const submitButton = section.querySelector('.button');
     submitButton.addEventListener('click', async () => {
-      const form = section.querySelector('div.schedule-form__fields');
+      const form = section.querySelector('.schedule-form__fields');
+      if (!form) {
+        alert('Unable to read the block form. Please refresh the page.');
+        return;
+      }
+
       const title = form.querySelector('input[name="title"]').value.trim();
       const start = form.querySelector('input[name="start"]').value;
       const end = form.querySelector('input[name="end"]').value;
       const dateValue = form.querySelector('input[name="date"]').value;
       const recurrence = form.querySelector('select[name="recurrence"]').value;
-      const selectedDays = Array.from(form.querySelectorAll('select[name="daysOfWeek"] option:checked')).map((option) => Number(option.value));
+
+      const daySelect = form.querySelector('select[name="daysOfWeek"]');
+      const selectedDays = daySelect ? Array.from(daySelect.selectedOptions).map((option) => Number(option.value)) : [];
+
       const color = form.querySelector('input[name="color"]').value;
       const monthDaysText = form.querySelector('input[name="monthDays"]').value;
       const monthDays = monthDaysText

@@ -1,8 +1,7 @@
 import { FirestoreService } from './firestoreService.js';
 
-const SCHEDULING_ROOT = (uid) => `users/${uid}/scheduling`;
-const TEMPLATES_PATH = (uid) => `${SCHEDULING_ROOT(uid)}/templates`;
-const OCCURRENCES_PATH = (uid) => `${SCHEDULING_ROOT(uid)}/occurrences`;
+const TEMPLATES_PATH = (uid) => `users/${uid}/schedulingTemplates`;
+const OCCURRENCES_PATH = (uid) => `users/${uid}/schedulingOccurrences`;
 
 const DEFAULT_TEMPLATE = {
   title: 'Blocked Time',

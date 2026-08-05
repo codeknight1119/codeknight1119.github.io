@@ -1,6 +1,16 @@
 import { createBackend } from './index.js';
 import { createSchedulePage } from './scheduling.js';
 
+const firebaseConfig = {
+  apiKey: 'AIzaSyBOxkHBmsa7gLBTxikoYCWCnzUhgkbR4Ws',
+  authDomain: 'workhelper-3762e.firebaseapp.com',
+  projectId: 'workhelper-3762e',
+  storageBucket: 'workhelper-3762e.firebasestorage.app',
+  messagingSenderId: '545103150128',
+  appId: '1:545103150128:web:078b8e04d0eb034c4041f5',
+  measurementId: 'G-E3EFJDVECX',
+};
+
 let authService = null;
 let currentUser = null;
 
@@ -258,7 +268,7 @@ function registerServiceWorker() {
 
 async function hydrateApp() {
   try {
-    const backend = await createBackend();
+    const backend = await createBackend(firebaseConfig);
     authService = backend.authService;
     authService.onAuthStateChanged((user) => {
       currentUser = user;

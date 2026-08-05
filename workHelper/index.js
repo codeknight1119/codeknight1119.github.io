@@ -5,3 +5,4 @@ export async function createBackend(config) {
 }
 
 export { getFirestoreService, getAuthService, getUserService } from './backendService.js';
+export { SchedulingService } from './schedulingService.js';

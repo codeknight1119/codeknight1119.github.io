@@ -1,8 +1,10 @@
+import { createSchedulePage } from './scheduling.js';
+
 const ROUTES = {
   calendar: {
     label: 'Calendar',
     icon: '📅',
-    render: () => renderEmptyState('Calendar', 'A clean slate for the month. Your schedule shell is ready — load events from the backend later.'),
+    render: () => createSchedulePage(),
   },
   day: {
     label: 'Day',

@@ -396,3 +396,12 @@ dropdown-btn i {
     padding-bottom: 30px;
     padding-left: 15px;
 }
+
+#checkedInGuests{
+    display: flex;
+    flex-direction: row;
+}
+
+.checkedInGuest{
+    outline: 2px solid black;
+}

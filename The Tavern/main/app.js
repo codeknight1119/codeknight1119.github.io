@@ -51,17 +51,17 @@ const messageInput = new Editor({
 async function checkUserManifest() {
     if (userManifest === null) {
         const rawData = await FirebaseUtils.getDocument("/users/userManifest");
-        if(rawData){
-        userManifest = rawData.manifest;
-        }else{
+        if (rawData) {
+            userManifest = rawData.manifest;
+        } else {
             userManifest = []
         }
     }
     if (guestManifest === null) {
         const rawData = await FirebaseUtils.getDocument("/users/guestManifest");
-        if(rawData){
-        guestManifest = rawData.manifest;
-        }else{
+        if (rawData) {
+            guestManifest = rawData.manifest;
+        } else {
             guestManifest = []
         }
     }
@@ -482,13 +482,28 @@ async function renderTool(id) {
                 const name = document.querySelector("#guestName").value
                 const lowerName = name.toLowerCase()
                 await checkUserManifest()
-                const guestData = guestManifest.find(guest => guest.name.toLowerCase().includes(lowerName))
+
+
+                const guestDatas = guestManifest.filter(item => {
+                    const itemValue = String(item[name] || "").toLowerCase();
+                    return itemValue.includes(searchTerm);
+                });
+                const guestData = guestData[0]
                 console.log(guestData)
-                if(guestData === undefined){
-                    guestManifest.push({name: name, meetingCount: 1})
-                }else{
+                let currentMeetings = 0;
+                if (guestData === undefined) {
+                    currentMeetings = 1
+                    guestManifest.push({ name: name, meetingCount: currentMeetings })
+                } else {
 
                 }
+                let end = ""
+                if (currentMeetings === 3) {
+                    end = `\nNeeds to pay dues then can join club.`
+                }
+                let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre>`
+
+
             })
 
             const guestTemplate = document.getElementById("guestTemplate")

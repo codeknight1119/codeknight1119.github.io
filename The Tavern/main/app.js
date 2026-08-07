@@ -330,7 +330,7 @@ function hideFeatureHTML() {
     }
 }
 
-function loadSidebar(data) {
+async function loadSidebar(data) {
     hideFeatureHTML()
     activeFeatureType = data.type;
     switch (data.type) {
@@ -340,7 +340,7 @@ function loadSidebar(data) {
             break;
 
         case "chat":
-            renderChat(data.id)
+            await renderChat(data.id)
             break;
         case "campaign":
             mainContentArea.appendChild(campaignUI)
@@ -348,11 +348,11 @@ function loadSidebar(data) {
             break
         case "conversation":
             activeChat = data.id
-            renderChat(data.id, true)
+            await renderChat(data.id, true)
             break
         case "roleCall":
             activeFeature = data.id;
-            renderRoleCall()
+            await renderRoleCall()
             break
     }
 }
@@ -755,7 +755,7 @@ async function fetchServer(enpoint, postData) {
 
 async function renderRoleCall() {
     try{
-console.log("rendering role call")
+    console.log("rendering role call")
     const guestUITemplate = document.getElementById("guestUITemplate")
     const guestUI = guestUITemplate.content.cloneNode(true)
     mainContentArea.appendChild(guestUI)
@@ -767,8 +767,6 @@ console.log("rendering role call")
     console.log(guestData)
 
     })
-
-
 
     const guestTemplate = document.getElementById("guestTemplate")
 }catch(e){

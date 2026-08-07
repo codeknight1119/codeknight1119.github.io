@@ -138,8 +138,6 @@ const friendFriendsBtn = document.getElementById("findFriends-btn")
 async function getMyFeatures() {
     if (user !== null) {
         async function setUpFeatures(params, parent, setActive) {
-            try{
-            console.log(params)
             const docs = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: params })
             myFeatures = myFeatures.concat(docs)
 
@@ -156,9 +154,6 @@ async function getMyFeatures() {
                 }
                 parentSidebar.prepend(fragment)
             })
-        }catch(e){
-            console.error(e)
-        }
         }
 
         await setUpFeatures(["all"], "everySidebarParent", true)
@@ -277,7 +272,6 @@ document.getElementById("findFriends-createConv").addEventListener("click", asyn
         chatNames.push(val.innerText)
     })
     chatIds.push(user.uid)
-    console.log(chatIds)
     let convObj = {
         name: document.getElementById("findFriends-convName").value,
         users: chatIds,
@@ -341,7 +335,6 @@ function loadSidebar(data) {
             renderChat(data.id)
             break;
         case "campaign":
-            // console.log("Loading campaign", data)
             mainContentArea.appendChild(campaignUI)
             campaignUI.hidden = false;
             break
@@ -452,6 +445,7 @@ async function renderTool(id) {
 
             // FIXED: Removed unnecessary async/await inside the array loop
             boards.forEach((board) => {
+                console.log(board)
                 const parsedBody = marked.parse(board.body)
                 newBoard(board.title, parsedBody, board.id)
             })
@@ -472,7 +466,6 @@ async function renderChat(id, conversation = false) {
     if (conversation) {
         activeFeature = "conversation"
     }
-    console.log(`/${dir}/${id}/messages`)
     const messages = await FirebaseUtils.getDocuments(`/${dir}/${id}/messages`, 50)
     activeChat = id
 
@@ -618,9 +611,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         })
 
         searchedRes.querySelector(".searched-save").addEventListener("click", async () => {
-            console.log(currentSearchUpdates[userUID])
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
-            console.log(currentSearchUpdates[userUID].permissions)
             currentSearchUpdates[userUID].permissions.forEach(async (val) => {
                 await fetchServer(`permsUpdate?user=${userUID}&perm=${val}`)
             })
@@ -744,8 +735,7 @@ async function fetchServer(enpoint, postData) {
 
     const jsData = await data.json();
     console.log(jsData);
-
-
+    //KEEP FOR TESTING
 }
 
 /*

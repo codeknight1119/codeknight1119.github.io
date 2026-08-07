@@ -754,27 +754,27 @@ async function fetchServer(enpoint, postData) {
 }
 
 async function renderRoleCall() {
-    const html = `
-    <h3>Regulars</h3>
-    <div id="regulars></div>
-    <hr>
-    <h3>Guests</h3>
-    <div id="guests></div>
-    `
+    try{
+console.log("rendering role call")
     mainContentArea.innerHTML = html
     const guestUITemplate = document.getElementById("guestUITemplate")
     const guestUI = guestUITemplate.content.cloneNode(true)
-    guestUI.querySelector("#guestCheckin").addEventListener("click", async ()=>{
-    const name = guestUI.querySelector("#guestName").toLowerCase()
+    mainContentArea.appendChild(guestUI)
+
+    guestUI.getElementById("guestCheckin").addEventListener("click", async ()=>{
+    const name = guestUI.getElementById("guestName").toLowerCase()
         await checkUserManifest()
     const guestData = guestManifest.find(guest => guest.name.includes(name))
     console.log(guestData)
 
     })
-    mainContentArea.appendChild(guestUI)
+
 
 
     const guestTemplate = document.getElementById("guestTemplate")
+}catch(e){
+    console.error(e)
+}
 
 }
 

@@ -488,7 +488,7 @@ console.log(guestManifest)
                     const itemValue = String(item.name || "").toLowerCase();
                     return itemValue.includes(lowerName);
                 });
-                const guestData = guestData[0]
+                const guestData = guestDatas[0]
                 console.log(guestData)
                 let currentMeetings = 0;
                 if (guestData === undefined) {

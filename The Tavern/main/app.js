@@ -465,7 +465,22 @@ async function renderTool(id) {
             break
 
         case "roleCall":
-            await renderRoleCall()
+            console.log("rendering role call")
+
+            const guestUITemplate = document.getElementById("guestUITemplate")
+            const guestUI = guestUITemplate.content.cloneNode(true)
+            mainContentArea.appendChild(guestUI)
+
+
+            guestUI.getElementById("guestCheckin").addEventListener("click", async () => {
+                const name = guestUI.getElementById("guestName").toLowerCase()
+                await checkUserManifest()
+                const guestData = guestManifest.find(guest => guest.name.includes(name))
+                console.log(guestData)
+
+            })
+
+            const guestTemplate = document.getElementById("guestTemplate")
             break
     }
 }
@@ -750,30 +765,6 @@ async function fetchServer(enpoint, postData) {
     const jsData = await data.json();
     console.log(jsData);
     //KEEP FOR TESTING
-}
-
-async function renderRoleCall() {
-    console.log("rendering role call")
-    try {
-        console.log("rendering role call")
-        const guestUITemplate = document.getElementById("guestUITemplate")
-        const guestUI = guestUITemplate.content.cloneNode(true)
-        mainContentArea.appendChild(guestUI)
-        /*
-        guestUI.getElementById("guestCheckin").addEventListener("click", async ()=>{
-        const name = guestUI.getElementById("guestName").toLowerCase()
-            await checkUserManifest()
-        const guestData = guestManifest.find(guest => guest.name.includes(name))
-        console.log(guestData)
-
-    })*/
-
-        const guestTemplate = document.getElementById("guestTemplate")
-
-    } catch (e) {
-        console.error(e)
-    }
-
 }
 
 

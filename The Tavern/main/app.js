@@ -1,4 +1,4 @@
-import  {FirebaseUtils} from "../firebaseUtils.js"
+import { FirebaseUtils } from "../firebaseUtils.js"
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import { Editor } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
@@ -12,7 +12,7 @@ import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 let user = null;
 let getToken = null
 let permissions = null;
-let myFeatures = null;
+let myFeatures = [];
 let currentSelectedSidebar = null
 const chatUI = document.getElementById("chatTools")
 let ss_TOOLS = new Map()
@@ -122,7 +122,7 @@ function newFeatureButton(val) {
     if (val.icon && val.icon.trim() !== "") {
         icon.classList.add(val.icon.trim())
     }
-    if(val.tooltip){
+    if (val.tooltip) {
         a.title = val.tooltip
     }
     a.dataset.id = val.id
@@ -137,27 +137,28 @@ function newFeatureButton(val) {
 const friendFriendsBtn = document.getElementById("findFriends-btn")
 async function getMyFeatures() {
     if (user !== null) {
-        async function setUpFeatures(params, parent, setActive){
+        async function setUpFeatures(params, parent, setActive) {
             console.log(params)
-        myFeatures = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: params })
+            const docs = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: params })
+            myFeatures.concat(docs)
 
-        const parentSidebar = document.getElementById(parent)
-        const reversedFeatures = myFeatures.toReversed()
+            const parentSidebar = document.getElementById(parent)
+            const reversedFeatures = myFeatures.toReversed()
 
-        reversedFeatures.forEach((val, index) => {
-            const fragment = newFeatureButton(val)
-            if (index === (reversedFeatures.length - 1) && setActive) {
-                const li = fragment.querySelector('li')
-                currentSelectedSidebar = li;
-                li.classList.add("active")
-                loadSidebar(val)
-            }
-            parentSidebar.prepend(fragment)
-        })
+            reversedFeatures.forEach((val, index) => {
+                const fragment = newFeatureButton(val)
+                if (index === (reversedFeatures.length - 1) && setActive) {
+                    const li = fragment.querySelector('li')
+                    currentSelectedSidebar = li;
+                    li.classList.add("active")
+                    loadSidebar(val)
+                }
+                parentSidebar.prepend(fragment)
+            })
         }
 
-        await setUpFeatures(["all"],"everySidebarParent", true)
-        if(permissions.length !== 0){
+        await setUpFeatures(["all"], "everySidebarParent", true)
+        if (permissions.length !== 0) {
             await setUpFeatures(permissions, "personal-menu", false)
         }
 
@@ -179,8 +180,8 @@ async function getMyFeatures() {
             })
             friendFriendsBtn.after(frag)
             myFeatures.push(val)
-            FirebaseUtils.listenForNewDocInCollection(`/conversations/${val.id}/messages`, (data)=>{
-                if(data.uid === user.uid || val.id !== activeChat) return
+            FirebaseUtils.listenForNewDocInCollection(`/conversations/${val.id}/messages`, (data) => {
+                if (data.uid === user.uid || val.id !== activeChat) return
                 renderMessage(data)
             })
         })
@@ -340,10 +341,10 @@ function loadSidebar(data) {
             mainContentArea.appendChild(campaignUI)
             campaignUI.hidden = false;
             break
-        case "conversation": 
-        activeChat = data.id
-        renderChat(data.id, true)
-        break
+        case "conversation":
+            activeChat = data.id
+            renderChat(data.id, true)
+            break
     }
 }
 
@@ -506,7 +507,7 @@ async function handleChatMesage() {
     if (activeChat === null) return
 
     const markdownContent = messageInput.getMarkdown();
-    if(markdownContent.trim() === "") return
+    if (markdownContent.trim() === "") return
 
     const sendData = {
         content: markdownContent ?? messageInput.getText(),

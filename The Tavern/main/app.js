@@ -444,7 +444,6 @@ async function renderTool(id) {
                 ss_TOOLS.set(id, boards)
             }
 
-            // FIXED: Wipe the slate clean right before drawing to stop concurrent/stacked duplications
             mainContentArea.replaceChildren();
 
             if (boards.length === 0) {
@@ -452,7 +451,6 @@ async function renderTool(id) {
                 return
             }
 
-            // FIXED: Removed unnecessary async/await inside the array loop
             boards.forEach((board) => {
                 console.log(board)
                 const parsedBody = marked.parse(board.body)
@@ -467,7 +465,6 @@ async function renderTool(id) {
             break
 
         case "roleCall":
-            activeFeature = data.id;
             await renderRoleCall()
             break
     }

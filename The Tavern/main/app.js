@@ -479,10 +479,16 @@ async function renderTool(id) {
             const guestUI = guestUITemplate.content.cloneNode(true)
 
             guestUI.querySelector("#guestCheckin").addEventListener("click", async () => {
-                const name = document.querySelector("#guestName").value.toLowerCase()
+                const name = document.querySelector("#guestName").value
+                const lowerName = name.toLowerCase()
                 await checkUserManifest()
-                const guestData = guestManifest.find(guest => guest.name.includes(name))
+                const guestData = guestManifest.find(guest => guest.name.toLowerCase().includes(lowerName))
                 console.log(guestData)
+                if(guestData === undefined){
+                    guestManifest.push({name: name, times: 1})
+                }else{
+
+                }
             })
 
             const guestTemplate = document.getElementById("guestTemplate")

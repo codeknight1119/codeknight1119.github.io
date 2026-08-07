@@ -333,6 +333,7 @@ function hideFeatureHTML() {
 async function loadSidebar(data) {
     hideFeatureHTML()
     activeFeatureType = data.type;
+    console.log(activeFeatureType)
     switch (data.type) {
         case "tool":
             activeFeature = data.id; // FIXED: Set the active ID BEFORE rendering the tool logic
@@ -760,17 +761,17 @@ async function renderRoleCall() {
         const guestUITemplate = document.getElementById("guestUITemplate")
         const guestUI = guestUITemplate.content.cloneNode(true)
         mainContentArea.appendChild(guestUI)
-
+        /*
         guestUI.getElementById("guestCheckin").addEventListener("click", async ()=>{
         const name = guestUI.getElementById("guestName").toLowerCase()
             await checkUserManifest()
         const guestData = guestManifest.find(guest => guest.name.includes(name))
         console.log(guestData)
 
-    })
+    })*/
 
     const guestTemplate = document.getElementById("guestTemplate")
-    
+
     }catch(e){
         console.error(e)
     }

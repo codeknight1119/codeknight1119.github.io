@@ -469,8 +469,6 @@ async function renderTool(id) {
 
             const guestUITemplate = document.getElementById("guestUITemplate")
             const guestUI = guestUITemplate.content.cloneNode(true)
-            mainContentArea.appendChild(guestUI)
-
 
             guestUI.querySelector("#guestCheckin").addEventListener("click", async () => {
                 const name = guestUI.getElementById("guestName").toLowerCase()
@@ -481,6 +479,8 @@ async function renderTool(id) {
             })
 
             const guestTemplate = document.getElementById("guestTemplate")
+
+            mainContentArea.appendChild(guestUI)
             break
     }
 }

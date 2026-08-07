@@ -474,9 +474,23 @@ async function renderTool(id) {
             const guestUITemplate = document.getElementById("guestUITemplate")
             const guestUI = guestUITemplate.content.cloneNode(true)
 
+            const checkedInHolder = document.getElementById("checkedInGuests")
             guestUI.querySelector("#guestCheckin").addEventListener("click", async () => {
                 const name = document.querySelector("#guestName").value
                 const lowerName = name.toLowerCase()
+                let canContinue = true;
+                Array.from(checkedInHolder.children).forEach((val=>{
+                    if(val.dataset.name = lowerName){
+                        canContinue = false;
+                    }
+                }))
+
+                if(!canContinue){
+                    alert("Cannot enter the same person twice")
+                    return
+                }
+                
+
                 await checkUserManifest()
 
                 const guestDatas = guestManifest.filter(item => {
@@ -498,8 +512,9 @@ async function renderTool(id) {
                 }
                 let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre><br>`
                 const checkedInElement = document.createElement("div")
+                checkedInElement.dataset.name = lowerName
                 checkedInElement.innerHTML = htmlCheckedIn
-                document.getElementById("checkedInGuests").appendChild(checkedInElement)
+                checkedInHolder.appendChild(checkedInElement)
             })
 
             const guestTemplate = document.getElementById("guestTemplate")

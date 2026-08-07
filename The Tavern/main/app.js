@@ -473,7 +473,6 @@ async function renderTool(id) {
 
             const guestUITemplate = document.getElementById("guestUITemplate");
             const guestUI = guestUITemplate.content.cloneNode(true);
-            const checkedInHolder = document.getElementById("checkedInGuests");
 
             // Grab the input relative to this specific cloned template instance
             const nameInput = guestUI.querySelector("#guestName");
@@ -484,6 +483,7 @@ async function renderTool(id) {
                 const lowerName = name.toLowerCase();
 
                 // Check if the guest is already checked in
+                const checkedInHolder = document.getElementById("checkedInGuests");
                 const isAlreadyCheckedIn = Array.from(checkedInHolder.children).some(
                     (val) => val.dataset.name === lowerName
                 );

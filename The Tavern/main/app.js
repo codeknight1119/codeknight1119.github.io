@@ -501,7 +501,7 @@ async function renderTool(id) {
                     end = `\nNeeds to pay dues then can join club.`
                 }
                 let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre><br>`
-                const checkedInElement = document.createElement()
+                const checkedInElement = document.createElement("div")
                 checkedInElement.innerHTML = htmlCheckedIn
                 document.getElementById("checkedInGuests").appendChild(checkedInElement)
             })

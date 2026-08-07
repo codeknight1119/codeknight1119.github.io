@@ -48,12 +48,12 @@ const messageInput = new Editor({
 /////////////////////////SITE UTILS///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-async function checkUserManifest(){
-     if (userManifest === null) {
+async function checkUserManifest() {
+    if (userManifest === null) {
         const rawData = await FirebaseUtils.getDocument("/users/userManifest");
         userManifest = rawData.manifest;
     }
-    if(guestManifest === null){
+    if (guestManifest === null) {
         const rawData = await FirebaseUtils.getDocument("/users/guestManifest");
         guestManifest = rawData.manifest;
     }
@@ -351,10 +351,6 @@ async function loadSidebar(data) {
             activeChat = data.id
             await renderChat(data.id, true)
             break
-        case "roleCall":
-            activeFeature = data.id;
-            await renderRoleCall()
-            break
     }
 }
 
@@ -468,6 +464,11 @@ async function renderTool(id) {
             const ui = document.getElementById("userPermsUI")
             ui.hidden = false
             mainContentArea.innerHTML = "<p><strong>Search to find users</strong></p>"
+            break
+
+        case "roleCall":
+            activeFeature = data.id;
+            await renderRoleCall()
             break
     }
 }
@@ -755,8 +756,8 @@ async function fetchServer(enpoint, postData) {
 }
 
 async function renderRoleCall() {
-            console.log("rendering role call")
-    try{
+    console.log("rendering role call")
+    try {
         console.log("rendering role call")
         const guestUITemplate = document.getElementById("guestUITemplate")
         const guestUI = guestUITemplate.content.cloneNode(true)
@@ -770,9 +771,9 @@ async function renderRoleCall() {
 
     })*/
 
-    const guestTemplate = document.getElementById("guestTemplate")
+        const guestTemplate = document.getElementById("guestTemplate")
 
-    }catch(e){
+    } catch (e) {
         console.error(e)
     }
 

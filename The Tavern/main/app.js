@@ -22,6 +22,7 @@ let activeChat = null;
 let activeFeature = null;
 let activeFeatureType = null;
 let userManifest = null;
+let guestManifest = null;
 
 const chatArea = document.getElementById("sendBar")
 
@@ -46,6 +47,17 @@ const messageInput = new Editor({
 //////////////////////////////////////////////////////////////////////
 /////////////////////////SITE UTILS///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
+
+async function checkUserManifest(){
+     if (userManifest === null) {
+        const rawData = await FirebaseUtils.getDocument("/users/userManifest");
+        userManifest = rawData.manifest;
+    }
+    if(guestManifest === null){
+        const rawData = await FirebaseUtils.getDocument("/users/guestManifest");
+        guestManifest = rawData.manifest;
+    }
+}
 
 const toggleButton = document.getElementById("toggle-btn")
 const sidebar = document.getElementById("sidebar")
@@ -204,11 +216,7 @@ async function search() {
 
     const key = findFriends_keyDropdown.value;
 
-    if (userManifest === null) {
-        const rawData = await FirebaseUtils.getDocument("/users/userManifest");
-        userManifest = rawData.manifest;
-    }
-
+    await checkUserManifest()
     const filteredResults = userManifest.filter(item => {
         const itemValue = String(item[key] || "").toLowerCase();
         return itemValue.includes(searchTerm);
@@ -341,6 +349,10 @@ function loadSidebar(data) {
         case "conversation":
             activeChat = data.id
             renderChat(data.id, true)
+            break
+        case "roleCall":
+            activeFeature = data.id;
+            renderRoleCall()
             break
     }
 }
@@ -740,6 +752,32 @@ async function fetchServer(enpoint, postData) {
     console.log(jsData);
     //KEEP FOR TESTING
 }
+
+async function renderRoleCall() {
+    const html = `
+    <h3>Regulars</h3>
+    <div id="regulars></div>
+    <hr>
+    <h3>Guests</h3>
+    <div id="guests></div>
+    `
+    mainContentArea.innerHTML = html
+    const guestUITemplate = document.getElementById("guestUITemplate")
+    const guestUI = guestUITemplate.content.cloneNode(true)
+    guestUI.querySelector("#guestCheckin").addEventListener("click", async ()=>{
+    const name = guestUI.querySelector("#guestName").toLowerCase()
+        await checkUserManifest()
+    const guestData = guestManifest.find(guest => guest.name.includes(name))
+    console.log(guestData)
+
+    })
+    mainContentArea.appendChild(guestUI)
+
+
+    const guestTemplate = document.getElementById("guestTemplate")
+
+}
+
 
 /*
 console.log(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣶⣶⣶⣶⣶⣶⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

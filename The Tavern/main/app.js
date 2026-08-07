@@ -756,7 +756,6 @@ async function fetchServer(enpoint, postData) {
 async function renderRoleCall() {
     try{
 console.log("rendering role call")
-    mainContentArea.innerHTML = html
     const guestUITemplate = document.getElementById("guestUITemplate")
     const guestUI = guestUITemplate.content.cloneNode(true)
     mainContentArea.appendChild(guestUI)

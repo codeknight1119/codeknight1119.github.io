@@ -142,7 +142,7 @@ async function getMyFeatures() {
             myFeatures = myFeatures.concat(docs)
 
             const parentSidebar = document.getElementById(parent)
-            const reversedFeatures = myFeatures.toReversed()
+            const reversedFeatures = docs.toReversed()
 
             reversedFeatures.forEach((val, index) => {
                 const fragment = newFeatureButton(val)

@@ -469,28 +469,29 @@ async function renderTool(id) {
             break
 
         case "roleCall":
-            console.log("rendering role call")
+            console.log("rendering role call");
 
-            const guestUITemplate = document.getElementById("guestUITemplate")
-            const guestUI = guestUITemplate.content.cloneNode(true)
+            const guestUITemplate = document.getElementById("guestUITemplate");
+            const guestUI = guestUITemplate.content.cloneNode(true);
+            const checkedInHolder = document.getElementById("checkedInGuests");
 
-            const checkedInHolder = document.getElementById("checkedInGuests")
-            guestUI.querySelector("#guestCheckin").addEventListener("click", async () => {
-                const name = document.querySelector("#guestName").value
-                const lowerName = name.toLowerCase()
-                let canContinue = true;
-                Array.from(checkedInHolder.children).forEach((val=>{
-                    if(val.dataset.name === lowerName){
-                        canContinue = false;
-                    }
-                }))
+            // Grab the input relative to this specific cloned template instance
+            const nameInput = guestUI.querySelector("#guestName");
+            const checkinBtn = guestUI.querySelector("#guestCheckin");
 
-                if(!canContinue){
-                    alert("Cannot enter the same person twice")
-                    return
+            checkinBtn.addEventListener("click", async () => {
+                const name = nameInput.value.trim();
+                const lowerName = name.toLowerCase();
+
+                // Check if the guest is already checked in
+                const isAlreadyCheckedIn = Array.from(checkedInHolder.children).some(
+                    (val) => val.dataset.name === lowerName
+                );
+
+                if (isAlreadyCheckedIn) {
+                    alert("Cannot enter the same person twice");
+                    return;
                 }
-                
-
                 await checkUserManifest()
 
                 const guestDatas = guestManifest.filter(item => {

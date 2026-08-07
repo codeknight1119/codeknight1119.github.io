@@ -156,9 +156,9 @@ async function getMyFeatures() {
         })
         }
 
-        setUpFeatures("all","everySidebarParent", true)
+        await setUpFeatures(["all"],"everySidebarParent", true)
         if(permissions.length !== 0){
-            setUpFeatures(permissions, "personal-menu", false)
+            await setUpFeatures(permissions, "personal-menu", false)
         }
 
         if (user.campaigns) {

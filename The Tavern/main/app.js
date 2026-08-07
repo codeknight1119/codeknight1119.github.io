@@ -332,19 +332,15 @@ function handleSidebarClick(event) {
 const campaignUI = document.getElementById("campaignUI")
 function hideFeatureHTML() {
     Array.from(document.getElementsByClassName("featureHTML")).forEach((val) => { val.hidden = true })
-    if (activeFeatureType === "campaign") {
-        document.querySelector("main").appendChild(campaignUI)
-        campaignUI.hiden = true
-    }
 }
 
 async function loadSidebar(data) {
     hideFeatureHTML()
     activeFeatureType = data.type;
-    console.log(activeFeatureType)
+    mainContentArea.innerHTML = ""
     switch (data.type) {
         case "tool":
-            activeFeature = data.id; // FIXED: Set the active ID BEFORE rendering the tool logic
+            activeFeature = data.id; 
             renderTool(data.id)
             break;
 

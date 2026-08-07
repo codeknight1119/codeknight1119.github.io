@@ -480,7 +480,7 @@ async function renderTool(id) {
                 const lowerName = name.toLowerCase()
                 let canContinue = true;
                 Array.from(checkedInHolder.children).forEach((val=>{
-                    if(val.dataset.name = lowerName){
+                    if(val.dataset.name === lowerName){
                         canContinue = false;
                     }
                 }))

@@ -485,8 +485,8 @@ async function renderTool(id) {
 
 console.log(guestManifest)
                 const guestDatas = guestManifest.filter(item => {
-                    const itemValue = String(item[name] || "").toLowerCase();
-                    return itemValue.includes(searchTerm);
+                    const itemValue = String(item.name || "").toLowerCase();
+                    return itemValue.includes(lowerName);
                 });
                 const guestData = guestData[0]
                 console.log(guestData)

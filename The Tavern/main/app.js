@@ -51,11 +51,19 @@ const messageInput = new Editor({
 async function checkUserManifest() {
     if (userManifest === null) {
         const rawData = await FirebaseUtils.getDocument("/users/userManifest");
+        if(rawData){
         userManifest = rawData.manifest;
+        }else{
+            userManifest = []
+        }
     }
     if (guestManifest === null) {
         const rawData = await FirebaseUtils.getDocument("/users/guestManifest");
+        if(rawData){
         guestManifest = rawData.manifest;
+        }else{
+            guestManifest = []
+        }
     }
 }
 
@@ -475,7 +483,6 @@ async function renderTool(id) {
                 await checkUserManifest()
                 const guestData = guestManifest.find(guest => guest.name.includes(name))
                 console.log(guestData)
-
             })
 
             const guestTemplate = document.getElementById("guestTemplate")

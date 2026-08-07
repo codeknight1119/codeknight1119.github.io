@@ -583,6 +583,9 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
         const allowedEl = searchedRes.querySelector(".searched-allowed")
         allowedEl.value = String(val.allowed)
 
+        const duesEl = searchedRes.querySelector(".searched-dues-paid")
+        duesEl.value = String(val.duesPaid)
+
         allowedEl.addEventListener("change", (event) => {
             const value = event.target.value;
             currentSearchUpdates[userUID].allowed = value.toLowerCase() === "true";

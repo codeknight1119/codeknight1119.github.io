@@ -494,15 +494,16 @@ async function renderTool(id) {
                     currentMeetings = 1
                     guestManifest.push({ name: name, meetingCount: currentMeetings })
                 } else {
-
+                    currentMeetings = guestData.meetingCount
                 }
                 let end = ""
                 if (currentMeetings === 3) {
                     end = `\nNeeds to pay dues then can join club.`
                 }
-                let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre>`
-
-
+                let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre><br>`
+                const checkedInElement = document.createElement()
+                checkedInElement.innerHTML = htmlCheckedIn
+                document.getElementById("checkedInGuests").appendChild(checkedInElement)
             })
 
             const guestTemplate = document.getElementById("guestTemplate")

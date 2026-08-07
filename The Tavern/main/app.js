@@ -138,9 +138,10 @@ const friendFriendsBtn = document.getElementById("findFriends-btn")
 async function getMyFeatures() {
     if (user !== null) {
         async function setUpFeatures(params, parent, setActive) {
+            try{
             console.log(params)
             const docs = await FirebaseUtils.getDocuments("/features", undefined, { field: "priority" }, { field: "allowed", value: params })
-            myFeatures.concat(docs)
+            myFeatures = myFeatures.concat(docs)
 
             const parentSidebar = document.getElementById(parent)
             const reversedFeatures = myFeatures.toReversed()
@@ -155,6 +156,9 @@ async function getMyFeatures() {
                 }
                 parentSidebar.prepend(fragment)
             })
+        }catch(e){
+            console.error(e)
+        }
         }
 
         await setUpFeatures(["all"], "everySidebarParent", true)

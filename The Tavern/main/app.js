@@ -485,7 +485,7 @@ async function renderTool(id) {
                 const guestData = guestManifest.find(guest => guest.name.toLowerCase().includes(lowerName))
                 console.log(guestData)
                 if(guestData === undefined){
-                    guestManifest.push({name: name, times: 1})
+                    guestManifest.push({name: name, meetingCount: 1})
                 }else{
 
                 }

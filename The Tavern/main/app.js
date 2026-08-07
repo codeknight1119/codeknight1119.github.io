@@ -472,7 +472,7 @@ async function renderTool(id) {
             mainContentArea.appendChild(guestUI)
 
 
-            guestUI.getElementById("guestCheckin").addEventListener("click", async () => {
+            guestUI.querySelector("#guestCheckin").addEventListener("click", async () => {
                 const name = guestUI.getElementById("guestName").toLowerCase()
                 await checkUserManifest()
                 const guestData = guestManifest.find(guest => guest.name.includes(name))

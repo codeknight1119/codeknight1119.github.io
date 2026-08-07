@@ -483,7 +483,6 @@ async function renderTool(id) {
                 const lowerName = name.toLowerCase()
                 await checkUserManifest()
 
-console.log(guestManifest)
                 const guestDatas = guestManifest.filter(item => {
                     const itemValue = String(item.name || "").toLowerCase();
                     return itemValue.includes(lowerName);

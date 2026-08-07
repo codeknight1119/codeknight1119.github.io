@@ -754,24 +754,26 @@ async function fetchServer(enpoint, postData) {
 }
 
 async function renderRoleCall() {
+            console.log("rendering role call")
     try{
-    console.log("rendering role call")
-    const guestUITemplate = document.getElementById("guestUITemplate")
-    const guestUI = guestUITemplate.content.cloneNode(true)
-    mainContentArea.appendChild(guestUI)
+        console.log("rendering role call")
+        const guestUITemplate = document.getElementById("guestUITemplate")
+        const guestUI = guestUITemplate.content.cloneNode(true)
+        mainContentArea.appendChild(guestUI)
 
-    guestUI.getElementById("guestCheckin").addEventListener("click", async ()=>{
-    const name = guestUI.getElementById("guestName").toLowerCase()
-        await checkUserManifest()
-    const guestData = guestManifest.find(guest => guest.name.includes(name))
-    console.log(guestData)
+        guestUI.getElementById("guestCheckin").addEventListener("click", async ()=>{
+        const name = guestUI.getElementById("guestName").toLowerCase()
+            await checkUserManifest()
+        const guestData = guestManifest.find(guest => guest.name.includes(name))
+        console.log(guestData)
 
     })
 
     const guestTemplate = document.getElementById("guestTemplate")
-}catch(e){
-    console.error(e)
-}
+    
+    }catch(e){
+        console.error(e)
+    }
 
 }
 

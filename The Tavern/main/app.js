@@ -340,7 +340,7 @@ async function loadSidebar(data) {
     mainContentArea.innerHTML = ""
     switch (data.type) {
         case "tool":
-            activeFeature = data.id; 
+            activeFeature = data.id;
             renderTool(data.id)
             break;
 
@@ -505,18 +505,19 @@ async function renderTool(id) {
                     currentMeetings = 1
                     guestManifest.push({ name: name, meetingCount: currentMeetings })
                 } else {
-                     let count =0
-                     if(count >= 3){count = 3}
-                    guestManifest.filter(item=>{
-                        count = item.meetingCount +=1
-                        if(item === guestData){
+                    let count = 0
+
+                    guestManifest.filter(item => {
+                        if (item === guestData) {
+                            count = item.meetingCount += 1
+                            if (count >= 3) { count = 3 }
                             item.meetingCount = count
                         }
                     })
                     currentMeetings = count
                     console.log(guestManifest)
-                    FirebaseUtils.updateDocument("/users/guestManifest", {manifest: guestManifest})
                 }
+                FirebaseUtils.updateDocument("/users/guestManifest", { manifest: guestManifest })
                 let end = ""
                 if (currentMeetings === 3) {
                     end = `\nNeeds to pay dues then can join club.`

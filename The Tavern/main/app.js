@@ -489,7 +489,8 @@ async function renderTool(id) {
                 checkedInElement.innerHTML = htmlCheckedIn
                 checkedInHolder.appendChild(checkedInElement)
             }
-            const today = Date.now().setHours(0)
+            const today = new Date()
+            today.setHours(0,0,0,0)
             const signedInToday = await FirebaseUtils.getDocumentFieldIncludes("/users/guestManifest", 50, {field: "lastCheckIn", today})
             signedInToday.forEach((val)=>{
                 makeSignedInGuest(val.name, val.meetingCount)
@@ -528,7 +529,8 @@ async function renderTool(id) {
                         if (item === guestData) {
                             count = item.meetingCount += 1
                             if (count >= 3) { count = 3 }
-                            const today = Date.now().setHours(0)
+                            const today = new Day()
+                            today.setHours(0,0,0,0)
                             item.lastCheckIn = today
                             item.meetingCount = count
                         }

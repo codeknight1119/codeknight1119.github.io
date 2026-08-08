@@ -491,11 +491,13 @@ async function renderTool(id) {
             }
             const today = new Date()
             today.setHours(0,0,0,0)
-            const signedInToday = await FirebaseUtils.getDocumentFieldIncludes("/users/guestManifest", 50, {field: "lastCheckIn", today})
-            signedInToday.forEach((val)=>{
-                makeSignedInGuest(val.name, val.meetingCount)
+            await checkUserManifest()
+            guestManifest.filter((item)=>{
+                if(!item.lastCheckIn) return
+                if(item.lastCheckIn === today){
+                    makeSignedInGuest(val.name, val.meetingCount)
+                }
             })
-
             checkinBtn.addEventListener("click", async () => {
                 const name = nameInput.value.trim();
                 const lowerName = name.toLowerCase();
@@ -510,7 +512,7 @@ async function renderTool(id) {
                     alert("Cannot enter the same person twice");
                     return;
                 }
-                await checkUserManifest()
+                
 
                 const guestDatas = guestManifest.filter(item => {
                     const itemValue = String(item.name || "").toLowerCase();

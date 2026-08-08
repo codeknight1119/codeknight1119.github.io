@@ -505,7 +505,13 @@ async function renderTool(id) {
                     currentMeetings = 1
                     guestManifest.push({ name: name, meetingCount: currentMeetings })
                 } else {
-                    currentMeetings = guestData.meetingCount
+                    guestManifest.filter(item=>{
+                        if(item === guestData){
+                            item.meetingCount +=1
+                        }
+                    })
+                    currentMeetings = guestData.meetingCount += 1
+                    FirebaseUtils.updateDocument("/users/guestManifest", {manifest: guestManifest})
                 }
                 let end = ""
                 if (currentMeetings === 3) {
@@ -517,8 +523,6 @@ async function renderTool(id) {
                 checkedInElement.innerHTML = htmlCheckedIn
                 checkedInHolder.appendChild(checkedInElement)
             })
-
-            const guestTemplate = document.getElementById("guestTemplate")
 
             mainContentArea.appendChild(guestUI)
             break

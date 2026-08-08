@@ -506,11 +506,14 @@ async function renderTool(id) {
                     guestManifest.push({ name: name, meetingCount: currentMeetings })
                 } else {
                     guestManifest.filter(item=>{
+                        let count = item.meetingCount +=1
+                        if(count >= 3){count = 3}
                         if(item === guestData){
-                            item.meetingCount +=1
+                            item.meetingCount = count
                         }
                     })
-                    currentMeetings = guestData.meetingCount += 1
+                    currentMeetings = count
+                    console.log(guestManifest)
                     FirebaseUtils.updateDocument("/users/guestManifest", {manifest: guestManifest})
                 }
                 let end = ""

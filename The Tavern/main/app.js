@@ -478,6 +478,23 @@ async function renderTool(id) {
             const nameInput = guestUI.querySelector("#guestName");
             const checkinBtn = guestUI.querySelector("#guestCheckin");
 
+            function makeSignedInGuest(name, meetings) {
+                let end = ""
+                if (meetings === 3) {
+                    end = `\nNeeds to pay dues then can join club.`
+                }
+                let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre><br>`
+                const checkedInElement = document.createElement("div")
+                checkedInElement.dataset.name = lowerName
+                checkedInElement.innerHTML = htmlCheckedIn
+                checkedInHolder.appendChild(checkedInElement)
+            }
+            const today = Date.now().setHours(0)
+            const signedInToday = await FirebaseUtils.getDocumentFieldIncludes("/users/guestManifest", 50, {field: "lastCheckIn", today})
+            signedInToday.forEach((val)=>{
+                makeSignedInGuest(val.name, val.meetingCount)
+            })
+
             checkinBtn.addEventListener("click", async () => {
                 const name = nameInput.value.trim();
                 const lowerName = name.toLowerCase();
@@ -511,6 +528,8 @@ async function renderTool(id) {
                         if (item === guestData) {
                             count = item.meetingCount += 1
                             if (count >= 3) { count = 3 }
+                            const today = Date.now().setHours(0)
+                            item.lastCheckIn = today
                             item.meetingCount = count
                         }
                     })
@@ -518,15 +537,7 @@ async function renderTool(id) {
                     console.log(guestManifest)
                 }
                 FirebaseUtils.updateDocument("/users/guestManifest", { manifest: guestManifest })
-                let end = ""
-                if (currentMeetings === 3) {
-                    end = `\nNeeds to pay dues then can join club.`
-                }
-                let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre><br>`
-                const checkedInElement = document.createElement("div")
-                checkedInElement.dataset.name = lowerName
-                checkedInElement.innerHTML = htmlCheckedIn
-                checkedInHolder.appendChild(checkedInElement)
+                makeSignedInGuest(name, currentMeetings)
             })
 
             mainContentArea.appendChild(guestUI)

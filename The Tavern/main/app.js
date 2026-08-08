@@ -505,9 +505,9 @@ async function renderTool(id) {
                     currentMeetings = 1
                     guestManifest.push({ name: name, meetingCount: currentMeetings })
                 } else {
+                     let count = item.meetingCount +=1
+                     if(count >= 3){count = 3}
                     guestManifest.filter(item=>{
-                        let count = item.meetingCount +=1
-                        if(count >= 3){count = 3}
                         if(item === guestData){
                             item.meetingCount = count
                         }

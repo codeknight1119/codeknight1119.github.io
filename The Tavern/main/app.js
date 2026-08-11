@@ -100,7 +100,7 @@ dropdowns.forEach((val) => {
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
 
-    getToken = await userCheck.getIdToken;
+    getToken = userCheck.getIdToken;
 
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"

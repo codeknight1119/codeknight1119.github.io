@@ -121,9 +121,10 @@ async function checkUser() {
         permissions = Object.keys(cleanPerms)
 
         await getMyFeatures()
+        await fetchServer("setRole")
     }
 }
-await checkUser()
+checkUser()
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////////PAGE RENDERING///////////////////////////////
@@ -468,6 +469,8 @@ async function renderTool(id) {
             break
 
         case "roleCall":
+            
+            /* 
             console.log("rendering role call");
 
             const guestUITemplate = document.getElementById("guestUITemplate");
@@ -543,7 +546,7 @@ async function renderTool(id) {
                 makeSignedInGuest(name, currentMeetings)
             })
 
-            mainContentArea.appendChild(guestUI)
+            mainContentArea.appendChild(guestUI)*/
             break
     }
 }
@@ -830,7 +833,7 @@ async function fetchServer(endpoint, postData) {
     //KEEP FOR TESTING
 }
 
-await fetchServer("setRole")
+
 /*
 console.log(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣶⣶⣶⣶⣶⣶⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⡶⠟⠛⠉⠛⠛⠉⠙⠿⢛⣫⣽⣿⣿⣿⣿⣿⣿⣷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

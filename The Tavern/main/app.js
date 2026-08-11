@@ -10,6 +10,7 @@ import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
+let firebaseUser = null
 let permissions = null;
 let myFeatures = [];
 let currentSelectedSidebar = null
@@ -105,6 +106,7 @@ async function checkUser() {
 
         user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
         user.uid = userCheck.uid
+        firebaseUser = userCheck
         getToken = () => userCheck.getIdToken();
 
         const tokens = await userCheck.getIdTokenResult(true);
@@ -802,7 +804,7 @@ function stopResizing() {
 
 
 async function fetchServer(endpoint, postData) {
-    const token = await user.getIdToken();
+    const token = await firebaseUser.getIdToken();
     const link = `https://unmixed-handed-cardboard.ngrok-free.dev/${endpoint}`;
 
     let body = {

@@ -121,7 +121,6 @@ async function checkUser() {
         permissions = Object.keys(cleanPerms)
 
         await getMyFeatures()
-        await fetchServer("setRole", {data:"test"})
     }
 }
 checkUser()
@@ -602,9 +601,7 @@ async function handleChatMesage() {
 
     const cleared = await fetchServer("checkMessage", {message: messageTxt})
 
-    const response = cleared.json()
-
-    if(!response.clean){
+    if(!cleared.clean){
         alert("Inapropiate content found in message. \nPlease try again with appropiate lanuage.")
         return
     }
@@ -842,7 +839,7 @@ async function fetchServer(endpoint, postData) {
 
     const jsData = await data.json();
     console.log(jsData);
-    //KEEP FOR TESTING
+    return jsData
 }
 
 

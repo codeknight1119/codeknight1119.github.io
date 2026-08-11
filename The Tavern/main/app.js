@@ -10,7 +10,6 @@ import { Markdown } from 'https://esm.sh/@tiptap/markdown';
 /////////////////////////GLOBAL VARS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 let user = null;
-let getToken = null
 let permissions = null;
 let myFeatures = [];
 let currentSelectedSidebar = null
@@ -99,8 +98,6 @@ dropdowns.forEach((val) => {
 //////////////////////////////////////////////////////////////////////
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
-
-    getToken = userCheck.getIdToken;
 
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
@@ -804,7 +801,7 @@ function stopResizing() {
 
 
 async function fetchServer(enpoint, postData) {
-    const token = await getToken()
+    const token = await user.getIdToken();
     const link = `https://unmixed-handed-cardboard.ngrok-free.dev/${endpoint}`;
 
     let body = {

@@ -121,7 +121,7 @@ async function checkUser() {
         permissions = Object.keys(cleanPerms)
 
         await getMyFeatures()
-        await fetchServer("setRole")
+        await fetchServer("setRole", {data:"test"})
     }
 }
 checkUser()

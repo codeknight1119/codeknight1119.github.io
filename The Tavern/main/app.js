@@ -105,6 +105,7 @@ async function checkUser() {
 
         user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
         user.uid = userCheck.uid
+        user.getIdToken = ()=> userCheck.getIdToken()
 
         const tokens = await userCheck.getIdTokenResult(true);
         const noisePerms = tokens.claims
@@ -800,7 +801,7 @@ function stopResizing() {
 }
 
 
-async function fetchServer(enpoint, postData) {
+async function fetchServer(endpoint, postData) {
     const token = await user.getIdToken();
     const link = `https://unmixed-handed-cardboard.ngrok-free.dev/${endpoint}`;
 

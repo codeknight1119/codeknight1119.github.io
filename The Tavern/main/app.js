@@ -598,8 +598,20 @@ async function handleChatMesage() {
     const markdownContent = messageInput.getMarkdown();
     if (markdownContent.trim() === "") return
 
+    const messageTxt = markdownContent ?? messageInput.getText()
+
+    const cleared = await fetchServer("checkMessage", {message: messageTxt})
+
+    const response = cleared.json()
+
+    if(!response.clean){
+        alert("Inapropiate content found in message. \nPlease try again with appropiate lanuage.")
+        return
+    }
+
+
     const sendData = {
-        content: markdownContent ?? messageInput.getText(),
+        content: messageTxt,
         username: user.name,
         uid: user.uid,
         timestamp: Date.now()

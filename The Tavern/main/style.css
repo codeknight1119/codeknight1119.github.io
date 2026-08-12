@@ -396,7 +396,7 @@ dropdown-btn i {
     outline: 2px solid black;
 }
 
-.mainArea {
+.mainArea:not([hidden]) {
     flex: 1;
     overflow-y: auto;
     justify-content: flex-start;

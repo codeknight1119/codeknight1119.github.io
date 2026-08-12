@@ -336,6 +336,7 @@ function hideFeatureHTML() {
 async function loadSidebar(data) {
     hideFeatureHTML()
     activeFeatureType = data.type;
+    mainContentArea = document.getElementById("mainContentArea")
     mainContentArea.innerHTML = ""
     switch (data.type) {
         case "tool":
@@ -347,8 +348,9 @@ async function loadSidebar(data) {
             await renderChat(data.id)
             break;
         case "campaign":
-            mainContentArea.appendChild(campaignUI)
             campaignUI.hidden = false;
+            mainContentArea = document.getElementById("campaignUI")
+            mainContentArea.appendChild(campaignUI)
             break
         case "conversation":
             activeChat = data.id
@@ -361,7 +363,7 @@ function getFeatureById(id) {
     return myFeatures.find((obj) => obj.id === id)
 }
 
-const mainContentArea = document.getElementById("mainContentArea")
+let mainContentArea = document.getElementById("mainContentArea")
 
 // Add 'id' as an optional third parameter
 async function newBoard(title, body, id = null) {

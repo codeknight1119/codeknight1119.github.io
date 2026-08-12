@@ -159,16 +159,6 @@ dropdown-btn i {
     background-color: var(--hover-clr);
 }
 
-#mainContentArea {
-    flex: 1;
-    overflow-y: auto;
-    justify-content: flex-start;
-    padding: 1em;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-}
-
 .message {
     padding: 0.25em;
     border: 1.5px solid var(--line-clr);
@@ -397,11 +387,21 @@ dropdown-btn i {
     padding-left: 15px;
 }
 
-#checkedInGuests{
+#checkedInGuests {
     display: flex;
     flex-direction: row;
 }
 
-.checkedInGuest{
+.checkedInGuest {
     outline: 2px solid black;
+}
+
+.mainArea {
+    flex: 1;
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
 }

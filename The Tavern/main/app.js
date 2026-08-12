@@ -349,8 +349,9 @@ async function loadSidebar(data) {
             break;
         case "campaign":
             campaignUI.hidden = false;
-            mainContentArea = document.getElementById("campaignUI")
             mainContentArea.appendChild(campaignUI)
+            mainContentArea = campaignUI
+            renderChat(data.id)
             break
         case "conversation":
             activeChat = data.id

@@ -653,7 +653,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
                 return
             }
 
-            doc = await FirebaseUtils.getDocumentFeildIncludes("/users", "Real Name", searchTermInput.value)
+            doc = await FirebaseUtils.getDocumentFieldIncludes("/users", "Real Name", searchTermInput.value)
             break
         case ("notAllowed"):
             doc = await FirebaseUtils.getDocuments("/users", 15, { field: "allowed" })
@@ -719,7 +719,7 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
 
         searchedRes.querySelector(".searched-save").addEventListener("click", async () => {
             const response = await fetchServer(`setPermissions`,{user:userUID, permissions:currentSearchUpdates[userUID].permissions})
-            
+
             
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
             

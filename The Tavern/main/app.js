@@ -481,7 +481,7 @@ async function renderTool(id) {
             
             const checkedInMemberHolder = document.getElementById("checkedInMembers");
             roleCallData.members.forEach((val) => {
-                let htmlCheckedIn = `<pre class="checkedInGuest">${val.firstName} ${val.lastName}</pre><br>`
+                let htmlCheckedIn = `<pre class="checkedInGuests">${val.firstName} ${val.lastName}</pre><br>`
                 const checkedInElement = document.createElement("div")
                 checkedInElement.dataset.name = val.studentId
                 checkedInElement.innerHTML = htmlCheckedIn

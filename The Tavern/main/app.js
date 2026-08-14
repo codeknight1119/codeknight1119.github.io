@@ -480,7 +480,7 @@ async function renderTool(id) {
             roleCallData.members.forEach((val) => {
                 let htmlCheckedIn = `<pre class="checkedInGuest">${val.firstName} ${val.lastName}</pre><br>`
                 const checkedInElement = document.createElement("div")
-                checkedInElement.dataset.name = lowerName
+                checkedInElement.dataset.name = val.studentId
                 checkedInElement.innerHTML = htmlCheckedIn
                 checkedInMemberHolder.appendChild(checkedInElement)
             })
@@ -493,7 +493,7 @@ async function renderTool(id) {
                 }
                 let htmlCheckedIn = `<pre class="checkedInGuest">${val.firstName} ${val.lastName}: ${val.totalMeetingsAttended}/3 trial meetings.${end}</pre><br>`
                 const checkedInElement = document.createElement("div")
-                checkedInElement.dataset.name = lowerName
+                checkedInElement.dataset.name = val.studentId
                 checkedInElement.innerHTML = htmlCheckedIn
                 checkedInGuestHolder.appendChild(checkedInElement)
             })

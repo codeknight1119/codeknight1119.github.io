@@ -471,17 +471,34 @@ async function renderTool(id) {
             break
 
         case "roleCall":
+            const guestUI = document.getElementById("guestUITemplate").content.cloneNode(true)
+            mainContentArea.appendChild(guestUI)
+            const roleCallPromise = await fetch("https://script.google.com/macros/s/AKfycbztnQLiJnHbNZra08IjKaZsHYtw1vB65zV4F1aweSLW0-mukY_eNLL1zggN_SN532Ot/exec");
+            const roleCallData = await roleCallPromise.json();
             
+            const checkedInMemberHolder = document.getElementById("checkedInMembers");
+            roleCallData.members.forEach((val) => {
+                let htmlCheckedIn = `<pre class="checkedInGuest">${val.firstName} ${val.lastName}</pre><br>`
+                const checkedInElement = document.createElement("div")
+                checkedInElement.dataset.name = lowerName
+                checkedInElement.innerHTML = htmlCheckedIn
+                checkedInMemberHolder.appendChild(checkedInElement)
+            })
+
+        const checkedInGuestHolder = document.getElementById("checkedInGuests");
+            roleCallData.guests.forEach((val) => {
+                let end = ""
+                if (meetings === 3) {
+                    end = `\nNeeds to pay dues soon.`
+                }
+                let htmlCheckedIn = `<pre class="checkedInGuest">${val.firstName} ${val.lastName}: ${val.totalMeetingsAttended}/3 trial meetings.${end}</pre><br>`
+                const checkedInElement = document.createElement("div")
+                checkedInElement.dataset.name = lowerName
+                checkedInElement.innerHTML = htmlCheckedIn
+                checkedInGuestHolder.appendChild(checkedInElement)
+            })
+
             /* 
-            console.log("rendering role call");
-
-            const guestUITemplate = document.getElementById("guestUITemplate");
-            const guestUI = guestUITemplate.content.cloneNode(true);
-
-            // Grab the input relative to this specific cloned template instance
-            const nameInput = guestUI.querySelector("#guestName");
-            const checkinBtn = guestUI.querySelector("#guestCheckin");
-
             function makeSignedInGuest(name, meetings) {
                 let end = ""
                 if (meetings === 3) {
@@ -548,7 +565,7 @@ async function renderTool(id) {
                 makeSignedInGuest(name, currentMeetings)
             })
 
-            mainContentArea.appendChild(guestUI)*/
+            */
             break
     }
 }
@@ -602,9 +619,9 @@ async function handleChatMesage() {
 
     const messageTxt = markdownContent ?? messageInput.getText()
 
-    const cleared = await fetchServer("checkMessage", {message: messageTxt})
+    const cleared = await fetchServer("checkMessage", { message: messageTxt })
 
-    if(!cleared.clean){
+    if (!cleared.clean) {
         alert("Inapropiate content found in message. \nPlease try again with appropiate lanuage.")
         return
     }
@@ -719,11 +736,11 @@ document.getElementById("userSearchBttn").addEventListener("click", async () => 
 
         searchedRes.querySelector(".searched-save").addEventListener("click", async () => {
             console.log(currentSearchUpdates[userUID].permissions)
-            const response = await fetchServer(`setPermissions`,{user:userUID, permissions:currentSearchUpdates[userUID].permissions })
+            const response = await fetchServer(`setPermissions`, { user: userUID, permissions: currentSearchUpdates[userUID].permissions })
 
-            
+
             FirebaseUtils.updateDocument(`users/${userUID}`, currentSearchUpdates[userUID])
-            
+
             currentSearchUpdates[userUID] = {}
             const time = new Date()
             FirebaseUtils.ALog("Change Permissions", {

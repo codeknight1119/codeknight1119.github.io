@@ -473,7 +473,9 @@ async function renderTool(id) {
         case "roleCall":
             const guestUI = document.getElementById("guestUITemplate").content.cloneNode(true)
             mainContentArea.appendChild(guestUI)
-            const roleCallPromise = await fetch("https://script.google.com/macros/s/AKfycbztnQLiJnHbNZra08IjKaZsHYtw1vB65zV4F1aweSLW0-mukY_eNLL1zggN_SN532Ot/exec");
+            const waitText = document.getElementById("rollCall_waitText")
+            waitText.hidden = false;
+            const roleCallPromise = await fetch("https://script.google.com/macros/s/AKfycbztnQLiJnHbNZra08IjKaZsHYtw1vB65zV4F1aweSLW0-mukY_eNLL1zggN_SN532Ot/exec").then(()=>{waitText.hidden = true;});
             const roleCallData = await roleCallPromise.json();
             
             const checkedInMemberHolder = document.getElementById("checkedInMembers");
@@ -488,7 +490,7 @@ async function renderTool(id) {
         const checkedInGuestHolder = document.getElementById("checkedInGuests");
             roleCallData.guests.forEach((val) => {
                 let end = ""
-                if (meetings === 3) {
+                if (val.totalMeetingsAttende === 3) {
                     end = `\nNeeds to pay dues soon.`
                 }
                 let htmlCheckedIn = `<pre class="checkedInGuest">${val.firstName} ${val.lastName}: ${val.totalMeetingsAttended}/3 trial meetings.${end}</pre><br>`

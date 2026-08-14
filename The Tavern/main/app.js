@@ -475,8 +475,9 @@ async function renderTool(id) {
             mainContentArea.appendChild(guestUI)
             const waitText = document.getElementById("rollCall_waitText")
             waitText.hidden = false;
-            const roleCallPromise = await fetch("https://script.google.com/macros/s/AKfycbztnQLiJnHbNZra08IjKaZsHYtw1vB65zV4F1aweSLW0-mukY_eNLL1zggN_SN532Ot/exec").then(()=>{waitText.hidden = true;});
+            const roleCallPromise = await fetch("https://script.google.com/macros/s/AKfycbztnQLiJnHbNZra08IjKaZsHYtw1vB65zV4F1aweSLW0-mukY_eNLL1zggN_SN532Ot/exec")
             const roleCallData = await roleCallPromise.json();
+            waitText.hidden = true;
             
             const checkedInMemberHolder = document.getElementById("checkedInMembers");
             roleCallData.members.forEach((val) => {

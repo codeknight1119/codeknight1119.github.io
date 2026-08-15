@@ -470,6 +470,23 @@ async function renderTool(id) {
             mainContentArea.innerHTML = "<p><strong>Search to find users</strong></p>"
             break
 
+        case ("officerMessage"):
+            const ui = document.getElementById("officersDeskUI").content.cloneNode(true)
+            ui.querySelector("#OD_submit").addEventListener("click", ()=>{
+            const data = await FirebaseUtils.addDocument(`features/${id}`, {
+                "creator": user.uid,
+                "type":  ui.querySelector("#OD_ticketType").value,
+                "description": ui.querySelector("#OD_textInput").value
+            })
+            ui.querySelector("#OD_ticketType").value = null
+            ui.querySelector("#OD_textInput").value = ""
+
+            })
+            mainContentArea.appendChild(ui)
+
+            
+            break
+
         case "roleCall":
             const guestUI = document.getElementById("guestUITemplate").content.cloneNode(true)
             mainContentArea.appendChild(guestUI)
@@ -478,7 +495,7 @@ async function renderTool(id) {
             const roleCallPromise = await fetch("https://script.google.com/macros/s/AKfycbztnQLiJnHbNZra08IjKaZsHYtw1vB65zV4F1aweSLW0-mukY_eNLL1zggN_SN532Ot/exec")
             const roleCallData = await roleCallPromise.json();
             waitText.hidden = true;
-            
+
             const checkedInMemberHolder = document.getElementById("checkedInMembers");
             roleCallData.members.forEach((val) => {
                 let htmlCheckedIn = `<pre class="checkedInGuests">${val.firstName} ${val.lastName}</pre><br>`
@@ -488,7 +505,7 @@ async function renderTool(id) {
                 checkedInMemberHolder.appendChild(checkedInElement)
             })
 
-        const checkedInGuestHolder = document.getElementById("checkedInGuests");
+            const checkedInGuestHolder = document.getElementById("checkedInGuests");
             roleCallData.guests.forEach((val) => {
                 let end = ""
                 if (val.totalMeetingsAttende === 3) {
@@ -500,75 +517,6 @@ async function renderTool(id) {
                 checkedInElement.innerHTML = htmlCheckedIn
                 checkedInGuestHolder.appendChild(checkedInElement)
             })
-
-            /* 
-            function makeSignedInGuest(name, meetings) {
-                let end = ""
-                if (meetings === 3) {
-                    end = `\nNeeds to pay dues then can join club.`
-                }
-                let htmlCheckedIn = `<pre class="checkedInGuest">${name}: ${currentMeetings}/3 meetings.${end}</pre><br>`
-                const checkedInElement = document.createElement("div")
-                checkedInElement.dataset.name = lowerName
-                checkedInElement.innerHTML = htmlCheckedIn
-                checkedInHolder.appendChild(checkedInElement)
-            }
-            const today = new Date()
-            today.setHours(0,0,0,0)
-            await checkUserManifest()
-            guestManifest.filter((item)=>{
-                if(!item.lastCheckIn) return
-                if(item.lastCheckIn === today){
-                    makeSignedInGuest(val.name, val.meetingCount)
-                }
-            })
-            checkinBtn.addEventListener("click", async () => {
-                const name = nameInput.value.trim();
-                const lowerName = name.toLowerCase();
-
-                // Check if the guest is already checked in
-                const checkedInHolder = document.getElementById("checkedInGuests");
-                const isAlreadyCheckedIn = Array.from(checkedInHolder.children).some(
-                    (val) => val.dataset.name === lowerName
-                );
-
-                if (isAlreadyCheckedIn) {
-                    alert("Cannot enter the same person twice");
-                    return;
-                }
-                
-
-                const guestDatas = guestManifest.filter(item => {
-                    const itemValue = String(item.name || "").toLowerCase();
-                    return itemValue.includes(lowerName);
-                });
-                const guestData = guestDatas[0]
-                console.log(guestData)
-                let currentMeetings = 0;
-                if (guestData === undefined) {
-                    currentMeetings = 1
-                    guestManifest.push({ name: name, meetingCount: currentMeetings })
-                } else {
-                    let count = 0
-
-                    guestManifest.filter(item => {
-                        if (item === guestData) {
-                            count = item.meetingCount += 1
-                            if (count >= 3) { count = 3 }
-                            const today = new Day()
-                            today.setHours(0,0,0,0)
-                            item.lastCheckIn = today
-                            item.meetingCount = count
-                        }
-                    })
-                    currentMeetings = count
-                    console.log(guestManifest)
-                }
-                FirebaseUtils.updateDocument("/users/guestManifest", { manifest: guestManifest })
-                makeSignedInGuest(name, currentMeetings)
-            })
-
-            */
             break
     }
 }
@@ -867,9 +815,11 @@ async function fetchServer(endpoint, postData) {
     return jsData
 }
 
+
 window.onerror = function (message, source, lineno, colno, error) {
     alert(`Error: ${message} at line ${lineno}`);
 };
+
 
 
 /*

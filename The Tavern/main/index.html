@@ -200,6 +200,32 @@
             </div>
         </template>
 
+        <template id="officersDeskUI">
+            <div>
+                <pre>This is reporting system for in club issues.</pre><br>
+                <pre>Your name will not be shown to officers who are handling your ticket.</pre><br>
+                <pre>Technical Admins may be able to identify your account if neccecary for security or system administration.</pre><br>
+                <pre>Thank you for keeping our club safe!</pre><br>
+                <strong><pre>See my tickets</pre></strong> <button>⌄</button>
+                <div id="OD_newTicket" style="display: flex;">
+                    <label for="OD_ticketType">Ticket Type</label>
+                    <select name="OD_ticketType" id="OD_ticketType">
+                        <option value="club">Club Issue</option>
+                        <option value="DM">DM Issue</option>
+                        <option value="player">Player Issue</option>
+                        <option value="safety">Safety Concern</option>
+                        <option value="bug">Website Bug</option>
+                        <option value="suggestion">Website Suggestion</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <label for="OD_textInput">Ticket information</label>
+                    <input type="text" id="OD_textInput" name="OD_textInput"><input>
+                    <button id="OD_submit">Submit</button>
+                </div>
+
+            </div>
+        </template>
+
     </main>
 </body>
 

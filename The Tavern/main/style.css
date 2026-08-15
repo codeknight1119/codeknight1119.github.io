@@ -405,3 +405,12 @@ dropdown-btn i {
     flex-direction: column;
     gap: 0.5em;
 }
+
+#OD_newTicket {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+
+}

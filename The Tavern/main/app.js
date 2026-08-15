@@ -471,18 +471,18 @@ async function renderTool(id) {
             break
 
         case ("officerMessage"):
-            const ui = document.getElementById("officersDeskUI").content.cloneNode(true)
-            ui.querySelector("#OD_submit").addEventListener("click", ()=>{
+            const OD_ui = document.getElementById("officersDeskUI").content.cloneNode(true)
+            OD_ui.querySelector("#OD_submit").addEventListener("click", ()=>{
             const data = await FirebaseUtils.addDocument(`features/${id}`, {
                 "creator": user.uid,
                 "type":  ui.querySelector("#OD_ticketType").value,
                 "description": ui.querySelector("#OD_textInput").value
             })
-            ui.querySelector("#OD_ticketType").value = null
-            ui.querySelector("#OD_textInput").value = ""
+            OD_ui.querySelector("#OD_ticketType").value = null
+            OD_ui.querySelector("#OD_textInput").value = ""
 
             })
-            mainContentArea.appendChild(ui)
+            mainContentArea.appendChild(OD_ui)
 
             
             break

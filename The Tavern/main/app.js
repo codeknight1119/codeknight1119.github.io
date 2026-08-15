@@ -472,7 +472,7 @@ async function renderTool(id) {
 
         case ("officerMessage"):
             const OD_ui = document.getElementById("officersDeskUI").content.cloneNode(true)
-            OD_ui.querySelector("#OD_submit").addEventListener("click", ()=>{
+            OD_ui.querySelector("#OD_submit").addEventListener("click", async ()=>{
             const data = await FirebaseUtils.addDocument(`features/${id}`, {
                 "creator": user.uid,
                 "type":  ui.querySelector("#OD_ticketType").value,

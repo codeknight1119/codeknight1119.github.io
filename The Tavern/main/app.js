@@ -475,8 +475,8 @@ async function renderTool(id) {
             OD_ui.querySelector("#OD_submit").addEventListener("click", async ()=>{
             const data = await FirebaseUtils.addDocument(`features/${id}`, {
                 "creator": user.uid,
-                "type":  ui.querySelector("#OD_ticketType").value,
-                "description": ui.querySelector("#OD_textInput").value
+                "type":  OD_ui.querySelector("#OD_ticketType").value,
+                "description": OD_ui.querySelector("#OD_textInput").value
             })
             OD_ui.querySelector("#OD_ticketType").value = null
             OD_ui.querySelector("#OD_textInput").value = ""

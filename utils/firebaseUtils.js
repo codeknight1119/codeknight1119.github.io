@@ -74,16 +74,17 @@ export class Firebase {
     async getDocuments(path, l, docParam, arrayFilter) {
         try {
             let constraints = [];
-
-            if (arrayFilter && arrayFilter.field && arrayFilter.value) {
-                if (Array.isArray(arrayFilter.value)) {
-                    constraints.push(where(arrayFilter.field, 'array-contains-any', arrayFilter.value));
-                } else if{
-                    constraints.push(where(arrayFilter.field, 'array-contains', arrayFilter.value));
-                }else {
-                constraints.push(where(filter.field, '==', filter.value));
-                }
-            }
+            if (filter && filter.field && filter.value !== undefined) {
+                        if (Array.isArray(filter.value)) {
+                            // Use 'in' for equality across multiple values, or 'array-contains-any' for arrays
+                            constraints.push(where(filter.field, filter.isArray ? 'array-contains-any' : 'in', filter.value));
+                        } else if (filter.isArray) {
+                            constraints.push(where(filter.field, 'array-contains', filter.value));
+                        } else {
+                            // Regular equality check for standard fields (strings, numbers, etc.)
+                            constraints.push(where(filter.field, '==', filter.value));
+                        }
+                    }
 
             if (docParam && docParam.field) {
                 constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));

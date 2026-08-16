@@ -71,24 +71,34 @@ export class Firebase {
         }
     }
 
-async getDocuments(path, l, docParam, filter) {
+async getDocuments(path, l, docParam, arrayFilter) {
     try {
         let constraints = [];
 
-        if (filter && filter.field && filter.value !== undefined) {
-            if (Array.isArray(filter.value)) {
-                // Use 'in' for equality across multiple values, or 'array-contains-any' for arrays
-                constraints.push(where(filter.field, filter.isArray ? 'array-contains-any' : 'in', filter.value));
-            } else if (filter.isArray) {
-                constraints.push(where(filter.field, 'array-contains', filter.value));
+        if (arrayFilter && arrayFilter.field && arrayFilter.value !== undefined) {
+            if (Array.isArray(arrayFilter.value)) {
+                constraints.push(
+                    where(
+                        arrayFilter.field,
+                        'array-contains-any',
+                        arrayFilter.value
+                    )
+                );
             } else {
-                // Regular equality check for standard fields (strings, numbers, etc.)
-                constraints.push(where(filter.field, '==', filter.value));
+                constraints.push(
+                    where(
+                        arrayFilter.field,
+                        '==',
+                        arrayFilter.value
+                    )
+                );
             }
         }
 
         if (docParam && docParam.field) {
-            constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));
+            constraints.push(
+                orderBy(docParam.field, docParam.direction || 'asc')
+            );
         }
 
         if (typeof l === 'number' && l > 0) {
@@ -107,6 +117,7 @@ async getDocuments(path, l, docParam, filter) {
             id: doc.id,
             ...doc.data()
         }));
+
     } catch (e) {
         console.log(e);
         throw e;

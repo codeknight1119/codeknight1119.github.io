@@ -488,6 +488,15 @@ async function renderTool(id) {
 
             })
             mainContentArea.appendChild(OD_ui)
+            const showMyTicketBtn = document.getElementById("OD_showMyTickets")
+            
+            showMyTicketBtn.addEventListener("click", async ()=>{
+                const toggle = !Boolean(showMyTicketBtn.dataset.toggle)
+                showMyTicketBtn.dataset.toggle = String(toggle)
+                const text = toggle ? "Hide my tickets ^" : "See my tickets ⌄"
+                document.getElementById("OD_showMyTicketsText").innerText = text
+                document.getElementById("OD_myTickets").hidden = toggle
+            })
 
             
             break
@@ -859,3 +868,4 @@ console.log(`
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠿⢿⣿⣿⣿⣦⣤⣤⣀⣀⣀⣀⣀⣠⣤⣴⣾⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠙⠛⠛⠛⠻⠿⠿⠿⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀`)
 console.log(`I can see you`)*/
+

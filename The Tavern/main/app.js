@@ -492,19 +492,28 @@ async function renderTool(id) {
             mainContentArea.appendChild(OD_ui)
             const showMyTicketBtn = document.getElementById("OD_showMyTickets")
             
-            showMyTicketBtn.addEventListener("click", async ()=>{
-                const toggle = !Boolean(showMyTicketBtn.dataset.toggle)
-                console.log(Boolean(showMyTicketBtn.dataset.toggle))
-                showMyTicketBtn.dataset.toggle = String(toggle)
-                const text = toggle ? "Hide my tickets ^" : "See my tickets ⌄"
-                document.getElementById("OD_showMyTicketsText").innerText = text
-                if(toggle){
-                    const myTickets = FirebaseUtils.getDocuments(`features/${id}/tickets`, 15, null, {field: "creator", value: user.uid})
-                    console.log(myTickets)
-                }
-                document.getElementById("OD_myTickets").hidden = toggle
-            })
+            showMyTicketBtn.addEventListener("click", async () => {
+                const isShowing = showMyTicketBtn.dataset.toggle === "true";
+                const toggle = !isShowing;
 
+                showMyTicketBtn.dataset.toggle = String(toggle);
+                
+                document.getElementById("OD_showMyTicketsText").innerText = toggle 
+                    ? "Hide my tickets ^" 
+                    : "See my tickets ⌄";
+
+                if (toggle) {
+                    const myTickets = await FirebaseUtils.getDocuments(
+                        `features/${id}/tickets`, 
+                        15, 
+                        null, 
+                        { field: "creator", value: user.uid }
+                    );
+                    console.log(myTickets);
+                }
+
+                    document.getElementById("OD_myTickets").hidden = !toggle;
+            });
             
             break
 

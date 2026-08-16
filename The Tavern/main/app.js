@@ -507,7 +507,7 @@ async function renderTool(id) {
                         `features/${id}/tickets`, 
                         15, 
                         null, 
-                        { field: "creator", value: user.uid }
+                        { field: "creator", value: [user.uid] }
                     );
                     console.log(myTickets);
                 }

@@ -494,6 +494,7 @@ async function renderTool(id) {
             
             showMyTicketBtn.addEventListener("click", async ()=>{
                 const toggle = !Boolean(showMyTicketBtn.dataset.toggle)
+                console.log(toggle)
                 showMyTicketBtn.dataset.toggle = String(toggle)
                 const text = toggle ? "Hide my tickets ^" : "See my tickets ⌄"
                 document.getElementById("OD_showMyTicketsText").innerText = text

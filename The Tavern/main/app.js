@@ -481,7 +481,9 @@ async function renderTool(id) {
                 "creator": user.uid,
                 "type":  ticketType,
                 "description": document.getElementById("OD_textInput").value,
-                "progress": "submitted"
+                "progress": "submitted",
+                "created": String(Date.now()),
+                "lastUpdate": String(Date.now())
             })
             document.getElementById("OD_ticketType").value = "null"
             document.getElementById("OD_textInput").value = ""
@@ -495,6 +497,10 @@ async function renderTool(id) {
                 showMyTicketBtn.dataset.toggle = String(toggle)
                 const text = toggle ? "Hide my tickets ^" : "See my tickets ⌄"
                 document.getElementById("OD_showMyTicketsText").innerText = text
+                if(toggle){
+                    const myTickets = FirebaseUtils.getDocuments(`features/${id}/tickets`, 15, null, {field: "creator", value: user.uid})
+                    console.log(myTickets)
+                }
                 document.getElementById("OD_myTickets").hidden = toggle
             })
 

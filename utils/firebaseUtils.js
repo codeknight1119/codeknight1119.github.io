@@ -44,7 +44,7 @@ export class Firebase {
             const docAdded = await addDoc(collection(this.db, path), data);
             return docAdded;
         } catch (e) {
-            console.error(`add doc failed at ${path} ` + JSON.stringify(e));
+            console.error(`add doc failed at ${path} `, e);
         }
     }
 

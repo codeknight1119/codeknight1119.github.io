@@ -504,7 +504,7 @@ async function renderTool(id) {
 
                 if (toggle) {
                     const myTickets = await FirebaseUtils.getDocuments(
-                        `features/${id}/tickets`, 
+                        `/features/${id}/tickets`, 
                         15, 
                         null, 
                         { field: "creator", value: [user.uid] }

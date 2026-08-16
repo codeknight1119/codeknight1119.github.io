@@ -71,48 +71,47 @@ export class Firebase {
         }
     }
 
-    async getDocuments(path, l, docParam, filter) {
-        try {
-            let constraints = [];
-            if (filter && filter.field && filter.value !== undefined) {
-                        if (Array.isArray(filter.value)) {
-                            // Use 'in' for equality across multiple values, or 'array-contains-any' for arrays
-                            constraints.push(where(filter.field, filter.isArray ? 'array-contains-any' : 'in', filter.value));
-                        } else if (filter.isArray) {
-                            constraints.push(where(filter.field, 'array-contains', filter.value));
-                        } else {
-                            // Regular equality check for standard fields (strings, numbers, etc.)
-                            constraints.push(where(filter.field, '==', filter.value));
-                        }
-                    }
+async getDocuments(path, l, docParam, filter) {
+    try {
+        let constraints = [];
 
-            if (docParam && docParam.field) {
-                constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));
+        if (filter && filter.field && filter.value !== undefined) {
+            if (Array.isArray(filter.value)) {
+                // Use 'in' for equality across multiple values, or 'array-contains-any' for arrays
+                constraints.push(where(filter.field, filter.isArray ? 'array-contains-any' : 'in', filter.value));
+            } else if (filter.isArray) {
+                constraints.push(where(filter.field, 'array-contains', filter.value));
+            } else {
+                // Regular equality check for standard fields (strings, numbers, etc.)
+                constraints.push(where(filter.field, '==', filter.value));
             }
-
-            if (typeof l === 'number' && l > 0) {
-                constraints.push(limit(l));
-            }
-
-            const collectionRef = collection(this.db, path);
-            const q = query(collectionRef, ...constraints);
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                return [];
-            }
-
-            const documents = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-
-            return documents;
-        } catch (e) {
-            console.log(e);
-            throw e;
         }
+
+        if (docParam && docParam.field) {
+            constraints.push(orderBy(docParam.field, docParam.direction || 'asc'));
+        }
+
+        if (typeof l === 'number' && l > 0) {
+            constraints.push(limit(l));
+        }
+
+        const collectionRef = collection(this.db, path);
+        const q = query(collectionRef, ...constraints);
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return [];
+        }
+
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+    } catch (e) {
+        console.log(e);
+        throw e;
     }
+}
 
     // Note: Fixed spelling of "Feild" to "Field" in function name and parameter
     async getDocumentFieldIncludes(path, field, text) {

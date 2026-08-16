@@ -71,7 +71,7 @@ export class Firebase {
         }
     }
 
-    async getDocuments(path, l, docParam, arrayFilter) {
+    async getDocuments(path, l, docParam, filter) {
         try {
             let constraints = [];
             if (filter && filter.field && filter.value !== undefined) {

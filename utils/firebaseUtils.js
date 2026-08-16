@@ -78,8 +78,10 @@ export class Firebase {
             if (arrayFilter && arrayFilter.field && arrayFilter.value) {
                 if (Array.isArray(arrayFilter.value)) {
                     constraints.push(where(arrayFilter.field, 'array-contains-any', arrayFilter.value));
-                } else {
+                } else if{
                     constraints.push(where(arrayFilter.field, 'array-contains', arrayFilter.value));
+                }else {
+                constraints.push(where(filter.field, '==', filter.value));
                 }
             }
 

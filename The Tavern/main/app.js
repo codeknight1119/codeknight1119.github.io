@@ -479,7 +479,7 @@ async function renderTool(id) {
                 }
             const data = await FirebaseUtils.addDocument(`features/${id}/tickets`, {
                 "creator": user.uid,
-                "type":  ,
+                "type":  ticketType,
                 "description": document.getElementById("OD_textInput").value
             })
             document.getElementById("OD_ticketType").value = "null"

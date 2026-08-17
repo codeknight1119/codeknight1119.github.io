@@ -501,7 +501,7 @@ async function renderTool(id) {
                 document.getElementById("OD_showMyTicketsText").innerText = toggle 
                     ? "Hide my tickets ^" 
                     : "See my tickets ⌄";
-const myTicketsArea = document.getElementById("OD_myTickets")
+                const myTicketsArea = document.getElementById("OD_myTickets")
                 if (toggle) {
                     const myTickets = await FirebaseUtils.getDocuments(
                         `/features/${id}/tickets`, 
@@ -511,13 +511,12 @@ const myTicketsArea = document.getElementById("OD_myTickets")
                     );
                 myTickets.forEach((val)=>{
                     const OD_myTicket_Template = document.getElementById("OD_myTicket_template").content.cloneNode(true)
-                    myTicketsArea.appendChild(OD_myTicket_Template)
+                    
                     OD_myTicket_Template.querySelector(".OD_myTicket_desc").innerText = val.description
                     OD_myTicket_Template.querySelector(".OD_myTicket_progress").innerText = val.progress
-                    const time = new Date(val.lastUpdate).toLocaleString()
+                    const time = new Date(Number(val.lastUpdate)).toLocaleString()
                     OD_myTicket_Template.querySelector(".OD_myTicket_lastUpdate").innerText = time
-
-                    
+                    myTicketsArea.appendChild(OD_myTicket_Template)
                 })
                 }
 

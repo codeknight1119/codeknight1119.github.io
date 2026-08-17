@@ -416,5 +416,7 @@ dropdown-btn i {
 }
 
 #OD_myTickets{
-    border: 2px solid var(--accent-clr)
+    border: 2px solid var(--accent-clr);
+    height: 100px;
+    overflow: scroll
 }

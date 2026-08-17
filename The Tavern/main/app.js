@@ -502,7 +502,7 @@ async function renderTool(id) {
                     ? "Hide my tickets ^" 
                     : "See my tickets ⌄";
                 const myTicketsArea = document.getElementById("OD_myTickets")
-                if (toggle) {
+                if (toggle && Array.from(myTicketsArea.children).length === 0) {
                     const myTickets = await FirebaseUtils.getDocuments(
                         `/features/${id}/tickets`, 
                         15, 

@@ -855,12 +855,6 @@ async function fetchServer(endpoint, postData) {
 }
 
 
-window.onerror = function (message, source, lineno, colno, error) {
-    alert(`Error: ${message} at line ${lineno}`);
-};
-
-
-
 /*
 console.log(`
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣶⣶⣶⣶⣶⣶⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

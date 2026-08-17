@@ -556,6 +556,8 @@ const myTicketsArea = document.getElementById("OD_myTickets")
                 checkedInElement.innerHTML = htmlCheckedIn
                 checkedInGuestHolder.appendChild(checkedInElement)
             })
+            document.getElementById("rollCall_memberNum").innerText = roleCallData.members.length;
+            document.getElementById("rollCall_GuestNum").innerText = roleCallData.guests.length
             break
     }
 }

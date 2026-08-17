@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=400..900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 </head>
 
 <body>
@@ -190,6 +191,8 @@
         <template id="guestUITemplate">
             <div>
                 <h2 id="rollCall_waitText" hidden>Loading...</h2>
+                <strong><pre id="rollCall_memberNum"></pre><pre> Members</pre></strong>
+                <strong><pre id="rollCall_GuestNum"></pre><pre> Guests</pre></strong>
                 <h3>Checked in members</h3>
                 <br>
                 <div id="checkedInMembers"></div>
@@ -249,14 +252,7 @@
 </body>
 
 <script>
-window.addEventListener('error', (event) => {
-    alert(`Error: ${event.message} at line ${event.lineno}`);
-});
-
-window.addEventListener('error', (event) => {
-    alert(`Error: ${event.message} at line ${event.lineno}`);
-});
-
+eruda.init();
 </script>
 
 </html>

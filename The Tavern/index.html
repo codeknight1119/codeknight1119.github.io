@@ -92,9 +92,29 @@
 
     <script type="module">
         import {FirebaseUtils} from "./firebaseUtils.js"
-        
+
         const loginSignUpEl = document.getElementById("loginSignUp")
         const getVerifiedEl = document.getElementById("getVerified")
+        const signUpEl = document.getElementById("newSignInPopup")
+
+        let userData = null
+        async function handleLogin(data, auto = true){
+             userData = await FirebaseUtils.getDocument(`/users/${data.uid}}`)
+            if(data.isNew || userData === undefined){
+                if(auto){
+                    signUpEl.hidden = false;
+                }
+            }else{
+                const tokens = await data.getIdTokenResult(true);
+                const perms = tokens.claims 
+                if(perms.includes("allowed")){
+                    goToMainSite()
+                }else{
+                    signUpEl.hidden = true;
+                    getVerifiedEl.hidden = false;
+                }
+            }
+        }
 
         async function checkLogin() {
             const data = await FirebaseUtils.isSignedIn()
@@ -104,40 +124,26 @@
 
         document.getElementById("login").addEventListener("click", async () => {
             const signIn = await FirebaseUtils.loginGoogle()
-            await handleLogin(signIn)
+            await handleLogin(signIn, false)
         })
 
-        function toggleVis() {
-            loginSignUpEl.hidden = true;
+        document.getElementById("signUp").addEventListener("click", async () => {
+            const firstName = document.getElementById("newSignInPopup_FirstName").value.trim()
+            const lastName = document.getElementById("newSignInPopup_LastName").value.trim()
+            const displayName = document.getElementById("newSignInPopup_UserName").value.trim()
+            const studentID = document.getElementById("newSignInPopup_StudentId").value.trim()
+            FirebaseUtils.setDocument(`/users/${userData.uid}`, {
+                realName : `${firstName} ${lastName}`,
+                realFirstName: firstName,
+                realLastName: lastName,
+                displayName: displayName,
+                studentID: studentID,
+                permissions: ["player"]
+            })
+            signUpEl.hidden = true;
             getVerifiedEl.hidden = false;
-        }
+        })
 
-        async function handleLogin(signIn) {
-            try {
-                if (signIn) {
-                    let userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
-                    console.log(userData)
-                    if (!userData) {
-                        userData = {
-                            name: signIn.user.displayName,
-                            allowed: false,
-                            role: "player",
-                        }
-                        await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, userData)
-                        toggleVis()
-                        return
-                    }
-                    if (!userData.allowed) {
-                        toggleVis()
-                        return
-                    } else {
-                        window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
-                    }
-                }
-            } catch (e) {
-                console.error("login error: ", e)
-            }
-        }
     </script>
 </body>
 

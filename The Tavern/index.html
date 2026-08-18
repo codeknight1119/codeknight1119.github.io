@@ -62,12 +62,32 @@
         
         const loginSignUpEl = document.getElementById("loginSignUp")
         const getVerifiedEl = document.getElementById("getVerified")
+        const newAccountMake = document.getElementById("newSignInPopup")
 
 
+        function goToMainSite(){
+            window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+        }
+
+        async function handleLogin(data){
+            const userData = await FirebaseUtils.getDocument(`/users/${data.uid}}`)
+            if(data.isNew || userData === undefined){
+                newAccountMake.hidden = false;
+            }else{
+                const tokens = await data.getIdTokenResult(true);
+                const perms = tokens.claims 
+                if(perms.includes("allowed")){
+                    goToMainSite()
+                }else{
+                    newAccountMake.hidden = true;
+                    getVerifiedEl.hidden = false;
+                }
+            }
+        }
 
         async function checkLogin() {
             const data = await FirebaseUtils.isSignedIn()
-            handleLogin({user: data})
+            await handleLogin(data)
         }
         checkLogin()
 
@@ -81,7 +101,7 @@
             loginSignUpEl.hidden = true;
             getVerifiedEl.hidden = false;
         }
-
+/*
         async function handleLogin(signIn) {
             try {
                 if (signIn) {
@@ -101,14 +121,14 @@
                         toggleVis()
                         return
                     } else {
-                        window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+                       
                     }
 
                 }
             } catch (e) {
                 console.error("login error: ", e)
             }
-        }
+        }*/
     </script>
 </body>
 

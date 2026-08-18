@@ -5,64 +5,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Tavern - Login</title>
-    <link rel="stylesheet" href="/The Tavern/main/style.css" />
+    <link rel="stylesheet" href="/style.css" />
     <style>
-    main {
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            overflow: hidden; 
+        }
+
+        main {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            gap: 15px
-        }
-        h1{
-            font-size: 3em;
-            padding: 15px;
-        }
-        body{
-            margin: 50px;                   
-            height: 100vh;               
-            display: flex;               
-            justify-content: center;     
-            align-items: center;         
-            flex-direction: column;      
-            text-align: center;  
-            overflow:none;  
+            gap: 15px;
         }
 
-        #newSignInPopup{
-            width: 50vw;
-            height: 30vh;
-            border: 1px solid var(--line-clr);
-            border-radius: 5px;
-            background: var(--base-clr);
-            display:flex;
-            flex-direction: column;
+        h1 {
+            font-size: 2.5em; 
             padding: 10px;
+            margin: 0;
+        }
+
+        #newSignInPopup {
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--line-clr, #ccc);
+            border-radius: 5px;
+            background: var(--base-clr, #fff);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 1000;            
+            z-index: 1000;
+        }
 
-            input{
-                margin: 5px;
-                border: 5px;
-                border-radius: 2px;
-            }
+        #newSignInPopup input {
+            margin: 5px 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </head>
 
 <body>
-<div id="newSignInPopup" hidden>
-    <h3>Register for The Tavern.</h3>
-    <input id="newSignInPopup_FirstName" placeholder="First Name"></input>
-    <input id="newSignInPopup_LastName" placeholder="Last Name"></input>
-    <input id="newSignInPopup_StudentId" placeholder="Student Id"></input>
-    <input id="newSignInPopup_UserName" placeholder="Username (This can be changed later)"></input>
-    <button id="signUp">Signup</button>
-</div>
+    <div id="newSignInPopup">
+        <h3>Register for The Tavern</h3>
+        <input id="newSignInPopup_FirstName" placeholder="First Name">
+        <input id="newSignInPopup_LastName" placeholder="Last Name">
+        <input id="newSignInPopup_StudentId" placeholder="Student Id">
+        <input id="newSignInPopup_UserName" placeholder="Username (This can be changed later)">
+        <button id="signUp">Signup</button>
+    </div>
+
     <div class="container">
         <header>
             <h1>The Tavern Login</h1>
@@ -70,55 +80,27 @@
 
         <main class="paper container">
             <div id="loginSignUp">
-                <p>The WCHS D&D club hub is just a click away! Sign in and get verified by an Officer to join the fun!
-                </p>
+                <p>The WCHS D&D club hub is just a click away! Sign in and get verified by an Officer to join the fun!</p>
                 <br>
                 <button id="login">Login/Sign Up</button>
             </div>
             <div id="getVerified" hidden>
-                <p>You are signed in but not verified, please tell an Officer to let you into the club!
-                </p>
+                <p>You are signed in but not verified, please tell an Officer to let you into the club!</p>
             </div>
         </main>
-
-        <footer>
-            <p>Made by Gabriel Christian (Codeknight999) for the WCHS D&D club.</p>
-        </footer>
     </div>
+
     <script type="module">
         import {FirebaseUtils} from "./firebaseUtils.js"
         
         const loginSignUpEl = document.getElementById("loginSignUp")
         const getVerifiedEl = document.getElementById("getVerified")
-        const newAccountMake = document.getElementById("newSignInPopup")
-
-
-        function goToMainSite(){
-            window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
-        }
-
-        async function handleLogin(data){
-            const userData = await FirebaseUtils.getDocument(`/users/${data.uid}}`)
-            if(data.isNew || userData === undefined){
-                newAccountMake.hidden = false;
-            }else{
-                const tokens = await data.getIdTokenResult(true);
-                const perms = tokens.claims 
-                if(perms.includes("allowed")){
-                    goToMainSite()
-                }else{
-                    newAccountMake.hidden = true;
-                    getVerifiedEl.hidden = false;
-                }
-            }
-        }
 
         async function checkLogin() {
             const data = await FirebaseUtils.isSignedIn()
-            await handleLogin(data)
+            handleLogin({user: data})
         }
         checkLogin()
-
 
         document.getElementById("login").addEventListener("click", async () => {
             const signIn = await FirebaseUtils.loginGoogle()
@@ -128,6 +110,33 @@
         function toggleVis() {
             loginSignUpEl.hidden = true;
             getVerifiedEl.hidden = false;
+        }
+
+        async function handleLogin(signIn) {
+            try {
+                if (signIn) {
+                    let userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
+                    console.log(userData)
+                    if (!userData) {
+                        userData = {
+                            name: signIn.user.displayName,
+                            allowed: false,
+                            role: "player",
+                        }
+                        await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, userData)
+                        toggleVis()
+                        return
+                    }
+                    if (!userData.allowed) {
+                        toggleVis()
+                        return
+                    } else {
+                        window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+                    }
+                }
+            } catch (e) {
+                console.error("login error: ", e)
+            }
         }
     </script>
 </body>

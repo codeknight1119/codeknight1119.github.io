@@ -100,14 +100,14 @@
         let userData = null
         async function handleLogin(data, auto = true){
              userData = await FirebaseUtils.getDocument(`/users/${data.uid}`)
-             console.log(userData)
             if(data.isNew || userData === undefined){
                 if(auto){
                     signUpEl.hidden = false;
                 }
             }else{
                 const tokens = await data.getIdTokenResult(true);
-                const perms = tokens.claims 
+                const perms = tokens.claims
+                console.log(perms) 
                 if(perms.includes("allowed")){
                     goToMainSite()
                 }else{

@@ -116,7 +116,7 @@
         const tokens = await data.getIdTokenResult(true);
 
         console.log("Claims:", tokens.claims)
-        console.log("Permissions:", perms)
+        console.log("Permissions:", tokens.claims)
 
         if(tokens.claims.allowed){
             goToMainSite()

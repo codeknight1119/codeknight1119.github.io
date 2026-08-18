@@ -118,13 +118,13 @@
 
         async function checkLogin() {
             const data = await FirebaseUtils.isSignedIn()
-            await handleLogin(data)
+            await handleLogin(data, false)
         }
         checkLogin()
 
         document.getElementById("login").addEventListener("click", async () => {
             const signIn = await FirebaseUtils.loginGoogle()
-            await handleLogin(signIn, false)
+            await handleLogin(signIn)
         })
 
         document.getElementById("signUp").addEventListener("click", async () => {

@@ -90,84 +90,73 @@
         </main>
     </div>
 
-<script type="module">
-    import { FirebaseUtils } from "./firebaseUtils.js";
+    <script type="module">
+        import {FirebaseUtils} from "./firebaseUtils.js"
 
-    const loginSignUpEl = document.getElementById("loginSignUp");
-    const getVerifiedEl = document.getElementById("getVerified");
-    const signUpEl = document.getElementById("newSignInPopup");
+        const loginSignUpEl = document.getElementById("loginSignUp")
+        const getVerifiedEl = document.getElementById("getVerified")
+        const signUpEl = document.getElementById("newSignInPopup")
 
-    let currentUser = null; // Store the Firebase Auth user object
-    let userData = null;    // Store the Firestore user profile
+        let userData = null
+        async function handleLogin(data, auto = true){
+    userData = await FirebaseUtils.getDocument(`/users/${data.uid}`)
 
-    async function handleLogin(authData, auto = true) {
-        // If the user isn't logged in at all, ensure UI is in default state
-        if (!authData) {
-            loginSignUpEl.hidden = false;
+    console.log("Login data:", data)
+    console.log("isNew:", data.isNew)
+    console.log("User data:", userData)
+
+    if(data.isNew || userData === undefined){
+        console.log("Showing signup popup")
+        if(auto){
+            signUpEl.hidden = false;
+        }
+    }else{
+        console.log("Existing user, checking permissions")
+
+        const tokens = await data.getIdTokenResult(true);
+
+        console.log("Claims:", tokens.claims)
+        console.log("Permissions:", perms)
+
+        if(tokens.claims.allowed){
+            goToMainSite()
+        }else{
             signUpEl.hidden = true;
-            getVerifiedEl.hidden = true;
-            return;
-        }
-
-        // Handle both UserCredential (authData.user) and direct User objects (authData)
-        currentUser = authData.user || authData;
-        
-        // Fetch profile using the correct UID
-        userData = await FirebaseUtils.getDocument(`/users/${currentUser.uid}`);
-
-        // Check if user is new or profile document doesn't exist
-        if (authData.isNew || !userData) {
-            if (auto) {
-                signUpEl.hidden = false;
-            }
-        } else {
-            const tokens = await currentUser.getIdTokenResult(true);
-            const perms = Object.keys(tokens.claims || {});
-
-            if (perms.includes("allowed")) {
-                goToMainSite();
-            } else {
-                signUpEl.hidden = true;
-                loginSignUpEl.hidden = true;
-                getVerifiedEl.hidden = false;
-            }
+            getVerifiedEl.hidden = false;
         }
     }
+}
 
-    async function checkLogin() {
-        const data = await FirebaseUtils.isSignedIn();
-        await handleLogin(data, false);
-    }
-    checkLogin();
+        async function checkLogin() {
+            const data = await FirebaseUtils.isSignedIn()
+            console.log(`isSignedIn`, data)
+            await handleLogin(data, false)
+        }
+        checkLogin()
 
-    document.getElementById("login").addEventListener("click", async () => {
-        const signIn = await FirebaseUtils.loginGoogle();
-        await handleLogin(signIn, true);
-    });
+        document.getElementById("login").addEventListener("click", async () => {
+            const signIn = await FirebaseUtils.loginGoogle()
+            await handleLogin(signIn)
+        })
 
-    document.getElementById("signUp").addEventListener("click", async () => {
-        if (!currentUser) return;
+        document.getElementById("signUp").addEventListener("click", async () => {
+            const firstName = document.getElementById("newSignInPopup_FirstName").value.trim()
+            const lastName = document.getElementById("newSignInPopup_LastName").value.trim()
+            const displayName = document.getElementById("newSignInPopup_UserName").value.trim()
+            const studentID = document.getElementById("newSignInPopup_StudentId").value.trim()
+            FirebaseUtils.setDocument(`/users/${userData.uid}`, {
+                realName : `${firstName} ${lastName}`,
+                realFirstName: firstName,
+                realLastName: lastName,
+                displayName: displayName,
+                studentID: studentID,
+                permissions: ["player"]
+            })
+            signUpEl.hidden = true;
+            getVerifiedEl.hidden = false;
+        })
 
-        const firstName = document.getElementById("newSignInPopup_FirstName").value.trim();
-        const lastName = document.getElementById("newSignInPopup_LastName").value.trim();
-        const displayName = document.getElementById("newSignInPopup_UserName").value.trim();
-        const studentID = document.getElementById("newSignInPopup_StudentId").value.trim();
-
-        // Use currentUser.uid instead of userData.uid
-        await FirebaseUtils.setDocument(`/users/${currentUser.uid}`, {
-            realName: `${firstName} ${lastName}`,
-            realFirstName: firstName,
-            realLastName: lastName,
-            displayName: displayName,
-            studentID: studentID,
-            permissions: ["player"]
-        });
-
-        signUpEl.hidden = true;
-        loginSignUpEl.hidden = true;
-        getVerifiedEl.hidden = false;
-    });
-</script>
+    </script>
 </body>
 
 </html>

@@ -122,7 +122,7 @@
         console.log("Claims:", tokens.claims)
         console.log("Permissions:", tokens.claims)
 
-        if(tokens.claims.allowed){
+        if(tokens.claims.allowed || tokens.claims.officer){
             goToMainSite()
         }else{
             signUpEl.hidden = true;

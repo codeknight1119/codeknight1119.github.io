@@ -106,7 +106,7 @@
                 }
             }else{
                 const tokens = await data.getIdTokenResult(true);
-                const perms = tokens.claims
+                const perms = Object.keys(tokens.claims)
                 console.log(perms) 
                 if(perms.includes("allowed")){
                     goToMainSite()

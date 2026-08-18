@@ -7,7 +7,7 @@
     <title>The Tavern - Login</title>
     <link rel="stylesheet" href="/The Tavern/main/style.css" />
     <style>
-        main {
+    main {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,9 +19,37 @@
             font-size: 3em;
             padding: 15px;
         }
-        main{
-            display: flex;
-            justify-content: center;
+        body{
+            margin: 50px;                   
+            height: 100vh;               
+            display: flex;               
+            justify-content: center;     
+            align-items: center;         
+            flex-direction: column;      
+            text-align: center;  
+            overflow:none;  
+        }
+
+        #newSignInPopup{
+            width: 50vw;
+            height: 30vh;
+            border: 1px solid var(--line-clr);
+            border-radius: 5px;
+            background: var(--base-clr);
+            display:flex;
+            flex-direction: column;
+            padding: 10px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;            
+
+            input{
+                margin: 5px;
+                border: 5px;
+                border-radius: 2px;
+            }
         }
     </style>
 </head>
@@ -101,34 +129,6 @@
             loginSignUpEl.hidden = true;
             getVerifiedEl.hidden = false;
         }
-/*
-        async function handleLogin(signIn) {
-            try {
-                if (signIn) {
-                    let userData = await FirebaseUtils.getDocument(`users/${signIn.user.uid}`)
-                    console.log(userData)
-                    if (!userData) {
-                        userData  = {
-                            name: signIn.user.displayName,
-                            allowed: false,
-                            role: "player",
-                        }
-                        await FirebaseUtils.setDocument(`users/${signIn.user.uid}`, userData)
-                        toggleVis()
-                        return
-                    }
-                    if (!userData.allowed) {
-                        toggleVis()
-                        return
-                    } else {
-                       
-                    }
-
-                }
-            } catch (e) {
-                console.error("login error: ", e)
-            }
-        }*/
     </script>
 </body>
 

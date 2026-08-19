@@ -102,6 +102,12 @@
         const signUpEl = document.getElementById("newSignInPopup")
 
         let userData = null
+
+
+ function goToMainSite(){
+            window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+        }
+
         async function handleLogin(data, auto = true){
     userData = await FirebaseUtils.getDocument(`/users/${data.uid}`)
 

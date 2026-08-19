@@ -94,81 +94,258 @@
         </main>
     </div>
 
-    <script type="module">
-        import {FirebaseUtils} from "./firebaseUtils.js"
+<script type="module">
+    import { FirebaseUtils } from "./firebaseUtils.js";
 
-        const loginSignUpEl = document.getElementById("loginSignUp")
-        const getVerifiedEl = document.getElementById("getVerified")
-        const signUpEl = document.getElementById("newSignInPopup")
+    const loginSignUpEl = document.getElementById("loginSignUp");
+    const getVerifiedEl = document.getElementById("getVerified");
+    const signUpEl = document.getElementById("newSignInPopup");
 
-        let userData = null
+    let authUser = null;
+    let tavernUser = null;
 
 
- function goToMainSite(){
-            window.location.href = "https://codeknight1119.github.io/The%20Tavern/main"
+    function goToMainSite() {
+        window.location.href =
+            "https://codeknight1119.github.io/The%20Tavern/main";
+    }
+
+
+    async function handleLogin(data, auto = true) {
+        if (!data) {
+            console.log("No user signed in.");
+            return;
         }
 
-        async function handleLogin(data, auto = true){
-    userData = await FirebaseUtils.getDocument(`/users/${data.uid}`)
+        // Both loginGoogle() and isSignedIn() should return:
+        // {
+        //     user: FirebaseUser,
+        //     isNew: boolean
+        // }
+        authUser = data.user;
 
-    console.log("Login data:", data)
-    console.log("isNew:", data.isNew)
-    console.log("User data:", userData)
+        console.log("Authentication data:", data);
+        console.log("Firebase user:", authUser);
+        console.log("Is new Firebase user:", data.isNew);
 
-    if(data.isNew || userData === undefined){
-        console.log("Showing signup popup")
-        if(auto){
-            signUpEl.hidden = false;
+        // Look for the user's Tavern profile in Firestore
+        tavernUser = await FirebaseUtils.getDocument(
+            `/users/${authUser.uid}`
+        );
+
+        console.log("Tavern user data:", tavernUser);
+
+
+        /*
+         * NEW USER
+         *
+         * There are two ways someone can end up here:
+         *
+         * 1. They just created a new Google/Firebase account.
+         * 2. They have a Firebase account, but don't have a
+         *    Tavern profile yet.
+         */
+        if (data.isNew || tavernUser === undefined) {
+            console.log("New Tavern user. Showing signup form.");
+
+            if (auto) {
+                signUpEl.hidden = false;
+            }
+
+            return;
         }
-    }else{
-        console.log("Existing user, checking permissions")
 
-        const tokens = await data.getIdTokenResult(true);
 
-        console.log("Claims:", tokens.claims)
-        console.log("Permissions:", tokens.claims)
+        /*
+         * EXISTING USER
+         *
+         * The user already has a Tavern profile, so now
+         * check their Firebase custom claims.
+         */
+        console.log("Existing Tavern user. Checking permissions...");
 
-        if(tokens.claims.allowed || tokens.claims.officer){
-            goToMainSite()
-        }else{
-            signUpEl.hidden = true;
-            getVerifiedEl.hidden = false;
-            loginSignUpEl.hidden = true;
+        try {
+            const tokenResult = await authUser.getIdTokenResult(true);
+
+            console.log("Firebase claims:", tokenResult.claims);
+
+            if (
+                tokenResult.claims.allowed ||
+                tokenResult.claims.officer
+            ) {
+                console.log("User is allowed into The Tavern.");
+                goToMainSite();
+            } else {
+                console.log("User is signed in but not verified.");
+
+                signUpEl.hidden = true;
+                loginSignUpEl.hidden = true;
+                getVerifiedEl.hidden = false;
+            }
+
+        } catch (error) {
+            console.error("Failed to check permissions:", error);
         }
     }
-}
 
-        async function checkLogin() {
-            const data = await FirebaseUtils.isSignedIn()
-            console.log(`isSignedIn`, data)
-            await handleLogin(data, false)
+
+    /*
+     * Check if the user is already signed in when the page loads.
+     */
+    async function checkLogin() {
+        try {
+            const data = await FirebaseUtils.isSignedIn();
+
+            console.log("isSignedIn:", data);
+
+            await handleLogin(data, false);
+
+        } catch (error) {
+            console.error("Failed to check login:", error);
         }
-        checkLogin()
+    }
 
-        document.getElementById("login").addEventListener("click", async () => {
-            const signIn = await FirebaseUtils.loginGoogle()
-            await handleLogin(signIn)
-        })
 
-        document.getElementById("signUp").addEventListener("click", async () => {
-            const firstName = document.getElementById("newSignInPopup_FirstName").value.trim()
-            const lastName = document.getElementById("newSignInPopup_LastName").value.trim()
-            const displayName = document.getElementById("newSignInPopup_UserName").value.trim()
-            const studentID = document.getElementById("newSignInPopup_StudentId").value.trim()
-            FirebaseUtils.setDocument(`/users/${userData.uid}`, {
-                realName : `${firstName} ${lastName}`,
+    /*
+     * LOGIN / SIGN UP
+     *
+     * This handles both existing Google users and completely
+     * new Google users.
+     */
+    document.getElementById("login").addEventListener("click", async () => {
+        try {
+            const signIn = await FirebaseUtils.loginGoogle();
+
+            if (!signIn) {
+                console.log("Google login failed.");
+                return;
+            }
+
+            await handleLogin(signIn);
+
+        } catch (error) {
+            console.error("Login failed:", error);
+        }
+    });
+
+
+    /*
+     * CREATE TAVERN PROFILE
+     */
+    document.getElementById("signUp").addEventListener("click", async () => {
+
+        if (!authUser) {
+            console.error("Cannot create profile: no authenticated user.");
+            alert("You are not signed in. Please sign in again.");
+            return;
+        }
+
+
+        const firstName =
+            document
+                .getElementById("newSignInPopup_FirstName")
+                .value
+                .trim();
+
+        const lastName =
+            document
+                .getElementById("newSignInPopup_LastName")
+                .value
+                .trim();
+
+        const studentID =
+            document
+                .getElementById("newSignInPopup_StudentId")
+                .value
+                .trim();
+
+        const displayName =
+            document
+                .getElementById("newSignInPopup_UserName")
+                .value
+                .trim();
+
+
+        /*
+         * Make sure everything was filled out.
+         */
+        if (
+            !firstName ||
+            !lastName ||
+            !studentID ||
+            !displayName
+        ) {
+            alert("Please fill out all fields.");
+            return;
+        }
+
+
+        /*
+         * Create the Tavern profile.
+         */
+        try {
+            console.log("Creating Tavern profile...");
+
+            await FirebaseUtils.setDocument(
+                `/users/${authUser.uid}`,
+                {
+                    realName: `${firstName} ${lastName}`,
+                    realFirstName: firstName,
+                    realLastName: lastName,
+
+                    displayName: displayName,
+
+                    studentID: studentID,
+
+                    // New users start as players.
+                    // They still need officer verification.
+                    permissions: ["player"]
+                }
+            );
+
+            console.log("Tavern profile successfully created.");
+
+            /*
+             * Update our local copy so the rest of the page
+             * knows the profile now exists.
+             */
+            tavernUser = {
+                realName: `${firstName} ${lastName}`,
                 realFirstName: firstName,
                 realLastName: lastName,
                 displayName: displayName,
                 studentID: studentID,
                 permissions: ["player"]
-            })
+            };
+
+
+            /*
+             * Hide registration and tell them they need
+             * an Officer to verify them.
+             */
             signUpEl.hidden = true;
             loginSignUpEl.hidden = true;
             getVerifiedEl.hidden = false;
-        })
 
-    </script>
+        } catch (error) {
+            console.error(
+                "Failed to create Tavern profile:",
+                error
+            );
+
+            alert(
+                "Something went wrong while creating your account. Please try again."
+            );
+        }
+    });
+
+
+    /*
+     * Start authentication check when the page loads.
+     */
+    checkLogin();
+
+</script>
 </body>
 
 </html>

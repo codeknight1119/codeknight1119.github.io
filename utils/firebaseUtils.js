@@ -171,27 +171,34 @@ async getDocuments(path, l, docParam, arrayFilter) {
         }
     }
 
-    isSignedIn() {
-        return new Promise((resolve, reject) => {
-            try {
-                const unsubscribe = this.auth.onAuthStateChanged(
-                    (user) => {
-                        unsubscribe();
-                        if (user) {
-                            const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
-                            resolve(user);
-                        } else {
-                            resolve(null);
-                        }
-                    },
-                    (error) => reject(error)
-                );
-            } catch (e) {
-                console.error('error + ' + JSON.stringify(e));
-                reject(e);
-            }
-        });
-    }
+isSignedIn() {
+    return new Promise((resolve, reject) => {
+        try {
+            const unsubscribe = this.auth.onAuthStateChanged(
+                (user) => {
+                    unsubscribe();
+
+                    if (user) {
+                        const isNew =
+                            user.metadata.creationTime ===
+                            user.metadata.lastSignInTime;
+
+                        resolve({
+                            user: user,
+                            isNew: isNew
+                        });
+                    } else {
+                        resolve(null);
+                    }
+                },
+                (error) => reject(error)
+            );
+        } catch (e) {
+            console.error("error + " + JSON.stringify(e));
+            reject(e);
+        }
+    });
+}
 
     logout() {
         try {

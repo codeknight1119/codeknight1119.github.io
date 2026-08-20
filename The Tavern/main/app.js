@@ -108,7 +108,7 @@ async function checkUser() {
         let uid = userCheck.user.uid
         user = await FirebaseUtils.getDocument(`users/${uid}`)
         user.uid = uid
-        firebaseUser = userCheck
+        firebaseUser = userCheck.user
         console.log("firebase user", firebaseUser)
         console.log("raw user", userCheck)
 

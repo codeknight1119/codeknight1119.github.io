@@ -99,7 +99,8 @@ dropdowns.forEach((val) => {
 //////////////////////////////////////////////////////////////////////
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
-    
+   
+
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
@@ -109,7 +110,7 @@ async function checkUser() {
         user.uid = uid
         firebaseUser = userCheck
 
-        const tokens = await userCheck.getIdTokenResult(true);
+        const tokens = await firebaseUser.user.getIdTokenResult(true);
         const noisePerms = tokens.claims
         const firebaseNoise = ["name", "picture", "iss", "aud", "auth_time", "user_id", "sub", "iat", "exp", "email", "email_verified", "firebase"]
 

@@ -108,9 +108,9 @@ async function checkUser() {
         let uid = userCheck.user.uid
         user = await FirebaseUtils.getDocument(`users/${uid}`)
         user.uid = uid
-        firebaseUser = userCheck
+        firebaseUser = userCheck.user
 
-        const tokens = await firebaseUser.user.getIdTokenResult(true);
+        const tokens = await firebaseUser.getIdTokenResult(true);
         const noisePerms = tokens.claims
         const firebaseNoise = ["name", "picture", "iss", "aud", "auth_time", "user_id", "sub", "iat", "exp", "email", "email_verified", "firebase"]
 

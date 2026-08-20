@@ -99,15 +99,14 @@ dropdowns.forEach((val) => {
 //////////////////////////////////////////////////////////////////////
 async function checkUser() {
     const userCheck = await FirebaseUtils.isSignedIn()
-    console.log(userCheck)
-    console.log(userCheck.user.uid)
-
+    
     if (!userCheck) {
         window.location.href = "https://codeknight1119.github.io/The%20Tavern"
     } else {
 
-        user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
-        user.uid = userCheck.user.uid
+        let uid = userCheck.user.uid
+        user = await FirebaseUtils.getDocument(`users/${uid}`)
+        user.uid = uid
         firebaseUser = userCheck
 
         const tokens = await userCheck.getIdTokenResult(true);

@@ -106,7 +106,7 @@ async function checkUser() {
     } else {
 
         user = await FirebaseUtils.getDocument(`users/${userCheck.uid}`)
-        user.uid = userCheck.uid
+        user.uid = userCheck.user.uid
         firebaseUser = userCheck
 
         const tokens = await userCheck.getIdTokenResult(true);

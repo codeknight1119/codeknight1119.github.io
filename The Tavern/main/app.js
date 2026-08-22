@@ -833,7 +833,7 @@ function stopResizing() {
 
 async function fetchServer(endpoint, postData) {
     const token = await firebaseUser.getIdToken();
-    const link = `https://unmixed-handed-cardboard.ngrok-free.dev/${endpoint}`;
+    const link = `https://the-tavern-backend.onrender.com/${endpoint}`;
 
     let body = {
         headers: {

@@ -17,10 +17,10 @@ Quagga.init({
     }
   },
 
-  locator: {
-    patchSize: "medium",
-    halfSample: false
-  },
+locator: {
+  patchSize: "medium",
+  halfSample: false
+},
 
   decoder: {
     readers: [

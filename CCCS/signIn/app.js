@@ -13,7 +13,6 @@ Quagga.init({
   },
 
   locator: {
-    patchSize: "large",
     halfSample: false
   },
 

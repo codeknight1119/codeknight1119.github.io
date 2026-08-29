@@ -1,8 +1,9 @@
 const scanner = document.querySelector("#scanner-container");
 
-// --------------------------------------------------
-// Debug display
-// --------------------------------------------------
+
+// ==================================================
+// DEBUG DISPLAY
+// ==================================================
 
 const debug = document.createElement("pre");
 
@@ -16,17 +17,17 @@ debug.style.whiteSpace = "pre-wrap";
 document.body.appendChild(debug);
 
 
-// --------------------------------------------------
-// Decode tracking
-// --------------------------------------------------
+// ==================================================
+// DECODE TRACKING
+// ==================================================
 
 let lastCode = null;
 let codeCount = 0;
 
 
-// --------------------------------------------------
-// Initialize Quagga
-// --------------------------------------------------
+// ==================================================
+// QUAGGA INITIALIZATION
+// ==================================================
 
 Quagga.init({
 
@@ -40,16 +41,35 @@ Quagga.init({
             width: { min: 1280 },
             height: { min: 720 },
             facingMode: "user"
+        },
+
+        // This makes Quagga consider the whole camera
+        // rather than restricting the input area.
+        area: {
+            top: "0%",
+            right: "0%",
+            left: "0%",
+            bottom: "0%"
         }
     },
 
+
+    // ==================================================
+    // LOCATOR
+    // ==================================================
+
     locator: {
 
-        patchSize: "large",
+        patchSize: "medium",
 
-        // Keep the full camera resolution
+        // Do NOT reduce the image
         halfSample: false
     },
+
+
+    // ==================================================
+    // DECODER
+    // ==================================================
 
     decoder: {
 
@@ -60,6 +80,11 @@ Quagga.init({
         multiple: false
     },
 
+
+    // ==================================================
+    // GENERAL
+    // ==================================================
+
     locate: true,
 
     frequency: 10
@@ -68,31 +93,39 @@ Quagga.init({
 
     if (err) {
 
-        console.error("Quagga initialization error:", err);
+        console.error(
+            "Quagga initialization error:",
+            err
+        );
 
         debug.textContent =
-            "ERROR INITIALIZING QUAGGA\n\n" +
+            "QUAGGA ERROR\n\n" +
             err;
 
         return;
     }
 
-    console.log("Quagga initialized successfully.");
+
+    console.log(
+        "Quagga initialized successfully."
+    );
 
     debug.textContent =
         "Quagga initialized.\n" +
         "Starting camera...";
 
+
     Quagga.start();
 
 
-    // --------------------------------------------------
-    // Check actual camera resolution
-    // --------------------------------------------------
+    // ==================================================
+    // CAMERA RESOLUTION
+    // ==================================================
 
     setTimeout(function () {
 
-        const video = scanner.querySelector("video");
+        const video =
+            scanner.querySelector("video");
 
         if (video) {
 
@@ -116,12 +149,9 @@ Quagga.init({
 });
 
 
-// --------------------------------------------------
-// Processed frame
-//
-// This fires even when Quagga DOES NOT decode
-// a barcode.
-// --------------------------------------------------
+// ==================================================
+// PROCESSED FRAME
+// ==================================================
 
 Quagga.onProcessed(function (result) {
 
@@ -130,18 +160,18 @@ Quagga.onProcessed(function (result) {
     }
 
 
-    // --------------------------------------------------
-    // Debug information
-    // --------------------------------------------------
-
-    let status = "Camera running\n";
+    let status =
+        "CAMERA RUNNING\n\n";
 
 
-    // --------------------------------------------------
-    // Possible barcode regions
-    // --------------------------------------------------
+    // ==================================================
+    // POSSIBLE REGIONS
+    // ==================================================
 
-    if (result.boxes && result.boxes.length > 0) {
+    if (
+        result.boxes &&
+        result.boxes.length > 0
+    ) {
 
         status +=
             "Possible regions: " +
@@ -160,121 +190,111 @@ Quagga.onProcessed(function (result) {
     }
 
 
-    // --------------------------------------------------
-    // Best region
-    // --------------------------------------------------
+    // ==================================================
+    // BEST REGION
+    // ==================================================
 
     if (result.box) {
-
-        status += "Best region detected!\n";
-
-        console.log(
-            "BEST BARCODE REGION:",
-            result.box
-        );
-
-    }
-
-
-    // --------------------------------------------------
-    // Decode information
-    // --------------------------------------------------
-
-    if (result.codeResult) {
 
         status +=
-            "Decoder returned something!\n";
+            "BEST REGION FOUND\n";
 
         console.log(
-            "CODE RESULT:",
-            result.codeResult
+            "BEST REGION:",
+            result.box
         );
-
     }
 
+
+    // ==================================================
+    // DRAW DEBUG BOXES
+    // ==================================================
+
+    const drawingCtx =
+        Quagga.canvas.ctx.overlay;
+
+    const drawingCanvas =
+        Quagga.canvas.dom.overlay;
+
+
+    if (
+        drawingCtx &&
+        drawingCanvas
+    ) {
+
+        drawingCtx.clearRect(
+            0,
+            0,
+            drawingCanvas.width,
+            drawingCanvas.height
+        );
+
+
+        // ----------------------------------------------
+        // Green = possible regions
+        // ----------------------------------------------
+
+        if (result.boxes) {
+
+            result.boxes
+                .filter(function (box) {
+
+                    return box !== result.box;
+
+                })
+                .forEach(function (box) {
+
+                    Quagga.ImageDebug.drawPath(
+                        box,
+                        {
+                            x: 0,
+                            y: 1
+                        },
+                        drawingCtx,
+                        {
+                            color: "green",
+                            lineWidth: 2
+                        }
+                    );
+
+                });
+        }
+
+
+        // ----------------------------------------------
+        // Red = best region
+        // ----------------------------------------------
+
+        if (result.box) {
+
+            Quagga.ImageDebug.drawPath(
+                result.box,
+                {
+                    x: 0,
+                    y: 1
+                },
+                drawingCtx,
+                {
+                    color: "red",
+                    lineWidth: 3
+                }
+            );
+        }
+    }
+
+
+    // ==================================================
+    // UPDATE DEBUG TEXT
+    // ==================================================
 
     debug.textContent = status;
-
-
-    // --------------------------------------------------
-    // Draw regions on the camera
-    // --------------------------------------------------
-
-    const drawingCtx = Quagga.canvas.ctx.overlay;
-    const drawingCanvas = Quagga.canvas.dom.overlay;
-
-    if (!drawingCtx || !drawingCanvas) {
-        return;
-    }
-
-
-    // Clear previous frame
-
-    drawingCtx.clearRect(
-        0,
-        0,
-        drawingCanvas.width,
-        drawingCanvas.height
-    );
-
-
-    // --------------------------------------------------
-    // Draw possible regions in GREEN
-    // --------------------------------------------------
-
-    if (result.boxes) {
-
-        result.boxes
-            .filter(function (box) {
-
-                return box !== result.box;
-
-            })
-            .forEach(function (box) {
-
-                Quagga.ImageDebug.drawPath(
-                    box,
-                    {
-                        x: 0,
-                        y: 1
-                    },
-                    drawingCtx,
-                    {
-                        color: "green",
-                        lineWidth: 2
-                    }
-                );
-
-            });
-    }
-
-
-    // --------------------------------------------------
-    // Draw best region in RED
-    // --------------------------------------------------
-
-    if (result.box) {
-
-        Quagga.ImageDebug.drawPath(
-            result.box,
-            {
-                x: 0,
-                y: 1
-            },
-            drawingCtx,
-            {
-                color: "red",
-                lineWidth: 3
-            }
-        );
-    }
 
 });
 
 
-// --------------------------------------------------
-// Barcode successfully decoded
-// --------------------------------------------------
+// ==================================================
+// DETECTION
+// ==================================================
 
 Quagga.onDetected(function (result) {
 
@@ -283,7 +303,7 @@ Quagga.onDetected(function (result) {
     );
 
     console.log(
-        "BARCODE DETECTED!"
+        "DETECTION EVENT"
     );
 
     console.log(
@@ -295,13 +315,14 @@ Quagga.onDetected(function (result) {
     );
 
 
-    const code = result.codeResult?.code;
+    const code =
+        result.codeResult?.code;
 
 
     if (!code) {
 
         console.log(
-            "Detection occurred, but no code was returned."
+            "Detection event had no code."
         );
 
         return;
@@ -309,14 +330,14 @@ Quagga.onDetected(function (result) {
 
 
     console.log(
-        "Decoded Code:",
+        "DECODED:",
         code
     );
 
 
-    // --------------------------------------------------
-    // Track repeated successful decodes
-    // --------------------------------------------------
+    // ==================================================
+    // TRACK REPEATED DECODES
+    // ==================================================
 
     if (code === lastCode) {
 
@@ -332,53 +353,38 @@ Quagga.onDetected(function (result) {
 
     console.log(
         "Same code seen:",
-        codeCount,
-        "time(s)"
+        codeCount
     );
 
 
-    // --------------------------------------------------
-    // Update debug display
-    // --------------------------------------------------
-
     debug.textContent +=
-        "\n\nDECODED:\n" +
+        "\n\n====================\n" +
+        "DECODED!\n" +
+        "CODE: " +
         code +
         "\n" +
-        "Seen " +
+        "COUNT: " +
         codeCount +
-        " time(s)";
+        "\n" +
+        "====================";
 
 
-    // --------------------------------------------------
-    // Confirm after two matching detections
-    // --------------------------------------------------
+    // ==================================================
+    // CONFIRM
+    // ==================================================
 
     if (codeCount >= 2) {
 
         console.log(
-            "================================"
-        );
-
-        console.log(
-            "CONFIRMED BARCODE:",
+            "CONFIRMED CAPID:",
             code
         );
-
-        console.log(
-            "================================"
-        );
-
 
         alert(
             "CAPID: " + code
         );
 
-
-        // Reset
-
         lastCode = null;
-
         codeCount = 0;
     }
 

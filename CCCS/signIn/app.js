@@ -18,10 +18,15 @@ Quagga.init({
   decoder: {
     readers: [
       "code_128_reader"
-    ]
+    ],
+
+    multiple: false
   },
 
-  locate: true
+  locate: true,
+
+  frequency: 20
+
 }, function (err) {
 
   if (err) {
@@ -33,117 +38,37 @@ Quagga.init({
   Quagga.start();
 });
 
+let lastCode = null;
+let codeCount = 0;
 
-/*
- * This fires for EVERY processed frame,
- * even when a barcode wasn't decoded.
- */
-Quagga.onProcessed(function (result) {
-
-  if (!result) {
-    return;
-  }
-
-  console.log("Frame processed");
-
-  if (result.boxes) {
-    console.log("Possible barcode regions:", result.boxes);
-  }
-
-  if (result.box) {
-    console.log("Best barcode region:", result.box);
-  }
-
-  if (result.codeResult) {
-    console.log("Code result:", result.codeResult);
-  }
-});
-
-
-/*
- * This ONLY fires when Quagga actually decodes something.
- */
 Quagga.onDetected(function (result) {
-
-  console.log("================================");
-  console.log("BARCODE DETECTED");
-  console.log(result);
-  console.log("================================");
 
   const code = result.codeResult?.code;
 
-  if (code) {
-    alert("Barcode detected: " + code);
-  }
-});
+  if (!code) return;
 
-const debug = document.querySelector("#debug");
+  console.log("Possible decode:", code);
 
-Quagga.onProcessed(function (result) {
-
-  if (!result) return;
-
-  let text = "Processing camera...\n";
-
-  if (result.boxes && result.boxes.length > 0) {
-    text += `Possible regions: ${result.boxes.length}\n`;
+  if (code === lastCode) {
+    codeCount++;
   } else {
-    text += "No barcode regions found\n";
+    lastCode = code;
+    codeCount = 1;
   }
 
-  if (result.codeResult) {
-    text += `Decoded: ${result.codeResult.code}\n`;
-  }
+  console.log(`Seen ${codeCount} time(s)`);
 
-  debug.textContent = text;
-});
+  // Accept after seeing the same code 2 times
+  if (codeCount >= 2) {
 
-Quagga.onProcessed(function (result) {
+    console.log("================================");
+    console.log("CONFIRMED BARCODE:", code);
+    console.log("================================");
 
-  const drawingCtx = Quagga.canvas.ctx.overlay;
-  const drawingCanvas = Quagga.canvas.dom.overlay;
+    alert("CAPID: " + code);
 
-  if (!drawingCtx || !drawingCanvas) {
-    return;
-  }
-
-  drawingCtx.clearRect(
-    0,
-    0,
-    drawingCanvas.width,
-    drawingCanvas.height
-  );
-
-  if (result) {
-
-    if (result.boxes) {
-      result.boxes
-        .filter(function (box) {
-          return box !== result.box;
-        })
-        .forEach(function (box) {
-          Quagga.ImageDebug.drawPath(
-            box,
-            { x: 0, y: 1 },
-            drawingCtx,
-            {
-              color: "green",
-              lineWidth: 2
-            }
-          );
-        });
-    }
-
-    if (result.box) {
-      Quagga.ImageDebug.drawPath(
-        result.box,
-        { x: 0, y: 1 },
-        drawingCtx,
-        {
-          color: "red",
-          lineWidth: 3
-        }
-      );
-    }
+    // Prevent repeatedly accepting the same barcode
+    codeCount = 0;
+    lastCode = null;
   }
 });

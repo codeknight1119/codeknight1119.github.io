@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>CCCS Attendence Scanner</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 18px;
+            text-align: center;
+            background: #1b1b1b;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        #scanner {
+            flex: 1;
+            min-height: 500px;
+        }
+
+        .result {
+            padding: 20px;
+            background: #1b1b1b;
+        }
+
+        .label {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        #result {
+            font-size: 24px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        #history {
+            margin-top: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .history-item {
+            padding: 7px;
+            border-bottom: 1px solid #333;
+        }
+        .hNzLQa{
+            background-color: #0E2B8D !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>CCCS Attendence Scanner</h1>
+</header>
+
+<div id="scanner"></div>
+
+<div class="result">
+    <div class="label">LAST SCAN</div>
+    <div id="result">Waiting...</div>
+    <button id="earlyNight">Send end of night email</button>
+    <button id="another">Scan another</button>
+
+</div>
+
+<!-- Scanbot Web SDK -->
+<script src="https://cdn.jsdelivr.net/npm/scanbot-web-sdk@latest/bundle/ScanbotSDK.ui2.min.js"></script>
+
+<script>
+(async function () {
+
+    const resultElement = document.getElementById("result");
+    const historyElement = document.getElementById("history");
+
+    try {
+        /*
+         * Initialize Scanbot.
+         *
+         * An empty license key gives you the evaluation
+         * period available by the SDK.
+         */
+        const sdk = await ScanbotSDK.initialize({
+            licenseKey: "",
+
+            enginePath:
+                "https://cdn.jsdelivr.net/npm/scanbot-web-sdk@latest/bundle/bin/barcode-scanner/"
+        });
+
+
+        console.log("Scanbot initialized");
+
+const licenseCheck = setInterval(async () => {
+    const licenseInfo = await sdk.getLicenseInfo();
+
+    if (!licenseInfo.isValid) {
+        clearInterval(licenseCheck);
+
+        alert("This page will reload.");
+        window.location.reload()
+    }
+}, 1000);
+        /*
+         * Configure the barcode scanner.
+         */
+        const config =
+            new ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
+
+        /*
+         * Start the scanner.
+         */
+        const result =
+            await ScanbotSDK.UI.createBarcodeScanner(config);
+
+        /*
+         * Scanner returns null if the user cancels.
+         */
+        if (!result || !result.items || result.items.length === 0) {
+            resultElement.textContent = "No barcode scanned";
+            return;
+        }
+
+        /*
+         * Process every detected barcode.
+         */
+        result.items.forEach(item => {
+
+            const barcode = item.barcode;
+
+            console.log("Barcode:", barcode);
+
+            const value = barcode.text || barcode.rawValue || "";
+
+            handleBarcode(value)
+
+            resultElement.textContent = value;
+        });
+
+    } catch (error) {
+
+        console.error("Scanner error:", error);
+
+        resultElement.textContent =
+            "Scanner error: " + error.message;
+    }
+
+})();
+async function handleBarcode(txt) {
+    try {
+        await fetch(
+            "https://script.google.com/macros/s/AKfycbzqSOcDtcyFlKX0r5XrLizYottvo5DIFFAK6HQFdfcH7_QRnii0HvSn5NtJ-6D5N8nOaQ/exec",
+            {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify({
+                    data: txt,
+                    testEnd: false
+                })
+            }
+        );
+
+        console.log("Barcode submitted:", txt);
+
+    } catch (error) {
+        console.error("Submit error:", error);
+    }
+}
+
+document.getElementById("earlyNight").addEventListener("click", async()=>{
+    try {
+        await fetch(
+            "https://script.google.com/macros/s/AKfycbwlBOjyfEpwEE6nwWWATL4kX0qk5ygapKDhI0MNSQLx1FAYQsvbVSpOn5SvZFZiifjL2A/exec",
+            {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify({
+                    testEnd: true
+                })
+            }
+        );
+
+        console.log("email sent");
+        alert("Email Sent!")
+
+    } catch (error) {
+        console.error("Submit error:", error);
+    }
+})
+
+
+
+document.getElementById("another").addEventListener("click", ()=>{
+window.location.reload()
+})
+</script>
+
+</body>
+</html>
